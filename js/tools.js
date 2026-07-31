@@ -22,12 +22,19 @@
 
     /* Composite canvas'tan belirtilen daire içini analiz et */
     analyze: function(cx, cy, radius) {
-      /* geçici canvas'a mevcut render'ı al */
+      /* geçici canvas'a mevcut render'ı al - referans görseli HARIÇ (tainted canvas) */
       var W=Cv.W, H=Cv.H;
       var tmp=document.createElement('canvas');
       tmp.width=W; tmp.height=H;
-      var tx=tmp.getContext('2d');
-      Cv.renderMap(tx,{includeReference:true,forExport:false});
+      var tx=tmp.getContext('2d',{willReadFrequently:true});
+      try {
+        Cv.renderMap(tx,{includeReference:false,forExport:false});
+      } catch(e) {
+        /* fallback: sadece raster katmanlar */
+        Layers.list.forEach(function(l){
+          if(l.type==='raster'&&l.visible&&l.canvas)tx.drawImage(l.canvas,0,0);
+        });
+      }
 
       var r=Math.max(4,Math.round(radius));
       var x0=Math.max(0,Math.round(cx-r)), y0=Math.max(0,Math.round(cy-r));
@@ -35,7 +42,9 @@
       var w=x1-x0, h=y1-y0;
       if(w<2||h<2)return null;
 
-      var id=tx.getImageData(x0,y0,w,h), d=id.data;
+      var id, d;
+      try { id=tx.getImageData(x0,y0,w,h); d=id.data; }
+      catch(e) { console.warn('getImageData failed:',e); return null; }
 
       /* --- ortalama renk (daire maskesi) --- */
       var rSum=0,gSum=0,bSum=0,cnt=0;
@@ -205,24 +214,17 @@
       if(e.button!==0)return;
       Cv.view.setPointerCapture(e.pointerId);
 
-      /* --- eyedropper: daire seçimi başlat --- */
+      /* --- eyedropper --- */
       if(App.tool==='eyedrop'){
-        if(Eyedropper.active){
-          /* örnekle ve fırça moduna geç */
-          var r=App.eyedrop.radius;
-          var s=Eyedropper.analyze(p.x,p.y,r);
-          if(s){
-            Eyedropper.sample=s;
-            App.eyedrop.hasSample=true;
-            App.eyedrop.painting=true;
-            UI.msg('✓ Doku örneklendi — şimdi haritaya boyayabilirsin');
-            this.startEyedropPaint(p);
-          }
+        if(App.eyedrop.painting&&Eyedropper.sample){
+          /* paint modu: boyamaya başla */
+          this.startEyedropPaint(p);
         } else {
-          /* pick modu: daire çizerek alan seç */
+          /* pick modu: daire başlat */
           Eyedropper.picking=true;
-          Eyedropper.pickPos={x:p.x,y:p.y};
-          this.eyeStartPos=p;
+          Eyedropper.picking=true;
+          this.eyeStartPos={x:p.x,y:p.y};
+          App.eyedrop.radius=10;
         }
         return;
       }
@@ -253,8 +255,10 @@
 
       /* eyedropper pick: yarıçapı güncelle */
       if(App.tool==='eyedrop'&&Eyedropper.picking&&this.eyeStartPos){
-        var d=Math.hypot(p.x-this.eyeStartPos.x,p.y-this.eyeStartPos.y);
-        App.eyedrop.radius=Math.max(8,d);
+        var ed=Math.hypot(p.x-this.eyeStartPos.x,p.y-this.eyeStartPos.y);
+        App.eyedrop.radius=Math.max(8,ed);
+        var el=$('eye-r');if(el)el.value=Math.min(400,Math.round(ed));
+        var vl=$('v-eye-r');if(vl)vl.textContent=Math.min(400,Math.round(ed));
         Cv.requestRender(); return;
       }
 
@@ -286,14 +290,17 @@
       if(App.tool==='eyedrop'&&Eyedropper.picking){
         Eyedropper.picking=false;
         var ep=this.eyeStartPos;
-        if(ep){
-          /* pick bölgesini analiz et */
+        if(ep&&App.eyedrop.radius>8){
           var s=Eyedropper.analyze(ep.x,ep.y,App.eyedrop.radius);
           if(s){
-            Eyedropper.sample=s;App.eyedrop.hasSample=true;App.eyedrop.painting=false;
+            Eyedropper.sample=s;
+            App.eyedrop.hasSample=true;
+            App.eyedrop.painting=false;
             Eyedropper.active=true;
-            UI.msg('✓ Doku kaydedildi — "Boyama modu"na geç veya aynı araçla boyamaya başla');
-            UI.refreshEyedropPanel();
+            UI.msg('✓ Doku örneklendi (r='+Math.round(App.eyedrop.radius)+'). "② Boyamaya başla" butonuna bas.');
+            if(global.UI)UI.refreshEyedropPanel();
+          } else {
+            UI.msg('Örnekleme başarısız — kara veya arazi katmanı üzerinde dene.');
           }
         }
         this.eyeStartPos=null;

@@ -10,7 +10,12 @@
     tr: {
       new: 'Yeni', open: 'Aç', save: 'Kaydet', parchment: 'Parşömen', grid: 'Izgara',
       t_select: 'Seç', t_landmass: 'Kara', t_erase: 'Deniz', t_terrain: 'Arazi', t_symbol: 'Sembol',
-      t_river: 'Nehir', t_road: 'Yol', t_label: 'Etiket', t_pan: 'Kaydır',
+      t_river: 'Nehir', t_road: 'Yol', t_label: 'Etiket', t_pan: 'Kaydır', t_eyedrop: 'Örnekle',
+      o_eyedrop: 'Doku Örnekleyici', o_eye_nosample: 'Henüz örnekleme yapılmadı',
+      o_eye_radius: 'Örnekleme yarıçapı', o_eye_brush: 'Fırça boyutu',
+      o_eye_pick: '① Alan seç', o_eye_paint: '② Boyamaya başla', o_eye_clear: 'Örneği temizle',
+      h_eyedrop: '① Alan seç: sürükleyerek daire çiz. ② Boyamaya başla: dokuyu haritaya uygula.',
+      sym_upload: '+ PNG Sembol yükle', sym_upload_done: 'sembol yüklendi', sym_del: 'Sil',
       o_landmass: 'Kara / Kıyı', o_brushsize: 'Fırça boyutu', o_rough: 'Kıyı sertliği',
       o_landcolor: 'Kara rengi', o_smooth: 'Kıyıyı yumuşat', o_clearland: 'Karayı temizle',
       h_landmass: 'Sürükleyerek kara çiz. "Deniz" aracı karayı siler.',
@@ -45,7 +50,12 @@
     en: {
       new: 'New', open: 'Open', save: 'Save', parchment: 'Parchment', grid: 'Grid',
       t_select: 'Select', t_landmass: 'Land', t_erase: 'Sea', t_terrain: 'Terrain', t_symbol: 'Symbol',
-      t_river: 'River', t_road: 'Road', t_label: 'Label', t_pan: 'Pan',
+      t_river: 'River', t_road: 'Road', t_label: 'Label', t_pan: 'Pan', t_eyedrop: 'Sample',
+      o_eyedrop: 'Texture Sampler', o_eye_nosample: 'No sample yet',
+      o_eye_radius: 'Sample radius', o_eye_brush: 'Brush size',
+      o_eye_pick: '① Pick area', o_eye_paint: '② Start painting', o_eye_clear: 'Clear sample',
+      h_eyedrop: '① Pick area: drag to draw circle. ② Paint: apply sampled texture to map.',
+      sym_upload: '+ Upload PNG Symbol', sym_upload_done: 'symbol(s) loaded', sym_del: 'Delete',
       o_landmass: 'Landmass / Coast', o_brushsize: 'Brush size', o_rough: 'Coast roughness',
       o_landcolor: 'Land colour', o_smooth: 'Smooth coastline', o_clearland: 'Clear landmass',
       h_landmass: 'Drag to paint land. The "Sea" tool erases it.',
@@ -324,17 +334,26 @@
       });
       on('eye-layer','change',function(e){App.eyedrop.targetLayer=e.target.value;});
       on('btn-eye-pick','click',function(){
-        Eyedropper.active=false;Eyedropper.sample=null;Eyedropper.picking=false;
-        App.eyedrop.hasSample=false;App.eyedrop.painting=false;
+        /* sıfırla ve pick moduna gir */
+        Eyedropper.active=false;
+        Eyedropper.sample=null;
+        Eyedropper.picking=false;
+        App.eyedrop.hasSample=false;
+        App.eyedrop.painting=false;
         self.setTool('eyedrop');
-        UI.msg('Daire çizerek örneklemek istediğin alanı seç...');
         self.refreshEyedropPanel();
+        UI.msg('Haritada bir alana tıklayıp sürükle → daire büyüklüğünü seç → bırak.');
       });
       on('btn-eye-paint','click',function(){
-        if(!Eyedropper.sample){UI.msg('Önce alan seç (①)');return;}
+        if(!Eyedropper.sample){
+          UI.msg('Önce ① Alan seç ile bir doku örnekle.');
+          return;
+        }
         App.eyedrop.painting=true;
+        App.eyedrop.hasSample=true;
         self.setTool('eyedrop');
-        UI.msg('Haritaya tıklayıp sürükleyerek dokuyu uygula.');
+        self.refreshEyedropPanel();
+        UI.msg('Haritaya tıklayıp sürükle → örneklenen doku uygulanır.');
       });
       on('btn-eye-clear','click',function(){
         Eyedropper.sample=null;Eyedropper.active=false;
