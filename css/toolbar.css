@@ -1,0 +1,33 @@
+/* ============================================================
+   Cartographer — toolbar.css
+   ============================================================ */
+#topbar{
+  position:absolute;top:0;left:0;right:0;height:var(--topbar-h);
+  background:linear-gradient(180deg,var(--ink-700),var(--ink-800));
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px;padding:0 12px;z-index:20;
+}
+
+.brand{display:flex;align-items:center;gap:7px;padding-right:12px;margin-right:4px;
+  border-right:1px solid var(--line)}
+.brand-mark{color:var(--brass);font-size:15px;line-height:1}
+.brand-name{font-family:var(--f-display);font-size:14px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--parch)}
+
+.tb-group{display:flex;gap:4px}
+.tb-sep{width:1px;height:22px;background:var(--line)}
+.tb-spacer{flex:1}
+
+.tb-btn{
+  background:var(--ink-600);border:1px solid var(--line);color:var(--text);
+  height:28px;padding:0 10px;border-radius:var(--radius);cursor:pointer;
+  display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:.12s
+}
+.tb-btn:hover{background:var(--ink-500);border-color:var(--brass-dim);color:var(--parch)}
+.tb-btn:active{transform:translateY(1px)}
+.tb-btn:disabled{opacity:.35;cursor:default;transform:none}
+.tb-btn.lang{font-family:var(--f-mono);font-size:11px;letter-spacing:.05em}
+
+.tb-select{width:auto;height:28px;margin:0;padding:0 6px}
+
+#topbar .chk{margin:0}

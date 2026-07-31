@@ -1,0 +1,10 @@
+{
+  "name": "cartographer",
+  "version": "1.0.0",
+  "description": "Vanilla JS fantasy map editor",
+  "private": true,
+  "scripts": {
+    "start": "npx --yes http-server . -p 8000 -c-1 -o",
+    "serve": "python3 serve.py 8000"
+  }
+}

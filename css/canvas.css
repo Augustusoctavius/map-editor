@@ -1,0 +1,23 @@
+/* ============================================================
+   Cartographer — canvas.css
+   ============================================================ */
+#canvas-area{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 50% 0%,#1a201d 0%,#0c0f0d 100%);
+}
+#canvas-area::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  box-shadow:inset 0 0 90px #000a;
+}
+#view{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}
+#view.pan{cursor:grab}
+#view.panning{cursor:grabbing}
+#view.pick{cursor:default}
+
+#minimap-wrap{
+  position:absolute;right:12px;bottom:12px;
+  border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--ink-800);padding:4px;box-shadow:0 6px 22px #000a;z-index:5;
+}
+#minimap{display:block;border-radius:3px;cursor:pointer;background:#0d1110}
