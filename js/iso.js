@@ -575,15 +575,66 @@
     onion:function (s, F) { emitDome(s, F, true); }
   };
 
+  /* Merkez, tipe göre farklı: kutu ailesi köşe-tabanlı,
+     dairesel aile merkez-tabanlı.                            */
+  var CORNER_BASED = { box:1, stake:1, gable:1, hip:1, pagoda:1 };
+
+  function centerOf(s) {
+    if (CORNER_BASED[s.t]) {
+      return [ s.x + (s.w || 0) / 2, s.y + (s.d || 0) / 2 ];
+    }
+    return [ s.x, s.y ];
+  }
+
+  /* Zemin yastığı her zaman en altta; sıralamaya girmez. */
+  function isGround(s) { return s.t === 'pad'; }
+
   Scene.prototype.build = function (partFn) {
-    var solids = this.solids.slice().sort(function (a, b) {
-      var ka = (a.x + (a.w || a.r || 0) / 2) + (a.y + (a.d || a.r || 0) / 2) + a.z * 0.9;
-      var kb = (b.x + (b.w || b.r || 0) / 2) + (b.y + (b.d || b.r || 0) / 2) + b.z * 0.9;
-      return ka - kb;
+    var ground = [], rest = [], i;
+    for (i = 0; i < this.solids.length; i++) {
+      (isGround(this.solids[i]) ? ground : rest).push(this.solids[i]);
+    }
+
+    rest.sort(function (a, b) {
+      var ca = centerOf(a), cb = centerOf(b);
+      var ka = ca[0] + ca[1] + a.z * 0.92;
+      var kb = cb[0] + cb[1] + b.z * 0.92;
+      if (ka !== kb) return ka - kb;
+      return (a.z + (a.h || 0)) - (b.z + (b.h || 0));
     });
 
+    /* --- zemin yastığını yapının ayak izine oturt --- */
+    if (ground.length && rest.length) {
+      var nx = Infinity, xx = -Infinity, ny = Infinity, xy = -Infinity;
+      for (i = 0; i < rest.length; i++) {
+        var s2 = rest[i];
+        var ax, bx, ay, by;
+        if (CORNER_BASED[s2.t]) {
+          ax = s2.x; bx = s2.x + (s2.w || 0);
+          ay = s2.y; by = s2.y + (s2.d || 0);
+        } else {
+          var rr = s2.r || (s2.h || 4) * 0.22;
+          ax = s2.x - rr; bx = s2.x + rr;
+          ay = s2.y - rr; by = s2.y + rr;
+        }
+        if (ax < nx) nx = ax;
+        if (bx > xx) xx = bx;
+        if (ay < ny) ny = ay;
+        if (by > xy) xy = by;
+      }
+      if (isFinite(nx)) {
+        var pcx = (nx + xx) / 2, pcy = (ny + xy) / 2;
+        var prr = Math.max(xx - nx, xy - ny) / 2 * 1.14 + 2;
+        for (i = 0; i < ground.length; i++) {
+          ground[i].x = pcx; ground[i].y = pcy; ground[i].r = prr;
+        }
+      }
+    }
+
+    var solids = ground.concat(rest);
+
     var F = [];
-    for (var i = 0; i < solids.length; i++) {
+    for (i = 0; i < solids.length; i++) {
       var fn = EMIT[solids[i].t];
       if (fn) fn(solids[i], F);
     }
