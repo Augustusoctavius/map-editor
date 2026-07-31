@@ -1,8 +1,9 @@
 /* ============================================================
-   Cartographer — history.js
-   50 adımlık geri al / ileri al.
-   Raster işlemler bbox yaması (PNG dataURL) olarak saklanır,
-   vektör işlemler JSON anlık görüntüsü olarak.
+   Cartographer — history.js  v3
+   50 adım geri/ileri. Raster yamaları bbox PNG olarak,
+   vektör ve ölçek çubuğu JSON anlık görüntüsü olarak saklanır.
+   rasterMulti: tek adımda birden çok katman (ör. silgi:
+   kara + arazi aynı anda) — undo atomik kalır.
    ============================================================ */
 (function (global) {
   'use strict';
@@ -28,20 +29,17 @@
     return c.toDataURL('image/png');
   }
 
+  function clampBox(box, canvas) {
+    var x = Math.max(0, Math.floor(box.x)), y = Math.max(0, Math.floor(box.y));
+    var w = Math.min(canvas.width - x, Math.ceil(box.w));
+    var h = Math.min(canvas.height - y, Math.ceil(box.h));
+    return { x:x, y:y, w:w, h:h };
+  }
+
   var History = {
-    stack: [],
-    index: -1,
-    limit: 50,
-    busy: false,
-    onChange: null,
+    stack: [], index: -1, limit: 50, busy: false, onChange: null,
 
-    clear: function () {
-      this.stack = [];
-      this.index = -1;
-      imgCache = {};
-      this._changed();
-    },
-
+    clear: function () { this.stack = []; this.index = -1; imgCache = {}; this._changed(); },
     _changed: function () { if (this.onChange) this.onChange(); },
 
     push: function (entry) {
@@ -53,73 +51,111 @@
       this._changed();
     },
 
-    /* ---- raster yaması ---- */
+    /* ---- tek katman raster yaması ---- */
     pushRaster: function (layerId, beforeCanvas, afterCanvas, box, label) {
-      var x = Math.max(0, Math.floor(box.x)), y = Math.max(0, Math.floor(box.y));
-      var w = Math.min(afterCanvas.width - x, Math.ceil(box.w));
-      var h = Math.min(afterCanvas.height - y, Math.ceil(box.h));
-      if (w <= 0 || h <= 0) return;
+      var b = clampBox(box, afterCanvas);
+      if (b.w <= 0 || b.h <= 0) return;
       this.push({
-        kind: 'raster', layerId: layerId, label: label || 'raster',
-        x: x, y: y, w: w, h: h,
-        before: cropDataURL(beforeCanvas, x, y, w, h),
-        after: cropDataURL(afterCanvas, x, y, w, h)
+        kind:'raster', layerId:layerId, label:label || 'raster',
+        x:b.x, y:b.y, w:b.w, h:b.h,
+        before: cropDataURL(beforeCanvas, b.x, b.y, b.w, b.h),
+        after:  cropDataURL(afterCanvas,  b.x, b.y, b.w, b.h)
       });
     },
 
-    /* ---- vektör anlık görüntüsü ---- */
+    /* ---- çok katmanlı raster yaması ----
+       patches: [{layerId, beforeCanvas, afterCanvas}]  ortak box  */
+    pushRasterMulti: function (patches, box, label) {
+      var items = [];
+      for (var i = 0; i < patches.length; i++) {
+        var p = patches[i];
+        var b = clampBox(box, p.afterCanvas);
+        if (b.w <= 0 || b.h <= 0) continue;
+        items.push({
+          layerId: p.layerId, x:b.x, y:b.y, w:b.w, h:b.h,
+          before: cropDataURL(p.beforeCanvas, b.x, b.y, b.w, b.h),
+          after:  cropDataURL(p.afterCanvas,  b.x, b.y, b.w, b.h)
+        });
+      }
+      if (!items.length) return;
+      this.push({ kind:'rasterMulti', items:items, label:label || 'raster' });
+    },
+
     pushVector: function (layerId, beforeArr, afterArr, label) {
       this.push({
-        kind: 'vector', layerId: layerId, label: label || 'vector',
+        kind:'vector', layerId:layerId, label:label || 'vector',
         before: JSON.stringify(beforeArr), after: JSON.stringify(afterArr)
       });
     },
 
-    /* ---- katman meta ---- */
     pushMeta: function (beforeMeta, afterMeta, label) {
       this.push({
-        kind: 'meta', label: label || 'meta',
+        kind:'meta', label:label || 'meta',
         before: JSON.stringify(beforeMeta), after: JSON.stringify(afterMeta)
+      });
+    },
+
+    pushScale: function (beforeObj, afterObj, label) {
+      this.push({
+        kind:'scale', label:label || 'scale',
+        before: JSON.stringify(beforeObj), after: JSON.stringify(afterObj)
+      });
+    },
+
+    _applyPatch: function (layerId, dataURL, x, y, w, h) {
+      var layer = Layers.get(layerId);
+      if (!layer || !layer.canvas) return Promise.resolve();
+      return loadImage(dataURL).then(function (im) {
+        var cx = layer.ctx;
+        cx.save();
+        cx.setTransform(1, 0, 0, 1, 0, 0);
+        cx.globalCompositeOperation = 'source-over';
+        cx.globalAlpha = 1;
+        cx.clearRect(x, y, w, h);
+        cx.drawImage(im, x, y);
+        cx.restore();
+        if (layerId === 'landmass' && global.Cv) Cv.shoreDirty = true;
       });
     },
 
     _apply: function (entry, dir) {
       var self = this;
-      var data = dir === 'undo' ? entry.before : entry.after;
+      var pick = dir === 'undo' ? 'before' : 'after';
 
       if (entry.kind === 'raster') {
-        var layer = Layers.get(entry.layerId);
-        if (!layer || !layer.canvas) return Promise.resolve();
-        return loadImage(data).then(function (im) {
-          var cx = layer.ctx;
-          cx.save();
-          cx.setTransform(1, 0, 0, 1, 0, 0);
-          cx.globalCompositeOperation = 'source-over';
-          cx.globalAlpha = 1;
-          cx.clearRect(entry.x, entry.y, entry.w, entry.h);
-          cx.drawImage(im, entry.x, entry.y);
-          cx.restore();
-        });
+        return this._applyPatch(entry.layerId, entry[pick], entry.x, entry.y, entry.w, entry.h);
+      }
+
+      if (entry.kind === 'rasterMulti') {
+        return Promise.all(entry.items.map(function (it) {
+          return self._applyPatch(it.layerId, it[pick], it.x, it.y, it.w, it.h);
+        }));
       }
 
       if (entry.kind === 'vector') {
         var l = Layers.get(entry.layerId);
-        if (l) l.objects = JSON.parse(data);
+        if (l) l.objects = JSON.parse(entry[pick]);
         if (global.App) App.selection = null;
         return Promise.resolve();
       }
 
       if (entry.kind === 'meta') {
-        Layers.applyMeta(JSON.parse(data));
+        Layers.applyMeta(JSON.parse(entry[pick]));
+        if (global.Cv) Cv.shoreDirty = true;
         return Promise.resolve();
       }
+
+      if (entry.kind === 'scale') {
+        if (global.App) App.scale = JSON.parse(entry[pick]);
+        return Promise.resolve();
+      }
+
       return Promise.resolve();
     },
 
     undo: function () {
       if (this.index < 0 || this.busy) return Promise.resolve(false);
-      var e = this.stack[this.index];
-      var self = this;
+      var e = this.stack[this.index], self = this;
       this.busy = true;
       return this._apply(e, 'undo').then(function () {
         self.index--;
@@ -133,8 +169,7 @@
 
     redo: function () {
       if (this.index >= this.stack.length - 1 || this.busy) return Promise.resolve(false);
-      var e = this.stack[this.index + 1];
-      var self = this;
+      var e = this.stack[this.index + 1], self = this;
       this.busy = true;
       return this._apply(e, 'redo').then(function () {
         self.index++;
@@ -146,7 +181,6 @@
       });
     },
 
-    /* geçmiş panelinden belirli bir adıma atla */
     goto: function (target) {
       var self = this;
       function step() {

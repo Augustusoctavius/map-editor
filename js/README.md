@@ -1,7 +1,9 @@
-# Cartographer — Fantasy Map Editor
+# Medieval Map Editor
 
 Vanilla JS / Canvas 2D. Framework yok, CDN yok, dış varlık yok.
-59 sembol, 9 arazi tipi, 8 katman, 50 adımlık undo, PNG/SVG/JSON çıktı.
+**139 sembol** (35'i izometrik 3B), **12 arazi tipi**, 10 etiket şablonu,
+8 katman, kıyı efekti, doku örnekleyici, custom PNG sembol yükleme,
+interaktif ölçek çubuğu, 50 adımlık undo, PNG/SVG/JSON çıktı.
 
 ## 1. Klasör yapısı
 
@@ -15,10 +17,10 @@ map-editor/
 │   ├── toolbar.css          # üst toolbar
 │   └── canvas.css           # tuval alanı + minimap
 ├── js/
-│   ├── symbols.js           # 59 SVG sembol + çizici + SVG export
+│   ├── symbols.js           # 139 sembol (izometrik üreteç dahil) + custom PNG
 │   ├── history.js           # undo/redo (raster yama + vektör snapshot)
-│   ├── layers.js            # katmanlar + arazi doku pattern'leri
-│   ├── canvas.js            # render, zoom/pan, minimap, nehir/yol/etiket çizimi
+│   ├── layers.js            # katmanlar + prosedürel arazi serpme
+│   ├── canvas.js            # render, kıyı efekti, etiket kapıtları, ölçek çubuğu
 │   ├── tools.js             # tüm araç mantığı + girdi yönetimi
 │   ├── export.js            # PNG / SVG / .json kaydet-yükle
 │   ├── ui.js                # panel, i18n (TR/EN), klavye
@@ -78,7 +80,8 @@ Chrome / Edge / Firefox güncel sürüm. Konsolda `[Cartographer] hazır — 59 
 | `E` | Deniz (silgi) | `T` | Arazi |
 | `S` | Sembol | `R` | Nehir |
 | `D` | Yol | `L` | Etiket |
-| `Space`+sürükle / orta tık | Kaydır | Tekerlek | Zoom (%10–%400) |
+| `I` | Doku örnekleyici | Tekerlek | Zoom (%10–%400) |
+| Sağ tık + sürükle / orta tık / `Space` | Kaydır | Yön tuşları | Kaydır (`Shift` = hızlı) |
 | `Enter` | Yolu bitir | `Esc` | Yolu iptal / seçimi bırak |
 | `Delete` | Son noktayı sil, yoksa seçimi sil | `Ctrl+Z` / `Ctrl+Y` | Geri / İleri |
 | `0` | Ekrana sığdır | `+` / `-` | Zoom |

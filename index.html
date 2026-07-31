@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cartographer — Fantasy Map Editor</title>
+<title>Medieval Map Editor</title>
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/toolbar.css">
 <link rel="stylesheet" href="css/canvas.css">
@@ -11,12 +11,15 @@
 <body>
 
 <header id="topbar">
-  <div class="brand"><span class="brand-mark">✦</span><span class="brand-name">Cartographer</span></div>
+  <div class="brand">
+    <span class="brand-mark">⚔</span>
+    <span class="brand-name">Medieval Map Editor</span>
+  </div>
 
   <div class="tb-group">
-    <button class="tb-btn" id="btn-new" data-i18n-title="new">✧ <span data-i18n="new">Yeni</span></button>
-    <button class="tb-btn" id="btn-open" data-i18n-title="open">▤ <span data-i18n="open">Aç</span></button>
-    <button class="tb-btn" id="btn-save" data-i18n-title="save">⌸ <span data-i18n="save">Kaydet</span></button>
+    <button class="tb-btn" id="btn-new">✧ <span data-i18n="new">Yeni</span></button>
+    <button class="tb-btn" id="btn-open">▤ <span data-i18n="open">Aç</span></button>
+    <button class="tb-btn" id="btn-save">⌸ <span data-i18n="save">Kaydet</span></button>
   </div>
 
   <div class="tb-sep"></div>
@@ -36,6 +39,7 @@
   <div class="tb-spacer"></div>
 
   <div class="tb-group">
+    <label class="chk"><input type="checkbox" id="chk-shore" checked><span data-i18n="shore">Kıyı</span></label>
     <label class="chk"><input type="checkbox" id="chk-parchment"><span data-i18n="parchment">Parşömen</span></label>
     <label class="chk"><input type="checkbox" id="chk-grid"><span data-i18n="grid">Izgara</span></label>
   </div>
@@ -53,7 +57,7 @@
 
 <main id="workspace">
 
-  <!-- ============ LEFT PANEL ============ -->
+  <!-- ============ SOL PANEL ============ -->
   <aside id="left-panel">
     <div class="tool-rail" id="tool-rail">
       <button class="tool" data-tool="select"   title="V"><span class="ico">➤</span><em data-i18n="t_select">Seç</em></button>
@@ -69,7 +73,8 @@
     </div>
 
     <div class="opt-scroll">
-      <!-- LANDMASS -->
+
+      <!-- LANDMASS / ERASE -->
       <section class="opt-group" data-for="landmass erase">
         <h3 data-i18n="o_landmass">Kara / Kıyı</h3>
         <label class="row"><span data-i18n="o_brushsize">Fırça boyutu</span><b id="v-lm-size">120</b></label>
@@ -77,12 +82,14 @@
         <label class="row"><span data-i18n="o_rough">Kıyı sertliği</span><b id="v-lm-rough">0.35</b></label>
         <input type="range" id="lm-rough" min="0" max="100" value="35">
         <label class="row"><span data-i18n="o_landcolor">Kara rengi</span></label>
-        <input type="color" id="lm-color" value="#ded0ac" data-default="#ded0ac">
+        <input type="color" id="lm-color" value="#ded0ac">
+        <label class="row"><span data-i18n="o_shorew">Kıyı genişliği</span><b id="v-shore-w">26</b></label>
+        <input type="range" id="shore-w" min="4" max="90" value="26">
         <div class="row2">
           <button class="btn" id="btn-smooth" data-i18n="o_smooth">Kıyıyı yumuşat</button>
           <button class="btn" id="btn-clear-land" data-i18n="o_clearland">Karayı temizle</button>
         </div>
-        <p class="hint" data-i18n="h_landmass">Sürükleyerek kara çiz. "Deniz" aracı karayı siler.</p>
+        <p class="hint" data-i18n="h_landmass">Sürükleyerek kara çiz. "Deniz" aracı hem karayı hem araziyi siler.</p>
       </section>
 
       <!-- TERRAIN -->
@@ -95,10 +102,11 @@
         <input type="range" id="tr-op" min="5" max="100" value="85">
         <label class="chk"><input type="checkbox" id="tr-clip" checked><span data-i18n="o_clip">Sadece karaya boya</span></label>
         <button class="btn wide" id="btn-clear-terrain" data-i18n="o_clearterrain">Arazi katmanını temizle</button>
+        <p class="hint" data-i18n="h_terrain">Doku her fırça vuruşunda rastgele serpilir — tekrar eden örüntü oluşmaz.</p>
       </section>
 
       <!-- SYMBOL -->
-      <section class="opt-group" data-for="symbol select">
+      <section class="opt-group" data-for="symbol">
         <h3 data-i18n="o_symbol">Sembol</h3>
         <label class="row"><span data-i18n="o_size">Boyut</span><b id="v-sy-size">72</b></label>
         <input type="range" id="sy-size" min="12" max="600" value="72">
@@ -117,55 +125,48 @@
         <h3 data-i18n="o_river">Nehir</h3>
         <label class="row"><span data-i18n="o_width">Ağız kalınlığı</span><b id="v-rv-w">16</b></label>
         <input type="range" id="rv-w" min="2" max="120" value="16">
-        <label class="row"><span data-i18n="o_meander">Kıvrım (meander)</span><b id="v-rv-m">0.3</b></label>
+        <label class="row"><span data-i18n="o_meander">Kıvrım</span><b id="v-rv-m">0.3</b></label>
         <input type="range" id="rv-m" min="0" max="100" value="30">
         <label class="chk"><input type="checkbox" id="rv-taper" checked><span data-i18n="o_taper">Kaynakta incelt</span></label>
         <label class="row"><span data-i18n="o_color">Renk</span></label>
         <input type="color" id="rv-color" value="#5b8aa6">
-        <p class="hint" data-i18n="h_path">Tıklayarak nokta ekle. Enter / çift tık ile bitir, Esc ile iptal et.</p>
+        <p class="hint" data-i18n="h_path">Tıklayarak nokta ekle. Enter / çift tık ile bitir, Esc ile iptal.</p>
       </section>
 
       <!-- ROAD -->
       <section class="opt-group" data-for="road">
         <h3 data-i18n="o_road">Yol / Kervan güzergâhı</h3>
         <select id="rd-style" class="sel">
-          <option value="solid" data-i18n="rs_solid">Ana yol (düz)</option>
-          <option value="dashed" selected data-i18n="rs_dashed">Patika (kesik)</option>
-          <option value="double" data-i18n="rs_double">Çift çizgi</option>
-          <option value="dotted" data-i18n="rs_dotted">Kervan izi (noktalı)</option>
+          <option value="solid">Ana yol (düz)</option>
+          <option value="dashed" selected>Patika (kesik)</option>
+          <option value="double">Çift çizgi</option>
+          <option value="dotted">Kervan izi (noktalı)</option>
         </select>
         <label class="row"><span data-i18n="o_width">Kalınlık</span><b id="v-rd-w">6</b></label>
         <input type="range" id="rd-w" min="1" max="60" value="6">
         <label class="row"><span data-i18n="o_color">Renk</span></label>
         <input type="color" id="rd-color" value="#6b4f2a">
-        <p class="hint" data-i18n="h_path">Tıklayarak nokta ekle. Enter / çift tık ile bitir, Esc ile iptal et.</p>
+        <p class="hint" data-i18n="h_path">Tıklayarak nokta ekle. Enter / çift tık ile bitir, Esc ile iptal.</p>
       </section>
 
       <!-- LABEL -->
       <section class="opt-group" data-for="label">
         <h3 data-i18n="o_label">Etiket</h3>
         <textarea id="lb-text" rows="2" placeholder="Sideria"></textarea>
-        <select id="lb-font" class="sel">
-          <option value="fantasy">Fantasy</option>
-          <option value="serif" selected>Serif</option>
-          <option value="sans">Sans-serif</option>
-          <option value="mono">Monospace</option>
-        </select>
+        <label class="row"><span data-i18n="o_preset">Stil şablonu</span></label>
+        <select id="lb-preset" class="sel"></select>
+        <div id="lb-preview-wrap"><canvas id="lb-preview" width="220" height="64"></canvas></div>
         <label class="row"><span data-i18n="o_size">Boyut</span><b id="v-lb-size">42</b></label>
         <input type="range" id="lb-size" min="8" max="400" value="42">
-        <label class="row"><span data-i18n="o_curve">Eğim (curved)</span><b id="v-lb-curve">0</b></label>
+        <label class="row"><span data-i18n="o_curve">Eğim</span><b id="v-lb-curve">0</b></label>
         <input type="range" id="lb-curve" min="-90" max="90" value="0">
         <label class="row"><span data-i18n="o_track">Harf aralığı</span><b id="v-lb-track">2</b></label>
         <input type="range" id="lb-track" min="0" max="40" value="2">
         <label class="row"><span data-i18n="o_rot">Dönüş</span><b id="v-lb-rot">0°</b></label>
         <input type="range" id="lb-rot" min="-180" max="180" value="0">
-        <div class="row2">
-          <div><label class="mini" data-i18n="o_color">Renk</label><input type="color" id="lb-color" value="#3a2b18"></div>
-          <div><label class="mini" data-i18n="o_outline">Kontur</label><input type="color" id="lb-outline" value="#f5ecd8"></div>
-        </div>
-        <label class="chk"><input type="checkbox" id="lb-hasoutline" checked><span data-i18n="o_hasoutline">Kontur uygula</span></label>
-        <label class="chk"><input type="checkbox" id="lb-shadow" checked><span data-i18n="o_shadow">Gölge</span></label>
-        <p class="hint" data-i18n="h_label">Metni yaz, sonra haritaya tıkla. Seçili etiket varsa ayarlar anında uygulanır.</p>
+        <label class="row"><span data-i18n="o_color">Metin rengi</span></label>
+        <input type="color" id="lb-color" value="#3a2b18">
+        <p class="hint" data-i18n="h_label">Şablon seç, metni yaz, haritaya tıkla. Seçili etikette ayarlar anında uygulanır.</p>
       </section>
 
       <!-- EYEDROPPER -->
@@ -185,7 +186,7 @@
           <button class="btn primary" id="btn-eye-paint" data-i18n="o_eye_paint">② Boyamaya başla</button>
         </div>
         <button class="btn wide" id="btn-eye-clear" data-i18n="o_eye_clear">Örneği temizle</button>
-        <p class="hint" data-i18n="h_eyedrop">① Alan seç: sürükleyerek daire çiz. ② Boyamaya başla: örneklenen dokuyu haritaya uygula. Her vuruşta çizgiler rastgele dağılır.</p>
+        <p class="hint" data-i18n="h_eyedrop">① Alan seç: sürükleyerek daire çiz. ② Boyamaya başla: dokuyu haritaya uygula.</p>
       </section>
 
       <!-- SELECT -->
@@ -196,6 +197,17 @@
           <button class="btn" id="btn-dup" data-i18n="o_dup">Çoğalt</button>
           <button class="btn danger" id="btn-del" data-i18n="o_del">Sil</button>
         </div>
+
+        <h3 style="margin-top:20px" data-i18n="o_scalebar">Ölçek çubuğu</h3>
+        <label class="chk"><input type="checkbox" id="sc-visible" checked><span data-i18n="o_scvis">Haritada göster</span></label>
+        <input type="text" id="sc-label" class="sel" value="200 fersah">
+        <label class="row"><span data-i18n="o_sclen">Uzunluk</span><b id="v-sc-len">420</b></label>
+        <input type="range" id="sc-len" min="80" max="1600" value="420">
+        <label class="row"><span data-i18n="o_scsize">Yazı boyutu</span><b id="v-sc-size">26</b></label>
+        <input type="range" id="sc-size" min="8" max="120" value="26">
+        <label class="row"><span data-i18n="o_scsegs">Bölme sayısı</span><b id="v-sc-segs">4</b></label>
+        <input type="range" id="sc-segs" min="2" max="12" value="4">
+        <p class="hint" data-i18n="h_scale">Ölçek çubuğunu haritada sürükleyerek taşıyabilirsin.</p>
       </section>
 
       <!-- PAN -->
@@ -205,12 +217,12 @@
           <button class="btn" id="btn-fit" data-i18n="o_fit">Ekrana sığdır</button>
           <button class="btn" id="btn-100" data-i18n="o_100">%100</button>
         </div>
-        <p class="hint" data-i18n="h_pan">Space + sürükle veya orta tık ile her araçta kaydırabilirsin.</p>
+        <p class="hint" data-i18n="h_pan">Sağ tık + sürükle, orta tık, Space + sürükle veya yön tuşları ile kaydır.</p>
       </section>
     </div>
   </aside>
 
-  <!-- ============ CANVAS ============ -->
+  <!-- ============ TUVAL ============ -->
   <section id="canvas-area">
     <canvas id="view"></canvas>
     <div id="minimap-wrap">
@@ -218,7 +230,7 @@
     </div>
   </section>
 
-  <!-- ============ RIGHT PANEL ============ -->
+  <!-- ============ SAĞ PANEL ============ -->
   <aside id="right-panel">
     <nav class="tabs">
       <button class="tab active" data-tab="layers" data-i18n="tab_layers">Katmanlar</button>

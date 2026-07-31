@@ -622,6 +622,353 @@
     ]},
   };
 
+
+  /* ====================================================================
+     İZOMETRİK (3B görünümlü) SEMBOLLER
+     Paralel projeksiyon: sx=(x-y)*0.866, sy=(x+y)*0.5-z
+     Kutular derinliğe göre sıralanıp ressam algoritmasıyla çizilir.
+     ==================================================================== */
+  function buildIso() {
+
+    var CX = 0.866, CY = 0.5;
+
+    function pr(x, y, z, ox, oy) { return [ox + (x - y) * CX, oy + (x + y) * CY - z]; }
+
+    function dOf(pts) {
+      var s = 'M' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(1);
+      for (var i = 1; i < pts.length; i++) s += ' L' + pts[i][0].toFixed(1) + ' ' + pts[i][1].toFixed(1);
+      return s + ' Z';
+    }
+
+    /* Sahne: kutu listesi topla, sonra derinliğe göre sırala */
+    function Scene() { this.boxes = []; this.extra = []; }
+
+    Scene.prototype.box = function (x, y, z, w, d, h, style) {
+      this.boxes.push({ x:x, y:y, z:z, w:w, d:d, h:h, s:style || 'stone' });
+      return this;
+    };
+
+    /* çatı prizması (üçgen alınlıklı) */
+    Scene.prototype.roof = function (x, y, z, w, d, h, style) {
+      this.boxes.push({ x:x, y:y, z:z, w:w, d:d, h:h, s:style || 'roof', roof:true });
+      return this;
+    };
+
+    /* koni çatı (kule için) */
+    Scene.prototype.cone = function (x, y, z, w, d, h, style) {
+      this.boxes.push({ x:x, y:y, z:z, w:w, d:d, h:h, s:style || 'roof', cone:true });
+      return this;
+    };
+
+    Scene.prototype.crenel = function (x, y, z, w, d, cw, ch, style) {
+      /* ön ve sağ kenar boyunca mazgal dişleri */
+      var n = Math.max(2, Math.round(w / (cw * 2)));
+      var stepX = w / n;
+      for (var i = 0; i < n; i++) {
+        this.box(x + i * stepX, y + d - cw, z, stepX * 0.58, cw, ch, style || 'stone');
+      }
+      var m = Math.max(2, Math.round(d / (cw * 2)));
+      var stepY = d / m;
+      for (var j = 0; j < m; j++) {
+        this.box(x + w - cw, y + j * stepY, z, cw, stepY * 0.58, ch, style || 'stone');
+      }
+      return this;
+    };
+
+    var STYLES = {
+      stone:  { top:'fill2',  left:'fill3',  right:'shade2', line:'ink'  },
+      stone2: { top:'stone',  left:'stoned', right:'shade3', line:'ink'  },
+      wood:   { top:'wood2',  left:'wood',   right:'ink3',   line:'ink'  },
+      roof:   { top:'red2',   left:'red',    right:'rust',   line:'ink'  },
+      roofB:  { top:'blue',   left:'#2f4a72',right:'#22355a',line:'ink'  },
+      roofG:  { top:'green2', left:'green',  right:'greend', line:'ink'  },
+      gold:   { top:'gold',   left:'gold2',  right:'ink3',   line:'ink'  },
+      dark:   { top:'stoned', left:'shade3', right:'ink3',   line:'ink'  },
+      ruin:   { top:'stone',  left:'stoned', right:'shade3', line:'ink2' }
+    };
+
+    /* Sahneyi part dizisine dönüştür.
+       İki geçiş: (1) ham yüzeyleri üret, (2) hepsini 0..100
+       kutusuna sığacak şekilde normalize et.                     */
+    Scene.prototype.build = function () {
+      var boxes = this.boxes.slice().sort(function (a, b) {
+        return (a.x + a.y + a.z) - (b.x + b.y + b.z);
+      });
+
+      var faces = [];
+      for (var i = 0; i < boxes.length; i++) {
+        var b = boxes[i];
+        var st = STYLES[b.s] || STYLES.stone;
+        var P = (function (bb) {
+          return function (x, y, z) { return pr(bb.x + x, bb.y + y, bb.z + z, 0, 0); };
+        })(b);
+
+        if (b.cone) {
+          var apex = P(b.w/2, b.d/2, b.h);
+          var c1 = P(0,0,0), c2 = P(b.w,0,0), c3 = P(b.w,b.d,0), c4 = P(0,b.d,0);
+          faces.push({ p:[c4,c3,apex], f:st.left,  s:st.line });
+          faces.push({ p:[c3,c2,apex], f:st.right, s:st.line });
+          faces.push({ p:[c2,c1,apex], f:st.top,   s:st.line });
+          continue;
+        }
+
+        if (b.roof) {
+          var r1 = P(0,b.d/2,b.h), r2 = P(b.w,b.d/2,b.h);
+          var f1 = P(0,b.d,0), f2 = P(b.w,b.d,0);
+          var k1 = P(0,0,0), k2 = P(b.w,0,0);
+          faces.push({ p:[f1,f2,r2,r1], f:st.left,  s:st.line });
+          faces.push({ p:[k1,k2,r2,r1], f:st.top,   s:st.line });
+          faces.push({ p:[f2,k2,r2],    f:st.right, s:st.line });
+          continue;
+        }
+
+        faces.push({ p:[P(0,b.d,0),P(0,b.d,b.h),P(b.w,b.d,b.h),P(b.w,b.d,0)], f:st.left,  s:st.line });
+        faces.push({ p:[P(b.w,b.d,0),P(b.w,b.d,b.h),P(b.w,0,b.h),P(b.w,0,0)], f:st.right, s:st.line });
+        faces.push({ p:[P(0,0,b.h),P(b.w,0,b.h),P(b.w,b.d,b.h),P(0,b.d,b.h)], f:st.top,   s:st.line });
+      }
+
+      /* --- normalize --- */
+      var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      faces.forEach(function (fc) {
+        fc.p.forEach(function (pt) {
+          if (pt[0] < minX) minX = pt[0];
+          if (pt[0] > maxX) maxX = pt[0];
+          if (pt[1] < minY) minY = pt[1];
+          if (pt[1] > maxY) maxY = pt[1];
+        });
+      });
+      var bw = Math.max(1, maxX - minX), bh = Math.max(1, maxY - minY);
+      var PAD = 6;
+      var k = Math.min((100 - PAD*2)/bw, (100 - PAD*2)/bh);
+      var offX = 50 - (minX + bw/2)*k;
+      var offY = (100 - PAD) - maxY*k;      /* tabanı alta yasla */
+
+      var lw = Math.max(1.1, Math.min(2.6, 2.2 * k));
+      var parts = [];
+      faces.forEach(function (fc) {
+        var mapped = fc.p.map(function (pt) { return [pt[0]*k + offX, pt[1]*k + offY]; });
+        parts.push(part(dOf(mapped), fc.f, fc.s, lw));
+      });
+      return parts.concat(this.extra);
+    };
+
+    var items = [];
+    function add(id, tr, en, sc) {
+      items.push({ id:id, tr:tr, en:en, parts: sc.build() });
+    }
+
+    /* ---------------- KULELER ---------------- */
+    var s;
+
+    s = new Scene();
+    s.box(0, 0, 0, 26, 26, 46, 'stone').crenel(0, 0, 46, 26, 26, 5, 8, 'stone');
+    add('iso_tower', 'Kule', 'Tower', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 26, 26, 42, 'stone').cone(-2, -2, 42, 30, 30, 22, 'roof');
+    add('iso_tower_roof', 'Çatılı kule', 'Roofed tower', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 22, 22, 62, 'stone').crenel(0, 0, 62, 22, 22, 4.5, 7, 'stone');
+    add('iso_tower_tall', 'Yüksek kule', 'Tall tower', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 30, 30, 30, 'stone2').crenel(0, 0, 30, 30, 30, 5.5, 8, 'stone2');
+    add('iso_bastion', 'Burç', 'Bastion', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 24, 24, 40, 'stone').cone(-3, -3, 40, 30, 30, 26, 'roofB');
+    add('iso_tower_blue', 'Mavi çatılı kule', 'Blue-roof tower', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 24, 24, 44, 'stone')
+     .box(2, 2, 44, 20, 20, 10, 'gold');
+    add('iso_wizard', 'Büyücü kulesi', 'Wizard tower', s);
+
+    /* ---------------- SURLAR / KAPILAR ---------------- */
+    s = new Scene();
+    s.box(0, 0, 0, 62, 14, 26, 'stone').crenel(0, 0, 26, 62, 14, 5, 7, 'stone');
+    add('iso_wall', 'Sur duvarı', 'Wall', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 62, 14, 26, 'stone').crenel(0, 0, 26, 62, 14, 5, 7, 'stone')
+     .box(20, -3, 0, 22, 20, 40, 'stone').crenel(20, -3, 40, 22, 20, 5, 8, 'stone');
+    add('iso_gatehouse', 'Kale kapısı', 'Gatehouse', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 58, 12, 24, 'wood');
+    add('iso_palisade', 'Kazık çit', 'Palisade', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 60, 14, 22, 'stone2').crenel(0, 0, 22, 60, 14, 5, 6, 'stone2')
+     .box(-2, -2, 0, 18, 18, 34, 'stone2').crenel(-2, -2, 34, 18, 18, 4.5, 7, 'stone2')
+     .box(46, -2, 0, 18, 18, 34, 'stone2').crenel(46, -2, 34, 18, 18, 4.5, 7, 'stone2');
+    add('iso_wall_towers', 'Kuleli sur', 'Towered wall', s);
+
+    /* ---------------- YAPILAR ---------------- */
+    s = new Scene();
+    s.box(0, 0, 0, 30, 24, 18, 'stone').roof(-2, -2, 18, 34, 28, 16, 'roof');
+    add('iso_house', 'Ev', 'House', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 26, 20, 16, 'wood').roof(-2, -2, 16, 30, 24, 14, 'roof');
+    add('iso_cottage', 'Kulübe', 'Cottage', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 40, 28, 22, 'stone').roof(-3, -3, 22, 46, 34, 20, 'roof');
+    add('iso_hall', 'Konak', 'Great hall', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 34, 26, 20, 'stone').roof(-2, -2, 20, 38, 30, 16, 'roofG')
+     .box(24, 4, 20, 12, 12, 30, 'stone').cone(23, 3, 50, 14, 14, 16, 'gold');
+    add('iso_church', 'Kilise', 'Church', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 26, 22, 24, 'stone').roof(-2, -2, 24, 30, 26, 14, 'roof')
+     .box(8, 6, 38, 10, 10, 18, 'stone').cone(7, 5, 56, 12, 12, 12, 'roofB');
+    add('iso_chapel', 'Şapel', 'Chapel', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 22, 22, 30, 'wood').cone(-2, -2, 30, 26, 26, 14, 'roof');
+    add('iso_windmill', 'Değirmen', 'Windmill', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 34, 26, 18, 'stone').roof(-2, -2, 18, 38, 30, 14, 'dark')
+     .box(24, 4, 18, 8, 8, 22, 'stone2');
+    add('iso_forge', 'Demirhane', 'Forge', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 44, 30, 14, 'wood').roof(-3, -3, 14, 50, 36, 12, 'roofG');
+    add('iso_barn', 'Ahır', 'Barn', s);
+
+    /* ---------------- KALE / ŞEHİR KÜMELERİ ---------------- */
+    s = new Scene();
+    s.box(0, 0, 0, 54, 40, 18, 'stone').crenel(0, 0, 18, 54, 40, 5, 6, 'stone')
+     .box(6, 6, 18, 26, 24, 30, 'stone').crenel(6, 6, 48, 26, 24, 5, 7, 'stone');
+    add('iso_castle', 'Kale', 'Castle', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 58, 44, 16, 'stone').crenel(0, 0, 16, 58, 44, 5, 6, 'stone')
+     .box(-2, -2, 0, 16, 16, 34, 'stone').cone(-4, -4, 34, 20, 20, 16, 'roof')
+     .box(44, -2, 0, 16, 16, 34, 'stone').cone(42, -4, 34, 20, 20, 16, 'roof')
+     .box(18, 14, 16, 22, 20, 26, 'stone').cone(16, 12, 42, 26, 24, 18, 'roof');
+    add('iso_castle_big', 'Büyük kale', 'Great castle', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 64, 48, 14, 'stone').crenel(0, 0, 14, 64, 48, 5, 5, 'stone')
+     .box(8, 10, 14, 16, 14, 16, 'stone').roof(6, 8, 30, 20, 18, 10, 'roof')
+     .box(30, 8, 14, 14, 12, 18, 'stone').roof(28, 6, 32, 18, 16, 10, 'roof')
+     .box(20, 28, 14, 18, 14, 22, 'stone').roof(18, 26, 36, 22, 18, 12, 'roof')
+     .box(46, 24, 14, 12, 12, 26, 'stone').cone(44, 22, 40, 16, 16, 14, 'roofB');
+    add('iso_city', 'Şehir', 'City', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 70, 52, 12, 'stone2').crenel(0, 0, 12, 70, 52, 5, 5, 'stone2')
+     .box(-3, -3, 0, 14, 14, 30, 'stone').cone(-5, -5, 30, 18, 18, 14, 'roof')
+     .box(58, -3, 0, 14, 14, 30, 'stone').cone(56, -5, 30, 18, 18, 14, 'roof')
+     .box(-3, 40, 0, 14, 14, 30, 'stone').cone(-5, 38, 30, 18, 18, 14, 'roof')
+     .box(8, 10, 12, 16, 14, 18, 'stone').roof(6, 8, 30, 20, 18, 10, 'roof')
+     .box(32, 12, 12, 16, 14, 22, 'stone').roof(30, 10, 34, 20, 18, 10, 'roof')
+     .box(20, 32, 12, 20, 14, 28, 'stone').cone(18, 30, 40, 24, 18, 18, 'gold');
+    add('iso_capital', 'Başkent', 'Capital', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 22, 18, 14, 'wood').roof(-2, -2, 14, 26, 22, 12, 'roof')
+     .box(28, 6, 0, 20, 16, 13, 'wood').roof(26, 4, 13, 24, 20, 11, 'roof')
+     .box(14, 26, 0, 20, 16, 13, 'wood').roof(12, 24, 13, 24, 20, 11, 'roof');
+    add('iso_village', 'Köy', 'Village', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 24, 20, 16, 'stone').roof(-2, -2, 16, 28, 24, 13, 'roof')
+     .box(30, 4, 0, 22, 18, 18, 'stone').roof(28, 2, 18, 26, 22, 13, 'roof')
+     .box(12, 28, 0, 24, 18, 16, 'wood').roof(10, 26, 16, 28, 22, 13, 'roofG')
+     .box(44, 30, 0, 14, 14, 26, 'stone').crenel(44, 30, 56, 14, 14, 4, 6, 'stone');
+    add('iso_town', 'Kasaba', 'Town', s);
+
+    /* ---------------- HARABELER ---------------- */
+    s = new Scene();
+    s.box(0, 0, 0, 26, 26, 30, 'ruin')
+     .box(0, 0, 30, 10, 26, 10, 'ruin')
+     .box(18, 0, 30, 8, 14, 6, 'ruin');
+    add('iso_ruin_tower', 'Yıkık kule', 'Ruined tower', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 50, 14, 16, 'ruin')
+     .box(0, 0, 16, 12, 14, 8, 'ruin')
+     .box(24, 0, 16, 8, 14, 5, 'ruin')
+     .box(40, 0, 16, 10, 14, 10, 'ruin');
+    add('iso_ruin_wall', 'Yıkık sur', 'Ruined wall', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 40, 32, 10, 'ruin')
+     .box(2, 4, 10, 10, 10, 22, 'ruin')
+     .box(26, 6, 10, 10, 10, 16, 'ruin')
+     .box(14, 22, 10, 12, 8, 8, 'ruin');
+    add('iso_ruin_keep', 'Yıkık iç kale', 'Ruined keep', s);
+
+    /* ---------------- ANITLAR ---------------- */
+    s = new Scene();
+    s.box(0, 0, 0, 26, 26, 8, 'stone2')
+     .box(6, 6, 8, 14, 14, 6, 'stone2')
+     .box(9, 9, 14, 8, 8, 44, 'stone')
+     .cone(8, 8, 58, 10, 10, 12, 'gold');
+    add('iso_obelisk', 'Dikilitaş', 'Obelisk', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 44, 44, 10, 'stone2')
+     .box(6, 6, 10, 32, 32, 10, 'stone2')
+     .box(12, 12, 20, 20, 20, 10, 'stone2')
+     .box(17, 17, 30, 10, 10, 10, 'gold');
+    add('iso_ziggurat', 'Zigurat', 'Ziggurat', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 40, 30, 6, 'stone2')
+     .box(3, 3, 6, 6, 6, 30, 'stone')
+     .box(17, 3, 6, 6, 6, 30, 'stone')
+     .box(31, 3, 6, 6, 6, 30, 'stone')
+     .box(3, 21, 6, 6, 6, 30, 'stone')
+     .box(31, 21, 6, 6, 6, 30, 'stone')
+     .roof(-2, -2, 36, 44, 34, 14, 'stone2');
+    add('iso_temple', 'Tapınak', 'Temple', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 34, 34, 20, 'stone')
+     .box(4, 4, 20, 26, 26, 8, 'stone2')
+     .cone(2, 2, 28, 30, 30, 24, 'gold');
+    add('iso_dome', 'Kubbe', 'Domed hall', s);
+
+    /* ---------------- LİMAN / DİĞER ---------------- */
+    s = new Scene();
+    s.box(0, 0, 0, 20, 20, 12, 'stone')
+     .box(3, 3, 12, 14, 14, 34, 'stone')
+     .box(1, 1, 46, 18, 18, 8, 'gold')
+     .cone(0, 0, 54, 20, 20, 12, 'roof');
+    add('iso_lighthouse', 'Deniz feneri', 'Lighthouse', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 50, 20, 6, 'wood')
+     .box(4, 22, 0, 10, 10, 12, 'wood')
+     .box(24, 22, 0, 10, 10, 12, 'wood')
+     .box(40, 22, 0, 10, 10, 12, 'wood');
+    add('iso_docks', 'Rıhtım', 'Docks', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 30, 26, 8, 'dark')
+     .box(4, 4, 8, 22, 18, 14, 'dark')
+     .box(10, 8, 22, 10, 10, 16, 'stone2');
+    add('iso_mine', 'Maden', 'Mine', s);
+
+    s = new Scene();
+    s.box(0, 0, 0, 18, 18, 10, 'wood').cone(-2, -2, 10, 22, 22, 20, 'roof')
+     .box(24, 4, 0, 18, 18, 10, 'wood').cone(22, 2, 10, 22, 22, 20, 'roof')
+     .box(12, 24, 0, 18, 18, 10, 'wood').cone(10, 22, 10, 22, 22, 20, 'roofB');
+    add('iso_camp', 'Ordugâh', 'Army camp', s);
+
+    return items;
+  }
+
+  SYMBOLS.iso = { tr: 'İzometrik (3B)', en: 'Isometric (3D)', items: buildIso() };
+
   /* ====================================================================
      CUSTOM PNG SEMBOL SİSTEMİ
      ==================================================================== */

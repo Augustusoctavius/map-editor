@@ -10,9 +10,15 @@
 
 .brand{display:flex;align-items:center;gap:7px;padding-right:12px;margin-right:4px;
   border-right:1px solid var(--line)}
-.brand-mark{color:var(--brass);font-size:15px;line-height:1}
-.brand-name{font-family:var(--f-display);font-size:14px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--parch)}
+.brand-mark{color:var(--brass);font-size:20px;line-height:1;
+  text-shadow:0 0 12px rgba(201,154,75,.45)}
+.brand-name{
+  font-family:var(--f-display);font-size:17px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--parch);white-space:nowrap;
+  text-shadow:0 1px 0 #000,0 0 18px rgba(201,154,75,.22)
+}
+@media (max-width:1240px){ .brand-name{font-size:14px;letter-spacing:.10em} }
+@media (max-width:1040px){ .brand-name{display:none} }
 
 .tb-group{display:flex;gap:4px}
 .tb-sep{width:1px;height:22px;background:var(--line)}
