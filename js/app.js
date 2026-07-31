@@ -17,6 +17,7 @@
     road:    { width: 6, style: 'dashed', color: '#6b4f2a' },
     label:   { font: 'serif', size: 42, color: '#3a2b18', outline: true,
                outlineColor: '#f5ecd8', shadow: true, curve: 0, track: 2, rot: 0 },
+    eyedrop: { radius: 60, brushRadius: 80, targetLayer: 'terrain', hasSample: false, painting: false },
 
     init: function () {
       var size = 2048;

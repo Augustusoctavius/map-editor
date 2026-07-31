@@ -114,13 +114,9 @@
 
   /* ---------------- doku üreticileri ---------------- */
   var oceanTile = null, parchTile = null;
-  var patCache = new WeakMap();
 
-  function ctxPattern(ctx, tile, key) {
-    var bag = patCache.get(ctx);
-    if (!bag) { bag = {}; patCache.set(ctx, bag); }
-    if (!bag[key]) bag[key] = ctx.createPattern(tile, 'repeat');
-    return bag[key];
+  function ctxPattern(ctx, tile) {
+    return ctx.createPattern(tile, 'repeat');
   }
 
   function makeOceanTile() {
@@ -284,7 +280,7 @@
 
       /* okyanus */
       ctx.save();
-      var op = ctxPattern(ctx, oceanTile, 'ocean');
+      var op = ctxPattern(ctx, oceanTile);
       ctx.fillStyle = op || '#9cc0cf';
       ctx.fillRect(0, 0, W, H);
       ctx.restore();
@@ -317,7 +313,7 @@
             var o = l.objects[j];
             if (l.id === 'rivers') this.drawRiver(ctx, o);
             else if (l.id === 'roads') this.drawRoad(ctx, o);
-            else if (l.id === 'symbols') Sym.draw(ctx, o.sym, o);
+            else if (l.id === 'symbols') Sym.draw(ctx, o.sym, o, function(){ Cv.requestRender(); });
             else if (l.id === 'labels') this.drawLabel(ctx, o);
           }
           ctx.restore();
@@ -329,7 +325,7 @@
             ctx.save();
             ctx.globalAlpha = 0.55 * l.opacity;
             ctx.globalCompositeOperation = 'multiply';
-            var pp = ctxPattern(ctx, parchTile, 'parch');
+            var pp = ctxPattern(ctx, parchTile);
             ctx.fillStyle = pp || 'rgba(217,199,154,0.5)';
             ctx.fillRect(0, 0, W, H);
             ctx.restore();

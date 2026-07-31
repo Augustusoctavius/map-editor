@@ -151,6 +151,7 @@
       var data = {
         app: 'cartographer', version: 1,
         W: Cv.W, H: Cv.H,
+        customSymbols: Sym.serializeCustom(),
         parchment: Cv.parchment, grid: Cv.grid,
         exportReference: App.exportReference,
         layers: Layers.serialize(true)
@@ -177,6 +178,7 @@
         document.getElementById('ref-export').checked = App.exportReference;
         document.getElementById('sel-canvas-size').value = String(d.W || 2048);
 
+        if(d.customSymbols) Sym.deserializeCustom(d.customSymbols);
         Layers.deserialize(d.layers || []).then(function () {
           History.clear();
           App.selection = null;

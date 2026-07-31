@@ -64,6 +64,7 @@
       <button class="tool" data-tool="river"    title="R"><span class="ico">≈</span><em data-i18n="t_river">Nehir</em></button>
       <button class="tool" data-tool="road"     title="D"><span class="ico">⋯</span><em data-i18n="t_road">Yol</em></button>
       <button class="tool" data-tool="label"    title="L"><span class="ico">A</span><em data-i18n="t_label">Etiket</em></button>
+      <button class="tool" data-tool="eyedrop"  title="I"><span class="ico">⊙</span><em data-i18n="t_eyedrop">Örnekle</em></button>
       <button class="tool" data-tool="pan"      title="Space"><span class="ico">✥</span><em data-i18n="t_pan">Kaydır</em></button>
     </div>
 
@@ -76,7 +77,7 @@
         <label class="row"><span data-i18n="o_rough">Kıyı sertliği</span><b id="v-lm-rough">0.35</b></label>
         <input type="range" id="lm-rough" min="0" max="100" value="35">
         <label class="row"><span data-i18n="o_landcolor">Kara rengi</span></label>
-        <input type="color" id="lm-color" value="#ded0ac">
+        <input type="color" id="lm-color" value="#ded0ac" data-default="#ded0ac">
         <div class="row2">
           <button class="btn" id="btn-smooth" data-i18n="o_smooth">Kıyıyı yumuşat</button>
           <button class="btn" id="btn-clear-land" data-i18n="o_clearland">Karayı temizle</button>
@@ -167,6 +168,26 @@
         <p class="hint" data-i18n="h_label">Metni yaz, sonra haritaya tıkla. Seçili etiket varsa ayarlar anında uygulanır.</p>
       </section>
 
+      <!-- EYEDROPPER -->
+      <section class="opt-group" data-for="eyedrop">
+        <h3 data-i18n="o_eyedrop">Doku Örnekleyici</h3>
+        <div id="eyedrop-status" class="sel-info" data-i18n="o_eye_nosample">Henüz örnekleme yapılmadı</div>
+        <label class="row"><span data-i18n="o_eye_radius">Örnekleme yarıçapı</span><b id="v-eye-r">60</b></label>
+        <input type="range" id="eye-r" min="10" max="400" value="60">
+        <label class="row"><span data-i18n="o_eye_brush">Fırça boyutu</span><b id="v-eye-br">80</b></label>
+        <input type="range" id="eye-br" min="8" max="500" value="80">
+        <select id="eye-layer" class="sel">
+          <option value="terrain">Arazi katmanı</option>
+          <option value="landmass">Kara katmanı</option>
+        </select>
+        <div class="row2">
+          <button class="btn" id="btn-eye-pick" data-i18n="o_eye_pick">① Alan seç</button>
+          <button class="btn primary" id="btn-eye-paint" data-i18n="o_eye_paint">② Boyamaya başla</button>
+        </div>
+        <button class="btn wide" id="btn-eye-clear" data-i18n="o_eye_clear">Örneği temizle</button>
+        <p class="hint" data-i18n="h_eyedrop">① Alan seç: sürükleyerek daire çiz. ② Boyamaya başla: örneklenen dokuyu haritaya uygula. Her vuruşta çizgiler rastgele dağılır.</p>
+      </section>
+
       <!-- SELECT -->
       <section class="opt-group" data-for="select">
         <h3 data-i18n="o_selection">Seçim</h3>
@@ -216,6 +237,11 @@
     </div>
 
     <div class="tab-body hidden" data-tab="library">
+      <div class="custom-sym-bar">
+        <button class="btn wide" id="btn-sym-upload" data-i18n="sym_upload">+ PNG Sembol yükle</button>
+        <input type="file" id="sym-file" accept="image/png,image/jpeg,image/svg+xml,image/webp" multiple hidden>
+        <div id="custom-sym-grid" class="sym-grid" style="margin-top:8px"></div>
+      </div>
       <select id="sym-cat" class="sel"></select>
       <div id="sym-grid" class="sym-grid"></div>
     </div>

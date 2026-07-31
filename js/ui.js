@@ -100,6 +100,7 @@
       this.bindKeys();
       this.applyLang();
       this.refreshAll();
+      this.syncColorPickers();
       this.setTool('landmass');
     },
 
@@ -310,6 +311,63 @@
       /* --- selection --- */
       on('btn-del', 'click', function () { Tools.deleteSelection(); });
       on('btn-dup', 'click', function () { Tools.duplicateSelection(); });
+
+
+      /* --- eyedropper --- */
+      on('eye-r','input',function(e){
+        App.eyedrop.radius=parseFloat(e.target.value);
+        $('v-eye-r').textContent=e.target.value;
+      });
+      on('eye-br','input',function(e){
+        App.eyedrop.brushRadius=parseFloat(e.target.value);
+        $('v-eye-br').textContent=e.target.value;
+      });
+      on('eye-layer','change',function(e){App.eyedrop.targetLayer=e.target.value;});
+      on('btn-eye-pick','click',function(){
+        Eyedropper.active=false;Eyedropper.sample=null;Eyedropper.picking=false;
+        App.eyedrop.hasSample=false;App.eyedrop.painting=false;
+        self.setTool('eyedrop');
+        UI.msg('Daire çizerek örneklemek istediğin alanı seç...');
+        self.refreshEyedropPanel();
+      });
+      on('btn-eye-paint','click',function(){
+        if(!Eyedropper.sample){UI.msg('Önce alan seç (①)');return;}
+        App.eyedrop.painting=true;
+        self.setTool('eyedrop');
+        UI.msg('Haritaya tıklayıp sürükleyerek dokuyu uygula.');
+      });
+      on('btn-eye-clear','click',function(){
+        Eyedropper.sample=null;Eyedropper.active=false;
+        App.eyedrop.hasSample=false;App.eyedrop.painting=false;
+        self.refreshEyedropPanel();
+        Cv.requestRender();
+      });
+
+      /* --- custom PNG sembol --- */
+      on('btn-sym-upload','click',function(){$('sym-file').click();});
+      on('sym-file','change',function(e){
+        var files=e.target.files;if(!files||!files.length)return;
+        var loaded=0,total=files.length;
+        Array.prototype.forEach.call(files,function(f){
+          var r=new FileReader();
+          r.onload=function(){
+            var im=new Image();
+            im.onload=function(){
+              var id='cus_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);
+              Sym.addCustom(id,f.name.replace(/\.[^.]+$/,''),r.result,im.naturalWidth,im.naturalHeight);
+              loaded++;
+              if(loaded===total){
+                self.renderCustomSymGrid();
+                self.buildSymbolLibrary();
+                UI.msg(total+' '+self.t('sym_upload_done'));
+              }
+            };
+            im.src=r.result;
+          };
+          r.readAsDataURL(f);
+        });
+        e.target.value='';
+      });
 
       /* --- view --- */
       on('btn-fit', 'click', function () { Cv.fit(); });
@@ -587,10 +645,26 @@
       Cv.requestRender();
     },
 
+    syncColorPickers: function () {
+      var pairs = [
+        ['lm-color',  function() { return App.brush.color; }],
+        ['rv-color',  function() { return App.river.color; }],
+        ['rd-color',  function() { return App.road.color; }],
+        ['lb-color',  function() { return App.label.color; }],
+        ['lb-outline',function() { return App.label.outlineColor; }]
+      ];
+      pairs.forEach(function(p) {
+        var el = $(p[0]);
+        if (el) el.value = p[1]();
+      });
+    },
+
     refreshAll: function () {
       this.refreshLayers();
       this.refreshHistory();
       this.refreshSelection();
+      this.renderCustomSymGrid();
+      this.refreshEyedropPanel();
       this.status();
     },
 
@@ -631,7 +705,7 @@
     bindKeys: function () {
       var self = this;
       var map = { v: 'select', b: 'landmass', e: 'erase', t: 'terrain', s: 'symbol',
-                  r: 'river', d: 'road', l: 'label', h: 'pan' };
+                  r: 'river', d: 'road', l: 'label', h: 'pan', i: 'eyedrop' };
 
       window.addEventListener('keydown', function (ev) {
         var tag = (ev.target.tagName || '').toLowerCase();
