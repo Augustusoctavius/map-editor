@@ -1,7 +1,7 @@
 # Medieval Map Editor
 
 Vanilla JS / Canvas 2D. Framework yok, CDN yok, dış varlık yok.
-**139 sembol** (35'i izometrik 3B), **12 arazi tipi**, 10 etiket şablonu,
+**452 sembol** (348'i detaylı izometrik), **20 arazi tipi**, 10 etiket şablonu,
 8 katman, kıyı efekti, doku örnekleyici, custom PNG sembol yükleme,
 interaktif ölçek çubuğu, 50 adımlık undo, PNG/SVG/JSON çıktı.
 
@@ -17,7 +17,10 @@ map-editor/
 │   ├── toolbar.css          # üst toolbar
 │   └── canvas.css           # tuval alanı + minimap
 ├── js/
-│   ├── symbols.js           # 139 sembol (izometrik üreteç dahil) + custom PNG
+│   ├── iso.js               # izometrik motor (taş sırası, kiremit, kazık detayı)
+│   ├── catalog.js           # izometrik yapı kataloğu
+│   ├── catalog2.js          # ek yapılar + malzeme varyantları
+│   ├── symbols.js           # sembol indeksi + custom PNG
 │   ├── history.js           # undo/redo (raster yama + vektör snapshot)
 │   ├── layers.js            # katmanlar + prosedürel arazi serpme
 │   ├── canvas.js            # render, kıyı efekti, etiket kapıtları, ölçek çubuğu

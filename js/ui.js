@@ -598,7 +598,7 @@
                         ' (' + Sym.SYMBOLS[k].items.length + ')';
         sel.appendChild(o);
       });
-      sel.value = cur && Sym.SYMBOLS[cur] ? cur : 'iso';
+      sel.value = cur && Sym.SYMBOLS[cur] ? cur : 'castles';
       this.renderSymbolGrid();
     },
 
@@ -659,7 +659,7 @@
         del.addEventListener('click', function (e) {
           e.stopPropagation();
           Sym.removeCustom(def.id);
-          if (App.symbol.id === def.id) App.symbol.id = 'iso_tower';
+          if (App.symbol.id === def.id) App.symbol.id = 'ik_knight';
           self.renderCustomSymGrid();
         });
         cell.appendChild(del);

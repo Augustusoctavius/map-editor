@@ -12,7 +12,7 @@
 
     brush:   { size:120, roughness:0.35, color:'#ded0ac' },
     terrain: { type:'grassland', size:160, opacity:0.85, clip:true },
-    symbol:  { id:'mnt_peak', size:72, rot:0, hue:0, opacity:1, jitter:false },
+    symbol:  { id:'ik_knight', size:72, rot:0, hue:0, opacity:1, jitter:false },
     river:   { width:16, meander:0.30, taper:true, color:'#5b8aa6' },
     road:    { width:6, style:'dashed', color:'#6b4f2a' },
     label:   { preset:'region', font:'serif', size:46, color:'#5a4326', outline:true,
