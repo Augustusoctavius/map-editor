@@ -208,7 +208,7 @@ textarea{font-family:var(--f-display);font-size:13px}
 }
 #lb-preview{display:block;width:100%;height:auto}
 
-.terrain-grid{grid-template-columns:repeat(3,1fr)}
+.terrain-grid{grid-template-columns:repeat(4,1fr)}
 .terrain-sw canvas{height:30px}
 
 input[type=text].sel{font-family:var(--f-display);font-size:12.5px}

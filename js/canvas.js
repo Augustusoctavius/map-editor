@@ -259,50 +259,17 @@
        birkaç halka olarak karanın altına çizer.                */
     buildShore: function () {
       var L = Layers.get('landmass');
+      var T = Layers.get('terrain');
       if (!L || !L.canvas) return null;
-      var w = L.canvas.width, h = L.canvas.height;
-      /* büyük tuvallerde downscale ile hızlandır */
-      var maxDim = 2048;
-      var sc = Math.min(1, maxDim / Math.max(w, h));
-      var sw = Math.max(1, Math.round(w*sc)), sh = Math.max(1, Math.round(h*sc));
-
-      var c = document.createElement('canvas');
-      c.width = sw; c.height = sh;
-      var x = c.getContext('2d');
-
-      var bw = Math.max(2, this.shoreWidth * sc);
-
-      /* dış halka — sığ su */
-      x.save();
-      x.filter = 'blur(' + (bw * 1.25).toFixed(1) + 'px)';
-      x.globalAlpha = 1;
-      x.drawImage(L.canvas, 0, 0, sw, sh);
-      x.drawImage(L.canvas, 0, 0, sw, sh);
-      x.filter = 'none';
-      x.globalCompositeOperation = 'source-in';
-      x.fillStyle = '#a8cbd8';
-      x.fillRect(0, 0, sw, sh);
-      x.restore();
-
-      /* iç halka — kum */
-      var c2 = document.createElement('canvas');
-      c2.width = sw; c2.height = sh;
-      var x2 = c2.getContext('2d');
-      x2.filter = 'blur(' + (bw * 0.45).toFixed(1) + 'px)';
-      x2.drawImage(L.canvas, 0, 0, sw, sh);
-      x2.drawImage(L.canvas, 0, 0, sw, sh);
-      x2.drawImage(L.canvas, 0, 0, sw, sh);
-      x2.filter = 'none';
-      x2.globalCompositeOperation = 'source-in';
-      x2.fillStyle = '#d9cfa4';
-      x2.fillRect(0, 0, sw, sh);
-
-      x.globalCompositeOperation = 'source-over';
-      x.drawImage(c2, 0, 0);
-
-      this.shoreCanvas = c;
-      this.shoreDirty = false;
-      return c;
+      var result = Terrain.buildShoreCanvas(
+        L.canvas, T ? T.canvas : L.canvas,
+        this.shoreWidth, this.W, this.H
+      );
+      this.shoreCanvas = result.canvas;
+      this._shoreScW   = result.sw;
+      this._shoreScH   = result.sh;
+      this.shoreDirty  = false;
+      return result.canvas;
     },
 
     /* ---------- ana render ---------- */
