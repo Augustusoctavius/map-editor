@@ -552,15 +552,20 @@
       tx.drawImage(L.canvas, 0, 0);
       tx.filter = 'none';
 
+      /* Blur sonrası sadece alpha threshold uygula — RGB renklere dokunma.
+         Böylece farklı renklerdeki kara bölgeleri kendi renklerini korur. */
       var id = tx.getImageData(0, 0, w, h), d = id.data;
-      var c = App.brush.color.replace('#','');
-      if (c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
-      var R = parseInt(c.substr(0,2),16), G = parseInt(c.substr(2,2),16), B = parseInt(c.substr(4,2),16);
       for (var i=0; i<d.length; i+=4) {
-        if (d[i+3] > 128) { d[i]=R; d[i+1]=G; d[i+2]=B; d[i+3]=255; }
-        else d[i+3] = 0;
+        d[i+3] = d[i+3] > 128 ? 255 : 0;
       }
       tx.putImageData(id, 0, 0);
+
+      /* Orijinal renkleri koru: blur şeklini maske olarak kullan,
+         üstüne orijinal kara canvas'ını çiz (source-in). */
+      tx.globalCompositeOperation = 'source-in';
+      tx.drawImage(before, 0, 0);
+      tx.globalCompositeOperation = 'source-over';
+
       L.ctx.clearRect(0, 0, w, h);
       L.ctx.drawImage(t, 0, 0);
 
