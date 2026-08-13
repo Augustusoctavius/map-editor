@@ -282,12 +282,12 @@
     /* --- zemin: çok katmanlı radyal (kenar geçişi için) --- */
     ctx.save();
     /* dış halo: dark tonu ile yumuşak kenar */
-    var g2 = ctx.createRadialGradient(cx, cy, R*0.50, cx, cy, R*1.05);
+    var g2 = ctx.createRadialGradient(cx, cy, R*0.50, cx, cy, R*0.98);
     g2.addColorStop(0, hexA(t.dark, 0));
     g2.addColorStop(0.6, hexA(t.dark, opacity*0.38));
     g2.addColorStop(1.0, hexA(t.dark, 0));
     ctx.fillStyle = g2;
-    ctx.beginPath(); ctx.arc(cx, cy, R*1.05, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, R*0.98, 0, Math.PI*2); ctx.fill();
 
     /* iç zemin */
     var g1 = ctx.createRadialGradient(cx, cy, R*0.20, cx, cy, R);

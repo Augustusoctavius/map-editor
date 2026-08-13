@@ -222,6 +222,7 @@
     },
 
     setTool: function (name) {
+      var self = this;
       App.tool = name;
       Tools.cancelPath();
       document.querySelectorAll('.tool').forEach(function (b) {
@@ -229,6 +230,10 @@
       });
       document.querySelectorAll('.opt-group').forEach(function (g) {
         g.classList.toggle('show', g.getAttribute('data-for').split(' ').indexOf(name) >= 0);
+      });
+      /* aktif panelin i18n'ini güncelle */
+      document.querySelectorAll('[data-i18n]').forEach(function (el) {
+        el.textContent = self.t(el.getAttribute('data-i18n'));
       });
       Cv.view.className = (name === 'pan') ? 'pan' : (name === 'select' ? 'pick' : '');
       if (name === 'symbol') this.showTab('library');

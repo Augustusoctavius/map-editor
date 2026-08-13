@@ -398,7 +398,7 @@
         var Lm = Layers.get('landmass');
         if (Lm && Lm.canvas) {
           /* Landmass maskesine clip — sadece fırça bbox'ı kadar geçici canvas */
-          var pad2 = Math.ceil(r) + 4;
+          var pad2 = Math.ceil(r * 1.12) + 6;
           var bx2 = Math.max(0, Math.floor(x - pad2));
           var by2 = Math.max(0, Math.floor(y - pad2));
           var bw2 = Math.min(layer.canvas.width  - bx2, Math.ceil(pad2*2));
