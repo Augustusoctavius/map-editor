@@ -177,7 +177,13 @@
       on('sel-canvas-size', 'change', function (e) {
         var s = parseInt(e.target.value, 10);
         if (confirm(self.t('confirmSize'))) {
+          var ratio = s / Cv.W;
           Cv.setSize(s, s, true);
+          /* Ölçek çubuğunu yeni canvas boyutuna oranla */
+          App.scale.x   = Math.round(App.scale.x   * ratio);
+          App.scale.y   = Math.round(App.scale.y   * ratio);
+          App.scale.len = Math.round(App.scale.len  * ratio);
+          App.scale.size= Math.round(App.scale.size * ratio);
           History.clear();
           self.refreshAll();
         } else e.target.value = String(Cv.W);
