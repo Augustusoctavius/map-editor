@@ -336,7 +336,7 @@
     strokeTo: function (p) {
       if (!this.last) { this.last = p; return; }
       var r = (this.mode === 'terrain' ? App.terrain.size : App.brush.size)/2;
-      var step = Math.max(1.5, r*(this.mode === 'terrain' ? 0.34 : 0.26));
+      var step = Math.max(1.5, r*(this.mode === 'terrain' ? 0.18 : 0.26));
       var dx = p.x-this.last.x, dy = p.y-this.last.y;
       var n = Math.max(1, Math.ceil(Math.hypot(dx,dy)/step));
       for (var i=1; i<=n; i++) this.stamp(this.last.x+dx*i/n, this.last.y+dy*i/n);
@@ -357,7 +357,7 @@
       if (this.mode === 'terrain') {
         var r = App.terrain.size/2;
         var Lm = Layers.get('landmass');
-        if (Lm && Lm.canvas && App.terrain.clip) {
+        if (Lm && Lm.canvas) {
           /* Landmass maskesine clip — sadece fırça bbox'ı kadar geçici canvas */
           var pad2 = Math.ceil(r) + 4;
           var bx2 = Math.max(0, Math.floor(x - pad2));
@@ -446,7 +446,7 @@
 
       var layer = Layers.get(this.activeLayerId);
 
-      if (this.mode === 'terrain' && App.terrain.clip) this.maskToLand(box);
+      if (this.mode === 'terrain') this.maskToLand(box);
 
       if (this.mode === 'erase' && this.beforeAux) {
         var T = Layers.get('terrain');
