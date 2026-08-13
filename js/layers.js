@@ -400,8 +400,8 @@
     var out  = mctx.createImageData(sw,sh);
     var od   = out.data;
 
-    /* Sabit fallback kıyı paleti */
-    var SHORE_FALLBACK = { outer:[120,170,185], inner:[180,165,120] };
+    /* Sabit fallback kıyı paleti — terrain yokken SADECE dış su halkası */
+    var SHORE_FALLBACK = { outer:[120,170,185] };
 
     for (var p=0; p<sw*sh; p++) {
       var i4=p*4;
@@ -413,12 +413,13 @@
       /* bu nokta kıyı şeridinde: terrain rengine bak */
       var tr = tData[i4], tg = tData[i4+1], tb = tData[i4+2], ta = tData[i4+3]/255;
 
-      var outerR, outerG, outerB, innerR, innerG, innerB;
+      var outerR, outerG, outerB, innerR=-1, innerG=-1, innerB=-1;
+      var hasInner = false;
 
       if (ta < 0.12) {
-        /* terrain boş → varsayılan kum/taş */
+        /* terrain boş → sadece dış su halkası, iç kum yok */
         outerR=SHORE_FALLBACK.outer[0]; outerG=SHORE_FALLBACK.outer[1]; outerB=SHORE_FALLBACK.outer[2];
-        innerR=SHORE_FALLBACK.inner[0]; innerG=SHORE_FALLBACK.inner[1]; innerB=SHORE_FALLBACK.inner[2];
+        hasInner = false;
       } else {
         /* terrain renginden en yakın terrain tipini bul */
         var bestKey=null, bestDist=1e9;
@@ -435,12 +436,13 @@
         var ci=parseInt(sh2[1].replace('#',''),16);
         outerR=(co>>16)&255; outerG=(co>>8)&255; outerB=co&255;
         innerR=(ci>>16)&255; innerG=(ci>>8)&255; innerB=ci&255;
+        hasInner = true;
       }
 
       /* dış band (daha şeffaf, geniş) ve iç band (daha opak, dar) */
       var norm = maskA; // 0..1 (kıyıya ne kadar yakın)
       var outerAlpha = norm * 0.55 * (1-landA);
-      var innerAlpha = Math.max(0, (norm-0.35)/0.65) * 0.70 * (1-landA);
+      var innerAlpha = hasInner ? Math.max(0, (norm-0.35)/0.65) * 0.70 * (1-landA) : 0;
 
       /* composite: önce outer, üstüne inner */
       var finalR = outerR + (innerR-outerR)*innerAlpha;

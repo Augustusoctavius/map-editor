@@ -356,7 +356,27 @@
       /* ---- ARAZİ: prosedürel serpme (tile yok) ---- */
       if (this.mode === 'terrain') {
         var r = App.terrain.size/2;
-        Terrain.scatter(ctx, App.terrain.type, x, y, r, App.terrain.opacity);
+        var Lm = Layers.get('landmass');
+        if (Lm && Lm.canvas && App.terrain.clip) {
+          /* Landmass maskesine clip — sadece fırça bbox'ı kadar geçici canvas */
+          var pad2 = Math.ceil(r) + 4;
+          var bx2 = Math.max(0, Math.floor(x - pad2));
+          var by2 = Math.max(0, Math.floor(y - pad2));
+          var bw2 = Math.min(layer.canvas.width  - bx2, Math.ceil(pad2*2));
+          var bh2 = Math.min(layer.canvas.height - by2, Math.ceil(pad2*2));
+          var tmp2 = document.createElement('canvas');
+          tmp2.width = bw2; tmp2.height = bh2;
+          var tmpCtx2 = tmp2.getContext('2d');
+          tmpCtx2.translate(-bx2, -by2);
+          Terrain.scatter(tmpCtx2, App.terrain.type, x, y, r, App.terrain.opacity);
+          tmpCtx2.setTransform(1,0,0,1,0,0);
+          tmpCtx2.globalCompositeOperation = 'destination-in';
+          tmpCtx2.drawImage(Lm.canvas, bx2, by2, bw2, bh2, 0, 0, bw2, bh2);
+          tmpCtx2.globalCompositeOperation = 'source-over';
+          ctx.drawImage(tmp2, bx2, by2);
+        } else {
+          Terrain.scatter(ctx, App.terrain.type, x, y, r, App.terrain.opacity);
+        }
         this.expandBox(x, y, r+3);
         return;
       }
@@ -479,7 +499,32 @@
       var layer = Layers.get(this.activeLayerId);
       if (!layer) return;
       var r = App.eyedrop.brushRadius || 80;
-      Eyedropper.paint(layer.ctx, x, y, r);
+
+      /* Landmass maskesine clip et: önce geçici canvas'a çiz, sonra
+         destination-in ile landmass alpha'sını uygula, ardından hedef
+         katmana aktar. Böylece kara dışına taşmaz.               */
+      var L = Layers.get('landmass');
+      if (L && L.canvas && this.activeLayerId !== 'landmass') {
+        /* Sadece fırça bbox'ı kadar geçici canvas — kara dışına taşmayı engelle */
+        var epad = Math.ceil(r) + 4;
+        var ebx = Math.max(0, Math.floor(x - epad));
+        var eby = Math.max(0, Math.floor(y - epad));
+        var ebw = Math.min(layer.canvas.width  - ebx, Math.ceil(epad*2));
+        var ebh = Math.min(layer.canvas.height - eby, Math.ceil(epad*2));
+        var tmp = document.createElement('canvas');
+        tmp.width = ebw; tmp.height = ebh;
+        var tmpCtx = tmp.getContext('2d');
+        tmpCtx.translate(-ebx, -eby);
+        Eyedropper.paint(tmpCtx, x, y, r);
+        tmpCtx.setTransform(1,0,0,1,0,0);
+        tmpCtx.globalCompositeOperation = 'destination-in';
+        tmpCtx.drawImage(L.canvas, ebx, eby, ebw, ebh, 0, 0, ebw, ebh);
+        tmpCtx.globalCompositeOperation = 'source-over';
+        layer.ctx.drawImage(tmp, ebx, eby);
+      } else {
+        Eyedropper.paint(layer.ctx, x, y, r);
+      }
+
       if (this.activeLayerId === 'landmass') Cv.shoreDirty = true;
       this.expandBox(x, y, r+3);
     },
