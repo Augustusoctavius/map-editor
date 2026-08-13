@@ -39,7 +39,7 @@
       Cv.renderMap(x, { includeReference: App.exportReference });
       x.restore();
       c.toBlob(function (b) {
-        download(b, 'harita-' + stamp() + '.png');
+        download(b, 'harita-' + stamp() + (scale > 1 ? '-' + scale + 'x' : '') + '.png');
         UI.msg(UI.t('exported') + ' PNG ' + w + '×' + h);
       }, 'image/png');
     },
@@ -79,7 +79,13 @@
         if (l.type === 'vector') {
           s.push('<g opacity="'+l.opacity+'">');
           l.objects.forEach(function (o) {
-            if (l.id === 'rivers') {
+            if (l.id === 'rivers' && o.kind === 'lake') {
+              /* göl SVG */
+              var lpts = Geo.sample(o.pts, 16);
+              s.push('<path d="' + Geo.svgPolyD(lpts, true) + '" fill="' + (o.color||'#5b8aa6') +
+                     '" opacity="' + (o.opacity||0.88) + '" stroke="' + (o.color||'#5b8aa6') +
+                     '" stroke-width="2" stroke-opacity="0.5" stroke-linejoin="round"/>');
+            } else if (l.id === 'rivers') {
               var pts = Cv.riverGeometry(o);
               var wEnd = o.width || 12;
               var wStart = o.taper ? Math.max(1.2, wEnd*0.18) : wEnd;
@@ -116,10 +122,41 @@
       }
 
       if (App.scale && App.scale.visible) s.push(Exporter.scaleSVG(App.scale));
+      if (App.windrose && App.windrose.visible) s.push(Exporter.windroseSVG(App.windrose));
 
       s.push('</svg>');
       download(new Blob([s.join('\n')], { type:'image/svg+xml' }), 'harita-' + stamp() + '.svg');
       UI.msg(UI.t('exported') + ' SVG');
+    },
+
+    windroseSVG: function (wr) {
+      if (!wr || !wr.visible) return '';
+      var x = wr.x, y = wr.y, R = wr.size || 120;
+      var col = esc(wr.color || '#3a2b18');
+      var o = ['<g transform="translate('+x+','+y+')" font-family="Georgia,serif">'];
+      /* dış daire */
+      o.push('<circle r="'+(R*0.52).toFixed(1)+'" fill="none" stroke="'+col+'" stroke-width="'+(R*0.025).toFixed(1)+'" opacity="0.55"/>');
+      /* 8 ok */
+      var dirs = [0,45,90,135,180,225,270,315];
+      dirs.forEach(function(deg) {
+        var isCard = deg % 90 === 0;
+        var tip = isCard ? R*0.50 : R*0.32;
+        var base = isCard ? R*0.13 : R*0.08;
+        var side = isCard ? R*0.10 : R*0.06;
+        var op = isCard ? '1' : '0.65';
+        o.push('<g transform="rotate('+deg+')" opacity="'+op+'">');
+        o.push('<path d="M0 '+(-tip).toFixed(1)+' L'+side.toFixed(1)+' '+(-base).toFixed(1)+
+               ' L0 0 L'+(-side).toFixed(1)+' '+(-base).toFixed(1)+' Z" fill="'+col+
+               '" stroke="'+col+'" stroke-width="'+(R*0.018).toFixed(1)+'"/>');
+        o.push('</g>');
+      });
+      /* merkez */
+      o.push('<circle r="'+(R*0.06).toFixed(1)+'" fill="#f5ecd8" stroke="'+col+'" stroke-width="'+(R*0.025).toFixed(1)+'"/>');
+      /* N */
+      o.push('<text x="0" y="'+(-R*0.70).toFixed(1)+'" font-size="'+(R*0.22).toFixed(1)+
+             '" font-weight="bold" fill="'+col+'" text-anchor="middle" dominant-baseline="middle">N</text>');
+      o.push('</g>');
+      return o.join('');
     },
 
     scaleSVG: function (sc) {

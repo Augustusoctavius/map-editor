@@ -52,7 +52,14 @@
       confirmNew:'Mevcut harita silinecek. Yeni tuval boyutunu seç:',
       confirmSize:'Tuval boyutunu değiştirmek mevcut katmanları ölçekler. Devam edilsin mi?',
       histStart:'Başlangıç', selNone:'Seçili nesne yok', symbols:'sembol',
-      selScale:'Ölçek çubuğu seçili'
+      selScale:'Ölçek çubuğu seçili',
+      t_lake:'Göl', o_lake:'Göl', h_lake:'Tıklayarak nokta ekle, 3+ nokta sonra Enter ile kapat.',
+      o_lakecolor:'Göl rengi',
+      o_symbbrush:'Fırça modu', o_symbdensity:'Yoğunluk',
+      o_windrose:'Pusula Gülü', o_wrvis:'Haritada göster', o_wrsize:'Boyut',
+      o_wrstyle:'Stil', o_wrcolor:'Renk', h_windrose:'Haritada sürükleyerek taşı.',
+      o_snap:'Izgaraya yapış', o_snapsize:'Izgara boyutu',
+      o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     },
     en: {
       new:'New', open:'Open', save:'Save', parchment:'Parchment', grid:'Grid', shore:'Shore',
@@ -99,7 +106,14 @@
       confirmNew:'The current map will be discarded. Choose a canvas size:',
       confirmSize:'Changing canvas size rescales existing layers. Continue?',
       histStart:'Start', selNone:'Nothing selected', symbols:'symbols',
-      selScale:'Scale bar selected'
+      selScale:'Scale bar selected',
+      t_lake:'Lake', o_lake:'Lake', h_lake:'Click to add points, 3+ points then Enter to close.',
+      o_lakecolor:'Lake colour',
+      o_symbbrush:'Brush mode', o_symbdensity:'Density',
+      o_windrose:'Windrose', o_wrvis:'Show on map', o_wrsize:'Size',
+      o_wrstyle:'Style', o_wrcolor:'Colour', h_windrose:'Drag on the map to reposition.',
+      o_snap:'Snap to grid', o_snapsize:'Grid size',
+      o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     }
   };
 
@@ -184,6 +198,10 @@
           App.scale.y   = Math.round(App.scale.y   * ratio);
           App.scale.len = Math.round(App.scale.len  * ratio);
           App.scale.size= Math.round(App.scale.size * ratio);
+          /* Windrose'u da oranla */
+          App.windrose.x    = Math.round(App.windrose.x    * ratio);
+          App.windrose.y    = Math.round(App.windrose.y    * ratio);
+          App.windrose.size = Math.round(App.windrose.size * ratio);
           History.clear();
           self.refreshAll();
         } else e.target.value = String(Cv.W);
@@ -427,6 +445,32 @@
       this.range('sc-len', 'v-sc-len', function (v) { App.scale.len = v; });
       this.range('sc-size', 'v-sc-size', function (v) { App.scale.size = v; });
       this.range('sc-segs', 'v-sc-segs', function (v) { App.scale.segs = Math.round(v); });
+
+      /* --- sembol fırçası --- */
+      on('sy-brush-mode', 'change', function (e) { App.symbol.brushMode = e.target.checked; });
+      self.range('sy-brush-density', 'v-sy-br-den', function (v) { App.symbol.brushDensity = v/100; },
+                 function (v) { return (v/100).toFixed(2); });
+
+      /* --- göl --- */
+      on('lk-color', 'input', function (e) { App.lake.color = e.target.value; });
+
+      /* --- windrose --- */
+      on('wr-visible', 'change', function (e) {
+        var b = JSON.parse(JSON.stringify(App.windrose));
+        App.windrose.visible = e.target.checked;
+        History.pushWindrose(b, JSON.parse(JSON.stringify(App.windrose)), 'windrose:visible');
+        self.refreshHistory(); Cv.requestRender();
+      });
+      self.range('wr-size', 'v-wr-size', function (v) { App.windrose.size = v; });
+      on('wr-color', 'input', function (e) { App.windrose.color = e.target.value; Cv.requestRender(); });
+
+      /* --- snap --- */
+      on('snap-enabled', 'change', function (e) { App.snap.enabled = e.target.checked; });
+      self.range('snap-size', 'v-snap-size', function (v) { App.snap.size = Math.round(v); });
+
+      /* --- PNG export ölçeği --- */
+      on('btn-export-png2', 'click', function () { Exporter.png(2); });
+      on('btn-export-png4', 'click', function () { Exporter.png(4); });
 
       /* --- görünüm --- */
       on('btn-fit', 'click', function () { Cv.fit(); });
@@ -861,9 +905,17 @@
       this.refreshHistory();
       this.refreshSelection();
       this.refreshScalePanel();
+      this.refreshWindrosePanel();
       this.refreshEyedropPanel();
       this.renderCustomSymGrid();
       this.status();
+    },
+
+    refreshWindrosePanel: function () {
+      if (!$('wr-size')) return;
+      $('wr-visible').checked = App.windrose.visible;
+      $('wr-size').value = App.windrose.size; $('v-wr-size').textContent = App.windrose.size;
+      $('wr-color').value = App.windrose.color || '#3a2b18';
     },
 
     /* ================= durum çubuğu ================= */
@@ -903,7 +955,7 @@
     bindKeys: function () {
       var self = this;
       var map = { v:'select', b:'landmass', e:'erase', t:'terrain', s:'symbol',
-                  r:'river', d:'road', l:'label', h:'pan', i:'eyedrop' };
+                  r:'river', d:'road', l:'label', h:'pan', i:'eyedrop', k:'lake' };
 
       window.addEventListener('keydown', function (ev) {
         var tag = (ev.target.tagName || '').toLowerCase();
@@ -941,6 +993,19 @@
         if (ev.key === '+' || ev.key === '=') { Cv.setZoom(Cv.zoom*1.15); return; }
         if (ev.key === '-') { Cv.setZoom(Cv.zoom/1.15); return; }
         if (ev.key === '0') { Cv.fit(); return; }
+        /* sembol döndürme */
+        if (ev.key === '[') {
+          App.symbol.rot = (App.symbol.rot - 15 + 360) % 360;
+          if ($('sy-rot')) { $('sy-rot').value = App.symbol.rot; $('v-sy-rot').textContent = Math.round(App.symbol.rot) + '°'; }
+          if (self.selIs('symbols')) Tools.applyToSelection({ rot: App.symbol.rot });
+          Cv.requestRender(); return;
+        }
+        if (ev.key === ']') {
+          App.symbol.rot = (App.symbol.rot + 15) % 360;
+          if ($('sy-rot')) { $('sy-rot').value = App.symbol.rot; $('v-sy-rot').textContent = Math.round(App.symbol.rot) + '°'; }
+          if (self.selIs('symbols')) Tools.applyToSelection({ rot: App.symbol.rot });
+          Cv.requestRender(); return;
+        }
         if (map[ev.key.toLowerCase()]) self.setTool(map[ev.key.toLowerCase()]);
       });
 

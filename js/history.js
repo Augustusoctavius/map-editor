@@ -102,6 +102,13 @@
       });
     },
 
+    pushWindrose: function (beforeObj, afterObj, label) {
+      this.push({
+        kind:'windrose', label:label || 'windrose',
+        before: JSON.stringify(beforeObj), after: JSON.stringify(afterObj)
+      });
+    },
+
     _applyPatch: function (layerId, dataURL, x, y, w, h) {
       var layer = Layers.get(layerId);
       if (!layer || !layer.canvas) return Promise.resolve();
@@ -147,6 +154,11 @@
 
       if (entry.kind === 'scale') {
         if (global.App) App.scale = JSON.parse(entry[pick]);
+        return Promise.resolve();
+      }
+
+      if (entry.kind === 'windrose') {
+        if (global.App) App.windrose = JSON.parse(entry[pick]);
         return Promise.resolve();
       }
 

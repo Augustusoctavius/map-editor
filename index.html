@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wayborne Map Editor</title>
+<title>Medieval Map Editor</title>
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/toolbar.css">
 <link rel="stylesheet" href="css/canvas.css">
@@ -13,7 +13,7 @@
 <header id="topbar">
   <div class="brand">
     <span class="brand-mark">⚔</span>
-    <span class="brand-name">Wayborne Map Editor</span>
+    <span class="brand-name">Medieval Map Editor</span>
   </div>
 
   <div class="tb-group">
@@ -33,6 +33,8 @@
 
   <div class="tb-group">
     <button class="tb-btn" id="btn-export-png">PNG</button>
+    <button class="tb-btn" id="btn-export-png2" title="2× çözünürlük">PNG 2×</button>
+    <button class="tb-btn" id="btn-export-png4" title="4× çözünürlük">PNG 4×</button>
     <button class="tb-btn" id="btn-export-svg">SVG</button>
   </div>
 
@@ -66,6 +68,7 @@
       <button class="tool" data-tool="terrain"  title="T"><span class="ico">▨</span><em data-i18n="t_terrain">Arazi</em></button>
       <button class="tool" data-tool="symbol"   title="S"><span class="ico">⛰</span><em data-i18n="t_symbol">Sembol</em></button>
       <button class="tool" data-tool="river"    title="R"><span class="ico">≈</span><em data-i18n="t_river">Nehir</em></button>
+      <button class="tool" data-tool="lake"     title="K"><span class="ico">◎</span><em data-i18n="t_lake">Göl</em></button>
       <button class="tool" data-tool="road"     title="D"><span class="ico">⋯</span><em data-i18n="t_road">Yol</em></button>
       <button class="tool" data-tool="label"    title="L"><span class="ico">A</span><em data-i18n="t_label">Etiket</em></button>
       <button class="tool" data-tool="eyedrop"  title="I"><span class="ico">⊙</span><em data-i18n="t_eyedrop">Örnekle</em></button>
@@ -117,7 +120,18 @@
         <label class="row"><span data-i18n="o_opacity">Opaklık</span><b id="v-sy-op">1</b></label>
         <input type="range" id="sy-op" min="10" max="100" value="100">
         <label class="chk"><input type="checkbox" id="sy-jitter"><span data-i18n="o_jitter">Yerleştirmede rastgelelik</span></label>
-        <p class="hint" data-i18n="h_symbol">Kütüphaneden sembol seç, haritaya tıkla. "Seç" aracıyla taşı; Delete ile sil.</p>
+        <label class="chk"><input type="checkbox" id="sy-brush-mode"><span data-i18n="o_symbbrush">Fırça modu (sürükle)</span></label>
+        <label class="row"><span data-i18n="o_symbdensity">Yoğunluk</span><b id="v-sy-br-den">0.50</b></label>
+        <input type="range" id="sy-brush-density" min="5" max="100" value="50">
+        <p class="hint" data-i18n="h_symbol">Kütüphaneden sembol seç, haritaya tıkla. [ ] tuşlarıyla döndür. Fırça modunda sürükle.</p>
+      </section>
+
+      <!-- LAKE -->
+      <section class="opt-group" data-for="lake">
+        <h3 data-i18n="o_lake">Göl</h3>
+        <label class="row"><span data-i18n="o_lakecolor">Göl rengi</span></label>
+        <input type="color" id="lk-color" value="#5b8aa6">
+        <p class="hint" data-i18n="h_lake">Tıklayarak nokta ekle, 3+ nokta sonra Enter ile kapat.</p>
       </section>
 
       <!-- RIVER -->
@@ -208,6 +222,19 @@
         <label class="row"><span data-i18n="o_scsegs">Bölme sayısı</span><b id="v-sc-segs">4</b></label>
         <input type="range" id="sc-segs" min="2" max="12" value="4">
         <p class="hint" data-i18n="h_scale">Ölçek çubuğunu haritada sürükleyerek taşıyabilirsin.</p>
+
+        <h3 style="margin-top:20px" data-i18n="o_windrose">Pusula Gülü</h3>
+        <label class="chk"><input type="checkbox" id="wr-visible"><span data-i18n="o_wrvis">Haritada göster</span></label>
+        <label class="row"><span data-i18n="o_wrsize">Boyut</span><b id="v-wr-size">120</b></label>
+        <input type="range" id="wr-size" min="40" max="400" value="120">
+        <label class="row"><span data-i18n="o_wrcolor">Renk</span></label>
+        <input type="color" id="wr-color" value="#3a2b18">
+        <p class="hint" data-i18n="h_windrose">Haritada sürükleyerek taşı.</p>
+
+        <h3 style="margin-top:20px" data-i18n="o_snap">Izgaraya Yapış</h3>
+        <label class="chk"><input type="checkbox" id="snap-enabled"><span data-i18n="o_snap">Aktif</span></label>
+        <label class="row"><span data-i18n="o_snapsize">Izgara boyutu</span><b id="v-snap-size">64</b></label>
+        <input type="range" id="snap-size" min="16" max="256" value="64">
       </section>
 
       <!-- PAN -->
@@ -270,7 +297,6 @@
   <span class="st"><i data-i18n="st_size">Tuval</i> <b id="st-size">2048 × 2048</b></span>
   <span class="st"><i data-i18n="st_tool">Araç</i> <b id="st-tool">Kara</b></span>
   <span class="st right" id="st-msg"></span>
-  <span class="st right" style="opacity:0.45;font-size:11px;letter-spacing:0.04em">v0.10</span>
 </footer>
 
 <div id="modal" class="modal hidden">

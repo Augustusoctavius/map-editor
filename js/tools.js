@@ -138,6 +138,9 @@
     dragging:null, activeLayerId:null,
     eyeStartPos:null,
     scaleDrag:null,
+    windroseDrag:null,
+    symBrushLast:null,
+    symBrushBefore:null,
 
     bind: function () {
       var v = Cv.view, self = this;
@@ -185,6 +188,13 @@
       if (e.button !== 0) return;
       Cv.view.setPointerCapture(e.pointerId);
 
+      /* windrose tutamağı */
+      if (App.windrose && App.windrose.visible && this.hitWindrose(p)) {
+        var wb = JSON.parse(JSON.stringify(App.windrose));
+        this.windroseDrag = { sx:p.x, sy:p.y, ox:App.windrose.x, oy:App.windrose.y, before:wb };
+        return;
+      }
+
       /* ölçek çubuğu tutamağı (her araçta) */
       if (App.scale && App.scale.visible && this.hitScale(p)) {
         var b = JSON.parse(JSON.stringify(App.scale));
@@ -208,7 +218,11 @@
         case 'landmass': this.startRaster('landmass', p, 'paint'); break;
         case 'erase':    this.startRaster('landmass', p, 'erase'); break;
         case 'terrain':  this.startRaster('terrain',  p, 'terrain'); break;
-        case 'symbol':   this.placeSymbol(p); break;
+        case 'symbol':
+          if (App.symbol.brushMode) this.startSymbolBrush(p);
+          else this.placeSymbol(p);
+          break;
+        case 'lake':
         case 'river':
         case 'road':     this.addPathPoint(p); break;
         case 'label':    this.placeLabel(p); break;
@@ -225,6 +239,13 @@
       if (this.panning && this.panStart) {
         Cv.panX = this.panStart.px + (e.clientX-this.panStart.x);
         Cv.panY = this.panStart.py + (e.clientY-this.panStart.y);
+        Cv.requestRender();
+        return;
+      }
+
+      if (this.windroseDrag) {
+        App.windrose.x = this.windroseDrag.ox + (p.x-this.windroseDrag.sx);
+        App.windrose.y = this.windroseDrag.oy + (p.y-this.windroseDrag.sy);
         Cv.requestRender();
         return;
       }
@@ -252,6 +273,12 @@
         return;
       }
 
+      if (this.mode === 'symbolBrush' && this.symBrushLast) {
+        this.symbolBrushTo(p);
+        Cv.requestRender();
+        return;
+      }
+
       if (this.dragging) {
         var o = this.dragging.obj;
         var dx = p.x-this.dragging.sx, dy = p.y-this.dragging.sy;
@@ -272,6 +299,13 @@
     /* ================= POINTER UP ================= */
     onUp: function () {
       if (this.panning) { this.panning = false; Cv.view.classList.remove('panning'); return; }
+
+      if (this.windroseDrag) {
+        History.pushWindrose(this.windroseDrag.before, JSON.parse(JSON.stringify(App.windrose)), 'windrose:move');
+        this.windroseDrag = null;
+        UI.refreshHistory();
+        return;
+      }
 
       if (this.scaleDrag) {
         History.pushScale(this.scaleDrag.before, JSON.parse(JSON.stringify(App.scale)), 'scale:move');
@@ -296,6 +330,11 @@
         }
         this.eyeStartPos = null;
         Cv.requestRender();
+        return;
+      }
+
+      if (this.mode === 'symbolBrush') {
+        this.endSymbolBrush();
         return;
       }
 
@@ -587,6 +626,64 @@
       Cv.requestRender();
     },
 
+    /* ================= SEMBOL FIRÇASI ================= */
+    startSymbolBrush: function (p) {
+      var L = Layers.get('symbols');
+      if (L.locked || !L.visible) { UI.msg(UI.t('locked')); return; }
+      this.mode = 'symbolBrush';
+      this.symBrushLast = p;
+      this.symBrushBefore = JSON.parse(JSON.stringify(L.objects));
+      this.symbolBrushStamp(p);
+    },
+
+    symbolBrushStamp: function (p) {
+      var L = Layers.get('symbols');
+      var s = App.symbol;
+      var density = App.symbol.brushDensity || 0.5;
+      var spread = s.size * (1.2 + density * 1.5);
+      var count = Math.max(1, Math.round(density * 3));
+      for (var i = 0; i < count; i++) {
+        var angle = Math.random() * Math.PI * 2;
+        var dist  = Math.random() * spread * 0.5;
+        var snp = Cv.snapPoint ? { x: p.x, y: p.y } : p;
+        var o = {
+          id: uid(), sym: s.id,
+          x: snp.x + Math.cos(angle) * dist * (s.jitter ? 1 : 0),
+          y: snp.y + Math.sin(angle) * dist * (s.jitter ? 1 : 0),
+          size: s.size * (0.78 + Math.random() * 0.44 * (s.jitter ? 1 : 0.2)),
+          rot:  s.rot + (Math.random() - 0.5) * 60 * (s.jitter ? 1 : 0.1),
+          hue: s.hue, opacity: s.opacity
+        };
+        L.objects.push(o);
+      }
+    },
+
+    symbolBrushTo: function (p) {
+      if (!this.symBrushLast) return;
+      var r = App.symbol.size * (0.8 + (App.symbol.brushDensity||0.5));
+      var step = Math.max(r * 0.6, 20);
+      var dx = p.x - this.symBrushLast.x, dy = p.y - this.symBrushLast.y;
+      var dist = Math.hypot(dx, dy);
+      if (dist < step) return;
+      var n = Math.ceil(dist / step);
+      for (var i = 1; i <= n; i++) {
+        this.symbolBrushStamp({ x: this.symBrushLast.x + dx*i/n, y: this.symBrushLast.y + dy*i/n });
+      }
+      this.symBrushLast = p;
+    },
+
+    endSymbolBrush: function () {
+      if (!this.symBrushBefore) return;
+      var L = Layers.get('symbols');
+      History.pushVector('symbols', this.symBrushBefore, JSON.parse(JSON.stringify(L.objects)), 'symbol:brush');
+      this.symBrushLast = null;
+      this.symBrushBefore = null;
+      this.mode = null;
+      App.selection = null;
+      UI.refreshHistory();
+      Cv.requestRender();
+    },
+
     /* ================= SEMBOL ================= */
     placeSymbol: function (p) {
       var L = Layers.get('symbols');
@@ -630,24 +727,33 @@
 
     /* ================= NEHİR / YOL ================= */
     addPathPoint: function (p) {
-      var lid = App.tool === 'river' ? 'rivers' : 'roads';
+      var snp = Cv.snapPoint(p);
+      var lid = App.tool === 'river' || App.tool === 'lake' ? 'rivers' : 'roads';
       var L = Layers.get(lid);
       if (L.locked || !L.visible) { UI.msg(UI.t('locked')); return; }
-      this.pathPts.push([p.x, p.y]);
-      this.pathHover = p;
+      this.pathPts.push([snp.x, snp.y]);
+      this.pathHover = snp;
     },
 
     finishPath: function () {
-      if (this.pathPts.length < 2) { this.pathPts = []; Cv.requestRender(); return; }
+      var minPts = (App.tool === 'lake') ? 3 : 2;
+      if (this.pathPts.length < minPts) { this.pathPts = []; Cv.requestRender(); return; }
       var isRiver = App.tool === 'river';
-      var lid = isRiver ? 'rivers' : 'roads';
+      var isLake  = App.tool === 'lake';
+      var lid = (isRiver || isLake) ? 'rivers' : 'roads';
       var L = Layers.get(lid);
       var before = JSON.parse(JSON.stringify(L.objects));
-      var o = isRiver
-        ? { id:uid(), pts:this.pathPts.slice(), width:App.river.width, meander:App.river.meander,
-            taper:App.river.taper, color:App.river.color, opacity:1 }
-        : { id:uid(), pts:this.pathPts.slice(), width:App.road.width, style:App.road.style,
-            color:App.road.color, opacity:1 };
+      var o;
+      if (isLake) {
+        o = { id:uid(), kind:'lake', pts:this.pathPts.slice(),
+              color:App.lake.color, opacity:App.lake.opacity };
+      } else if (isRiver) {
+        o = { id:uid(), pts:this.pathPts.slice(), width:App.river.width, meander:App.river.meander,
+              taper:App.river.taper, color:App.river.color, opacity:1 };
+      } else {
+        o = { id:uid(), pts:this.pathPts.slice(), width:App.road.width, style:App.road.style,
+              color:App.road.color, opacity:1 };
+      }
       L.objects.push(o);
       this.pathPts = []; this.pathHover = null;
       App.selection = { layerId:lid, id:o.id };
@@ -663,6 +769,13 @@
     },
 
     /* ================= SEÇİM ================= */
+    hitWindrose: function (p) {
+      if (!App.windrose || !App.windrose.visible) return false;
+      var b = Cv.windroseBounds(App.windrose);
+      var m = App.windrose.size * 0.15;
+      return p.x >= b.x-m && p.x <= b.x+b.w+m && p.y >= b.y-m && p.y <= b.y+b.h+m;
+    },
+
     hitScale: function (p) {
       if (!App.scale || !App.scale.visible) return false;
       var b = Cv.scaleBounds(App.scale);
@@ -789,11 +902,26 @@
         if (this.pathHover) pts.push([this.pathHover.x, this.pathHover.y]);
         var sm = Geo.sample(pts, 14);
         ctx.save();
-        ctx.strokeStyle = App.tool === 'river' ? App.river.color : App.road.color;
-        ctx.globalAlpha = 0.75;
-        ctx.lineWidth = Math.max(1/z, (App.tool==='river'?App.river.width:App.road.width));
-        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-        ctx.stroke(Geo.polyPath(sm));
+        if (App.tool === 'lake') {
+          ctx.strokeStyle = App.lake.color;
+          ctx.fillStyle = App.lake.color;
+          ctx.globalAlpha = 0.35;
+          ctx.lineWidth = 2/z;
+          ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+          if (pts.length >= 3) {
+            var lpath = Geo.polyPath(sm);
+            lpath.closePath();
+            ctx.fill(lpath);
+          }
+          ctx.globalAlpha = 0.75;
+          ctx.stroke(Geo.polyPath(sm));
+        } else {
+          ctx.strokeStyle = App.tool === 'river' ? App.river.color : App.road.color;
+          ctx.globalAlpha = 0.75;
+          ctx.lineWidth = Math.max(1/z, (App.tool==='river'?App.river.width:App.road.width));
+          ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+          ctx.stroke(Geo.polyPath(sm));
+        }
         ctx.globalAlpha = 1;
         ctx.fillStyle = '#c99a4b';
         for (var i=0; i<this.pathPts.length; i++) {
