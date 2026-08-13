@@ -289,11 +289,11 @@
     ctx.fillStyle = g2;
     ctx.beginPath(); ctx.arc(cx, cy, R*0.98, 0, Math.PI*2); ctx.fill();
 
-    /* iç zemin */
-    var g1 = ctx.createRadialGradient(cx, cy, R*0.20, cx, cy, R);
+    /* iç zemin — kenar fade daha uzak, boşluk kalmasın */
+    var g1 = ctx.createRadialGradient(cx, cy, R*0.10, cx, cy, R);
     g1.addColorStop(0.00, hexA(t.base, opacity));
-    g1.addColorStop(0.55, hexA(t.base, opacity));
-    g1.addColorStop(0.82, hexA(t.base, opacity*0.72));
+    g1.addColorStop(0.65, hexA(t.base, opacity));
+    g1.addColorStop(0.88, hexA(t.base, opacity*0.60));
     g1.addColorStop(1.00, hexA(t.base, 0));
     ctx.fillStyle = g1;
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
