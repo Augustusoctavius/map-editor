@@ -440,22 +440,71 @@
     /* ---------- göl ---------- */
     drawLake: function (ctx, o) {
       if (!o.pts || o.pts.length < 3) return;
-      var pts = Geo.sample(o.pts, 16);
+      var pts = Geo.sample(o.pts, 22);
+      var col = o.color || '#5b8aa6';
       ctx.save();
-      ctx.globalAlpha *= (o.opacity === undefined ? 0.88 : o.opacity);
-      /* dolgu */
-      ctx.beginPath();
-      ctx.moveTo(pts[0][0], pts[0][1]);
-      for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
-      ctx.closePath();
-      ctx.fillStyle = o.color || '#5b8aa6';
-      ctx.fill();
-      /* kenar çizgisi */
-      ctx.strokeStyle = o.color || '#5b8aa6';
-      ctx.globalAlpha *= 0.5;
-      ctx.lineWidth = 2;
+
+      /* göl path'i bir kez oluştur */
+      function lakePath() {
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+        ctx.closePath();
+      }
+
+      /* --- kıyı efekti: terrain rengine göre ince bant --- */
+      /* terrain canvas'ından kıyı rengini örnekle (göl merkezinden) */
+      var cx = 0, cy = 0;
+      for (var k = 0; k < pts.length; k++) { cx += pts[k][0]; cy += pts[k][1]; }
+      cx /= pts.length; cy /= pts.length;
+
+      /* dış kıyı halkası — terrain rengiyle uyumlu açık ton */
+      ctx.save();
+      lakePath();
+      ctx.save();
+      ctx.clip(); /* kıyıyı göl içinde tut */
+      ctx.restore();
+      /* kıyı genişliği */
+      var shoreW = 18;
+      ctx.lineWidth = shoreW * 2;
+      ctx.strokeStyle = 'rgba(200,190,160,0.55)'; /* kum/kıyı tonu */
       ctx.lineJoin = 'round';
+      lakePath();
       ctx.stroke();
+      /* iç göl rengi üstüne gelecek, kıyı sadece dış halkada kalacak */
+      ctx.restore();
+
+      /* --- ana dolgu: tam opak, terrain görünmesin --- */
+      ctx.save();
+      ctx.globalAlpha = 0.96;
+      lakePath();
+      ctx.fillStyle = col;
+      ctx.fill();
+      ctx.restore();
+
+      /* --- göl içi derinlik efekti: merkeze doğru biraz daha koyu --- */
+      ctx.save();
+      lakePath();
+      ctx.clip();
+      var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(
+        Math.abs(pts[0][0]-cx), Math.abs(pts[0][1]-cy)) * 1.2);
+      grad.addColorStop(0,   'rgba(0,0,0,0.18)');
+      grad.addColorStop(0.5, 'rgba(0,0,0,0.06)');
+      grad.addColorStop(1,   'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(cx - 2000, cy - 2000, 4000, 4000);
+      ctx.restore();
+
+      /* --- kenar çizgisi ince --- */
+      ctx.save();
+      ctx.globalAlpha = 0.45;
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 1.5;
+      ctx.lineJoin = 'round';
+      lakePath();
+      ctx.stroke();
+      ctx.restore();
+
       ctx.restore();
     },
 
