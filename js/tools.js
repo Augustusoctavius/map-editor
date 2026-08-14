@@ -134,7 +134,6 @@
     painting:false, panning:false, spaceDown:false,
     panStart:null, last:null, box:null,
     beforeMain:null, beforeAux:null,
-    strokeAllPts:null,
     pathPts:[], pathHover:null,
     dragging:null, activeLayerId:null,
     eyeStartPos:null,
@@ -370,39 +369,15 @@
         if (T && !T.locked) this.beforeAux = snap(T.canvas);
       }
 
-      /* terrain stroke: tüm noktaları biriktir, her frame sıfırdan çiz */
-      this.strokeAllPts = (mode === 'terrain') ? [[p.x, p.y]] : null;
-
       this.stamp(p.x, p.y);
     },
 
     strokeTo: function (p) {
       if (!this.last) { this.last = p; return; }
       var r = (this.mode === 'terrain' ? App.terrain.size : App.brush.size)/2;
-      var step = Math.max(1.5, r*(this.mode === 'terrain' ? 0.25 : 0.26));
+      var step = Math.max(1.5, r * 0.26);
       var dx = p.x-this.last.x, dy = p.y-this.last.y;
       var n = Math.max(1, Math.ceil(Math.hypot(dx,dy)/step));
-
-      if (this.mode === 'terrain' && this.strokeAllPts && this.beforeMain) {
-        /* yeni noktaları biriktir */
-        for (var i=1; i<=n; i++) {
-          this.strokeAllPts.push([this.last.x+dx*i/n, this.last.y+dy*i/n]);
-        }
-        this.last = p;
-
-        /* terrain canvas'ını snapshot'a sıfırla */
-        var layer = Layers.get('terrain');
-        if (layer) {
-          layer.ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
-          layer.ctx.drawImage(this.beforeMain, 0, 0);
-          /* tüm birikmiş noktaları yeniden çiz */
-          for (var j=0; j<this.strokeAllPts.length; j++) {
-            this.stampTerrain(this.strokeAllPts[j][0], this.strokeAllPts[j][1]);
-          }
-        }
-        return;
-      }
-
       for (var i=1; i<=n; i++) this.stamp(this.last.x+dx*i/n, this.last.y+dy*i/n);
       this.last = p;
     },
@@ -532,7 +507,6 @@
 
       this.box = null; this.last = null;
       this.beforeMain = null; this.beforeAux = null;
-      this.strokeAllPts = null;
       Cv.shoreDirty = true;
       UI.refreshHistory();
       Cv.requestRender();

@@ -279,47 +279,40 @@
     var t = TERRAIN[key]; if (!t) return;
     var R = radius;
 
-    /* --- zemin: düz dolgu + yalnızca son %10'da fade --- */
     ctx.save();
-    var g1 = ctx.createRadialGradient(cx, cy, R*0.70, cx, cy, R);
-    g1.addColorStop(0, hexA(t.base, opacity));
-    g1.addColorStop(1, hexA(t.base, 0));
-    /* önce tam dolu daire */
+
+    /* clip: tüm çizimler daire içinde kalır — kenar taşmaz */
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.clip();
+
+    /* zemin: düz dolgu → damgalar arası boşluk yok */
     ctx.fillStyle = hexA(t.base, opacity);
-    ctx.beginPath(); ctx.arc(cx, cy, R*0.80, 0, Math.PI*2); ctx.fill();
-    /* kenar fade */
-    ctx.fillStyle = g1;
+    ctx.fillRect(cx - R, cy - R, R*2, R*2);
+
+    /* kenar fade: sadece dış %18'de */
+    var gEdge = ctx.createRadialGradient(cx, cy, R*0.82, cx, cy, R);
+    gEdge.addColorStop(0, hexA(t.base, 0));
+    gEdge.addColorStop(1, hexA(t.base, opacity));
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = gEdge;
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
-    /* dış dark halo — çok ince */
-    var g2 = ctx.createRadialGradient(cx, cy, R*0.78, cx, cy, R*0.98);
-    g2.addColorStop(0, hexA(t.dark, 0));
-    g2.addColorStop(0.7, hexA(t.dark, opacity*0.22));
-    g2.addColorStop(1.0, hexA(t.dark, 0));
-    ctx.fillStyle = g2;
-    ctx.beginPath(); ctx.arc(cx, cy, R*0.98, 0, Math.PI*2); ctx.fill();
-    ctx.restore();
+    ctx.globalCompositeOperation = 'source-over';
 
-    /* --- işaretler --- */
-    var n = Math.round(R * 0.18 * (t.density||1));
-    n = Math.max(2, Math.min(60, n));
+    /* işaretler — clip sayesinde dışarı çıkamaz */
+    var n = Math.round(R * 0.14 * (t.density||1));
+    n = Math.max(2, Math.min(40, n));
     var unit = Math.max(3, R * 0.11);
-
-    ctx.save();
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
     for (var i = 0; i < n; i++) {
       var a  = Math.random() * Math.PI * 2;
-      var rr = Math.sqrt(Math.random()) * R * 0.90;
+      var rr = Math.sqrt(Math.random()) * R * 0.85;
       var mx = cx + Math.cos(a)*rr;
       var my = cy + Math.sin(a)*rr;
-      var edge = 1 - Math.pow(rr/R, 2.4);
-      var alpha = opacity * (0.38 + Math.random()*0.50) * edge;
+      var alpha = opacity * (0.30 + Math.random()*0.40) * (1 - rr/R * 0.5);
       if (alpha < 0.04) continue;
-
       var sc  = unit/6 * (0.62 + Math.random()*0.82);
       var rot = (Math.random()-0.5) * (t.kind==='field'?0.4 : t.kind==='dune'||t.kind==='chevron'?0.28 : 0.90);
       var col = Math.random() < 0.55 ? t.mark : t.mark2;
-
       ctx.save();
       ctx.globalAlpha = alpha;
       ctx.translate(mx, my);
@@ -331,6 +324,7 @@
       mark(ctx, t.kind);
       ctx.restore();
     }
+
     ctx.restore();
   }
 
