@@ -380,6 +380,16 @@
             for (var j = 0; j < l.objects.length; j++) {
               if (l.objects[j].kind === 'lake') self_.drawLakeFill(ctx, l.objects[j]);
             }
+            /* 4. pass: nehir-göl birleşim yerinde delta/plume karışım efekti */
+            for (var j = 0; j < l.objects.length; j++) {
+              if (l.objects[j].kind !== 'lake') {
+                for (var k2 = 0; k2 < l.objects.length; k2++) {
+                  if (l.objects[k2].kind === 'lake') {
+                    self_.drawRiverLakeConfluence(ctx, l.objects[j], l.objects[k2]);
+                  }
+                }
+              }
+            }
           } else {
             for (var j = 0; j < l.objects.length; j++) {
               var o = l.objects[j];
@@ -432,6 +442,84 @@
       return Geo.meander(pts, (o.meander||0)*(o.width||12)*1.6, (o.width||12)*9);
     },
 
+    _pointInPoly: function (x, y, pts) {
+      var inside = false;
+      for (var i=0, j=pts.length-1; i<pts.length; j=i++) {
+        var xi=pts[i][0], yi=pts[i][1], xj=pts[j][0], yj=pts[j][1];
+        var intersect = ((yi>y) !== (yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi)+xi);
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    },
+
+    /* nehir ucu göle giriyorsa: delta/plume karışım şekli çiz —
+       nehir rengi ile göl rengi arasında yumuşak, düzensiz bir yelpaze */
+    drawRiverLakeConfluence: function (ctx, river, lake) {
+      if (!river.pts || river.pts.length < 2 || !lake.pts || lake.pts.length < 3) return;
+      var rPts = this.riverGeometry(river);
+      var lPts = Geo.sample(lake.pts, 30);
+      var mouth = rPts[rPts.length-1];
+      var prev  = rPts[Math.max(0, rPts.length-4)];
+      if (!this._pointInPoly(mouth[0], mouth[1], lPts)) return; /* göle girmiyor */
+
+      var lakeCol = lake.color || '#5b8aa6';
+      var riverCol = river.color || lakeCol;
+      var wEnd = river.width || 12;
+
+      /* akış yönü */
+      var dx = mouth[0]-prev[0], dy = mouth[1]-prev[1];
+      var dlen = Math.hypot(dx,dy) || 1;
+      dx/=dlen; dy/=dlen;
+      var nx = -dy, ny = dx; /* normal */
+
+      ctx.save();
+      /* göl sınırına clip — plume göl dışına taşmasın */
+      ctx.beginPath();
+      ctx.moveTo(lPts[0][0], lPts[0][1]);
+      for (var i=1;i<lPts.length;i++) ctx.lineTo(lPts[i][0], lPts[i][1]);
+      ctx.closePath();
+      ctx.clip();
+
+      /* yelpaze/delta şekli: ağızdan göl içine doğru genişleyen düzensiz blob */
+      var fanLen = wEnd * 5.5;
+      var fanW   = wEnd * 3.2;
+      var steps = 10;
+      ctx.beginPath();
+      for (var s=0; s<=steps; s++) {
+        var t = s/steps;
+        var spread = fanW * (0.3 + t*0.9) * (1 + Math.sin(t*7+mouth[0]*0.01)*0.18);
+        var fx = mouth[0] + dx*fanLen*t + nx*spread;
+        var fy = mouth[1] + dy*fanLen*t + ny*spread;
+        if (s===0) ctx.moveTo(fx,fy); else ctx.lineTo(fx,fy);
+      }
+      for (var s=steps; s>=0; s--) {
+        var t = s/steps;
+        var spread = fanW * (0.3 + t*0.9) * (1 + Math.sin(t*7+mouth[1]*0.01)*0.18);
+        var fx = mouth[0] + dx*fanLen*t - nx*spread;
+        var fy = mouth[1] + dy*fanLen*t - ny*spread;
+        ctx.lineTo(fx,fy);
+      }
+      ctx.closePath();
+
+      /* radyal gradient: ağızda nehir rengi, göle doğru göl rengine erir */
+      var grad = ctx.createRadialGradient(mouth[0],mouth[1],0, mouth[0],mouth[1], fanLen*1.1);
+      grad.addColorStop(0,   riverCol);
+      grad.addColorStop(0.45,riverCol);
+      grad.addColorStop(1,   lakeCol);
+      ctx.globalAlpha = 0.55;
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      /* ikinci, daha küçük ve daha opak katman — ağız net görünsün */
+      ctx.beginPath();
+      ctx.ellipse(mouth[0], mouth[1], wEnd*1.4, wEnd*1.4, 0, 0, Math.PI*2);
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = riverCol;
+      ctx.fill();
+
+      ctx.restore();
+    },
+
     drawRiver: function (ctx, o) {
       if (!o.pts || o.pts.length < 2) return;
       var pts = this.riverGeometry(o);
@@ -457,33 +545,31 @@
 
       ctx.save();
 
-      if (mouthFade && pts.length >= 3) {
-        /* denize dökülen nehir: son segmentte fade — clip + lineer gradient mask */
-        var fadeStart = pts[Math.max(0, pts.length-Math.ceil(pts.length*0.25))];
-        var grad = ctx.createLinearGradient(fadeStart[0], fadeStart[1], lastPt[0], lastPt[1]);
-        grad.addColorStop(0, col);
-        grad.addColorStop(1, 'rgba('+parseInt(col.slice(1,3),16)+','+
-                              parseInt(col.slice(3,5),16)+','+
-                              parseInt(col.slice(5,7),16)+',0)');
-        /* tüm nehri normal çiz, sonra son kısmı fade maskesiyle üst üste */
-        ctx.globalAlpha = baseAlpha;
-        var path = Geo.polyPath(poly); path.closePath();
-        ctx.fillStyle = col; ctx.fill(path);
-        ctx.strokeStyle = col; ctx.globalAlpha = baseAlpha*0.55;
-        ctx.lineWidth = Math.max(0.7, wEnd*0.09); ctx.lineJoin='round'; ctx.stroke(path);
-        /* fade overlay: son kısım üstüne şeffaf dikdörtgen */
+      /* nehri her zaman normal (tam opak) çiz */
+      ctx.globalAlpha = baseAlpha;
+      var path = Geo.polyPath(poly); path.closePath();
+      ctx.fillStyle = col; ctx.fill(path);
+      ctx.strokeStyle = col; ctx.globalAlpha = baseAlpha*0.55;
+      ctx.lineWidth = Math.max(0.7, wEnd*0.09); ctx.lineJoin='round'; ctx.stroke(path);
+
+      if (mouthFade) {
+        /* SADECE ağız noktası çevresinde küçük bir daireye clip edip
+           orada radyal fade uygula — nehrin geri kalanına dokunmaz.
+           Böylece önceki sürümdeki "tüm nehri yanlış yönde silme" hatası yok. */
+        var fadeR = Math.max(wEnd*3, 24);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(lastPt[0], lastPt[1], fadeR, 0, Math.PI*2);
+        ctx.clip();
+        var rg = ctx.createRadialGradient(lastPt[0],lastPt[1],0, lastPt[0],lastPt[1], fadeR);
+        rg.addColorStop(0, 'rgba(0,0,0,1)');   /* ağızda tam sil */
+        rg.addColorStop(1, 'rgba(0,0,0,0)');   /* fadeR'de hiç silme */
         ctx.globalAlpha = 1;
         ctx.globalCompositeOperation = 'destination-out';
-        ctx.fillStyle = grad;
-        var path2 = Geo.polyPath(poly); path2.closePath();
-        ctx.fill(path2);
+        ctx.fillStyle = rg;
+        ctx.fillRect(lastPt[0]-fadeR, lastPt[1]-fadeR, fadeR*2, fadeR*2);
         ctx.globalCompositeOperation = 'source-over';
-      } else {
-        ctx.globalAlpha = baseAlpha;
-        var path = Geo.polyPath(poly); path.closePath();
-        ctx.fillStyle = col; ctx.fill(path);
-        ctx.strokeStyle = col; ctx.globalAlpha *= 0.55;
-        ctx.lineWidth = Math.max(0.7, wEnd*0.09); ctx.lineJoin='round'; ctx.stroke(path);
+        ctx.restore();
       }
 
       ctx.restore();
@@ -509,22 +595,72 @@
       return shoreCol;
     },
 
-    /* ---------- göl 1. pass: sadece dış kıyı bandı (nehirlerin altında) ---------- */
+    /* ---------- göl 1. pass: düzensiz organik kıyı bandı (nehirlerin altında) ---------- */
     drawLakeShore: function (ctx, o) {
       if (!o.pts || o.pts.length < 3) return;
-      var pts = Geo.sample(o.pts, 22);
+      var pts = Geo.sample(o.pts, 48);
       var shoreCol = this._lakeShoreColor(pts);
+      var n = pts.length;
+
+      var cx=0, cy=0;
+      for (var k=0;k<n;k++){ cx+=pts[k][0]; cy+=pts[k][1]; }
+      cx/=n; cy/=n;
+
+      /* lokal normal: komşu noktalardan teğet çıkar, 90° döndür.
+         Bu, merkez-bazlı offsetin uzun göllerde yarattığı ışın/patlama
+         hatasını önler — kıyı her zaman sınırın kendi şekline sadık kalır. */
+      function normalAt(i) {
+        var a = pts[(i-1+n)%n], b = pts[(i+1)%n];
+        var tx = b[0]-a[0], ty = b[1]-a[1];
+        var tl = Math.hypot(tx,ty) || 1;
+        tx/=tl; ty/=tl;
+        var nx = -ty, ny = tx;
+        /* normalin dışa baktığından emin ol (merkezden uzaklaşan yönde) */
+        var toC = [pts[i][0]-cx, pts[i][1]-cy];
+        if (nx*toC[0] + ny*toC[1] < 0) { nx=-nx; ny=-ny; }
+        return [nx, ny];
+      }
+
+      function seededRand(i) {
+        var x = Math.sin(i*12.9898 + cx*0.0013 + cy*0.0071) * 43758.5453;
+        return x - Math.floor(x);
+      }
+
+      /* düşük frekanslı, geniş dalgalar — birkaç yumuşak tümsek, diken değil */
+      var widths = [];
+      for (var i=0;i<n;i++) {
+        var w1 = Math.sin(i*0.28 + cx*0.01)*0.5+0.5;
+        var w2 = Math.sin(i*0.11 + cy*0.01 + 1.7)*0.5+0.5;
+        var rnd = seededRand(i);
+        widths.push(9 + (w1*0.55 + w2*0.30 + rnd*0.15) * 16); /* 9..25 aralığı, yumuşak */
+      }
+      /* komşu genişlikleri ortalayarak ekstra yumuşat (3-nokta smoothing) */
+      var smoothed = widths.map(function(w,i){
+        var a=widths[(i-1+n)%n], b=widths[i], c=widths[(i+1)%n];
+        return (a+b*2+c)/4;
+      });
+
       ctx.save();
-      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      /* dış kıyı: stroke göl sınırının dışına ve içine eşit yayılır,
-         lineWidth=shoreW*2 → dışına shoreW kadar çıkar */
-      ctx.lineWidth = 28;
-      ctx.strokeStyle = shoreCol;
-      ctx.beginPath();
-      ctx.moveTo(pts[0][0], pts[0][1]);
-      for (var i=1; i<pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
-      ctx.closePath();
-      ctx.stroke();
+      var layers = [
+        { mul:1.00, alpha:0.22 },
+        { mul:0.62, alpha:0.34 },
+        { mul:0.30, alpha:0.42 }
+      ];
+      layers.forEach(function(layer) {
+        ctx.beginPath();
+        for (var i=0;i<=n;i++) {
+          var idx = i % n;
+          var nrm = normalAt(idx);
+          var w = smoothed[idx]*layer.mul;
+          var px = pts[idx][0] + nrm[0]*w;
+          var py = pts[idx][1] + nrm[1]*w;
+          if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+        }
+        ctx.closePath();
+        ctx.globalAlpha = layer.alpha;
+        ctx.fillStyle = shoreCol;
+        ctx.fill();
+      });
       ctx.restore();
     },
 
@@ -569,12 +705,6 @@
       ctx.fillStyle = dg;
       ctx.fillRect(cx-maxR-10, cy-maxR-10, (maxR+10)*2, (maxR+10)*2);
       ctx.restore();
-
-      /* iç kıyı şeridi — sığ su */
-      ctx.globalAlpha = 0.45;
-      ctx.strokeStyle = shoreCol;
-      ctx.lineWidth = 10;
-      makePath(); ctx.stroke();
 
       /* dış kenar ince */
       ctx.globalAlpha = 0.30;
