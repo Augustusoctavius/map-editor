@@ -274,6 +274,8 @@
       this._shoreScW   = result.sw;
       this._shoreScH   = result.sh;
       this.shoreDirty  = false;
+      /* kıyı çizgisi değişti — nehir kesim noktaları geçersiz olabilir */
+      this._riverCrossingCache = {};
       return result.canvas;
     },
 
@@ -342,9 +344,42 @@
         }
       }
 
+      /* --- nehir ağzı deniz plume'u: TERRAIN'DEN ÖNCE çizilir.
+         Böylece terrain rasteri bunun üstüne biner ve karaya taşan
+         kısım otomatik örtülür — kıyı efektiyle aynı teknik. --- */
+      var riversLayerEarly = Layers.get('rivers');
+      if (riversLayerEarly && riversLayerEarly.visible) {
+        var self0 = this;
+        for (var pi = 0; pi < riversLayerEarly.objects.length; pi++) {
+          var ro = riversLayerEarly.objects[pi];
+          if (ro.kind === 'lake') continue;
+          if (!ro.pts || ro.pts.length < 2) continue;
+          var fp = self0.riverGeometry(ro);
+          var wE = ro.width || 12;
+          var crossing0 = self0._findSeaCrossingCached(ro, fp);
+          if (crossing0) {
+            self0._drawRiverPlume(ctx, ro, crossing0, fp, ro.color || '#5b8aa6', wE);
+          }
+        }
+      }
+
+      /* Yollar varsayılan olarak nehirlerin ALTINDA kalır (köprü olmadan
+         geçiş doğal görünsün). Panel sırasını değiştirmeden, sadece
+         render sırasında yolları nehirlerden önce çiziyoruz. */
+      var roadsLayerEarly = Layers.get('roads');
+      if (roadsLayerEarly && roadsLayerEarly.visible) {
+        ctx.save();
+        ctx.globalAlpha = roadsLayerEarly.opacity;
+        for (var ri = 0; ri < roadsLayerEarly.objects.length; ri++) {
+          this.drawRoad(ctx, roadsLayerEarly.objects[ri]);
+        }
+        ctx.restore();
+      }
+
       for (var i = 0; i < Layers.list.length; i++) {
         var l = Layers.list[i];
         if (!l.visible) continue;
+        if (l.id === 'roads') continue; /* yukarıda erken çizildi */
 
         if (l.id === 'reference') {
           if (!opt.includeReference || !l.image) continue;
@@ -452,127 +487,231 @@
       return inside;
     },
 
-    /* nehir ucu göle giriyorsa: delta/plume karışım şekli çiz —
-       nehir rengi ile göl rengi arasında yumuşak, düzensiz bir yelpaze */
+    /* nehir ucu göle giriyorsa: göl içine dağılan organik tortu bulutu.
+       Geometrik yelpaze yerine çok sayıda yumuşak leke kullanılır. */
     drawRiverLakeConfluence: function (ctx, river, lake) {
       if (!river.pts || river.pts.length < 2 || !lake.pts || lake.pts.length < 3) return;
       var rPts = this.riverGeometry(river);
-      var lPts = Geo.sample(lake.pts, 30);
+      var lPts = this.lakeSmoothPts(lake.pts, 30);
       var mouth = rPts[rPts.length-1];
-      var prev  = rPts[Math.max(0, rPts.length-4)];
-      if (!this._pointInPoly(mouth[0], mouth[1], lPts)) return; /* göle girmiyor */
-
-      var lakeCol = lake.color || '#5b8aa6';
-      var riverCol = river.color || lakeCol;
-      var wEnd = river.width || 12;
-
-      /* akış yönü */
-      var dx = mouth[0]-prev[0], dy = mouth[1]-prev[1];
-      var dlen = Math.hypot(dx,dy) || 1;
-      dx/=dlen; dy/=dlen;
-      var nx = -dy, ny = dx; /* normal */
+      if (!this._pointInPoly(mouth[0], mouth[1], lPts)) return;
 
       ctx.save();
-      /* göl sınırına clip — plume göl dışına taşmasın */
+      /* göl sınırına clip — dağılım göl dışına taşmasın */
       ctx.beginPath();
       ctx.moveTo(lPts[0][0], lPts[0][1]);
       for (var i=1;i<lPts.length;i++) ctx.lineTo(lPts[i][0], lPts[i][1]);
       ctx.closePath();
       ctx.clip();
 
-      /* yelpaze/delta şekli: ağızdan göl içine doğru genişleyen düzensiz blob */
-      var fanLen = wEnd * 5.5;
-      var fanW   = wEnd * 3.2;
-      var steps = 10;
-      ctx.beginPath();
-      for (var s=0; s<=steps; s++) {
-        var t = s/steps;
-        var spread = fanW * (0.3 + t*0.9) * (1 + Math.sin(t*7+mouth[0]*0.01)*0.18);
-        var fx = mouth[0] + dx*fanLen*t + nx*spread;
-        var fy = mouth[1] + dy*fanLen*t + ny*spread;
-        if (s===0) ctx.moveTo(fx,fy); else ctx.lineTo(fx,fy);
-      }
-      for (var s=steps; s>=0; s--) {
-        var t = s/steps;
-        var spread = fanW * (0.3 + t*0.9) * (1 + Math.sin(t*7+mouth[1]*0.01)*0.18);
-        var fx = mouth[0] + dx*fanLen*t - nx*spread;
-        var fy = mouth[1] + dy*fanLen*t - ny*spread;
-        ctx.lineTo(fx,fy);
-      }
-      ctx.closePath();
-
-      /* radyal gradient: ağızda nehir rengi, göle doğru göl rengine erir */
-      var grad = ctx.createRadialGradient(mouth[0],mouth[1],0, mouth[0],mouth[1], fanLen*1.1);
-      grad.addColorStop(0,   riverCol);
-      grad.addColorStop(0.45,riverCol);
-      grad.addColorStop(1,   lakeCol);
-      ctx.globalAlpha = 0.55;
-      ctx.fillStyle = grad;
-      ctx.fill();
-
-      /* ikinci, daha küçük ve daha opak katman — ağız net görünsün */
-      ctx.beginPath();
-      ctx.ellipse(mouth[0], mouth[1], wEnd*1.4, wEnd*1.4, 0, 0, Math.PI*2);
-      ctx.globalAlpha = 0.5;
-      ctx.fillStyle = riverCol;
-      ctx.fill();
+      /* nehir ağzı dağılımıyla aynı organik yöntemi kullan */
+      var fakeCrossing = { point: mouth, index: rPts.length-1 };
+      this._drawRiverPlume(ctx, river, fakeCrossing, rPts,
+                           river.color || lake.color || '#5b8aa6',
+                           river.width || 12);
 
       ctx.restore();
     },
 
+    /* karadan denize geçiş noktasını bulur. SONUÇ CACHE'LENİR —
+       her karede yeniden hesaplanmaz, sadece nehir noktaları değişince. */
+    _riverCrossingCache: {},
+
+    _findSeaCrossing: function (pts) {
+      var lmLayer = global.Layers && Layers.get('landmass');
+      if (!lmLayer || !lmLayer.canvas) return null;
+      var tc = document.createElement('canvas'); tc.width=1; tc.height=1;
+      var tx = tc.getContext('2d');
+      function isLand(x, y) {
+        try {
+          tx.clearRect(0,0,1,1);
+          tx.drawImage(lmLayer.canvas, Math.round(x)-1, Math.round(y)-1, 3,3, 0,0,1,1);
+          return tx.getImageData(0,0,1,1).data[3] >= 80;
+        } catch(e) { return true; }
+      }
+      /* SONDAN BAŞA doğru tara: "karada olunan SON nokta"yı bul.
+         İlk geçişi aramak yerine bunu yapmamızın sebebi: kıyı düzensiz
+         olduğunda meander sapması nehri kısa süreliğine "deniz" sayılan
+         bir noktaya değdirebilir — ilk geçişi kesim noktası sayarsak
+         nehri erken ve yanlış yerden keseriz. Sondan taramak, nehrin
+         kalıcı olarak karayı terk ettiği GERÇEK noktayı bulur. */
+      var lastLandIdx = -1;
+      for (var i = pts.length - 1; i >= 0; i--) {
+        if (isLand(pts[i][0], pts[i][1])) { lastLandIdx = i; break; }
+      }
+      if (lastLandIdx === -1) return null;               /* hiç kara yok — nehir tamamen denizde, gösterme */
+      if (lastLandIdx === pts.length - 1) return null;     /* nehir tamamen karada, deniz hiç görmüyor */
+      return { index: lastLandIdx + 1, point: pts[lastLandIdx + 1] };
+    },
+
+    _findSeaCrossingCached: function (o, fullPts) {
+      var key = JSON.stringify(o.pts);
+      var c = this._riverCrossingCache[o.id];
+      if (c && c.key === key) return c.crossing;
+      var crossing = this._findSeaCrossing(fullPts);
+      this._riverCrossingCache[o.id] = { key: key, crossing: crossing };
+      return crossing;
+    },
+
     drawRiver: function (ctx, o) {
       if (!o.pts || o.pts.length < 2) return;
-      var pts = this.riverGeometry(o);
+      var fullPts = this.riverGeometry(o);
       var wEnd = o.width || 12;
       var wStart = o.taper ? Math.max(1.2, wEnd*0.18) : wEnd;
-      var poly = Geo.ribbon(pts, wStart, wEnd);
       var col = o.color || '#5b8aa6';
       var baseAlpha = (o.opacity === undefined ? 1 : o.opacity);
 
-      /* nehrin son noktası: deniz/kıyı fade için alfa kontrol */
-      var lastPt = pts[pts.length-1];
-      var lmLayer = global.Layers && Layers.get('landmass');
-      var mouthFade = false;
-      if (lmLayer && lmLayer.canvas) {
-        try {
-          var mc = document.createElement('canvas'); mc.width=1; mc.height=1;
-          var mx = mc.getContext('2d');
-          mx.drawImage(lmLayer.canvas, Math.round(lastPt[0])-1, Math.round(lastPt[1])-1, 3,3, 0,0,1,1);
-          var mpx = mx.getImageData(0,0,1,1).data;
-          if (mpx[3] < 80) mouthFade = true; /* son nokta denizde */
-        } catch(e) {}
-      }
+      /* kıyı geçişini bul (cache'li) — nehri SADECE karada kalan
+         kısmıyla çiz, deniz üzerindeki kısmı tamamen at */
+      var crossing = this._findSeaCrossingCached(o, fullPts);
+      var pts = crossing ? fullPts.slice(0, crossing.index + 1) : fullPts;
+      if (pts.length < 2) pts = fullPts.slice(0, 2);
+
+      var poly = Geo.ribbon(pts, wStart, wEnd);
 
       ctx.save();
-
-      /* nehri her zaman normal (tam opak) çiz */
       ctx.globalAlpha = baseAlpha;
       var path = Geo.polyPath(poly); path.closePath();
       ctx.fillStyle = col; ctx.fill(path);
       ctx.strokeStyle = col; ctx.globalAlpha = baseAlpha*0.55;
       ctx.lineWidth = Math.max(0.7, wEnd*0.09); ctx.lineJoin='round'; ctx.stroke(path);
+      ctx.restore();
 
-      if (mouthFade) {
-        /* SADECE ağız noktası çevresinde küçük bir daireye clip edip
-           orada radyal fade uygula — nehrin geri kalanına dokunmaz.
-           Böylece önceki sürümdeki "tüm nehri yanlış yönde silme" hatası yok. */
-        var fadeR = Math.max(wEnd*3, 24);
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(lastPt[0], lastPt[1], fadeR, 0, Math.PI*2);
-        ctx.clip();
-        var rg = ctx.createRadialGradient(lastPt[0],lastPt[1],0, lastPt[0],lastPt[1], fadeR);
-        rg.addColorStop(0, 'rgba(0,0,0,1)');   /* ağızda tam sil */
-        rg.addColorStop(1, 'rgba(0,0,0,0)');   /* fadeR'de hiç silme */
-        ctx.globalAlpha = 1;
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.fillStyle = rg;
-        ctx.fillRect(lastPt[0]-fadeR, lastPt[1]-fadeR, fadeR*2, fadeR*2);
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.restore();
+      /* not: deniz plume efekti artık burada değil — render döngüsünün
+         başında (terrain katmanından önce) çiziliyor, böylece terrain
+         onun üstüne binip karaya taşan kısmı otomatik örtüyor. */
+    },
+
+    /* ---------- nehir ağzı tortu dağılımı ----------
+       Tek geometrik poligon yerine, akış yönünde savrulmuş ÇOK SAYIDA
+       yumuşak radyal leke üst üste bindirilir. Her leke farklı konum,
+       boyut ve saydamlıkta; toplamı düzensiz, bulutsu bir dağılım verir.
+       Deterministik seed → her render'da aynı görünüm.               */
+    _drawRiverPlume: function (ctx, o, crossing, fullPts, col, wEnd) {
+      var mouth = crossing.point;
+      var prevIdx = Math.max(0, crossing.index - 1);
+      var prevPt = fullPts[prevIdx];
+      var dx = mouth[0]-prevPt[0], dy = mouth[1]-prevPt[1];
+      var dlen = Math.hypot(dx,dy) || 1; dx/=dlen; dy/=dlen;
+      var nx = -dy, ny = dx;
+
+      /* deterministik pseudo-random (nehir id + index seed) */
+      var seedBase = 0;
+      var idStr = String(o.id || '');
+      for (var q=0; q<idStr.length; q++) seedBase += idStr.charCodeAt(q)*(q+1);
+      seedBase += Math.round(mouth[0]*0.7 + mouth[1]*1.3);
+      function rnd(i) {
+        var x = Math.sin(seedBase*0.017 + i*78.233) * 43758.5453;
+        return x - Math.floor(x);
       }
 
+      /* rgb ayrıştır — alfalı gradient için */
+      var hex = (col||'#5b8aa6').replace('#','');
+      if (hex.length===3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+      var R = parseInt(hex.substr(0,2),16),
+          G = parseInt(hex.substr(2,2),16),
+          B = parseInt(hex.substr(4,2),16);
+      function rgba(a) { return 'rgba('+R+','+G+','+B+','+a+')'; }
+
+      var reach = wEnd * 4.2;      /* toplam yayılma mesafesi — kısaltıldı */
+      var blobs = 24;            /* leke sayısı */
+
+      ctx.save();
+      ctx.globalCompositeOperation = 'source-over';
+
+      for (var i=0; i<blobs; i++) {
+        var r1 = rnd(i*3), r2 = rnd(i*3+1), r3 = rnd(i*3+2);
+
+        /* akış yönünde ilerleme: öne doğru yoğunlaşan dağılım */
+        var t = Math.pow(r1, 0.65);              /* 0..1, ağıza yakın daha sık */
+        var along = reach * t;
+
+        /* yanal savrulma: mesafeyle artan, rastgele işaretli */
+        var lateralMax = wEnd * (0.65 + t * 4.4);
+        var lateral = (r2 - 0.5) * 2 * lateralMax;
+
+        /* hafif geri/ileri jitter — sıra sıra dizilmesin */
+        var jitter = (r3 - 0.5) * wEnd * 1.2;
+
+        var px = mouth[0] + dx*(along + jitter) + nx*lateral;
+        var py = mouth[1] + dy*(along + jitter) + ny*lateral;
+
+        /* leke boyutu: uzaklaştıkça büyür ama zayıflar */
+        var rad = wEnd * (0.95 + t*2.5) * (0.6 + r3*0.9);
+        /* saydamlık: ağıza yakın koyu, uzakta silik */
+        var alpha = 0.30 * (1 - t*0.88) * (0.55 + r2*0.65);
+        if (alpha < 0.012) continue;
+
+        var g = ctx.createRadialGradient(px, py, 0, px, py, rad);
+        g.addColorStop(0,    rgba(alpha));
+        g.addColorStop(0.45, rgba(alpha*0.55));
+        g.addColorStop(1,    rgba(0));
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(px, py, rad, 0, Math.PI*2);
+        ctx.fill();
+      }
+
+      /* ağız çekirdeği — nehrin sudan çıktığı nokta belli olsun,
+         ama sert kenar olmadan */
+      var coreR = wEnd * 1.7;
+      var cg = ctx.createRadialGradient(mouth[0],mouth[1],0, mouth[0],mouth[1], coreR);
+      cg.addColorStop(0,   rgba(0.42));
+      cg.addColorStop(0.5, rgba(0.22));
+      cg.addColorStop(1,   rgba(0));
+      ctx.fillStyle = cg;
+      ctx.beginPath();
+      ctx.arc(mouth[0], mouth[1], coreR, 0, Math.PI*2);
+      ctx.fill();
+
       ctx.restore();
+    },
+
+    /* ---------- göl yardımcısı: köşe yumuşatma (Chaikin) ----------
+       Kullanıcının elle çizdiği ham göl noktaları keskin köşeler
+       içerebilir. Kapalı bir poligonu birkaç iterasyonda yumuşatır. */
+    _chaikinSmooth: function (pts, iterations) {
+      var out = pts;
+      for (var it = 0; it < iterations; it++) {
+        var next = [];
+        var n = out.length;
+        for (var i = 0; i < n; i++) {
+          var p0 = out[i], p1 = out[(i+1)%n];
+          next.push([p0[0]*0.75 + p1[0]*0.25, p0[1]*0.75 + p1[1]*0.25]);
+          next.push([p0[0]*0.25 + p1[0]*0.75, p0[1]*0.25 + p1[1]*0.75]);
+        }
+        out = next;
+      }
+      return out;
+    },
+
+    /* ham çizim noktalarını basitleştir: birbirine çok yakın ardışık
+       noktaları birleştir. Kullanıcının elle çizdiği göller genelde
+       yoğun/düzensiz nokta kümeleri içerir, bu kümeler Chaikin sonrası
+       bile ufak köşeler bırakabilir — önce onları temizliyoruz. */
+    _simplifyPts: function (pts, minDist) {
+      if (pts.length < 4) return pts;
+      var out = [pts[0]];
+      for (var i = 1; i < pts.length; i++) {
+        var last = out[out.length-1];
+        var d = Math.hypot(pts[i][0]-last[0], pts[i][1]-last[1]);
+        if (d >= minDist) out.push(pts[i]);
+      }
+      if (out.length < 3) return pts; /* aşırı basitleşmeyi önle */
+      return out;
+    },
+
+    /* göl için yumuşatılmış nokta dizisi üretir — tüm göl fonksiyonları
+       bunu ortak kullanır ki kıyı ve dolgu birbiriyle tutarlı kalsın */
+    lakeSmoothPts: function (rawPts, sampleN) {
+      /* Az agresif basitleştirme — kullanıcının orijinal hatlarını koru */
+      var cleaned = this._simplifyPts(rawPts, 6);
+      /* Daha fazla örnekleme noktası — detayları kaybetmeden yumuşat */
+      var sampled = Geo.sample(cleaned, Math.max(sampleN, 48));
+      /* SADECE 1 hafif Chaikin iterasyonu: çizilen şekli generic bir
+         oval/elmasa dönüştürmeden yalnızca sivri köşeleri hafifçe kırpar.
+         Önceki 5 iterasyon şekli tanınmaz hale getiriyordu. */
+      return this._chaikinSmooth(sampled, 1);
     },
 
     /* ---------- göl yardımcısı: terrain kıyı rengi ---------- */
@@ -595,79 +734,91 @@
       return shoreCol;
     },
 
-    /* ---------- göl 1. pass: düzensiz organik kıyı bandı (nehirlerin altında) ---------- */
+    /* ---------- göl kıyı maskesi: blur tabanlı (raster), asla sivri uç üretmez ----------
+       Vektör offset yöntemi göllerin dar/çukur (concave) bölgelerinde
+       matematiksel olarak kırılıp sivri uçlar üretiyordu. Bunun yerine
+       ana kıyı efektinde (buildShoreCanvas) kullanılan kanıtlanmış
+       blur yöntemi kullanılıyor: göl siluetini çiz, blur uygula.
+       Sonuç PTS bazlı cache'lenir — sadece göl şekli değişince yeniden
+       hesaplanır, her karede değil. */
+    _lakeShoreCache: {},
+
+    _buildLakeShoreMask: function (o) {
+      var pts = this.lakeSmoothPts(o.pts, 40);
+      var minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+      for (var i=0;i<pts.length;i++) {
+        if (pts[i][0]<minX) minX=pts[i][0];
+        if (pts[i][0]>maxX) maxX=pts[i][0];
+        if (pts[i][1]<minY) minY=pts[i][1];
+        if (pts[i][1]>maxY) maxY=pts[i][1];
+      }
+      var pad = 46;
+      var bx = minX-pad, by = minY-pad;
+      var bw = (maxX-minX)+pad*2, bh = (maxY-minY)+pad*2;
+      var MAXD = 700;
+      var scale = Math.min(1, MAXD/Math.max(bw,bh,1));
+      var cw = Math.max(1, Math.round(bw*scale)), ch = Math.max(1, Math.round(bh*scale));
+
+      var c1 = document.createElement('canvas'); c1.width=cw; c1.height=ch;
+      var x1 = c1.getContext('2d');
+      x1.save();
+      x1.scale(scale, scale);
+      x1.translate(-bx, -by);
+      x1.fillStyle = '#fff';
+      x1.beginPath();
+      x1.moveTo(pts[0][0], pts[0][1]);
+      for (var i=1;i<pts.length;i++) x1.lineTo(pts[i][0], pts[i][1]);
+      x1.closePath();
+      x1.fill();
+      x1.restore();
+
+      /* blur ile yumuşak, düzensiz-görünen kenar — vektör diken riski yok */
+      var blurPx = Math.max(4, 24*scale);
+      var c2 = document.createElement('canvas'); c2.width=cw; c2.height=ch;
+      var x2 = c2.getContext('2d');
+      x2.filter = 'blur(' + blurPx.toFixed(1) + 'px)';
+      x2.drawImage(c1, 0, 0);
+      x2.filter = 'none';
+
+      return { canvas:c2, bx:bx, by:by, bw:bw, bh:bh };
+    },
+
     drawLakeShore: function (ctx, o) {
       if (!o.pts || o.pts.length < 3) return;
-      var pts = Geo.sample(o.pts, 48);
+
+      var key = JSON.stringify(o.pts);
+      var entry = this._lakeShoreCache[o.id];
+      if (!entry || entry.key !== key) {
+        var built = this._buildLakeShoreMask(o);
+        entry = { key:key, mask:built.canvas, bx:built.bx, by:built.by, bw:built.bw, bh:built.bh };
+        this._lakeShoreCache[o.id] = entry;
+      }
+
+      var pts = this.lakeSmoothPts(o.pts, 8);
       var shoreCol = this._lakeShoreColor(pts);
-      var n = pts.length;
 
-      var cx=0, cy=0;
-      for (var k=0;k<n;k++){ cx+=pts[k][0]; cy+=pts[k][1]; }
-      cx/=n; cy/=n;
-
-      /* lokal normal: komşu noktalardan teğet çıkar, 90° döndür.
-         Bu, merkez-bazlı offsetin uzun göllerde yarattığı ışın/patlama
-         hatasını önler — kıyı her zaman sınırın kendi şekline sadık kalır. */
-      function normalAt(i) {
-        var a = pts[(i-1+n)%n], b = pts[(i+1)%n];
-        var tx = b[0]-a[0], ty = b[1]-a[1];
-        var tl = Math.hypot(tx,ty) || 1;
-        tx/=tl; ty/=tl;
-        var nx = -ty, ny = tx;
-        /* normalin dışa baktığından emin ol (merkezden uzaklaşan yönde) */
-        var toC = [pts[i][0]-cx, pts[i][1]-cy];
-        if (nx*toC[0] + ny*toC[1] < 0) { nx=-nx; ny=-ny; }
-        return [nx, ny];
-      }
-
-      function seededRand(i) {
-        var x = Math.sin(i*12.9898 + cx*0.0013 + cy*0.0071) * 43758.5453;
-        return x - Math.floor(x);
-      }
-
-      /* düşük frekanslı, geniş dalgalar — birkaç yumuşak tümsek, diken değil */
-      var widths = [];
-      for (var i=0;i<n;i++) {
-        var w1 = Math.sin(i*0.28 + cx*0.01)*0.5+0.5;
-        var w2 = Math.sin(i*0.11 + cy*0.01 + 1.7)*0.5+0.5;
-        var rnd = seededRand(i);
-        widths.push(9 + (w1*0.55 + w2*0.30 + rnd*0.15) * 16); /* 9..25 aralığı, yumuşak */
-      }
-      /* komşu genişlikleri ortalayarak ekstra yumuşat (3-nokta smoothing) */
-      var smoothed = widths.map(function(w,i){
-        var a=widths[(i-1+n)%n], b=widths[i], c=widths[(i+1)%n];
-        return (a+b*2+c)/4;
-      });
+      /* maskeyi renklendir: ayrı bir scratch canvas'ta — ana ctx'e
+         asla destination-in gibi yıkıcı bir mod uygulanmaz */
+      var scratch = document.createElement('canvas');
+      scratch.width = entry.mask.width; scratch.height = entry.mask.height;
+      var sx = scratch.getContext('2d');
+      sx.fillStyle = shoreCol;
+      sx.fillRect(0,0,scratch.width,scratch.height);
+      sx.globalCompositeOperation = 'destination-in';
+      sx.drawImage(entry.mask, 0, 0);
+      sx.globalCompositeOperation = 'source-over';
 
       ctx.save();
-      var layers = [
-        { mul:1.00, alpha:0.22 },
-        { mul:0.62, alpha:0.34 },
-        { mul:0.30, alpha:0.42 }
-      ];
-      layers.forEach(function(layer) {
-        ctx.beginPath();
-        for (var i=0;i<=n;i++) {
-          var idx = i % n;
-          var nrm = normalAt(idx);
-          var w = smoothed[idx]*layer.mul;
-          var px = pts[idx][0] + nrm[0]*w;
-          var py = pts[idx][1] + nrm[1]*w;
-          if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
-        }
-        ctx.closePath();
-        ctx.globalAlpha = layer.alpha;
-        ctx.fillStyle = shoreCol;
-        ctx.fill();
-      });
+      ctx.globalAlpha = 0.85;
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(scratch, entry.bx, entry.by, entry.bw, entry.bh);
       ctx.restore();
     },
 
     /* ---------- göl 2. pass: dolgu + iç efektler (nehirlerin üstünde) ---------- */
     drawLakeFill: function (ctx, o) {
       if (!o.pts || o.pts.length < 3) return;
-      var pts = Geo.sample(o.pts, 22);
+      var pts = this.lakeSmoothPts(o.pts, 24);
       var col = o.color || '#5b8aa6';
       var shoreCol = this._lakeShoreColor(pts);
 
