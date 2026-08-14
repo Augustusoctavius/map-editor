@@ -366,18 +366,31 @@
         if (l.type === 'vector') {
           ctx.save();
           ctx.globalAlpha = l.opacity;
-          for (var j = 0; j < l.objects.length; j++) {
-            var o = l.objects[j];
-            if (l.id === 'rivers') { if (o.kind==='lake') this.drawLake(ctx,o); else this.drawRiver(ctx, o); }
-            else if (l.id === 'roads') this.drawRoad(ctx, o);
-            else if (l.id === 'symbols') {
-              if (o.kind === 'group') {
-                o.members.forEach(function(m){ Sym.draw(ctx, m.sym, m, function(){ Cv.requestRender(); }); });
-              } else {
-                Sym.draw(ctx, o.sym, o, function(){ Cv.requestRender(); });
-              }
+          var self_ = this;
+          if (l.id === 'rivers') {
+            /* 1. pass: nehirler — göl hariç */
+            for (var j = 0; j < l.objects.length; j++) {
+              if (l.objects[j].kind !== 'lake') self_.drawRiver(ctx, l.objects[j]);
             }
-            else if (l.id === 'labels') this.drawLabel(ctx, o);
+            /* 2. pass: göller nehirlerin üstüne çizilir.
+               Böylece nehir göl içinden geçerse göl rengiyle örtülür,
+               sadece gölden çıkan uç kısmı nehir rengiyle görünür.     */
+            for (var j = 0; j < l.objects.length; j++) {
+              if (l.objects[j].kind === 'lake') self_.drawLake(ctx, l.objects[j]);
+            }
+          } else {
+            for (var j = 0; j < l.objects.length; j++) {
+              var o = l.objects[j];
+              if (l.id === 'roads') this.drawRoad(ctx, o);
+              else if (l.id === 'symbols') {
+                if (o.kind === 'group') {
+                  o.members.forEach(function(m){ Sym.draw(ctx, m.sym, m, function(){ Cv.requestRender(); }); });
+                } else {
+                  Sym.draw(ctx, o.sym, o, function(){ Cv.requestRender(); });
+                }
+              }
+              else if (l.id === 'labels') this.drawLabel(ctx, o);
+            }
           }
           ctx.restore();
           continue;
@@ -442,68 +455,83 @@
       if (!o.pts || o.pts.length < 3) return;
       var pts = Geo.sample(o.pts, 22);
       var col = o.color || '#5b8aa6';
-      ctx.save();
 
-      /* göl path'i bir kez oluştur */
-      function lakePath() {
+      /* merkez */
+      var cx = 0, cy = 0;
+      for (var k = 0; k < pts.length; k++) { cx += pts[k][0]; cy += pts[k][1]; }
+      cx /= pts.length; cy /= pts.length;
+
+      function makePath() {
         ctx.beginPath();
         ctx.moveTo(pts[0][0], pts[0][1]);
         for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
         ctx.closePath();
       }
 
-      /* --- kıyı efekti: terrain rengine göre ince bant --- */
-      /* terrain canvas'ından kıyı rengini örnekle (göl merkezinden) */
-      var cx = 0, cy = 0;
-      for (var k = 0; k < pts.length; k++) { cx += pts[k][0]; cy += pts[k][1]; }
-      cx /= pts.length; cy /= pts.length;
+      ctx.save();
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
-      /* dış kıyı halkası — terrain rengiyle uyumlu açık ton */
-      ctx.save();
-      lakePath();
-      ctx.save();
-      ctx.clip(); /* kıyıyı göl içinde tut */
-      ctx.restore();
-      /* kıyı genişliği */
-      var shoreW = 18;
+      /* --- terrain'den kıyı rengi örnekle --- */
+      var shoreCol = 'rgba(195,178,140,0.80)'; /* varsayılan kum */
+      var tLayer = global.Layers && Layers.get('terrain');
+      if (tLayer && tLayer.canvas) {
+        try {
+          var tc = document.createElement('canvas'); tc.width=1; tc.height=1;
+          var tx = tc.getContext('2d');
+          /* gölün kenarından 30px dışarı örnekle */
+          var sampleX = Math.round(pts[0][0]), sampleY = Math.round(pts[0][1]);
+          tx.drawImage(tLayer.canvas, sampleX-1, sampleY-1, 3, 3, 0, 0, 1, 1);
+          var px = tx.getImageData(0,0,1,1).data;
+          if (px[3] > 20) {
+            /* terrain var — rengini biraz açarak kıyı tonu yap */
+            var lr = Math.min(255, px[0]+55), lg = Math.min(255, px[1]+45), lb = Math.min(255, px[2]+35);
+            shoreCol = 'rgba('+lr+','+lg+','+lb+',0.85)';
+          }
+        } catch(e) {}
+      }
+
+      /* --- DIŞ kıyı bandı (göl sınırının dışında) --- */
+      var shoreW = 22;
       ctx.lineWidth = shoreW * 2;
-      ctx.strokeStyle = 'rgba(200,190,160,0.55)'; /* kum/kıyı tonu */
-      ctx.lineJoin = 'round';
-      lakePath();
+      ctx.strokeStyle = shoreCol;
+      makePath();
       ctx.stroke();
-      /* iç göl rengi üstüne gelecek, kıyı sadece dış halkada kalacak */
-      ctx.restore();
 
-      /* --- ana dolgu: tam opak, terrain görünmesin --- */
-      ctx.save();
-      ctx.globalAlpha = 0.96;
-      lakePath();
+      /* --- ana dolgu: tam opak --- */
+      ctx.globalAlpha = 0.97;
       ctx.fillStyle = col;
+      makePath();
       ctx.fill();
+
+      /* --- derinlik gradient'i (içte, clip ile) --- */
+      ctx.save();
+      makePath(); ctx.clip();
+      var maxR = 0;
+      for (var j=0; j<pts.length; j++) {
+        var d = Math.hypot(pts[j][0]-cx, pts[j][1]-cy);
+        if (d > maxR) maxR = d;
+      }
+      var dg = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR);
+      dg.addColorStop(0,   'rgba(0,0,0,0.22)');
+      dg.addColorStop(0.6, 'rgba(0,0,0,0.06)');
+      dg.addColorStop(1,   'rgba(0,0,0,0)');
+      ctx.fillStyle = dg;
+      ctx.fillRect(cx-maxR-10, cy-maxR-10, (maxR+10)*2, (maxR+10)*2);
       ctx.restore();
 
-      /* --- göl içi derinlik efekti: merkeze doğru biraz daha koyu --- */
-      ctx.save();
-      lakePath();
-      ctx.clip();
-      var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(
-        Math.abs(pts[0][0]-cx), Math.abs(pts[0][1]-cy)) * 1.2);
-      grad.addColorStop(0,   'rgba(0,0,0,0.18)');
-      grad.addColorStop(0.5, 'rgba(0,0,0,0.06)');
-      grad.addColorStop(1,   'rgba(0,0,0,0)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(cx - 2000, cy - 2000, 4000, 4000);
-      ctx.restore();
+      /* --- iç kıyı şeridi (göl içinde, sığ su tonu) --- */
+      ctx.globalAlpha = 0.55;
+      ctx.strokeStyle = shoreCol;
+      ctx.lineWidth = 8;
+      makePath();
+      ctx.stroke();
 
-      /* --- kenar çizgisi ince --- */
-      ctx.save();
-      ctx.globalAlpha = 0.45;
+      /* --- dış kenar ince çizgi --- */
+      ctx.globalAlpha = 0.35;
       ctx.strokeStyle = col;
       ctx.lineWidth = 1.5;
-      ctx.lineJoin = 'round';
-      lakePath();
+      makePath();
       ctx.stroke();
-      ctx.restore();
 
       ctx.restore();
     },
@@ -580,18 +608,36 @@
       var pts = this.roadGeometry(o);
       var path = Geo.polyPath(pts);
       var w = o.width || 5;
+      var col = o.color || '#6b4f2a';
       ctx.save();
       ctx.globalAlpha *= (o.opacity === undefined ? 1 : o.opacity);
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      ctx.strokeStyle = o.color || '#6b4f2a';
-      if (o.style === 'dashed') { ctx.setLineDash([w*2.6, w*2.0]); ctx.lineWidth = w; ctx.stroke(path); }
-      else if (o.style === 'dotted') { ctx.setLineDash([w*0.35, w*2.1]); ctx.lineWidth = w; ctx.stroke(path); }
-      else if (o.style === 'double') {
+
+      /* --- alt gölge şeridi: yolun orada olduğu belli olsun --- */
+      ctx.setLineDash([]);
+      ctx.strokeStyle = 'rgba(0,0,0,0.22)';
+      ctx.lineWidth = w * 2.8;
+      ctx.stroke(path);
+
+      /* --- terrain zemin tonu (yol altı kazılmış görünüm) --- */
+      ctx.strokeStyle = 'rgba(210,185,140,0.55)';
+      ctx.lineWidth = w * 1.9;
+      ctx.stroke(path);
+
+      /* --- asıl yol çizgisi --- */
+      ctx.strokeStyle = col;
+      if (o.style === 'dashed') {
+        ctx.setLineDash([w*2.6, w*2.0]); ctx.lineWidth = w; ctx.stroke(path);
+      } else if (o.style === 'dotted') {
+        ctx.setLineDash([w*0.35, w*2.1]); ctx.lineWidth = w; ctx.stroke(path);
+      } else if (o.style === 'double') {
         ctx.setLineDash([]); ctx.lineWidth = w*1.9; ctx.stroke(path);
         ctx.globalCompositeOperation = 'destination-out';
         ctx.lineWidth = w*0.7; ctx.stroke(path);
         ctx.globalCompositeOperation = 'source-over';
-      } else { ctx.setLineDash([]); ctx.lineWidth = w; ctx.stroke(path); }
+      } else {
+        ctx.setLineDash([]); ctx.lineWidth = w; ctx.stroke(path);
+      }
       ctx.setLineDash([]);
       ctx.restore();
     },
