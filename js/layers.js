@@ -298,9 +298,11 @@
     ctx.globalCompositeOperation = 'source-over';
 
     /* işaretler — clip sayesinde dışarı çıkamaz */
-    var n = Math.round(R * 0.14 * (t.density||1));
-    n = Math.max(2, Math.min(40, n));
-    var unit = Math.max(3, R * 0.11);
+    /* mark yoğunluğu: birim alana göre sabit — büyük fırçada daha çok mark ama aynı yoğunluk */
+    var area = Math.PI * R * R;
+    var n = Math.round(area / 1800 * (t.density||1));
+    n = Math.max(3, Math.min(80, n));
+    var unit = 14; /* mark boyutu sabit — fırça büyüse de desen ölçeği değişmez */
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
     for (var i = 0; i < n; i++) {
