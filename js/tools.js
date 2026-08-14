@@ -138,6 +138,7 @@
     dragging:null, activeLayerId:null,
     eyeStartPos:null,
     scaleDrag:null,
+    rubberBand:null,
     windroseDrag:null,
     symBrushLast:null,
     symBrushBefore:null,
@@ -226,7 +227,7 @@
         case 'river':
         case 'road':     this.addPathPoint(p); break;
         case 'label':    this.placeLabel(p); break;
-        case 'select':   this.startSelect(p); break;
+        case 'select':   this.startSelect(p, ev.shiftKey); break;
       }
       Cv.requestRender();
     },
@@ -279,9 +280,19 @@
         return;
       }
 
+      if (this.rubberBand) {
+        this.rubberBand.x1 = p.x; this.rubberBand.y1 = p.y;
+        Cv.requestRender(); return;
+      }
+
       if (this.dragging) {
-        var o = this.dragging.obj;
         var dx = p.x-this.dragging.sx, dy = p.y-this.dragging.sy;
+        /* multi drag */
+        if (this.dragging.multi) {
+          this.dragging.objs.forEach(function(item){ item.o.x=item.ox+dx; item.o.y=item.oy+dy; });
+          Cv.requestRender(); return;
+        }
+        var o = this.dragging.obj;
         if (o.pts) {
           for (var i=0; i<o.pts.length; i++) {
             o.pts[i][0] = this.dragging.orig[i][0]+dx;
@@ -339,6 +350,42 @@
       }
 
       if (this.painting) this.endRaster();
+
+      if (this.rubberBand) {
+        var rb = this.rubberBand; this.rubberBand = null;
+        var rx0=Math.min(rb.x0,rb.x1), rx1=Math.max(rb.x0,rb.x1);
+        var ry0=Math.min(rb.y0,rb.y1), ry1=Math.max(rb.y0,rb.y1);
+        if (rx1-rx0 > 4 || ry1-ry0 > 4) {
+          /* içindeki sembolleri ve etiketleri seç */
+          var hits = []; var lobjs = [];
+          ['symbols','labels'].forEach(function(lid){
+            var LL = Layers.get(lid); if (!LL||!LL.visible) return;
+            LL.objects.forEach(function(obj){
+              var b = lid==='symbols' ? Sym.bounds(obj) : Cv.labelBounds(obj);
+              var cx2 = b.x+b.w/2, cy2 = b.y+b.h/2;
+              if (cx2>=rx0&&cx2<=rx1&&cy2>=ry0&&cy2<=ry1) {
+                hits.push(obj.id); lobjs.push(obj);
+              }
+            });
+          });
+          if (hits.length === 1) {
+            App.selection = { layerId:'symbols', id:hits[0] };
+          } else if (hits.length > 1) {
+            App.selection = { multi:true, layerId:'symbols', ids:hits, objs:lobjs };
+          } else {
+            App.selection = null;
+          }
+          UI.refreshSelection(); Cv.requestRender();
+        }
+        return;
+      }
+
+      if (this.dragging && this.dragging.multi) {
+        var dm = this.dragging; this.dragging = null;
+        var Lsym = Layers.get('symbols');
+        History.pushVector('symbols', dm.before, JSON.parse(JSON.stringify(Lsym.objects)), 'multi:move');
+        UI.refreshHistory(); return;
+      }
 
       if (this.dragging) {
         var d = this.dragging;
@@ -814,9 +861,53 @@
       return null;
     },
 
-    startSelect: function (p) {
+    startSelect: function (p, shiftKey) {
       var hit = this.hitTest(p);
-      if (!hit) { App.selection = null; UI.refreshSelection(); Cv.requestRender(); return; }
+
+      if (!hit) {
+        /* rubber band başlat */
+        if (!shiftKey) App.selection = null;
+        this.rubberBand = { x0:p.x, y0:p.y, x1:p.x, y1:p.y };
+        UI.refreshSelection();
+        Cv.requestRender();
+        return;
+      }
+
+      /* Shift+tık: çoklu seçime ekle/çıkar */
+      if (shiftKey) {
+        var sel = App.selection;
+        /* mevcut multi seçim varsa */
+        if (sel && sel.multi) {
+          var idx = sel.ids.indexOf(hit.id);
+          var nids = sel.ids.slice();
+          var nobjs = sel.objs.slice();
+          if (idx >= 0) { nids.splice(idx,1); nobjs.splice(idx,1); }
+          else { nids.push(hit.id); nobjs.push(hit.obj); }
+          App.selection = nids.length === 1
+            ? { layerId:'symbols', id:nids[0] }
+            : { multi:true, layerId:'symbols', ids:nids, objs:nobjs };
+        } else if (sel && sel.layerId === 'symbols' && hit.layerId === 'symbols') {
+          /* tekli → multi */
+          App.selection = { multi:true, layerId:'symbols',
+            ids:[sel.id, hit.id], objs:[this.findObj('symbols', sel.id), hit.obj] };
+        } else {
+          App.selection = { layerId:hit.layerId, id:hit.id };
+        }
+        UI.refreshSelection(); Cv.requestRender(); return;
+      }
+
+      /* normal tek seçim */
+      /* eğer multi seçimde bir nesneye tıklandıysa — grubu taşı */
+      if (App.selection && App.selection.multi && App.selection.ids.indexOf(hit.id) >= 0) {
+        var L0 = Layers.get('symbols');
+        this.dragging = {
+          multi:true, sx:p.x, sy:p.y,
+          objs: App.selection.objs.map(function(o){ return {o:o, ox:o.x, oy:o.y}; }),
+          before: JSON.parse(JSON.stringify(L0.objects))
+        };
+        return;
+      }
+
       App.selection = { layerId:hit.layerId, id:hit.id };
       var L = Layers.get(hit.layerId);
       this.dragging = {
@@ -826,6 +917,12 @@
         before:JSON.parse(JSON.stringify(L.objects))
       };
       UI.refreshSelection();
+    },
+
+    findObj: function(layerId, id) {
+      var L = Layers.get(layerId); if (!L) return null;
+      for (var i=0; i<L.objects.length; i++) if (L.objects[i].id === id) return L.objects[i];
+      return null;
     },
 
     selected: function () {
@@ -840,6 +937,16 @@
     deleteSelection: function () {
       var s = App.selection;
       if (!s || s.layerId === 'scale') return;
+      if (s.multi) {
+        var ids = s.ids.slice();
+        /* semboller ve etiketler karışık olabilir — symbols layer'ından sil */
+        var Ls = Layers.get('symbols');
+        var bef = JSON.parse(JSON.stringify(Ls.objects));
+        Ls.objects = Ls.objects.filter(function(o){ return ids.indexOf(o.id) < 0; });
+        History.pushVector('symbols', bef, JSON.parse(JSON.stringify(Ls.objects)), 'multi:delete');
+        App.selection = null;
+        UI.refreshHistory(); UI.refreshSelection(); Cv.requestRender(); return;
+      }
       var L = Layers.get(s.layerId);
       var before = JSON.parse(JSON.stringify(L.objects));
       L.objects = L.objects.filter(function (o) { return o.id !== s.id; });
@@ -861,6 +968,83 @@
       L.objects.push(c);
       App.selection = { layerId:App.selection.layerId, id:c.id };
       History.pushVector(App.selection.layerId, before, JSON.parse(JSON.stringify(L.objects)), 'duplicate');
+      UI.refreshHistory(); UI.refreshSelection(); Cv.requestRender();
+    },
+
+    bringForward: function () {
+      var s = App.selection; if (!s || s.multi || s.layerId === 'scale') return;
+      var L = Layers.get(s.layerId); if (!L) return;
+      var before = JSON.parse(JSON.stringify(L.objects));
+      var idx = L.objects.findIndex(function(o){ return o.id === s.id; });
+      if (idx < L.objects.length-1) {
+        var tmp = L.objects[idx]; L.objects[idx] = L.objects[idx+1]; L.objects[idx+1] = tmp;
+      }
+      History.pushVector(s.layerId, before, JSON.parse(JSON.stringify(L.objects)), 'zorder');
+      UI.refreshHistory(); Cv.requestRender();
+    },
+
+    sendBackward: function () {
+      var s = App.selection; if (!s || s.multi || s.layerId === 'scale') return;
+      var L = Layers.get(s.layerId); if (!L) return;
+      var before = JSON.parse(JSON.stringify(L.objects));
+      var idx = L.objects.findIndex(function(o){ return o.id === s.id; });
+      if (idx > 0) {
+        var tmp = L.objects[idx]; L.objects[idx] = L.objects[idx-1]; L.objects[idx-1] = tmp;
+      }
+      History.pushVector(s.layerId, before, JSON.parse(JSON.stringify(L.objects)), 'zorder');
+      UI.refreshHistory(); Cv.requestRender();
+    },
+
+    bringToFront: function () {
+      var s = App.selection; if (!s || s.multi || s.layerId === 'scale') return;
+      var L = Layers.get(s.layerId); if (!L) return;
+      var before = JSON.parse(JSON.stringify(L.objects));
+      var idx = L.objects.findIndex(function(o){ return o.id === s.id; });
+      if (idx >= 0) { var o = L.objects.splice(idx,1)[0]; L.objects.push(o); }
+      History.pushVector(s.layerId, before, JSON.parse(JSON.stringify(L.objects)), 'zorder');
+      UI.refreshHistory(); Cv.requestRender();
+    },
+
+    sendToBack: function () {
+      var s = App.selection; if (!s || s.multi || s.layerId === 'scale') return;
+      var L = Layers.get(s.layerId); if (!L) return;
+      var before = JSON.parse(JSON.stringify(L.objects));
+      var idx = L.objects.findIndex(function(o){ return o.id === s.id; });
+      if (idx > 0) { var o = L.objects.splice(idx,1)[0]; L.objects.unshift(o); }
+      History.pushVector(s.layerId, before, JSON.parse(JSON.stringify(L.objects)), 'zorder');
+      UI.refreshHistory(); Cv.requestRender();
+    },
+
+    groupSelection: function () {
+      var s = App.selection; if (!s || !s.multi) return;
+      var L = Layers.get('symbols');
+      var before = JSON.parse(JSON.stringify(L.objects));
+      var members = s.ids.map(function(id){
+        return JSON.parse(JSON.stringify(Tools.findObj('symbols', id)));
+      }).filter(Boolean);
+      if (!members.length) return;
+      /* üyeleri sil */
+      L.objects = L.objects.filter(function(o){ return s.ids.indexOf(o.id) < 0; });
+      /* grup objesi ekle */
+      var grp = { id:uid(), kind:'group', members:members };
+      L.objects.push(grp);
+      App.selection = { layerId:'symbols', id:grp.id };
+      History.pushVector('symbols', before, JSON.parse(JSON.stringify(L.objects)), 'group');
+      UI.refreshHistory(); UI.refreshSelection(); Cv.requestRender();
+    },
+
+    ungroupSelection: function () {
+      var s = App.selection; if (!s || s.multi) return;
+      var o = this.selected(); if (!o || o.kind !== 'group') return;
+      var L = Layers.get('symbols');
+      var before = JSON.parse(JSON.stringify(L.objects));
+      var idx = L.objects.findIndex(function(ob){ return ob.id === o.id; });
+      var members = o.members || [];
+      L.objects.splice(idx, 1, ...members);
+      App.selection = members.length > 0
+        ? { multi:true, layerId:'symbols', ids:members.map(function(m){return m.id;}), objs:members }
+        : null;
+      History.pushVector('symbols', before, JSON.parse(JSON.stringify(L.objects)), 'ungroup');
       UI.refreshHistory(); UI.refreshSelection(); Cv.requestRender();
     },
 
@@ -936,6 +1120,35 @@
         ctx.restore();
       }
 
+      /* rubber band dikdörtgeni */
+      if (this.rubberBand) {
+        var rb = this.rubberBand;
+        ctx.save();
+        ctx.strokeStyle = '#c99a4b';
+        ctx.fillStyle = 'rgba(201,154,75,0.08)';
+        ctx.lineWidth = 1.5/z;
+        ctx.setLineDash([5/z, 4/z]);
+        var rbx=Math.min(rb.x0,rb.x1), rby=Math.min(rb.y0,rb.y1);
+        var rbw=Math.abs(rb.x1-rb.x0), rbh=Math.abs(rb.y1-rb.y0);
+        ctx.fillRect(rbx,rby,rbw,rbh);
+        ctx.strokeRect(rbx,rby,rbw,rbh);
+        ctx.restore();
+      }
+
+      /* multi seçim */
+      if (App.selection && App.selection.multi) {
+        ctx.save();
+        ctx.strokeStyle = '#c99a4b';
+        ctx.lineWidth = 1.5/z;
+        ctx.setLineDash([6/z, 4/z]);
+        App.selection.objs.forEach(function(obj) {
+          var b = Sym.bounds(obj);
+          ctx.strokeRect(b.x-4/z, b.y-4/z, b.w+8/z, b.h+8/z);
+        });
+        ctx.restore();
+        return;
+      }
+
       var o = this.selected();
       if (!o) return;
       ctx.save();
@@ -953,6 +1166,14 @@
         for (var k=0; k<o.pts.length; k++) {
           ctx.beginPath(); ctx.arc(o.pts[k][0], o.pts[k][1], 4/z, 0, Math.PI*2); ctx.fill();
         }
+      } else if (o.kind === 'group') {
+        /* grup bbox */
+        var gbs = o.members.map(function(m){ return Sym.bounds(m); });
+        var gx0=Math.min.apply(null,gbs.map(function(b){return b.x;}));
+        var gy0=Math.min.apply(null,gbs.map(function(b){return b.y;}));
+        var gx1=Math.max.apply(null,gbs.map(function(b){return b.x+b.w;}));
+        var gy1=Math.max.apply(null,gbs.map(function(b){return b.y+b.h;}));
+        ctx.strokeRect(gx0-6/z, gy0-6/z, gx1-gx0+12/z, gy1-gy0+12/z);
       } else {
         var b = App.selection.layerId==='labels' ? Cv.labelBounds(o) : Sym.bounds(o);
         ctx.strokeRect(b.x-4/z, b.y-4/z, b.w+8/z, b.h+8/z);

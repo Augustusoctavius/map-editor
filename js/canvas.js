@@ -370,7 +370,13 @@
             var o = l.objects[j];
             if (l.id === 'rivers') { if (o.kind==='lake') this.drawLake(ctx,o); else this.drawRiver(ctx, o); }
             else if (l.id === 'roads') this.drawRoad(ctx, o);
-            else if (l.id === 'symbols') Sym.draw(ctx, o.sym, o, function(){ Cv.requestRender(); });
+            else if (l.id === 'symbols') {
+              if (o.kind === 'group') {
+                o.members.forEach(function(m){ Sym.draw(ctx, m.sym, m, function(){ Cv.requestRender(); }); });
+              } else {
+                Sym.draw(ctx, o.sym, o, function(){ Cv.requestRender(); });
+              }
+            }
             else if (l.id === 'labels') this.drawLabel(ctx, o);
           }
           ctx.restore();

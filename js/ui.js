@@ -53,6 +53,10 @@
       confirmSize:'Tuval boyutunu değiştirmek mevcut katmanları ölçekler. Devam edilsin mi?',
       histStart:'Başlangıç', selNone:'Seçili nesne yok', symbols:'sembol',
       selScale:'Ölçek çubuğu seçili',
+      o_zorder:'Sıralama', o_front:'En öne', o_back:'En arkaya',
+      o_fwd:'Öne getir', o_bwd:'Arkaya gönder',
+      o_group:'Grupla', o_ungroup:'Grubu çöz',
+      selMulti:'nesne seçili',
       t_lake:'Göl', o_lake:'Göl', h_lake:'Tıklayarak nokta ekle, 3+ nokta sonra Enter ile kapat.',
       o_lakecolor:'Göl rengi',
       o_symbbrush:'Fırça modu', o_symbdensity:'Yoğunluk',
@@ -107,6 +111,10 @@
       confirmSize:'Changing canvas size rescales existing layers. Continue?',
       histStart:'Start', selNone:'Nothing selected', symbols:'symbols',
       selScale:'Scale bar selected',
+      o_zorder:'Z-Order', o_front:'Bring to front', o_back:'Send to back',
+      o_fwd:'Bring forward', o_bwd:'Send backward',
+      o_group:'Group', o_ungroup:'Ungroup',
+      selMulti:'objects selected',
       t_lake:'Lake', o_lake:'Lake', h_lake:'Click to add points, 3+ points then Enter to close.',
       o_lakecolor:'Lake colour',
       o_symbbrush:'Brush mode', o_symbdensity:'Density',
@@ -840,8 +848,26 @@
       var box = $('sel-info');
       if (!box) return;
 
+      /* z-order butonlarını güster/gizle */
+      var isMulti = App.selection && App.selection.multi;
+      var isSingle = App.selection && !App.selection.multi && App.selection.layerId !== 'scale';
+      var isGroup = isSingle && Tools.selected() && Tools.selected().kind === 'group';
+      if ($('btn-front')) $('btn-front').style.display = isSingle ? '' : 'none';
+      if ($('btn-back'))  $('btn-back').style.display  = isSingle ? '' : 'none';
+      if ($('btn-fwd'))   $('btn-fwd').style.display   = isSingle ? '' : 'none';
+      if ($('btn-bwd'))   $('btn-bwd').style.display   = isSingle ? '' : 'none';
+      if ($('btn-group'))   $('btn-group').style.display   = isMulti ? '' : 'none';
+      if ($('btn-ungroup')) $('btn-ungroup').style.display = isGroup ? '' : 'none';
+
       if (App.selection && App.selection.layerId === 'scale') {
         box.textContent = this.t('selScale');
+        Cv.requestRender();
+        return;
+      }
+
+      /* multi seçim */
+      if (App.selection && App.selection.multi) {
+        box.textContent = App.selection.ids.length + ' ' + this.t('selMulti');
         Cv.requestRender();
         return;
       }
