@@ -305,18 +305,16 @@
     /* clip: tüm çizimler daire içinde kalır — kenar taşmaz */
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.clip();
 
-    /* zemin: düz dolgu → damgalar arası boşluk yok */
-    ctx.fillStyle = hexA(t.base, opacity);
-    ctx.fillRect(cx - R, cy - R, R*2, R*2);
-
-    /* kenar fade: sadece dış %18'de */
-    var gEdge = ctx.createRadialGradient(cx, cy, R*0.82, cx, cy, R);
-    gEdge.addColorStop(0, hexA(t.base, 0));
-    gEdge.addColorStop(1, hexA(t.base, opacity));
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.fillStyle = gEdge;
+    /* zemin: merkez tam dolu, kenar %35'ten itibaren şeffaflaşır.
+       destination-out YOK — alttaki terrain kenar bölgesinde görünür kalır.
+       Bu sayede terrain geçişleri organik görünür: altta ne varsa kenarda
+       kısmen geçirgen, merkeze doğru yeni terrain tam hakim olur.         */
+    var gBlend = ctx.createRadialGradient(cx, cy, R*0.35, cx, cy, R);
+    gBlend.addColorStop(0.0, hexA(t.base, opacity));
+    gBlend.addColorStop(0.7, hexA(t.base, opacity * 0.85));
+    gBlend.addColorStop(1.0, hexA(t.base, 0));
+    ctx.fillStyle = gBlend;
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
-    ctx.globalCompositeOperation = 'source-over';
 
     /* işaretler — clip sayesinde dışarı çıkamaz */
     /* mark yoğunluğu: birim alana göre sabit — büyük fırçada daha çok mark ama aynı yoğunluk */
