@@ -117,7 +117,7 @@
     /* --- TARIM / MEDENIYET --- */
     farmland: {
       tr:'Tarla', en:'Farmland',
-      base:'#d8c87a', dark:'#a89e4e', mark:'#847a38', mark2:'#a09848', kind:'field',  density:0.65,
+      base:'#ccc48e', dark:'#9a9060', mark:'#6a5830', mark2:'#8a7840', kind:'field',  density:1.20,
       shore:['#b0a450','#d4c87a']
     },
     /* --- ORMAN KIYISI / MANGROV --- */
@@ -244,11 +244,32 @@
         break;
 
       case 'field':
-        ctx.beginPath(); ctx.rect(-5.4,-3.8,10.8,7.6); ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(-2.4,-3.8); ctx.lineTo(-2.4,3.8);
-        ctx.moveTo( 1.4,-3.8); ctx.lineTo( 1.4,3.8);
-        ctx.stroke();
+        /* bitişik tarla parselleri — gerçekçi tarla deseni */
+        (function() {
+          var cols = 2 + (Math.random() > 0.5 ? 1 : 0);
+          var rows = 2 + (Math.random() > 0.5 ? 1 : 0);
+          var pw = 10.0 / cols;
+          var ph = 8.0 / rows;
+          var ox = -5.0, oy = -4.0;
+          var palette = ['#c8b86a','#8aaa62','#b09858','#d4c882','#7a9858','#c4a070','#a8b870','#b8886a','#9ab468','#c8aa58'];
+          var baseAlpha = ctx.globalAlpha;
+          for (var r2=0; r2<rows; r2++) {
+            for (var c2=0; c2<cols; c2++) {
+              var px = ox + c2*pw + (Math.random()-0.5)*pw*0.15;
+              var py = oy + r2*ph + (Math.random()-0.5)*ph*0.15;
+              var pw2 = pw * (0.84 + Math.random()*0.18);
+              var ph2 = ph * (0.84 + Math.random()*0.18);
+              ctx.globalAlpha = baseAlpha * (0.70 + Math.random()*0.35);
+              ctx.fillStyle = palette[Math.floor(Math.random()*palette.length)];
+              ctx.beginPath(); ctx.rect(px, py, pw2, ph2); ctx.fill();
+              ctx.globalAlpha = baseAlpha * 0.55;
+              ctx.strokeStyle = '#5a4820';
+              ctx.lineWidth = 0.22;
+              ctx.stroke();
+            }
+          }
+          ctx.globalAlpha = baseAlpha;
+        })();
         break;
 
       case 'mangrove':
