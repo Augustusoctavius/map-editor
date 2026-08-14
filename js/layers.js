@@ -309,9 +309,9 @@
        destination-out YOK — alttaki terrain kenar bölgesinde görünür kalır.
        Bu sayede terrain geçişleri organik görünür: altta ne varsa kenarda
        kısmen geçirgen, merkeze doğru yeni terrain tam hakim olur.         */
-    var gBlend = ctx.createRadialGradient(cx, cy, R*0.35, cx, cy, R);
+    var gBlend = ctx.createRadialGradient(cx, cy, R*0.0, cx, cy, R);
     gBlend.addColorStop(0.0, hexA(t.base, opacity));
-    gBlend.addColorStop(0.7, hexA(t.base, opacity * 0.85));
+    gBlend.addColorStop(0.55, hexA(t.base, opacity * 0.90));
     gBlend.addColorStop(1.0, hexA(t.base, 0));
     ctx.fillStyle = gBlend;
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
