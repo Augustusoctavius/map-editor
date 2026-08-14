@@ -134,6 +134,7 @@
     painting:false, panning:false, spaceDown:false,
     panStart:null, last:null, box:null,
     beforeMain:null, beforeAux:null,
+    strokeAllPts:null,
     pathPts:[], pathHover:null,
     dragging:null, activeLayerId:null,
     eyeStartPos:null,
@@ -369,17 +370,69 @@
         if (T && !T.locked) this.beforeAux = snap(T.canvas);
       }
 
+      /* terrain stroke: tüm noktaları biriktir, her frame sıfırdan çiz */
+      this.strokeAllPts = (mode === 'terrain') ? [[p.x, p.y]] : null;
+
       this.stamp(p.x, p.y);
     },
 
     strokeTo: function (p) {
       if (!this.last) { this.last = p; return; }
       var r = (this.mode === 'terrain' ? App.terrain.size : App.brush.size)/2;
-      var step = Math.max(1.5, r*(this.mode === 'terrain' ? 0.12 : 0.26));
+      var step = Math.max(1.5, r*(this.mode === 'terrain' ? 0.25 : 0.26));
       var dx = p.x-this.last.x, dy = p.y-this.last.y;
       var n = Math.max(1, Math.ceil(Math.hypot(dx,dy)/step));
+
+      if (this.mode === 'terrain' && this.strokeAllPts && this.beforeMain) {
+        /* yeni noktaları biriktir */
+        for (var i=1; i<=n; i++) {
+          this.strokeAllPts.push([this.last.x+dx*i/n, this.last.y+dy*i/n]);
+        }
+        this.last = p;
+
+        /* terrain canvas'ını snapshot'a sıfırla */
+        var layer = Layers.get('terrain');
+        if (layer) {
+          layer.ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
+          layer.ctx.drawImage(this.beforeMain, 0, 0);
+          /* tüm birikmiş noktaları yeniden çiz */
+          for (var j=0; j<this.strokeAllPts.length; j++) {
+            this.stampTerrain(this.strokeAllPts[j][0], this.strokeAllPts[j][1]);
+          }
+        }
+        return;
+      }
+
       for (var i=1; i<=n; i++) this.stamp(this.last.x+dx*i/n, this.last.y+dy*i/n);
       this.last = p;
+    },
+
+    stampTerrain: function (x, y) {
+      var layer = Layers.get('terrain');
+      if (!layer) return;
+      var ctx = layer.ctx;
+      var r = App.terrain.size/2;
+      var Lm = Layers.get('landmass');
+      if (Lm && Lm.canvas) {
+        var pad2 = Math.ceil(r * 1.12) + 6;
+        var bx2 = Math.max(0, Math.floor(x - pad2));
+        var by2 = Math.max(0, Math.floor(y - pad2));
+        var bw2 = Math.min(layer.canvas.width  - bx2, Math.ceil(pad2*2));
+        var bh2 = Math.min(layer.canvas.height - by2, Math.ceil(pad2*2));
+        var tmp2 = document.createElement('canvas');
+        tmp2.width = bw2; tmp2.height = bh2;
+        var tmpCtx2 = tmp2.getContext('2d');
+        tmpCtx2.translate(-bx2, -by2);
+        Terrain.scatter(tmpCtx2, App.terrain.type, x, y, r, App.terrain.opacity);
+        tmpCtx2.setTransform(1,0,0,1,0,0);
+        tmpCtx2.globalCompositeOperation = 'destination-in';
+        tmpCtx2.drawImage(Lm.canvas, bx2, by2, bw2, bh2, 0, 0, bw2, bh2);
+        tmpCtx2.globalCompositeOperation = 'source-over';
+        ctx.drawImage(tmp2, bx2, by2);
+      } else {
+        Terrain.scatter(ctx, App.terrain.type, x, y, r, App.terrain.opacity);
+      }
+      this.expandBox(x, y, r + pad2);
     },
 
     expandBox: function (x, y, r) {
@@ -394,29 +447,7 @@
 
       /* ---- ARAZİ: prosedürel serpme (tile yok) ---- */
       if (this.mode === 'terrain') {
-        var r = App.terrain.size/2;
-        var Lm = Layers.get('landmass');
-        if (Lm && Lm.canvas) {
-          /* Landmass maskesine clip — sadece fırça bbox'ı kadar geçici canvas */
-          var pad2 = Math.ceil(r * 1.12) + 6;
-          var bx2 = Math.max(0, Math.floor(x - pad2));
-          var by2 = Math.max(0, Math.floor(y - pad2));
-          var bw2 = Math.min(layer.canvas.width  - bx2, Math.ceil(pad2*2));
-          var bh2 = Math.min(layer.canvas.height - by2, Math.ceil(pad2*2));
-          var tmp2 = document.createElement('canvas');
-          tmp2.width = bw2; tmp2.height = bh2;
-          var tmpCtx2 = tmp2.getContext('2d');
-          tmpCtx2.translate(-bx2, -by2);
-          Terrain.scatter(tmpCtx2, App.terrain.type, x, y, r, App.terrain.opacity);
-          tmpCtx2.setTransform(1,0,0,1,0,0);
-          tmpCtx2.globalCompositeOperation = 'destination-in';
-          tmpCtx2.drawImage(Lm.canvas, bx2, by2, bw2, bh2, 0, 0, bw2, bh2);
-          tmpCtx2.globalCompositeOperation = 'source-over';
-          ctx.drawImage(tmp2, bx2, by2);
-        } else {
-          Terrain.scatter(ctx, App.terrain.type, x, y, r, App.terrain.opacity);
-        }
-        this.expandBox(x, y, r+3);
+        this.stampTerrain(x, y);
         return;
       }
 
@@ -501,6 +532,7 @@
 
       this.box = null; this.last = null;
       this.beforeMain = null; this.beforeAux = null;
+      this.strokeAllPts = null;
       Cv.shoreDirty = true;
       UI.refreshHistory();
       Cv.requestRender();
