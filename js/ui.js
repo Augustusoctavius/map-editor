@@ -122,8 +122,485 @@
       o_wrstyle:'Style', o_wrcolor:'Colour', h_windrose:'Drag on the map to reposition.',
       o_snap:'Snap to grid', o_snapsize:'Grid size',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
+    },
+    de: {
+      new:'Neu', open:'Öffnen', save:'Speichern', parchment:'Pergament', grid:'Raster', shore:'Küste',
+      t_select:'Auswahl', t_landmass:'Land', t_erase:'Meer', t_terrain:'Gelände', t_symbol:'Symbol',
+      t_river:'Fluss', t_road:'Straße', t_label:'Beschriftung', t_pan:'Verschieben', t_eyedrop:'Pipette',
+      o_landmass:'Land / Küste', o_brushsize:'Pinselgröße', o_rough:'Küstenrauheit',
+      o_landcolor:'Landfarbe', o_shorew:'Küstenbreite',
+      o_smooth:'Küste glätten', o_clearland:'Land löschen',
+      h_landmass:'Ziehen, um Land zu malen. Das Werkzeug "Meer" löscht Land und Gelände gleichzeitig.',
+      o_terrain:'Gelände malen', o_opacity:'Deckkraft', o_clip:'Nur auf Land malen',
+      o_clearterrain:'Geländeebene löschen',
+      h_terrain:'Muster werden bei jedem Pinselstrich zufällig gestreut — kein wiederholtes Muster.',
+      o_symbol:'Symbol', o_size:'Größe', o_rot:'Drehung', o_hue:'Farbton',
+      o_jitter:'Zufällige Platzierung',
+      h_symbol:'Symbol aus der Bibliothek wählen, auf die Karte klicken. Mit "Auswahl" verschieben; Entf zum Löschen.',
+      o_river:'Fluss', o_width:'Breite', o_meander:'Mäander',
+      o_taper:'An der Quelle verjüngen', o_color:'Farbe',
+      h_path:'Klicken, um Punkte hinzuzufügen. Enter/Doppelklick zum Beenden, Esc zum Abbrechen.',
+      o_road:'Straße / Karawanenroute',
+      o_label:'Beschriftung', o_preset:'Stilvorlage', o_curve:'Krümmung', o_track:'Zeichenabstand',
+      h_label:'Vorlage wählen, Text eingeben, auf die Karte klicken. Wirkt sofort bei ausgewählter Beschriftung.',
+      o_eyedrop:'Texturpipette', o_eye_nosample:'Noch keine Probe entnommen',
+      o_eye_radius:'Probenradius', o_eye_brush:'Pinselgröße',
+      o_eye_pick:'① Bereich wählen', o_eye_paint:'② Malen starten', o_eye_clear:'Probe löschen',
+      h_eyedrop:'① Bereich wählen: Kreis aufziehen. ② Malen: Textur auf die Karte auftragen.',
+      eyeOk:'✓ Textur entnommen', eyeFail:'Entnahme fehlgeschlagen — über Land/Gelände versuchen.',
+      eyePick:'Auf der Karte klicken und ziehen → Kreisgröße wählen → loslassen.',
+      eyePaint:'Auf der Karte klicken und ziehen → Textur wird aufgetragen.',
+      eyeNeed:'Zuerst mit ① Bereich wählen eine Textur entnehmen.',
+      o_selection:'Auswahl', o_nosel:'Nichts ausgewählt', o_dup:'Duplizieren', o_del:'Löschen',
+      o_scalebar:'Maßstabsleiste', o_scvis:'Auf der Karte anzeigen', o_sclen:'Länge',
+      o_scsize:'Textgröße', o_scsegs:'Segmente',
+      h_scale:'Maßstabsleiste auf der Karte ziehen, um sie zu verschieben.',
+      o_view:'Ansicht', o_fit:'An Fenster anpassen', o_100:'100 %',
+      h_pan:'Rechtsklick + ziehen, Mittelklick, Leertaste + ziehen oder Pfeiltasten zum Verschieben.',
+      tab_layers:'Ebenen', tab_library:'Bibliothek', tab_history:'Verlauf',
+      ref_title:'Referenzbild', ref_export:'In Export einschließen', ref_clear:'Referenz entfernen',
+      sym_upload:'+ PNG-Symbol hochladen', sym_upload_done:'Symbol(e) geladen', sym_del:'Löschen',
+      st_pos:'Position', st_zoom:'Zoom', st_size:'Leinwand', st_tool:'Werkzeug',
+      cancel:'Abbrechen', ok:'OK',
+      locked:'Ebene ist gesperrt oder ausgeblendet.', needtext:'Zuerst den Beschriftungstext eingeben.',
+      exported:'Exportiert:', saved:'Projekt gespeichert.', loaded:'Projekt geladen.',
+      badfile:'Ungültige Projektdatei.', newmap:'Neue Karte erstellt.',
+      confirmNew:'Die aktuelle Karte wird verworfen. Leinwandgröße wählen:',
+      confirmSize:'Das Ändern der Leinwandgröße skaliert vorhandene Ebenen. Fortfahren?',
+      histStart:'Anfang', selNone:'Nichts ausgewählt', symbols:'Symbole',
+      selScale:'Maßstabsleiste ausgewählt',
+      o_zorder:'Ebenenreihenfolge', o_front:'In den Vordergrund', o_back:'In den Hintergrund',
+      o_fwd:'Eine Ebene vor', o_bwd:'Eine Ebene zurück',
+      o_group:'Gruppieren', o_ungroup:'Gruppierung aufheben',
+      selMulti:'Objekte ausgewählt',
+      t_lake:'See', o_lake:'See', h_lake:'Klicken, um Punkte hinzuzufügen, ab 3 Punkten mit Enter schließen.',
+      o_lakecolor:'Seefarbe',
+      o_symbbrush:'Pinselmodus', o_symbdensity:'Dichte',
+      o_windrose:'Windrose', o_wrvis:'Auf der Karte anzeigen', o_wrsize:'Größe',
+      o_wrstyle:'Stil', o_wrcolor:'Farbe', h_windrose:'Auf der Karte ziehen, um sie zu verschieben.',
+      o_snap:'Am Raster ausrichten', o_snapsize:'Rastergröße',
+      o_png2x:'PNG 2×', o_png4x:'PNG 4×'
+    },
+    fr: {
+      new:'Nouveau', open:'Ouvrir', save:'Enregistrer', parchment:'Parchemin', grid:'Grille', shore:'Rivage',
+      t_select:'Sélection', t_landmass:'Terre', t_erase:'Mer', t_terrain:'Terrain', t_symbol:'Symbole',
+      t_river:'Rivière', t_road:'Route', t_label:'Étiquette', t_pan:'Déplacer', t_eyedrop:'Pipette',
+      o_landmass:'Terre / Côte', o_brushsize:'Taille du pinceau', o_rough:'Irrégularité de la côte',
+      o_landcolor:'Couleur de la terre', o_shorew:'Largeur du rivage',
+      o_smooth:'Lisser la côte', o_clearland:'Effacer la terre',
+      h_landmass:"Glisser pour peindre la terre. L'outil « Mer » efface à la fois la terre et le terrain.",
+      o_terrain:'Peinture de terrain', o_opacity:'Opacité', o_clip:'Peindre uniquement sur la terre',
+      o_clearterrain:'Effacer le calque de terrain',
+      h_terrain:'Les motifs sont dispersés aléatoirement à chaque coup de pinceau — aucun motif répétitif.',
+      o_symbol:'Symbole', o_size:'Taille', o_rot:'Rotation', o_hue:'Teinte',
+      o_jitter:'Placement aléatoire',
+      h_symbol:'Choisissez un symbole dans la bibliothèque, cliquez sur la carte. Utilisez « Sélection » pour déplacer ; Suppr pour effacer.',
+      o_river:'Rivière', o_width:'Largeur', o_meander:'Méandre',
+      o_taper:'Affiner à la source', o_color:'Couleur',
+      h_path:'Cliquez pour ajouter des points. Entrée / double-clic pour terminer, Échap pour annuler.',
+      o_road:'Route / Route caravanière',
+      o_label:'Étiquette', o_preset:'Style prédéfini', o_curve:'Courbure', o_track:'Espacement des lettres',
+      h_label:"Choisissez un style, saisissez le texte, cliquez sur la carte. S'applique instantanément à l'étiquette sélectionnée.",
+      o_eyedrop:'Pipette de texture', o_eye_nosample:"Aucun échantillon pour l'instant",
+      o_eye_radius:"Rayon d'échantillonnage", o_eye_brush:'Taille du pinceau',
+      o_eye_pick:'① Choisir une zone', o_eye_paint:'② Commencer à peindre', o_eye_clear:"Effacer l'échantillon",
+      h_eyedrop:'① Choisir une zone : tracez un cercle. ② Peindre : appliquez la texture sur la carte.',
+      eyeOk:'✓ Texture échantillonnée', eyeFail:"Échec de l'échantillonnage — essayez sur la terre/le terrain.",
+      eyePick:'Cliquez et glissez sur la carte → définissez la taille du cercle → relâchez.',
+      eyePaint:'Cliquez et glissez sur la carte → la texture est appliquée.',
+      eyeNeed:"Échantillonnez d'abord une texture avec ① Choisir une zone.",
+      o_selection:'Sélection', o_nosel:'Rien de sélectionné', o_dup:'Dupliquer', o_del:'Supprimer',
+      o_scalebar:'Échelle', o_scvis:'Afficher sur la carte', o_sclen:'Longueur',
+      o_scsize:'Taille du texte', o_scsegs:'Segments',
+      h_scale:"Faites glisser l'échelle sur la carte pour la repositionner.",
+      o_view:'Vue', o_fit:"Ajuster à l'écran", o_100:'100 %',
+      h_pan:'Clic droit + glisser, clic molette, Espace + glisser, ou flèches pour vous déplacer.',
+      tab_layers:'Calques', tab_library:'Bibliothèque', tab_history:'Historique',
+      ref_title:'Image de référence', ref_export:"Inclure dans l'export", ref_clear:'Retirer la référence',
+      sym_upload:'+ Importer un symbole PNG', sym_upload_done:'symbole(s) chargé(s)', sym_del:'Supprimer',
+      st_pos:'Position', st_zoom:'Zoom', st_size:'Toile', st_tool:'Outil',
+      cancel:'Annuler', ok:'OK',
+      locked:'Le calque est verrouillé ou masqué.', needtext:"Saisissez d'abord le texte de l'étiquette.",
+      exported:'Exporté :', saved:'Projet enregistré.', loaded:'Projet chargé.',
+      badfile:'Fichier de projet invalide.', newmap:'Nouvelle carte créée.',
+      confirmNew:'La carte actuelle sera abandonnée. Choisissez une taille de toile :',
+      confirmSize:'Changer la taille de la toile redimensionne les calques existants. Continuer ?',
+      histStart:'Début', selNone:'Rien de sélectionné', symbols:'symboles',
+      selScale:'Échelle sélectionnée',
+      o_zorder:"Ordre d'empilement", o_front:'Mettre au premier plan', o_back:"Mettre à l'arrière-plan",
+      o_fwd:'Avancer', o_bwd:'Reculer',
+      o_group:'Grouper', o_ungroup:'Dissocier',
+      selMulti:'objets sélectionnés',
+      t_lake:'Lac', o_lake:'Lac', h_lake:'Cliquez pour ajouter des points, puis Entrée (3 points min.) pour fermer.',
+      o_lakecolor:'Couleur du lac',
+      o_symbbrush:'Mode pinceau', o_symbdensity:'Densité',
+      o_windrose:'Rose des vents', o_wrvis:'Afficher sur la carte', o_wrsize:'Taille',
+      o_wrstyle:'Style', o_wrcolor:'Couleur', h_windrose:'Faites glisser sur la carte pour repositionner.',
+      o_snap:'Aligner sur la grille', o_snapsize:'Taille de la grille',
+      o_png2x:'PNG 2×', o_png4x:'PNG 4×'
+    },
+    es: {
+      new:'Nuevo', open:'Abrir', save:'Guardar', parchment:'Pergamino', grid:'Cuadrícula', shore:'Costa',
+      t_select:'Seleccionar', t_landmass:'Tierra', t_erase:'Mar', t_terrain:'Terreno', t_symbol:'Símbolo',
+      t_river:'Río', t_road:'Camino', t_label:'Etiqueta', t_pan:'Desplazar', t_eyedrop:'Muestra',
+      o_landmass:'Tierra / Costa', o_brushsize:'Tamaño del pincel', o_rough:'Rugosidad de la costa',
+      o_landcolor:'Color de la tierra', o_shorew:'Ancho de la costa',
+      o_smooth:'Suavizar costa', o_clearland:'Borrar tierra',
+      h_landmass:'Arrastra para pintar tierra. La herramienta «Mar» borra tanto la tierra como el terreno.',
+      o_terrain:'Pintura de terreno', o_opacity:'Opacidad', o_clip:'Pintar solo sobre tierra',
+      o_clearterrain:'Borrar capa de terreno',
+      h_terrain:'Los motivos se dispersan aleatoriamente en cada trazo — sin patrones repetidos.',
+      o_symbol:'Símbolo', o_size:'Tamaño', o_rot:'Rotación', o_hue:'Tono',
+      o_jitter:'Colocación aleatoria',
+      h_symbol:'Elige un símbolo de la biblioteca, haz clic en el mapa. Usa «Seleccionar» para mover; Supr para borrar.',
+      o_river:'Río', o_width:'Ancho', o_meander:'Meandro',
+      o_taper:'Adelgazar en el nacimiento', o_color:'Color',
+      h_path:'Haz clic para añadir puntos. Intro / doble clic para terminar, Esc para cancelar.',
+      o_road:'Camino / Ruta de caravanas',
+      o_label:'Etiqueta', o_preset:'Estilo predefinido', o_curve:'Curvatura', o_track:'Espaciado de letras',
+      h_label:'Elige un estilo, escribe el texto, haz clic en el mapa. Se aplica al instante a la etiqueta seleccionada.',
+      o_eyedrop:'Muestreador de textura', o_eye_nosample:'Aún no hay muestra',
+      o_eye_radius:'Radio de muestreo', o_eye_brush:'Tamaño del pincel',
+      o_eye_pick:'① Elegir área', o_eye_paint:'② Empezar a pintar', o_eye_clear:'Borrar muestra',
+      h_eyedrop:'① Elegir área: arrastra para dibujar un círculo. ② Pintar: aplica la textura al mapa.',
+      eyeOk:'✓ Textura muestreada', eyeFail:'Muestreo fallido — prueba sobre tierra/terreno.',
+      eyePick:'Haz clic y arrastra en el mapa → ajusta el tamaño del círculo → suelta.',
+      eyePaint:'Haz clic y arrastra en el mapa → se aplica la textura.',
+      eyeNeed:'Primero muestrea una textura con ① Elegir área.',
+      o_selection:'Selección', o_nosel:'Nada seleccionado', o_dup:'Duplicar', o_del:'Borrar',
+      o_scalebar:'Barra de escala', o_scvis:'Mostrar en el mapa', o_sclen:'Longitud',
+      o_scsize:'Tamaño del texto', o_scsegs:'Segmentos',
+      h_scale:'Arrastra la barra de escala en el mapa para reposicionarla.',
+      o_view:'Vista', o_fit:'Ajustar a la pantalla', o_100:'100 %',
+      h_pan:'Clic derecho + arrastrar, clic central, Espacio + arrastrar, o flechas para desplazarte.',
+      tab_layers:'Capas', tab_library:'Biblioteca', tab_history:'Historial',
+      ref_title:'Imagen de referencia', ref_export:'Incluir en la exportación', ref_clear:'Quitar referencia',
+      sym_upload:'+ Subir símbolo PNG', sym_upload_done:'símbolo(s) cargado(s)', sym_del:'Borrar',
+      st_pos:'Posición', st_zoom:'Zoom', st_size:'Lienzo', st_tool:'Herramienta',
+      cancel:'Cancelar', ok:'Aceptar',
+      locked:'La capa está bloqueada u oculta.', needtext:'Escribe primero el texto de la etiqueta.',
+      exported:'Exportado:', saved:'Proyecto guardado.', loaded:'Proyecto cargado.',
+      badfile:'Archivo de proyecto no válido.', newmap:'Mapa nuevo creado.',
+      confirmNew:'Se descartará el mapa actual. Elige un tamaño de lienzo:',
+      confirmSize:'Cambiar el tamaño del lienzo reescala las capas existentes. ¿Continuar?',
+      histStart:'Inicio', selNone:'Nada seleccionado', symbols:'símbolos',
+      selScale:'Barra de escala seleccionada',
+      o_zorder:'Orden de apilado', o_front:'Traer al frente', o_back:'Enviar al fondo',
+      o_fwd:'Avanzar', o_bwd:'Retroceder',
+      o_group:'Agrupar', o_ungroup:'Desagrupar',
+      selMulti:'objetos seleccionados',
+      t_lake:'Lago', o_lake:'Lago', h_lake:'Haz clic para añadir puntos; con 3 o más, pulsa Intro para cerrar.',
+      o_lakecolor:'Color del lago',
+      o_symbbrush:'Modo pincel', o_symbdensity:'Densidad',
+      o_windrose:'Rosa de los vientos', o_wrvis:'Mostrar en el mapa', o_wrsize:'Tamaño',
+      o_wrstyle:'Estilo', o_wrcolor:'Color', h_windrose:'Arrastra en el mapa para reposicionarla.',
+      o_snap:'Ajustar a la cuadrícula', o_snapsize:'Tamaño de la cuadrícula',
+      o_png2x:'PNG 2×', o_png4x:'PNG 4×'
+    },
+    it: {
+      new:'Nuovo', open:'Apri', save:'Salva', parchment:'Pergamena', grid:'Griglia', shore:'Costa',
+      t_select:'Seleziona', t_landmass:'Terra', t_erase:'Mare', t_terrain:'Terreno', t_symbol:'Simbolo',
+      t_river:'Fiume', t_road:'Strada', t_label:'Etichetta', t_pan:'Sposta', t_eyedrop:'Campiona',
+      o_landmass:'Terra / Costa', o_brushsize:'Dimensione pennello', o_rough:'Irregolarità della costa',
+      o_landcolor:'Colore della terra', o_shorew:'Larghezza della costa',
+      o_smooth:'Smussa la costa', o_clearland:'Cancella terra',
+      h_landmass:'Trascina per disegnare la terra. Lo strumento «Mare» cancella sia la terra sia il terreno.',
+      o_terrain:'Pittura del terreno', o_opacity:'Opacità', o_clip:'Dipingi solo sulla terra',
+      o_clearterrain:'Cancella livello terreno',
+      h_terrain:'I motivi vengono sparsi casualmente a ogni pennellata — nessun motivo ripetuto.',
+      o_symbol:'Simbolo', o_size:'Dimensione', o_rot:'Rotazione', o_hue:'Tonalità',
+      o_jitter:'Posizionamento casuale',
+      h_symbol:'Scegli un simbolo dalla libreria, clicca sulla mappa. Usa «Seleziona» per spostare; Canc per eliminare.',
+      o_river:'Fiume', o_width:'Spessore', o_meander:'Meandro',
+      o_taper:'Assottiglia alla sorgente', o_color:'Colore',
+      h_path:'Clicca per aggiungere punti. Invio / doppio clic per terminare, Esc per annullare.',
+      o_road:'Strada / Rotta carovaniera',
+      o_label:'Etichetta', o_preset:'Stile predefinito', o_curve:'Curvatura', o_track:'Spaziatura lettere',
+      h_label:"Scegli uno stile, scrivi il testo, clicca sulla mappa. Si applica subito all'etichetta selezionata.",
+      o_eyedrop:'Campionatore texture', o_eye_nosample:'Nessun campione ancora',
+      o_eye_radius:'Raggio campionamento', o_eye_brush:'Dimensione pennello',
+      o_eye_pick:'① Scegli area', o_eye_paint:'② Inizia a dipingere', o_eye_clear:'Cancella campione',
+      h_eyedrop:'① Scegli area: trascina per disegnare un cerchio. ② Dipingi: applica la texture alla mappa.',
+      eyeOk:'✓ Texture campionata', eyeFail:'Campionamento non riuscito — prova su terra/terreno.',
+      eyePick:'Clicca e trascina sulla mappa → imposta la dimensione del cerchio → rilascia.',
+      eyePaint:'Clicca e trascina sulla mappa → la texture viene applicata.',
+      eyeNeed:'Prima campiona una texture con ① Scegli area.',
+      o_selection:'Selezione', o_nosel:'Nessun oggetto selezionato', o_dup:'Duplica', o_del:'Elimina',
+      o_scalebar:'Barra della scala', o_scvis:'Mostra sulla mappa', o_sclen:'Lunghezza',
+      o_scsize:'Dimensione testo', o_scsegs:'Segmenti',
+      h_scale:'Trascina la barra della scala sulla mappa per riposizionarla.',
+      o_view:'Visualizza', o_fit:'Adatta allo schermo', o_100:'100%',
+      h_pan:'Clic destro + trascina, clic centrale, Spazio + trascina, o frecce per spostarti.',
+      tab_layers:'Livelli', tab_library:'Libreria', tab_history:'Cronologia',
+      ref_title:'Immagine di riferimento', ref_export:"Includi nell'esportazione", ref_clear:'Rimuovi riferimento',
+      sym_upload:'+ Carica simbolo PNG', sym_upload_done:'simbolo/i caricato/i', sym_del:'Elimina',
+      st_pos:'Posizione', st_zoom:'Zoom', st_size:'Tela', st_tool:'Strumento',
+      cancel:'Annulla', ok:'OK',
+      locked:'Il livello è bloccato o nascosto.', needtext:"Scrivi prima il testo dell'etichetta.",
+      exported:'Esportato:', saved:'Progetto salvato.', loaded:'Progetto caricato.',
+      badfile:'File di progetto non valido.', newmap:'Nuova mappa creata.',
+      confirmNew:'La mappa attuale verrà eliminata. Scegli una dimensione della tela:',
+      confirmSize:'Cambiare la dimensione della tela ridimensiona i livelli esistenti. Continuare?',
+      histStart:'Inizio', selNone:'Nessun oggetto selezionato', symbols:'simboli',
+      selScale:'Barra della scala selezionata',
+      o_zorder:'Ordine', o_front:'Porta in primo piano', o_back:'Porta sullo sfondo',
+      o_fwd:'Avanti di uno', o_bwd:'Indietro di uno',
+      o_group:'Raggruppa', o_ungroup:'Separa',
+      selMulti:'oggetti selezionati',
+      t_lake:'Lago', o_lake:'Lago', h_lake:'Clicca per aggiungere punti, con 3+ punti premi Invio per chiudere.',
+      o_lakecolor:'Colore del lago',
+      o_symbbrush:'Modalità pennello', o_symbdensity:'Densità',
+      o_windrose:'Rosa dei venti', o_wrvis:'Mostra sulla mappa', o_wrsize:'Dimensione',
+      o_wrstyle:'Stile', o_wrcolor:'Colore', h_windrose:'Trascina sulla mappa per riposizionarla.',
+      o_snap:'Aggancia alla griglia', o_snapsize:'Dimensione griglia',
+      o_png2x:'PNG 2×', o_png4x:'PNG 4×'
+    },
+    pt: {
+      new:'Novo', open:'Abrir', save:'Guardar', parchment:'Pergaminho', grid:'Grelha', shore:'Costa',
+      t_select:'Selecionar', t_landmass:'Terra', t_erase:'Mar', t_terrain:'Terreno', t_symbol:'Símbolo',
+      t_river:'Rio', t_road:'Estrada', t_label:'Etiqueta', t_pan:'Deslocar', t_eyedrop:'Amostra',
+      o_landmass:'Terra / Costa', o_brushsize:'Tamanho do pincel', o_rough:'Irregularidade da costa',
+      o_landcolor:'Cor da terra', o_shorew:'Largura da costa',
+      o_smooth:'Suavizar costa', o_clearland:'Limpar terra',
+      h_landmass:'Arraste para pintar terra. A ferramenta «Mar» apaga a terra e o terreno em simultâneo.',
+      o_terrain:'Pintura de terreno', o_opacity:'Opacidade', o_clip:'Pintar só sobre terra',
+      o_clearterrain:'Limpar camada de terreno',
+      h_terrain:'Os motivos são espalhados aleatoriamente a cada pincelada — sem padrões repetidos.',
+      o_symbol:'Símbolo', o_size:'Tamanho', o_rot:'Rotação', o_hue:'Matiz',
+      o_jitter:'Colocação aleatória',
+      h_symbol:'Escolha um símbolo na biblioteca, clique no mapa. Use «Selecionar» para mover; Delete para apagar.',
+      o_river:'Rio', o_width:'Largura', o_meander:'Meandro',
+      o_taper:'Afinar na nascente', o_color:'Cor',
+      h_path:'Clique para adicionar pontos. Enter / duplo clique para terminar, Esc para cancelar.',
+      o_road:'Estrada / Rota de caravanas',
+      o_label:'Etiqueta', o_preset:'Estilo predefinido', o_curve:'Curvatura', o_track:'Espaçamento das letras',
+      h_label:'Escolha um estilo, escreva o texto, clique no mapa. Aplica-se de imediato à etiqueta selecionada.',
+      o_eyedrop:'Amostrador de textura', o_eye_nosample:'Ainda sem amostra',
+      o_eye_radius:'Raio de amostragem', o_eye_brush:'Tamanho do pincel',
+      o_eye_pick:'① Escolher área', o_eye_paint:'② Começar a pintar', o_eye_clear:'Limpar amostra',
+      h_eyedrop:'① Escolher área: arraste para desenhar um círculo. ② Pintar: aplica a textura ao mapa.',
+      eyeOk:'✓ Textura amostrada', eyeFail:'Falha na amostragem — tente sobre terra/terreno.',
+      eyePick:'Clique e arraste no mapa → defina o tamanho do círculo → solte.',
+      eyePaint:'Clique e arraste no mapa → a textura é aplicada.',
+      eyeNeed:'Primeiro faça uma amostra com ① Escolher área.',
+      o_selection:'Seleção', o_nosel:'Nada selecionado', o_dup:'Duplicar', o_del:'Apagar',
+      o_scalebar:'Barra de escala', o_scvis:'Mostrar no mapa', o_sclen:'Comprimento',
+      o_scsize:'Tamanho do texto', o_scsegs:'Segmentos',
+      h_scale:'Arraste a barra de escala no mapa para a reposicionar.',
+      o_view:'Vista', o_fit:'Ajustar ao ecrã', o_100:'100%',
+      h_pan:'Clique direito + arrastar, clique do meio, Espaço + arrastar, ou setas para deslocar.',
+      tab_layers:'Camadas', tab_library:'Biblioteca', tab_history:'Histórico',
+      ref_title:'Imagem de referência', ref_export:'Incluir na exportação', ref_clear:'Remover referência',
+      sym_upload:'+ Carregar símbolo PNG', sym_upload_done:'símbolo(s) carregado(s)', sym_del:'Apagar',
+      st_pos:'Posição', st_zoom:'Zoom', st_size:'Tela', st_tool:'Ferramenta',
+      cancel:'Cancelar', ok:'OK',
+      locked:'A camada está bloqueada ou oculta.', needtext:'Escreva primeiro o texto da etiqueta.',
+      exported:'Exportado:', saved:'Projeto guardado.', loaded:'Projeto carregado.',
+      badfile:'Ficheiro de projeto inválido.', newmap:'Novo mapa criado.',
+      confirmNew:'O mapa atual será descartado. Escolha um tamanho de tela:',
+      confirmSize:'Alterar o tamanho da tela redimensiona as camadas existentes. Continuar?',
+      histStart:'Início', selNone:'Nada selecionado', symbols:'símbolos',
+      selScale:'Barra de escala selecionada',
+      o_zorder:'Ordem de sobreposição', o_front:'Trazer para a frente', o_back:'Enviar para trás',
+      o_fwd:'Avançar', o_bwd:'Recuar',
+      o_group:'Agrupar', o_ungroup:'Desagrupar',
+      selMulti:'objetos selecionados',
+      t_lake:'Lago', o_lake:'Lago', h_lake:'Clique para adicionar pontos; com 3+ pontos, prima Enter para fechar.',
+      o_lakecolor:'Cor do lago',
+      o_symbbrush:'Modo pincel', o_symbdensity:'Densidade',
+      o_windrose:'Rosa dos ventos', o_wrvis:'Mostrar no mapa', o_wrsize:'Tamanho',
+      o_wrstyle:'Estilo', o_wrcolor:'Cor', h_windrose:'Arraste no mapa para reposicionar.',
+      o_snap:'Alinhar à grelha', o_snapsize:'Tamanho da grelha',
+      o_png2x:'PNG 2×', o_png4x:'PNG 4×'
+    },
+    nl: {
+      new:'Nieuw', open:'Openen', save:'Opslaan', parchment:'Perkament', grid:'Raster', shore:'Kust',
+      t_select:'Selecteren', t_landmass:'Land', t_erase:'Zee', t_terrain:'Terrein', t_symbol:'Symbool',
+      t_river:'Rivier', t_road:'Weg', t_label:'Label', t_pan:'Verschuiven', t_eyedrop:'Pipet',
+      o_landmass:'Land / Kust', o_brushsize:'Penseelgrootte', o_rough:'Ruwheid van de kust',
+      o_landcolor:'Landkleur', o_shorew:'Kustbreedte',
+      o_smooth:'Kust gladstrijken', o_clearland:'Land wissen',
+      h_landmass:'Sleep om land te tekenen. Het gereedschap "Zee" wist zowel land als terrein.',
+      o_terrain:'Terrein schilderen', o_opacity:'Dekking', o_clip:'Alleen op land schilderen',
+      o_clearterrain:'Terreinlaag wissen',
+      h_terrain:'Patronen worden bij elke penseelstreek willekeurig verspreid — geen herhalend patroon.',
+      o_symbol:'Symbool', o_size:'Grootte', o_rot:'Rotatie', o_hue:'Tint',
+      o_jitter:'Willekeurige plaatsing',
+      h_symbol:'Kies een symbool uit de bibliotheek, klik op de kaart. Gebruik "Selecteren" om te verplaatsen; Delete om te wissen.',
+      o_river:'Rivier', o_width:'Breedte', o_meander:'Meandering',
+      o_taper:'Versmallen bij de bron', o_color:'Kleur',
+      h_path:'Klik om punten toe te voegen. Enter / dubbelklik om te voltooien, Esc om te annuleren.',
+      o_road:'Weg / Karavaanroute',
+      o_label:'Label', o_preset:'Stijlvoorinstelling', o_curve:'Kromming', o_track:'Letterspatiëring',
+      h_label:'Kies een stijl, typ de tekst, klik op de kaart. Wordt direct toegepast op een geselecteerd label.',
+      o_eyedrop:'Textuurpipet', o_eye_nosample:'Nog geen monster genomen',
+      o_eye_radius:'Bemonsteringsstraal', o_eye_brush:'Penseelgrootte',
+      o_eye_pick:'① Gebied kiezen', o_eye_paint:'② Beginnen met schilderen', o_eye_clear:'Monster wissen',
+      h_eyedrop:'① Gebied kiezen: sleep om een cirkel te tekenen. ② Schilderen: breng de textuur aan op de kaart.',
+      eyeOk:'✓ Textuur bemonsterd', eyeFail:'Bemonstering mislukt — probeer boven land/terrein.',
+      eyePick:'Klik en sleep op de kaart → stel de cirkelgrootte in → laat los.',
+      eyePaint:'Klik en sleep op de kaart → de textuur wordt toegepast.',
+      eyeNeed:'Neem eerst een monster met ① Gebied kiezen.',
+      o_selection:'Selectie', o_nosel:'Niets geselecteerd', o_dup:'Dupliceren', o_del:'Verwijderen',
+      o_scalebar:'Schaalbalk', o_scvis:'Tonen op de kaart', o_sclen:'Lengte',
+      o_scsize:'Tekstgrootte', o_scsegs:'Segmenten',
+      h_scale:'Sleep de schaalbalk op de kaart om deze te verplaatsen.',
+      o_view:'Weergave', o_fit:'Passend maken', o_100:'100%',
+      h_pan:'Rechtsklikken + slepen, middelklik, Spatie + slepen, of pijltjestoetsen om te verschuiven.',
+      tab_layers:'Lagen', tab_library:'Bibliotheek', tab_history:'Geschiedenis',
+      ref_title:'Referentieafbeelding', ref_export:'Opnemen in export', ref_clear:'Referentie verwijderen',
+      sym_upload:'+ PNG-symbool uploaden', sym_upload_done:'symbo(o)l(en) geladen', sym_del:'Verwijderen',
+      st_pos:'Positie', st_zoom:'Zoom', st_size:'Canvas', st_tool:'Gereedschap',
+      cancel:'Annuleren', ok:'OK',
+      locked:'Laag is vergrendeld of verborgen.', needtext:'Typ eerst de labeltekst.',
+      exported:'Geëxporteerd:', saved:'Project opgeslagen.', loaded:'Project geladen.',
+      badfile:'Ongeldig projectbestand.', newmap:'Nieuwe kaart aangemaakt.',
+      confirmNew:'De huidige kaart wordt verwijderd. Kies een canvasgrootte:',
+      confirmSize:'Het wijzigen van de canvasgrootte schaalt bestaande lagen. Doorgaan?',
+      histStart:'Begin', selNone:'Niets geselecteerd', symbols:'symbolen',
+      selScale:'Schaalbalk geselecteerd',
+      o_zorder:'Volgorde', o_front:'Naar voorgrond', o_back:'Naar achtergrond',
+      o_fwd:'Naar voren', o_bwd:'Naar achteren',
+      o_group:'Groeperen', o_ungroup:'Groepering opheffen',
+      selMulti:'objecten geselecteerd',
+      t_lake:'Meer', o_lake:'Meer', h_lake:'Klik om punten toe te voegen, druk vanaf 3 punten op Enter om te sluiten.',
+      o_lakecolor:'Kleur van het meer',
+      o_symbbrush:'Penseelmodus', o_symbdensity:'Dichtheid',
+      o_windrose:'Windroos', o_wrvis:'Tonen op de kaart', o_wrsize:'Grootte',
+      o_wrstyle:'Stijl', o_wrcolor:'Kleur', h_windrose:'Sleep op de kaart om te verplaatsen.',
+      o_snap:'Uitlijnen op raster', o_snapsize:'Rastergrootte',
+      o_png2x:'PNG 2×', o_png4x:'PNG 4×'
+    },
+    pl: {
+      new:'Nowy', open:'Otwórz', save:'Zapisz', parchment:'Pergamin', grid:'Siatka', shore:'Wybrzeże',
+      t_select:'Zaznacz', t_landmass:'Ląd', t_erase:'Morze', t_terrain:'Teren', t_symbol:'Symbol',
+      t_river:'Rzeka', t_road:'Droga', t_label:'Etykieta', t_pan:'Przesuń', t_eyedrop:'Próbnik',
+      o_landmass:'Ląd / Wybrzeże', o_brushsize:'Rozmiar pędzla', o_rough:'Nieregularność wybrzeża',
+      o_landcolor:'Kolor lądu', o_shorew:'Szerokość wybrzeża',
+      o_smooth:'Wygładź wybrzeże', o_clearland:'Wyczyść ląd',
+      h_landmass:'Przeciągnij, aby malować ląd. Narzędzie „Morze” usuwa zarówno ląd, jak i teren.',
+      o_terrain:'Malowanie terenu', o_opacity:'Krycie', o_clip:'Maluj tylko na lądzie',
+      o_clearterrain:'Wyczyść warstwę terenu',
+      h_terrain:'Wzory są losowo rozrzucane przy każdym pociągnięciu — bez powtarzającego się wzoru.',
+      o_symbol:'Symbol', o_size:'Rozmiar', o_rot:'Obrót', o_hue:'Odcień',
+      o_jitter:'Losowe rozmieszczenie',
+      h_symbol:'Wybierz symbol z biblioteki, kliknij na mapie. Użyj „Zaznacz”, aby przesunąć; Delete, aby usunąć.',
+      o_river:'Rzeka', o_width:'Szerokość', o_meander:'Meandrowanie',
+      o_taper:'Zwężaj przy źródle', o_color:'Kolor',
+      h_path:'Kliknij, aby dodać punkty. Enter / podwójne kliknięcie kończy, Esc anuluje.',
+      o_road:'Droga / Szlak karawan',
+      o_label:'Etykieta', o_preset:'Styl predefiniowany', o_curve:'Wygięcie', o_track:'Odstępy między literami',
+      h_label:'Wybierz styl, wpisz tekst, kliknij na mapie. Zmiany stosują się od razu do zaznaczonej etykiety.',
+      o_eyedrop:'Próbnik tekstury', o_eye_nosample:'Brak pobranej próbki',
+      o_eye_radius:'Promień próbkowania', o_eye_brush:'Rozmiar pędzla',
+      o_eye_pick:'① Wybierz obszar', o_eye_paint:'② Zacznij malować', o_eye_clear:'Wyczyść próbkę',
+      h_eyedrop:'① Wybierz obszar: przeciągnij, rysując okrąg. ② Maluj: nałóż teksturę na mapę.',
+      eyeOk:'✓ Tekstura pobrana', eyeFail:'Pobieranie nie powiodło się — spróbuj nad lądem/terenem.',
+      eyePick:'Kliknij i przeciągnij na mapie → ustaw rozmiar okręgu → puść.',
+      eyePaint:'Kliknij i przeciągnij na mapie → tekstura zostaje nałożona.',
+      eyeNeed:'Najpierw pobierz teksturę za pomocą ① Wybierz obszar.',
+      o_selection:'Zaznaczenie', o_nosel:'Nic nie zaznaczono', o_dup:'Duplikuj', o_del:'Usuń',
+      o_scalebar:'Podziałka', o_scvis:'Pokaż na mapie', o_sclen:'Długość',
+      o_scsize:'Rozmiar tekstu', o_scsegs:'Segmenty',
+      h_scale:'Przeciągnij podziałkę na mapie, aby ją przesunąć.',
+      o_view:'Widok', o_fit:'Dopasuj do ekranu', o_100:'100%',
+      h_pan:'Prawy przycisk + przeciągnij, środkowy przycisk, Spacja + przeciągnij lub strzałki, aby przesuwać.',
+      tab_layers:'Warstwy', tab_library:'Biblioteka', tab_history:'Historia',
+      ref_title:'Obraz referencyjny', ref_export:'Uwzględnij w eksporcie', ref_clear:'Usuń obraz referencyjny',
+      sym_upload:'+ Wgraj symbol PNG', sym_upload_done:'wczytano symboli', sym_del:'Usuń',
+      st_pos:'Pozycja', st_zoom:'Powiększenie', st_size:'Płótno', st_tool:'Narzędzie',
+      cancel:'Anuluj', ok:'OK',
+      locked:'Warstwa jest zablokowana lub ukryta.', needtext:'Najpierw wpisz tekst etykiety.',
+      exported:'Wyeksportowano:', saved:'Projekt zapisany.', loaded:'Projekt wczytany.',
+      badfile:'Nieprawidłowy plik projektu.', newmap:'Utworzono nową mapę.',
+      confirmNew:'Bieżąca mapa zostanie odrzucona. Wybierz rozmiar płótna:',
+      confirmSize:'Zmiana rozmiaru płótna przeskaluje istniejące warstwy. Kontynuować?',
+      histStart:'Początek', selNone:'Nic nie zaznaczono', symbols:'symboli',
+      selScale:'Zaznaczono podziałkę',
+      o_zorder:'Kolejność warstw', o_front:'Przenieś na wierzch', o_back:'Przenieś na spód',
+      o_fwd:'Przenieś wyżej', o_bwd:'Przenieś niżej',
+      o_group:'Grupuj', o_ungroup:'Rozgrupuj',
+      selMulti:'zaznaczonych obiektów',
+      t_lake:'Jezioro', o_lake:'Jezioro', h_lake:'Kliknij, aby dodać punkty; od 3 punktów naciśnij Enter, aby zamknąć.',
+      o_lakecolor:'Kolor jeziora',
+      o_symbbrush:'Tryb pędzla', o_symbdensity:'Gęstość',
+      o_windrose:'Róża wiatrów', o_wrvis:'Pokaż na mapie', o_wrsize:'Rozmiar',
+      o_wrstyle:'Styl', o_wrcolor:'Kolor', h_windrose:'Przeciągnij na mapie, aby przesunąć.',
+      o_snap:'Przyciągaj do siatki', o_snapsize:'Rozmiar siatki',
+      o_png2x:'PNG 2×', o_png4x:'PNG 4×'
+    },
+    ru: {
+      new:'Новый', open:'Открыть', save:'Сохранить', parchment:'Пергамент', grid:'Сетка', shore:'Берег',
+      t_select:'Выделение', t_landmass:'Суша', t_erase:'Море', t_terrain:'Местность', t_symbol:'Символ',
+      t_river:'Река', t_road:'Дорога', t_label:'Надпись', t_pan:'Перемещение', t_eyedrop:'Пипетка',
+      o_landmass:'Суша / Берег', o_brushsize:'Размер кисти', o_rough:'Неровность берега',
+      o_landcolor:'Цвет суши', o_shorew:'Ширина берега',
+      o_smooth:'Сгладить берег', o_clearland:'Очистить сушу',
+      h_landmass:'Перетаскивайте, чтобы рисовать сушу. Инструмент «Море» стирает и сушу, и местность.',
+      o_terrain:'Рисование местности', o_opacity:'Непрозрачность', o_clip:'Рисовать только по суше',
+      o_clearterrain:'Очистить слой местности',
+      h_terrain:'Узоры при каждом мазке разбрасываются случайно — повторяющегося рисунка не будет.',
+      o_symbol:'Символ', o_size:'Размер', o_rot:'Поворот', o_hue:'Оттенок',
+      o_jitter:'Случайное размещение',
+      h_symbol:'Выберите символ из библиотеки, щёлкните по карте. «Выделение» — для перемещения; Delete — для удаления.',
+      o_river:'Река', o_width:'Толщина', o_meander:'Извилистость',
+      o_taper:'Сужать у истока', o_color:'Цвет',
+      h_path:'Щёлкайте, чтобы добавить точки. Enter / двойной щелчок — завершить, Esc — отменить.',
+      o_road:'Дорога / Караванный путь',
+      o_label:'Надпись', o_preset:'Стиль оформления', o_curve:'Изгиб', o_track:'Межбуквенный интервал',
+      h_label:'Выберите стиль, введите текст, щёлкните по карте. Изменения сразу применяются к выделенной надписи.',
+      o_eyedrop:'Пипетка текстуры', o_eye_nosample:'Образец ещё не взят',
+      o_eye_radius:'Радиус выборки', o_eye_brush:'Размер кисти',
+      o_eye_pick:'① Выбрать область', o_eye_paint:'② Начать рисование', o_eye_clear:'Очистить образец',
+      h_eyedrop:'① Выбрать область: растяните круг. ② Рисование: наносит взятую текстуру на карту.',
+      eyeOk:'✓ Текстура взята', eyeFail:'Не удалось взять образец — попробуйте на суше/местности.',
+      eyePick:'Щёлкните и потяните по карте → задайте размер круга → отпустите.',
+      eyePaint:'Щёлкните и потяните по карте → текстура наносится.',
+      eyeNeed:'Сначала возьмите образец через ① Выбрать область.',
+      o_selection:'Выделение', o_nosel:'Ничего не выделено', o_dup:'Дублировать', o_del:'Удалить',
+      o_scalebar:'Масштабная линейка', o_scvis:'Показывать на карте', o_sclen:'Длина',
+      o_scsize:'Размер текста', o_scsegs:'Сегменты',
+      h_scale:'Перетащите масштабную линейку по карте, чтобы переместить её.',
+      o_view:'Вид', o_fit:'По размеру экрана', o_100:'100%',
+      h_pan:'ПКМ + перетаскивание, СКМ, Пробел + перетаскивание или стрелки для перемещения.',
+      tab_layers:'Слои', tab_library:'Библиотека', tab_history:'История',
+      ref_title:'Референс-изображение', ref_export:'Включить в экспорт', ref_clear:'Убрать референс',
+      sym_upload:'+ Загрузить PNG-символ', sym_upload_done:'символ(ов) загружено', sym_del:'Удалить',
+      st_pos:'Позиция', st_zoom:'Масштаб', st_size:'Холст', st_tool:'Инструмент',
+      cancel:'Отмена', ok:'ОК',
+      locked:'Слой заблокирован или скрыт.', needtext:'Сначала введите текст надписи.',
+      exported:'Экспортировано:', saved:'Проект сохранён.', loaded:'Проект загружен.',
+      badfile:'Некорректный файл проекта.', newmap:'Создана новая карта.',
+      confirmNew:'Текущая карта будет удалена. Выберите размер холста:',
+      confirmSize:'Изменение размера холста масштабирует существующие слои. Продолжить?',
+      histStart:'Начало', selNone:'Ничего не выделено', symbols:'символов',
+      selScale:'Выделена масштабная линейка',
+      o_zorder:'Порядок слоёв', o_front:'На передний план', o_back:'На задний план',
+      o_fwd:'Переместить выше', o_bwd:'Переместить ниже',
+      o_group:'Сгруппировать', o_ungroup:'Разгруппировать',
+      selMulti:'объектов выделено',
+      t_lake:'Озеро', o_lake:'Озеро', h_lake:'Щёлкайте, чтобы добавить точки; от 3 точек — Enter, чтобы замкнуть.',
+      o_lakecolor:'Цвет озера',
+      o_symbbrush:'Режим кисти', o_symbdensity:'Плотность',
+      o_windrose:'Роза ветров', o_wrvis:'Показывать на карте', o_wrsize:'Размер',
+      o_wrstyle:'Стиль', o_wrcolor:'Цвет', h_windrose:'Перетащите по карте, чтобы переместить.',
+      o_snap:'Привязка к сетке', o_snapsize:'Размер сетки',
+      o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     }
   };
+
+  var LANGS = [
+    { code:'tr', flag:'🇹🇷', name:'Türkçe' },
+    { code:'en', flag:'🇬🇧', name:'English' },
+    { code:'de', flag:'🇩🇪', name:'Deutsch' },
+    { code:'fr', flag:'🇫🇷', name:'Français' },
+    { code:'es', flag:'🇪🇸', name:'Español' },
+    { code:'it', flag:'🇮🇹', name:'Italiano' },
+    { code:'pt', flag:'🇵🇹', name:'Português' },
+    { code:'nl', flag:'🇳🇱', name:'Nederlands' },
+    { code:'pl', flag:'🇵🇱', name:'Polski' },
+    { code:'ru', flag:'🇷🇺', name:'Русский' }
+  ];
 
   function $(id){ return document.getElementById(id); }
   function on(id, ev, fn){ var el = $(id); if (el) el.addEventListener(ev, fn); }
@@ -160,6 +637,7 @@
       this.buildTerrainSwatches();
       this.buildLabelPresets();
       this.buildSymbolLibrary();
+      this.buildLangMenu();
       this.refreshLayers();
       this.refreshSelection();
       this.status();
@@ -215,10 +693,46 @@
         } else e.target.value = String(Cv.W);
       });
 
-      on('btn-lang', 'click', function () {
-        self.lang = self.lang === 'tr' ? 'en' : 'tr';
-        self.applyLang();
+      this.buildLangMenu();
+      on('btn-lang', 'click', function (e) { e.stopPropagation(); self.toggleLangMenu(); });
+      document.addEventListener('click', function () { self.closeLangMenu(); });
+    },
+
+    /* ================= dil menüsü ================= */
+    buildLangMenu: function () {
+      var menu = $('lang-menu');
+      if (!menu) return;
+      menu.innerHTML = '';
+      var self = this;
+      LANGS.forEach(function (l) {
+        var li = document.createElement('li');
+        li.className = 'lang-item' + (self.lang === l.code ? ' active' : '');
+        var flag = document.createElement('span');
+        flag.className = 'lang-flag';
+        flag.textContent = l.flag;
+        var name = document.createElement('span');
+        name.className = 'lang-name';
+        name.textContent = l.name;
+        li.appendChild(flag); li.appendChild(name);
+        li.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (self.lang === l.code) { self.closeLangMenu(); return; }
+          self.lang = l.code;
+          self.applyLang();
+          self.closeLangMenu();
+        });
+        menu.appendChild(li);
       });
+    },
+
+    toggleLangMenu: function () {
+      var menu = $('lang-menu');
+      if (menu) menu.classList.toggle('hidden');
+    },
+
+    closeLangMenu: function () {
+      var menu = $('lang-menu');
+      if (menu) menu.classList.add('hidden');
     },
 
     /* ================= araç seçimi ================= */
@@ -551,7 +1065,7 @@
       Object.keys(LABEL_PRESETS).forEach(function (k) {
         var o = document.createElement('option');
         o.value = k;
-        o.textContent = self.lang === 'en' ? LABEL_PRESETS[k].en : LABEL_PRESETS[k].tr;
+        o.textContent = self.lang === 'tr' ? LABEL_PRESETS[k].tr : LABEL_PRESETS[k].en;
         sel.appendChild(o);
       });
       sel.value = LABEL_PRESETS[cur] ? cur : 'region';
@@ -635,7 +1149,7 @@
         c.getContext('2d').drawImage(Terrain.swatch(key, 90, 34), 0, 0);
         b.appendChild(c);
         var s = document.createElement('span');
-        s.textContent = self.lang === 'en' ? t.en : t.tr;
+        s.textContent = self.lang === 'tr' ? t.tr : t.en;
         b.appendChild(s);
         b.addEventListener('click', function () {
           App.terrain.type = key;
@@ -657,7 +1171,7 @@
       Object.keys(Sym.SYMBOLS).forEach(function (k) {
         var o = document.createElement('option');
         o.value = k;
-        o.textContent = (self.lang === 'en' ? Sym.SYMBOLS[k].en : Sym.SYMBOLS[k].tr) +
+        o.textContent = (self.lang === 'tr' ? Sym.SYMBOLS[k].tr : Sym.SYMBOLS[k].en) +
                         ' (' + Sym.SYMBOLS[k].items.length + ')';
         sel.appendChild(o);
       });
@@ -678,7 +1192,7 @@
         Sym.draw(c.getContext('2d'), def.id, { x:48, y:48, size:86, rot:0, hue:0, opacity:1 });
         cell.appendChild(c);
         var s = document.createElement('small');
-        s.textContent = self.lang === 'en' ? def.en : def.tr;
+        s.textContent = self.lang === 'tr' ? def.tr : def.en;
         cell.appendChild(s);
         cell.addEventListener('click', function () {
           App.symbol.id = def.id;
