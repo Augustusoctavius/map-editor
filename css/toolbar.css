@@ -32,8 +32,27 @@
 .tb-btn:hover{background:var(--ink-500);border-color:var(--brass-dim);color:var(--parch)}
 .tb-btn:active{transform:translateY(1px)}
 .tb-btn:disabled{opacity:.35;cursor:default;transform:none}
-.tb-btn.lang{font-family:var(--f-mono);font-size:11px;letter-spacing:.05em}
+.tb-btn.lang{font-size:16px;padding:0 9px;line-height:1}
 
 .tb-select{width:auto;height:28px;margin:0;padding:0 6px}
 
 #topbar .chk{margin:0}
+
+/* ---------- language switcher ---------- */
+.lang-switch{position:relative}
+.lang-menu{
+  position:absolute;top:calc(100% + 6px);right:0;z-index:60;
+  min-width:170px;margin:0;padding:4px;list-style:none;
+  background:var(--ink-700);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:0 12px 30px rgba(0,0,0,.5);
+}
+.lang-menu.hidden{display:none}
+.lang-item{
+  display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;
+  cursor:pointer;font-size:12px;color:var(--text);white-space:nowrap;
+}
+.lang-item:hover{background:var(--ink-600)}
+.lang-item.active{color:var(--brass);background:var(--ink-600)}
+.lang-flag{font-size:15px;line-height:1}
+.lang-name{flex:1}
+.lang-item.active::after{content:'✓';font-size:11px;color:var(--brass)}
