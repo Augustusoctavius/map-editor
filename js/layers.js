@@ -542,7 +542,7 @@
       this.list.splice(to,0,item);
     },
 
-    name: function(l,lang){ return lang==='tr'?l.tr:l.en; },
+    name: function(l,lang){ return global.i18nName ? global.i18nName(l.id, l.tr, l.en, lang) : (lang==='tr'?l.tr:l.en); },
 
     meta: function(){
       return this.list.map(function(l){

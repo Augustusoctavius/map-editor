@@ -640,6 +640,7 @@
       this.buildLangMenu();
       this.refreshLayers();
       this.refreshSelection();
+      this.refreshHistory();
       this.status();
     },
 
@@ -1065,7 +1066,7 @@
       Object.keys(LABEL_PRESETS).forEach(function (k) {
         var o = document.createElement('option');
         o.value = k;
-        o.textContent = self.lang === 'tr' ? LABEL_PRESETS[k].tr : LABEL_PRESETS[k].en;
+        o.textContent = i18nName(k, LABEL_PRESETS[k].tr, LABEL_PRESETS[k].en, self.lang);
         sel.appendChild(o);
       });
       sel.value = LABEL_PRESETS[cur] ? cur : 'region';
@@ -1149,7 +1150,7 @@
         c.getContext('2d').drawImage(Terrain.swatch(key, 90, 34), 0, 0);
         b.appendChild(c);
         var s = document.createElement('span');
-        s.textContent = self.lang === 'tr' ? t.tr : t.en;
+        s.textContent = i18nName(key, t.tr, t.en, self.lang);
         b.appendChild(s);
         b.addEventListener('click', function () {
           App.terrain.type = key;
@@ -1171,7 +1172,7 @@
       Object.keys(Sym.SYMBOLS).forEach(function (k) {
         var o = document.createElement('option');
         o.value = k;
-        o.textContent = (self.lang === 'tr' ? Sym.SYMBOLS[k].tr : Sym.SYMBOLS[k].en) +
+        o.textContent = i18nName(k, Sym.SYMBOLS[k].tr, Sym.SYMBOLS[k].en, self.lang) +
                         ' (' + Sym.SYMBOLS[k].items.length + ')';
         sel.appendChild(o);
       });
@@ -1192,7 +1193,7 @@
         Sym.draw(c.getContext('2d'), def.id, { x:48, y:48, size:86, rot:0, hue:0, opacity:1 });
         cell.appendChild(c);
         var s = document.createElement('small');
-        s.textContent = self.lang === 'tr' ? def.tr : def.en;
+        s.textContent = i18nName(def.id, def.tr, def.en, self.lang);
         cell.appendChild(s);
         cell.addEventListener('click', function () {
           App.symbol.id = def.id;
