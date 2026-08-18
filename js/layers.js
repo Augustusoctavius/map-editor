@@ -523,6 +523,7 @@
     { id:'rivers',    type:'vector', tr:'Nehirler',        en:'Rivers',          opacity:1,   visible:true  },
     { id:'roads',     type:'vector', tr:'Yollar',          en:'Roads',           opacity:1,   visible:true  },
     { id:'symbols',   type:'vector', tr:'Semboller',       en:'Symbols',         opacity:1,   visible:true  },
+    { id:'links',     type:'vector', tr:'Harita bağlantıları', en:'Map links',   opacity:1,   visible:true  },
     { id:'labels',    type:'vector', tr:'Etiketler',       en:'Labels',          opacity:1,   visible:true  },
     { id:'overlay',   type:'overlay',tr:'Kaplama',         en:'Overlay',         opacity:1,   visible:true  }
   ];

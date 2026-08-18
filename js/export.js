@@ -36,7 +36,7 @@
       var x = c.getContext('2d');
       x.save();
       x.scale(scale, scale);
-      Cv.renderMap(x, { includeReference: App.exportReference });
+      Cv.renderMap(x, { includeReference: App.exportReference, includeLinks: false });
       x.restore();
       c.toBlob(function (b) {
         download(b, 'harita-' + stamp() + (scale > 1 ? '-' + scale + 'x' : '') + '.png');
@@ -62,6 +62,7 @@
 
       Layers.list.forEach(function (l) {
         if (!l.visible) return;
+        if (l.id === 'links') return; /* editör içi gezinme iğneleri, çıktıya dahil edilmez */
 
         if (l.id === 'reference') {
           if (!App.exportReference || !l.imageData) return;
@@ -285,6 +286,9 @@
     },
 
     saveProject: function () {
+      /* aktif haritayı da App.maps'e senkronize et ki dünya + tüm bölge
+         haritaları tek bir .json içinde tam olarak saklansın */
+      App.maps[App.currentMapId] = Layers.serialize(true);
       var data = {
         app:'cartographer', version:3,
         W:Cv.W, H:Cv.H,
@@ -296,7 +300,8 @@
         exportReference:App.exportReference,
         scale:App.scale,
         customSymbols: Sym.serializeCustom(),
-        layers: Layers.serialize(true)
+        maps: App.maps,
+        layers: App.maps.root || Layers.serialize(true)
       };
       download(new Blob([JSON.stringify(data)], { type:'application/json' }), 'harita-'+stamp()+'.json');
       UI.msg(UI.t('saved'));
@@ -337,12 +342,18 @@
 
         if (d.customSymbols) Sym.deserializeCustom(d.customSymbols);
 
-        Layers.deserialize(d.layers||[]).then(function () {
+        App.maps = d.maps || {};
+        App.mapStack = [];
+        App.currentMapId = 'root';
+        App.currentMapLabel = '';
+
+        Layers.deserialize(App.maps.root || d.layers || []).then(function () {
           History.clear();
           App.selection = null;
           Cv.shoreDirty = true;
           Cv.elevationDirty = true;
           UI.refreshAll();
+          UI.refreshBreadcrumb();
           Cv.fit();
           UI.msg(UI.t('loaded'));
         });
@@ -352,6 +363,8 @@
 
     newProject: function (size) {
       Layers.init(size, size);
+      App._blankSnapshot = App._snapshotLayers();
+      App.maps = {}; App.mapStack = []; App.currentMapId = 'root'; App.currentMapLabel = '';
       Cv.setSize(size, size, false);
       App.scale.x = Math.round(size*0.06);
       App.scale.y = Math.round(size*0.92);
@@ -361,6 +374,7 @@
       Cv.shoreDirty = true;
       Cv.shoreCanvas = null;
       UI.refreshAll();
+      UI.refreshBreadcrumb();
       Cv.fit();
       UI.msg(UI.t('newmap'));
     }

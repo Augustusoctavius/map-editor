@@ -620,6 +620,7 @@
                   Sym.draw(ctx, o.sym, o, function(){ Cv.requestRender(); });
                 }
               }
+              else if (l.id === 'links') { if (opt.includeLinks !== false) this.drawLink(ctx, o); }
               else if (l.id === 'labels') this.drawLabel(ctx, o);
             }
           }
@@ -1342,6 +1343,39 @@
         return out;
       }
       return out;
+    },
+
+    /* ---------- bölge haritası bağlantı iğnesi ---------- */
+    drawLink: function (ctx, o) {
+      var r = (o.size||40)*0.5;
+      ctx.save();
+      ctx.translate(o.x, o.y);
+
+      ctx.shadowColor = 'rgba(20,15,5,0.5)';
+      ctx.shadowBlur = r*0.5;
+      ctx.shadowOffsetY = r*0.12;
+      ctx.fillStyle = '#c99a4b';
+      ctx.strokeStyle = '#4a3218';
+      ctx.lineWidth = Math.max(1.5, r*0.14);
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+      ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+      ctx.fillStyle = '#3a2b18';
+      ctx.beginPath();
+      ctx.moveTo(0, -r*0.55); ctx.lineTo(r*0.4, 0); ctx.lineTo(0, r*0.55); ctx.lineTo(-r*0.4, 0);
+      ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.arc(0, 0, r*0.16, 0, Math.PI*2); ctx.fillStyle = '#c99a4b'; ctx.fill();
+
+      if (o.name) {
+        ctx.font = '600 ' + Math.round(r*0.62) + 'px Georgia, serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        ctx.lineWidth = Math.max(2, r*0.16);
+        ctx.strokeStyle = '#f5ecd8';
+        ctx.strokeText(o.name, 0, r + r*0.28);
+        ctx.fillStyle = '#3a2b18';
+        ctx.fillText(o.name, 0, r + r*0.28);
+      }
+      ctx.restore();
     },
 
     drawLabel: function (ctx, o) {

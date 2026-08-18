@@ -74,6 +74,7 @@
       <button class="tool" data-tool="river"    title="R"><span class="ico">≈</span><em data-i18n="t_river">Nehir</em></button>
       <button class="tool" data-tool="lake"     title="K"><span class="ico">◎</span><em data-i18n="t_lake">Göl</em></button>
       <button class="tool" data-tool="territory" title="G"><span class="ico">▧</span><em data-i18n="t_territory">Bölge</em></button>
+      <button class="tool" data-tool="regionlink" title="M"><span class="ico">◈</span><em data-i18n="t_regionlink">Bölge bağlantısı</em></button>
       <button class="tool" data-tool="road"     title="D"><span class="ico">⋯</span><em data-i18n="t_road">Yol</em></button>
       <button class="tool" data-tool="label"    title="L"><span class="ico">A</span><em data-i18n="t_label">Etiket</em></button>
       <button class="tool" data-tool="eyedrop"  title="I"><span class="ico">⊙</span><em data-i18n="t_eyedrop">Örnekle</em></button>
@@ -179,6 +180,12 @@
         <p class="hint" data-i18n="h_territory">Tıklayarak nokta ekle, 3+ nokta sonra Enter ile kapat.</p>
       </section>
 
+      <!-- REGION LINK -->
+      <section class="opt-group" data-for="regionlink">
+        <h3 data-i18n="t_regionlink">Bölge bağlantısı</h3>
+        <p class="hint" data-i18n="h_regionlink">Haritaya tıkla, isim ver: yeni ve boş bir bölge haritası oluşturulur. Seç aracıyla iğneye çift tıklayarak o bölgeye gir, sol üstteki "Geri" ile dünya haritasına dön.</p>
+      </section>
+
       <!-- RIVER -->
       <section class="opt-group" data-for="river">
         <h3 data-i18n="o_river">Nehir</h3>
@@ -253,6 +260,7 @@
       <section class="opt-group" data-for="select">
         <h3 data-i18n="o_selection">Seçim</h3>
         <div id="sel-info" class="sel-info" data-i18n="o_nosel">Seçili nesne yok</div>
+        <button class="btn wide" id="btn-rl-open" style="display:none" data-i18n="rl_open">Bölgeye gir →</button>
         <div class="row2">
           <button class="btn" id="btn-dup" data-i18n="o_dup">Çoğalt</button>
           <button class="btn danger" id="btn-del" data-i18n="o_del">Sil</button>
@@ -315,6 +323,10 @@
 
   <!-- ============ TUVAL ============ -->
   <section id="canvas-area">
+    <div id="map-breadcrumb" class="hidden">
+      <button id="btn-map-back" title="Backspace">◀ <span data-i18n="bc_back">Geri</span></button>
+      <span id="map-breadcrumb-path"></span>
+    </div>
     <canvas id="view"></canvas>
     <div id="minimap-wrap">
       <canvas id="minimap" width="180" height="180"></canvas>

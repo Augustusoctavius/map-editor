@@ -165,7 +165,14 @@
       window.addEventListener('pointerup', function (e) { self.onUp(e); });
       v.addEventListener('pointerleave', function () { Cv.mouse.over = false; Cv.requestRender(); });
       v.addEventListener('pointerenter', function () { Cv.mouse.over = true; });
-      v.addEventListener('dblclick', function (e) { e.preventDefault(); self.finishPath(); });
+      v.addEventListener('dblclick', function (e) {
+        e.preventDefault();
+        if (App.tool === 'select') {
+          var hit = self.hitTest(self.pos(e));
+          if (hit && hit.layerId === 'links') { App.enterMap(hit.obj.targetMapId, hit.obj.name); return; }
+        }
+        self.finishPath();
+      });
 
       /* sağ tık: pan (bekleyen yol varsa yolu bitir) */
       v.addEventListener('contextmenu', function (e) { e.preventDefault(); });
@@ -255,6 +262,7 @@
         case 'road':
         case 'territory': this.addPathPoint(p); break;
         case 'label':    this.placeLabel(p); break;
+        case 'regionlink': this.placeRegionLink(p); break;
         case 'select':   this.startSelect(p, e.shiftKey); break;
       }
       Cv.requestRender();
@@ -888,6 +896,24 @@
       UI.refreshHistory(); UI.refreshSelection();
     },
 
+    /* ================= BÖLGE HARİTASI BAĞLANTISI ================= */
+    placeRegionLink: function (p) {
+      var L = Layers.get('links');
+      if (L.locked || !L.visible) { UI.msg(UI.t('locked')); return; }
+      UI.modal(UI.t('rl_newtitle'),
+        '<input type="text" id="rl-name-input" placeholder="' + UI.t('rl_placeholder') + '" style="width:100%">',
+        function () {
+          var name = ($('rl-name-input').value || '').trim() || UI.t('rl_default');
+          var before = JSON.parse(JSON.stringify(L.objects));
+          var o = { id: uid(), x: p.x, y: p.y, size: 40, name: name, targetMapId: uid() };
+          L.objects.push(o);
+          App.selection = { layerId:'links', id:o.id };
+          History.pushVector('links', before, JSON.parse(JSON.stringify(L.objects)), 'regionlink');
+          UI.refreshHistory(); UI.refreshSelection();
+          Cv.requestRender();
+        });
+    },
+
     /* tıklanan noktaya en yakın nehir/yol'u bulur (etiketi yola oturtmak için) */
     findNearestPath: function (p, maxDist) {
       var best = null;
@@ -977,13 +1003,17 @@
     },
 
     hitTest: function (p) {
-      var order = ['labels','symbols','roads','rivers','territories'];
+      var order = ['links','labels','symbols','roads','rivers','territories'];
       for (var i=0; i<order.length; i++) {
         var L = Layers.get(order[i]);
         if (!L.visible || L.locked) continue;
         for (var j=L.objects.length-1; j>=0; j--) {
           var o = L.objects[j];
-          if (order[i] === 'symbols') {
+          if (order[i] === 'links') {
+            var dxl = p.x-o.x, dyl = p.y-o.y;
+            if (dxl*dxl + dyl*dyl <= (o.size||40)*(o.size||40)*0.36)
+              return { layerId:'links', id:o.id, obj:o };
+          } else if (order[i] === 'symbols') {
             var b = Sym.bounds(o);
             if (p.x>=b.x && p.x<=b.x+b.w && p.y>=b.y && p.y<=b.y+b.h)
               return { layerId:'symbols', id:o.id, obj:o };
@@ -1323,6 +1353,9 @@
         var gx1=Math.max.apply(null,gbs.map(function(b){return b.x+b.w;}));
         var gy1=Math.max.apply(null,gbs.map(function(b){return b.y+b.h;}));
         ctx.strokeRect(gx0-6/z, gy0-6/z, gx1-gx0+12/z, gy1-gy0+12/z);
+      } else if (App.selection.layerId === 'links') {
+        var r5 = (o.size||40)*0.6;
+        ctx.beginPath(); ctx.arc(o.x, o.y, r5+4/z, 0, Math.PI*2); ctx.stroke();
       } else {
         var b = App.selection.layerId==='labels' ? Cv.labelBounds(o) : Sym.bounds(o);
         ctx.strokeRect(b.x-4/z, b.y-4/z, b.w+8/z, b.h+8/z);

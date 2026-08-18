@@ -15,6 +15,21 @@
 #view.panning{cursor:grabbing}
 #view.pick{cursor:default}
 
+#map-breadcrumb{
+  position:absolute;top:12px;left:12px;z-index:6;
+  display:flex;align-items:center;gap:8px;
+  background:var(--ink-800);border:1px solid var(--line);border-radius:var(--radius);
+  padding:6px 12px;box-shadow:0 6px 22px #000a;
+  font-size:13px;color:var(--text);
+}
+#map-breadcrumb.hidden{display:none}
+#map-breadcrumb button{
+  background:none;border:1px solid var(--line);border-radius:6px;
+  color:inherit;font:inherit;padding:3px 8px;cursor:pointer;
+}
+#map-breadcrumb button:hover{background:var(--ink-700)}
+#map-breadcrumb-path{opacity:0.85}
+
 #minimap-wrap{
   position:absolute;right:12px;bottom:12px;
   border:1px solid var(--line);border-radius:var(--radius);

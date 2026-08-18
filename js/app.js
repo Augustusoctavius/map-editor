@@ -27,9 +27,57 @@
     windrose:{ visible:false, x:0, y:0, size:120, style:'classic', color:'#3a2b18' },
     snap:    { enabled:false, size:64 },
 
+    /* ================= ÇOKLU HARİTA (dünya ↔ bölge bağlantısı) =================
+       Tek bir Layers/Cv/History dokümanı her zaman "aktif" haritadır. Bir bağlantı
+       iğnesine çift tıklandığında aktif doküman App.maps altında serileştirilip
+       hedef haritanın (varsa) serileştirilmiş hâli yüklenir; yoksa boş bir harita
+       (App._blankSnapshot) başlatılır. Geri dönüş için App.mapStack bir yığın
+       (breadcrumb) tutar. Undo geçmişi haritaya özeldir, geçişte sıfırlanır. */
+    maps: {}, mapStack: [], currentMapId: 'root', currentMapLabel: '',
+
+    /* Layers.serialize() vektör katmanlarda .objects dizisini referans olarak
+       döndürür (JSON.stringify'a hazırlık amaçlı) — bellekte doküman olarak
+       saklanacaksa mutlaka derin kopyalanmalı, yoksa iki "harita" aynı diziyi
+       paylaşıp birbirini kirletir. */
+    _snapshotLayers: function () { return JSON.parse(JSON.stringify(Layers.serialize(true))); },
+
+    enterMap: function (targetId, label) {
+      if (targetId === this.currentMapId) return;
+      this.maps[this.currentMapId] = this._snapshotLayers();
+      this.mapStack.push({ id: this.currentMapId, label: this.currentMapLabel });
+      var self = this;
+      var snap = this.maps[targetId] || this._blankSnapshot;
+      Layers.deserialize(snap).then(function () {
+        self.currentMapId = targetId;
+        self.currentMapLabel = label || '';
+        self._afterMapSwitch();
+      });
+    },
+
+    exitMap: function () {
+      if (!this.mapStack.length) return;
+      this.maps[this.currentMapId] = this._snapshotLayers();
+      var parent = this.mapStack.pop();
+      var self = this;
+      Layers.deserialize(this.maps[parent.id] || this._blankSnapshot).then(function () {
+        self.currentMapId = parent.id;
+        self.currentMapLabel = parent.label;
+        self._afterMapSwitch();
+      });
+    },
+
+    _afterMapSwitch: function () {
+      App.selection = null;
+      History.clear();
+      Cv.shoreDirty = true; Cv.elevationDirty = true;
+      if (global.UI) { UI.refreshAll(); UI.refreshBreadcrumb(); }
+      Cv.fit();
+    },
+
     init: function () {
       var size = 2048;
       Layers.init(size, size);
+      this._blankSnapshot = this._snapshotLayers();
       Cv.init(size, size);
       Tools.bind();
 
