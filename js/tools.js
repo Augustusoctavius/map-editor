@@ -869,10 +869,42 @@
         curve:s.curve, track:s.track, rot:s.rot, caps:s.caps,
         banner:s.banner, opacity:1
       };
+
+      if (s.snapPath) {
+        var hit = this.findNearestPath(p, 70);
+        if (hit) {
+          o.pathPts = hit.pts;
+          o.pathCenter = hit.len;
+          var ctr = Geo.pointAtLength(hit.pts, hit.len);
+          o.x = ctr.x; o.y = ctr.y;
+        } else {
+          UI.msg(UI.t('nopathnear'));
+        }
+      }
+
       L.objects.push(o);
       App.selection = { layerId:'labels', id:o.id };
       History.pushVector('labels', before, JSON.parse(JSON.stringify(L.objects)), 'label');
       UI.refreshHistory(); UI.refreshSelection();
+    },
+
+    /* tıklanan noktaya en yakın nehir/yol'u bulur (etiketi yola oturtmak için) */
+    findNearestPath: function (p, maxDist) {
+      var best = null;
+      ['rivers', 'roads'].forEach(function (lid) {
+        var L = Layers.get(lid);
+        if (!L || !L.visible) return;
+        L.objects.forEach(function (o) {
+          if (o.kind === 'lake') return;
+          var pts = lid === 'rivers' ? Cv.riverGeometry(o) : Cv.roadGeometry(o);
+          if (!pts || pts.length < 2) return;
+          var n = Geo.nearestOnPolyline(pts, p.x, p.y);
+          if (n.dist <= maxDist && (!best || n.dist < best.dist)) {
+            best = { pts:pts, len:n.len, dist:n.dist };
+          }
+        });
+      });
+      return best;
     },
 
     /* ================= NEHİR / YOL / BÖLGE ================= */

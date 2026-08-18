@@ -250,6 +250,18 @@
                    (o.outline ? ' stroke="'+(o.outlineColor||'#f5ecd8')+'" stroke-width="'+
                      Math.max(1.5,(o.size||32)*0.16)+'" paint-order="stroke"' : '');
 
+      if (o.pathPts && o.pathPts.length > 1) {
+        var pathLen = Geo.polylineLength(o.pathPts);
+        var center = (o.pathCenter != null) ? o.pathCenter : pathLen/2;
+        var startOffPx = center - total/2;
+        var startPct = (startOffPx / pathLen) * 100;
+        var pid2 = 'lp' + o.id;
+        out.push('<defs><path id="'+pid2+'" d="'+Geo.svgPolyD(o.pathPts, false)+'" fill="none"/></defs>');
+        out.push('<text '+common+'><textPath xlink:href="#'+pid2+
+                 '" startOffset="'+startPct.toFixed(2)+'%">'+esc(text)+'</textPath></text>');
+        return out.join('');
+      }
+
       if (!o.curve) {
         out.push('<text x="'+o.x+'" y="'+o.y+'" text-anchor="middle" dominant-baseline="middle" '+
                  common+rot+'>'+esc(text)+'</text>');

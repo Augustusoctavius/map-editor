@@ -132,6 +132,50 @@
       var d = 'M' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(1);
       for (var i = 1; i < pts.length; i++) d += ' L' + pts[i][0].toFixed(1) + ' ' + pts[i][1].toFixed(1);
       return d + (close ? ' Z' : '');
+    },
+
+    /* ---------- çizgi (nehir/yol) üzerinde konumlandırma — kavisli etiketler için ----------
+       pathPts: [[x,y],...] örneklenmiş polyline (Cv.riverGeometry/roadGeometry çıktısı) */
+    polylineLength: function (pts) {
+      var len = 0;
+      for (var i = 1; i < pts.length; i++) len += Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]);
+      return len;
+    },
+
+    /* verilen kümülatif uzunlukta {x,y,ang} döner (ang: teğet açısı, radyan) */
+    pointAtLength: function (pts, len) {
+      if (!pts || pts.length < 2) return { x:0, y:0, ang:0 };
+      if (len <= 0) return { x:pts[0][0], y:pts[0][1], ang:Math.atan2(pts[1][1]-pts[0][1], pts[1][0]-pts[0][0]) };
+      var acc = 0;
+      for (var i = 1; i < pts.length; i++) {
+        var dx = pts[i][0]-pts[i-1][0], dy = pts[i][1]-pts[i-1][1];
+        var segLen = Math.hypot(dx, dy);
+        if (acc + segLen >= len || i === pts.length-1) {
+          var t = segLen > 0 ? Math.min(1, Math.max(0, (len-acc)/segLen)) : 0;
+          return { x: pts[i-1][0]+dx*t, y: pts[i-1][1]+dy*t, ang: Math.atan2(dy, dx) };
+        }
+        acc += segLen;
+      }
+      var last = pts.length-1;
+      return { x:pts[last][0], y:pts[last][1], ang:Math.atan2(pts[last][1]-pts[last-1][1], pts[last][0]-pts[last-1][0]) };
+    },
+
+    /* polyline üzerindeki en yakın noktanın kümülatif uzunluğunu ve mesafesini döner */
+    nearestOnPolyline: function (pts, px, py) {
+      var best = { len:0, dist:Infinity };
+      var acc = 0;
+      for (var i = 1; i < pts.length; i++) {
+        var x0=pts[i-1][0], y0=pts[i-1][1], x1=pts[i][0], y1=pts[i][1];
+        var dx=x1-x0, dy=y1-y0;
+        var segLen = Math.hypot(dx, dy);
+        var t = segLen > 0 ? ((px-x0)*dx + (py-y0)*dy) / (segLen*segLen) : 0;
+        t = Math.min(1, Math.max(0, t));
+        var qx = x0+dx*t, qy = y0+dy*t;
+        var d = Math.hypot(px-qx, py-qy);
+        if (d < best.dist) best = { len: acc + segLen*t, dist: d };
+        acc += segLen;
+      }
+      return best;
     }
   };
 
@@ -1312,6 +1356,41 @@
       ctx.miterLimit = 2;
 
       var total = this.measureLabel(ctx, o);
+
+      /* --- nehir/yol üzerine oturan etiket: gerçek çizilmiş eğriyi izler,
+         daire yayı değil, sabit poligon (o.pathPts, oluşturulduğu anda alınmış) --- */
+      if (o.pathPts && o.pathPts.length > 1) {
+        if (o.shadow) {
+          ctx.shadowColor = 'rgba(40,25,5,0.45)';
+          ctx.shadowBlur = Math.max(2, (o.size||32)*0.12);
+          ctx.shadowOffsetY = Math.max(1, (o.size||32)*0.05);
+        }
+        var pathLen = Geo.polylineLength(o.pathPts);
+        var center = (o.pathCenter != null) ? o.pathCenter : pathLen/2;
+        var startLen = center - total/2;
+        var tr3 = o.track||0;
+        var cursor = startLen;
+        for (var pi = 0; pi < text.length; pi++) {
+          var cw3 = ctx.measureText(text[pi]).width;
+          var mid3 = cursor + cw3/2;
+          var pt = Geo.pointAtLength(o.pathPts, mid3);
+          ctx.save();
+          ctx.translate(pt.x, pt.y);
+          ctx.rotate(pt.ang);
+          if (o.outline) {
+            ctx.strokeStyle = o.outlineColor || '#f5ecd8';
+            ctx.lineWidth = Math.max(1.5, (o.size||32)*0.16);
+            ctx.strokeText(text[pi], 0, 0);
+          }
+          ctx.fillStyle = o.color || '#3a2b18';
+          ctx.fillText(text[pi], 0, 0);
+          ctx.restore();
+          cursor += cw3 + tr3;
+        }
+        ctx.restore();
+        return;
+      }
+
       ctx.translate(o.x, o.y);
       if (o.rot) ctx.rotate(o.rot*Math.PI/180);
 
