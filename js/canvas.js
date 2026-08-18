@@ -321,7 +321,25 @@
       this.shoreDirty  = false;
       /* kıyı çizgisi değişti — nehir kesim noktaları geçersiz olabilir */
       this._riverCrossingCache = {};
+
+      /* kara/deniz nokta testi için düşük çözünürlüklü alfa önbelleği —
+         sembol "karaya kenetle" (clip) kontrolü ve fırça yerleştirmesi bunu kullanır */
+      var LS = 512;
+      var scx = document.createElement('canvas'); scx.width = LS; scx.height = LS;
+      var sctx = scx.getContext('2d', { willReadFrequently:true });
+      sctx.drawImage(L.canvas, 0, 0, LS, LS);
+      this.landSample = { data: sctx.getImageData(0,0,LS,LS).data, size: LS, scale: LS / this.W };
+
       return result.canvas;
+    },
+
+    /* (x,y) tuval koordinatındaki nokta kara mı? Önbellek yoksa iyimser true döner. */
+    isOnLand: function (x, y) {
+      var ls = this.landSample;
+      if (!ls) return true;
+      var sx = Math.round(x * ls.scale), sy = Math.round(y * ls.scale);
+      if (sx < 0 || sy < 0 || sx >= ls.size || sy >= ls.size) return false;
+      return ls.data[(sy*ls.size + sx)*4 + 3] > 30;
     },
 
     /* ---------- YÜKSELTİ EFEKTİ (hillshade + kontur) ----------
@@ -551,7 +569,8 @@
               if (l.id === 'roads') this.drawRoad(ctx, o);
               else if (l.id === 'territories') this.drawTerritory(ctx, o);
               else if (l.id === 'symbols') {
-                if (o.kind === 'group') {
+                if (o.clip && !this.isOnLand(o.x, o.y)) { /* kara sınırı dışına taştı — çizme */ }
+                else if (o.kind === 'group') {
                   o.members.forEach(function(m){ Sym.draw(ctx, m.sym, m, function(){ Cv.requestRender(); }); });
                 } else {
                   Sym.draw(ctx, o.sym, o, function(){ Cv.requestRender(); });

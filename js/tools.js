@@ -764,6 +764,9 @@
       this.mode = 'symbolBrush';
       this.symBrushLast = p;
       this.symBrushBefore = JSON.parse(JSON.stringify(L.objects));
+      /* aynı vuruş içinde birbirine çok yakın sembol yığılmasını önlemek için
+         bu vuruşta yerleştirilen noktaların minimum mesafe kontrolü */
+      this.symBrushPlaced = [];
       this.symbolBrushStamp(p);
     },
 
@@ -773,14 +776,29 @@
       var density = App.symbol.brushDensity || 0.5;
       var spread = s.size * (1.2 + density * 1.5);
       var count = Math.max(1, Math.round(density * 3));
+      var minGap = s.size * (0.55 - density * 0.25); /* yoğunluk arttıkça izin verilen minimum aralık daralır */
+      var placed = this.symBrushPlaced || (this.symBrushPlaced = []);
+      var clip = s.clipToLand;
       for (var i = 0; i < count; i++) {
         var angle = Math.random() * Math.PI * 2;
         var dist  = Math.random() * spread * 0.5;
         var snp = Cv.snapPoint ? { x: p.x, y: p.y } : p;
+        var x = snp.x + Math.cos(angle) * dist * (s.jitter ? 1 : 0);
+        var y = snp.y + Math.sin(angle) * dist * (s.jitter ? 1 : 0);
+
+        if (clip && global.Cv && !Cv.isOnLand(x, y)) continue;
+
+        var tooClose = false;
+        for (var k = 0; k < placed.length; k++) {
+          var dx = placed[k][0]-x, dy = placed[k][1]-y;
+          if (dx*dx + dy*dy < minGap*minGap) { tooClose = true; break; }
+        }
+        if (tooClose) continue;
+        placed.push([x, y]);
+
         var o = {
           id: uid(), sym: s.id,
-          x: snp.x + Math.cos(angle) * dist * (s.jitter ? 1 : 0),
-          y: snp.y + Math.sin(angle) * dist * (s.jitter ? 1 : 0),
+          x: x, y: y, clip: clip,
           size: s.size * (0.78 + Math.random() * 0.44 * (s.jitter ? 1 : 0.2)),
           rot:  s.rot + (Math.random() - 0.5) * 60 * (s.jitter ? 1 : 0.1),
           hue: s.hue, opacity: s.opacity, wear: s.wear || 0
@@ -809,6 +827,7 @@
       History.pushVector('symbols', this.symBrushBefore, JSON.parse(JSON.stringify(L.objects)), 'symbol:brush');
       this.symBrushLast = null;
       this.symBrushBefore = null;
+      this.symBrushPlaced = null;
       this.mode = null;
       App.selection = null;
       UI.refreshHistory();
