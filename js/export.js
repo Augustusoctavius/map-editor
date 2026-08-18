@@ -81,7 +81,7 @@
           l.objects.forEach(function (o) {
             if (l.id === 'rivers' && o.kind === 'lake') {
               /* göl SVG */
-              var lpts = Geo.sample(o.pts, 16);
+              var lpts = Cv.lakeSmoothPts(o, 16);
               s.push('<path d="' + Geo.svgPolyD(lpts, true) + '" fill="' + (o.color||'#5b8aa6') +
                      '" opacity="' + (o.opacity||0.88) + '" stroke="' + (o.color||'#5b8aa6') +
                      '" stroke-width="2" stroke-opacity="0.5" stroke-linejoin="round"/>');
@@ -107,7 +107,7 @@
                        '" stroke-width="'+w+'" stroke-linecap="round" stroke-linejoin="round"'+dash+'/>');
               }
             } else if (l.id === 'territories') {
-              var tpts = Cv.lakeSmoothPts(o.pts, 24);
+              var tpts = Cv.lakeSmoothPts(o, 24);
               var tdash = o.borderWidth ? ' stroke-dasharray="'+(o.borderWidth*3)+','+(o.borderWidth*2)+'"' : '';
               s.push('<path d="' + Geo.svgPolyD(tpts, true) + '" fill="' + (o.color||'#8a5a3a') +
                      '" opacity="' + (o.opacity===undefined?0.30:o.opacity) + '" stroke="' + (o.borderColor||'#5a3a20') +

@@ -77,6 +77,48 @@
       return best;
     },
 
+    /* Catmull-Rom <-> Bezier dönüşümü: elle tutamaç ayarlanmamış bir nokta
+       için, mevcut Geo.sample ile TAM AYNI eğriyi üreten simetrik tutamaç.
+       Böylece bir yolun bazı noktalarında özel tutamaç, bazılarında otomatik
+       tutamaç karışık kullanılabilir — görsel süreklilik bozulmaz. */
+    autoHandle: function (pts, i, closed) {
+      var n = pts.length;
+      var prev = closed ? pts[(i-1+n)%n] : (pts[i-1] || pts[i]);
+      var next = closed ? pts[(i+1)%n] : (pts[i+1] || pts[i]);
+      var tx = (next[0]-prev[0])/6, ty = (next[1]-prev[1])/6;
+      return { ix:-tx, iy:-ty, ox:tx, oy:ty };
+    },
+
+    /* handles[i] = {ix,iy,ox,oy} (nokta i'nin giriş/çıkış tutamaç ofsetleri,
+       nokta konumuna göre göreli) ya da null/undefined → otomatik tutamaç.
+       closed=true ise son noktadan ilk noktaya kapanan bir eğri örneklenir
+       (göl/bölge poligonları için). */
+    sampleBezier: function (pts, handles, perSeg, closed) {
+      var n = pts.length;
+      if (n < 2) return (pts || []).slice();
+      var self = this, res = [];
+      var ps = Math.max(2, perSeg || 16);
+      var segCount = closed ? n : n - 1;
+      for (var i = 0; i < segCount; i++) {
+        var i2 = closed ? (i+1) % n : i+1;
+        var P0 = pts[i], P3 = pts[i2];
+        var hOut = (handles && handles[i])  || self.autoHandle(pts, i, closed);
+        var hIn  = (handles && handles[i2]) || self.autoHandle(pts, i2, closed);
+        var C1 = [P0[0]+(hOut.ox||0), P0[1]+(hOut.oy||0)];
+        var C2 = [P3[0]+(hIn.ix||0),  P3[1]+(hIn.iy||0)];
+        for (var j = 0; j < ps; j++) {
+          var t = j/ps, mt = 1-t;
+          var a = mt*mt*mt, b = 3*mt*mt*t, c = 3*mt*t*t, d = t*t*t;
+          res.push([
+            a*P0[0]+b*C1[0]+c*C2[0]+d*P3[0],
+            a*P0[1]+b*C1[1]+c*C2[1]+d*P3[1]
+          ]);
+        }
+      }
+      if (!closed) res.push(pts[n-1].slice());
+      return res;
+    },
+
     polyPath: function (pts) {
       var p = new Path2D();
       if (!pts.length) return p;
@@ -474,7 +516,7 @@
 
     /* ---------- nehir ---------- */
     riverGeometry: function (o) {
-      var pts = Geo.sample(o.pts, 18);
+      var pts = o.handles ? Geo.sampleBezier(o.pts, o.handles, 18, false) : Geo.sample(o.pts, 18);
       return Geo.meander(pts, (o.meander||0)*(o.width||12)*1.6, (o.width||12)*9);
     },
 
@@ -493,7 +535,7 @@
     drawRiverLakeConfluence: function (ctx, river, lake) {
       if (!river.pts || river.pts.length < 2 || !lake.pts || lake.pts.length < 3) return;
       var rPts = this.riverGeometry(river);
-      var lPts = this.lakeSmoothPts(lake.pts, 30);
+      var lPts = this.lakeSmoothPts(lake, 30);
       var mouth = rPts[rPts.length-1];
       if (!this._pointInPoly(mouth[0], mouth[1], lPts)) return;
 
@@ -702,9 +744,18 @@
       return out;
     },
 
-    /* göl için yumuşatılmış nokta dizisi üretir — tüm göl fonksiyonları
-       bunu ortak kullanır ki kıyı ve dolgu birbiriyle tutarlı kalsın */
-    lakeSmoothPts: function (rawPts, sampleN) {
+    /* göl/bölge için yumuşatılmış nokta dizisi üretir — tüm göl/bölge
+       fonksiyonları bunu ortak kullanır ki kıyı ve dolgu birbiriyle
+       tutarlı kalsın. o: nesne ({pts,handles}) ya da geriye dönük
+       uyumluluk için doğrudan nokta dizisi kabul eder. */
+    lakeSmoothPts: function (o, sampleN) {
+      var rawPts  = Array.isArray(o) ? o : o.pts;
+      var handles = Array.isArray(o) ? null : o.handles;
+      if (handles) {
+        /* kullanıcı tutamaç düzenlemesi yaptıysa: basitleştirme/Chaikin
+           uygulanmaz, doğrudan kapalı bezier eğrisi örneklenir */
+        return Geo.sampleBezier(rawPts, handles, 12, true);
+      }
       /* Az agresif basitleştirme — kullanıcının orijinal hatlarını koru */
       var cleaned = this._simplifyPts(rawPts, 6);
       /* Daha fazla örnekleme noktası — detayları kaybetmeden yumuşat */
@@ -745,7 +796,7 @@
     _lakeShoreCache: {},
 
     _buildLakeShoreMask: function (o) {
-      var pts = this.lakeSmoothPts(o.pts, 40);
+      var pts = this.lakeSmoothPts(o, 40);
       var minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
       for (var i=0;i<pts.length;i++) {
         if (pts[i][0]<minX) minX=pts[i][0];
@@ -795,7 +846,7 @@
         this._lakeShoreCache[o.id] = entry;
       }
 
-      var pts = this.lakeSmoothPts(o.pts, 8);
+      var pts = this.lakeSmoothPts(o, 8);
       var shoreCol = this._lakeShoreColor(pts);
 
       /* maskeyi renklendir: ayrı bir scratch canvas'ta — ana ctx'e
@@ -819,7 +870,7 @@
     /* ---------- göl 2. pass: dolgu + iç efektler (nehirlerin üstünde) ---------- */
     drawLakeFill: function (ctx, o) {
       if (!o.pts || o.pts.length < 3) return;
-      var pts = this.lakeSmoothPts(o.pts, 24);
+      var pts = this.lakeSmoothPts(o, 24);
       var col = o.color || '#5b8aa6';
       var shoreCol = this._lakeShoreColor(pts);
 
@@ -870,7 +921,7 @@
     /* ---------- bölge/toprak (territory) dolgusu ---------- */
     drawTerritory: function (ctx, o) {
       if (!o.pts || o.pts.length < 3) return;
-      var pts = this.lakeSmoothPts(o.pts, 24);
+      var pts = this.lakeSmoothPts(o, 24);
       ctx.save();
       ctx.lineJoin = 'round';
       var path = Geo.polyPath(pts);
@@ -1018,7 +1069,9 @@
     },
 
     /* ---------- yol ---------- */
-    roadGeometry: function (o) { return Geo.sample(o.pts, 14); },
+    roadGeometry: function (o) {
+      return o.handles ? Geo.sampleBezier(o.pts, o.handles, 14, false) : Geo.sample(o.pts, 14);
+    },
 
     drawRoad: function (ctx, o) {
       if (!o.pts || o.pts.length < 2) return;

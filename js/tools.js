@@ -140,6 +140,7 @@
     scaleDrag:null,
     rubberBand:null,
     windroseDrag:null,
+    handleDrag:null,
     symBrushLast:null,
     symBrushBefore:null,
 
@@ -215,6 +216,17 @@
         return;
       }
 
+      /* bezier tutamacı sürüklemeye başla (seçili nehir/yol/göl/bölge) */
+      if (App.tool === 'select') {
+        var hh = this.hitTestHandle(p);
+        if (hh) {
+          var Lh = Layers.get(App.selection.layerId);
+          this.handleDrag = { obj:hh.obj, index:hh.index, dir:hh.dir, closed:hh.closed,
+                               before: JSON.parse(JSON.stringify(Lh.objects)) };
+          return;
+        }
+      }
+
       switch (App.tool) {
         case 'landmass': this.startRaster('landmass', p, 'paint'); break;
         case 'erase':    this.startRaster('landmass', p, 'erase'); break;
@@ -255,6 +267,25 @@
       if (this.scaleDrag) {
         App.scale.x = this.scaleDrag.ox + (p.x-this.scaleDrag.sx);
         App.scale.y = this.scaleDrag.oy + (p.y-this.scaleDrag.sy);
+        Cv.requestRender();
+        return;
+      }
+
+      if (this.handleDrag) {
+        var hd = this.handleDrag, ho = hd.obj;
+        if (!ho.handles) ho.handles = {};
+        var hp = ho.pts[hd.index];
+        var hdx = p.x - hp[0], hdy = p.y - hp[1];
+        var hcur = ho.handles[hd.index] || Geo.autoHandle(ho.pts, hd.index, hd.closed);
+        var hnext = { ix:hcur.ix, iy:hcur.iy, ox:hcur.ox, oy:hcur.oy };
+        if (hd.dir === 'out') {
+          hnext.ox = hdx; hnext.oy = hdy;
+          if (!e.altKey) { hnext.ix = -hdx; hnext.iy = -hdy; }
+        } else {
+          hnext.ix = hdx; hnext.iy = hdy;
+          if (!e.altKey) { hnext.ox = -hdx; hnext.oy = -hdy; }
+        }
+        ho.handles[hd.index] = hnext;
         Cv.requestRender();
         return;
       }
@@ -322,6 +353,14 @@
       if (this.scaleDrag) {
         History.pushScale(this.scaleDrag.before, JSON.parse(JSON.stringify(App.scale)), 'scale:move');
         this.scaleDrag = null;
+        UI.refreshHistory();
+        return;
+      }
+
+      if (this.handleDrag) {
+        var hd2 = this.handleDrag; this.handleDrag = null;
+        var Lh2 = Layers.get(App.selection.layerId);
+        History.pushVector(App.selection.layerId, hd2.before, JSON.parse(JSON.stringify(Lh2.objects)), 'handle');
         UI.refreshHistory();
         return;
       }
@@ -864,7 +903,7 @@
             if (p.x>=lb.x-6 && p.x<=lb.x+lb.w+6 && p.y>=lb.y-6 && p.y<=lb.y+lb.h+6)
               return { layerId:'labels', id:o.id, obj:o };
           } else if (order[i] === 'territories') {
-            if (o.pts && o.pts.length >= 3 && Cv._pointInPoly(p.x, p.y, Cv.lakeSmoothPts(o.pts, 24)))
+            if (o.pts && o.pts.length >= 3 && Cv._pointInPoly(p.x, p.y, Cv.lakeSmoothPts(o, 24)))
               return { layerId:'territories', id:o.id, obj:o };
           } else {
             var pts = order[i]==='rivers' ? Cv.riverGeometry(o) : Cv.roadGeometry(o);
@@ -1175,13 +1214,14 @@
         var sb = Cv.scaleBounds(o);
         ctx.strokeRect(sb.x-4/z, sb.y-4/z, sb.w+8/z, sb.h+8/z);
       } else if (o.pts) {
-        var isTerr = App.selection.layerId === 'territories';
-        var g = App.selection.layerId==='rivers' ? Cv.riverGeometry(o) :
-                isTerr ? Cv.lakeSmoothPts(o.pts, 24) : Cv.roadGeometry(o);
+        var isClosed = App.selection.layerId === 'territories' || o.kind === 'lake';
+        var g = isClosed ? Cv.lakeSmoothPts(o, 24) :
+                App.selection.layerId === 'rivers' ? Cv.riverGeometry(o) : Cv.roadGeometry(o);
         var gp = Geo.polyPath(g);
-        if (isTerr) gp.closePath();
+        if (isClosed) gp.closePath();
         ctx.stroke(gp);
         ctx.setLineDash([]);
+        this.drawPathHandles(ctx, o, isClosed, z);
         ctx.fillStyle = '#c99a4b';
         for (var k=0; k<o.pts.length; k++) {
           ctx.beginPath(); ctx.arc(o.pts[k][0], o.pts[k][1], 4/z, 0, Math.PI*2); ctx.fill();
@@ -1199,6 +1239,57 @@
         ctx.strokeRect(b.x-4/z, b.y-4/z, b.w+8/z, b.h+8/z);
       }
       ctx.restore();
+    },
+
+    /* seçili nehir/yol/göl/bölge için bezier tutamaçlarını çiz (sap + küçük kare) */
+    drawPathHandles: function (ctx, o, closed, z) {
+      var pts = o.pts;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(120,190,255,0.9)';
+      ctx.fillStyle = '#78bfff';
+      ctx.lineWidth = 1/z;
+      for (var i = 0; i < pts.length; i++) {
+        var h = (o.handles && o.handles[i]) || Geo.autoHandle(pts, i, closed);
+        var px = pts[i][0], py = pts[i][1];
+        var hasNext = closed || i < pts.length - 1;
+        var hasPrev = closed || i > 0;
+        if (hasNext) {
+          var ox = px + h.ox, oy = py + h.oy;
+          ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(ox, oy); ctx.stroke();
+          ctx.beginPath(); ctx.rect(ox-3/z, oy-3/z, 6/z, 6/z); ctx.fill();
+        }
+        if (hasPrev) {
+          var ix = px + h.ix, iy = py + h.iy;
+          ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(ix, iy); ctx.stroke();
+          ctx.beginPath(); ctx.rect(ix-3/z, iy-3/z, 6/z, 6/z); ctx.fill();
+        }
+      }
+      ctx.restore();
+    },
+
+    /* verilen ekran/harita noktasına en yakın tutamaç ucunu bul (seçili yol için) */
+    hitTestHandle: function (p) {
+      var s = App.selection;
+      if (!s || s.multi || s.layerId === 'scale') return null;
+      var o = this.selected();
+      if (!o || !o.pts) return null;
+      var closed = s.layerId === 'territories' || o.kind === 'lake';
+      var thresh = 9 / Cv.zoom;
+      for (var i = 0; i < o.pts.length; i++) {
+        var h = (o.handles && o.handles[i]) || Geo.autoHandle(o.pts, i, closed);
+        var px = o.pts[i][0], py = o.pts[i][1];
+        var hasNext = closed || i < o.pts.length - 1;
+        var hasPrev = closed || i > 0;
+        if (hasNext) {
+          var ox = px + h.ox, oy = py + h.oy;
+          if (Math.hypot(p.x-ox, p.y-oy) < thresh) return { index:i, dir:'out', obj:o, closed:closed };
+        }
+        if (hasPrev) {
+          var ix = px + h.ix, iy = py + h.iy;
+          if (Math.hypot(p.x-ix, p.y-iy) < thresh) return { index:i, dir:'in', obj:o, closed:closed };
+        }
+      }
+      return null;
     }
   };
 

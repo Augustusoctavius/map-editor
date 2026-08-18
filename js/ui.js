@@ -990,7 +990,12 @@
                  function (v) { return (v/100).toFixed(2); });
 
       /* --- göl --- */
-      on('lk-color', 'input', function (e) { App.lake.color = e.target.value; });
+      on('lk-color', 'input', function (e) {
+        App.lake.color = e.target.value;
+        if (self.selIs('rivers') && Tools.selected() && Tools.selected().kind === 'lake') {
+          Tools.applyToSelection({ color:e.target.value });
+        }
+      });
 
       /* --- bölge/toprak --- */
       function terrEdit(props) { if (self.selIs('territories')) Tools.applyToSelection(props); }
@@ -1470,6 +1475,8 @@
         $('lb-track').value = o.track;  $('v-lb-track').textContent = o.track;
         $('lb-rot').value = o.rot;      $('v-lb-rot').textContent = o.rot+'°';
         $('lb-color').value = o.color;
+      } else if (kind === 'rivers' && o.kind === 'lake') {
+        $('lk-color').value = o.color;
       } else if (kind === 'rivers') {
         $('rv-w').value = o.width;  $('v-rv-w').textContent = o.width;
         $('rv-m').value = Math.round(o.meander*100);
