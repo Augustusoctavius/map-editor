@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Wayborne Map Editor (aka "Cartographer") — a fantasy/medieval map editor. Vanilla JS + Canvas 2D only: no framework, no build step, no bundler, no npm dependencies, no CDN assets. Everything (452 symbols, 20 terrain types, isometric buildings) is generated in code, not loaded from files.
+Wayborne Map Editor (aka "Cartographer") — a fantasy/medieval map editor. Vanilla JS + Canvas 2D only: no framework, no build step, no bundler, no npm dependencies, no CDN assets. Everything (472 symbols, 20 terrain types, isometric buildings) is generated in code, not loaded from files.
 
 Source comments and UI strings are primarily Turkish (this is a Turkish-authored project with TR/EN i18n built in via `js/ui.js`'s `DICT`). Keep that convention in mind when reading/writing comments.
 
@@ -34,9 +34,9 @@ This order matters: later files reference globals defined by earlier ones (e.g. 
 
 Module responsibilities:
 - **`app.js`** — `App`, the single mutable state object (current tool, brush/terrain/symbol/river/road/label/scale/windrose settings). `App.init()` is the entry point, wired to `DOMContentLoaded`.
-- **`layers.js`** — `Layers` (the 8 raster/vector layers — land, terrain, rivers, roads, symbols, labels, etc.) and `Terrain` (20 terrain type definitions: base/dark/mark colors, procedural scatter density, terrain-aware shore coloring). Terrain texture is generated per-brush-stroke, not tiled — no two strokes look identical.
+- **`layers.js`** — `Layers` (the 9 raster/vector layers — land, terrain, territories, rivers, roads, symbols, labels, etc.) and `Terrain` (20 terrain type definitions: base/dark/mark colors, procedural scatter density, terrain-aware shore coloring, selectable shore style — sandy/rocky/reef). Terrain texture is generated per-brush-stroke, not tiled — no two strokes look identical.
 - **`canvas.js`** — `Cv` (viewport: zoom/pan/fit/minimap, main render loop, shore glow effect, river/road/label rendering, interactive scale bar) and `Geo` (path sampling/geometry helpers).
-- **`tools.js`** — `Tools`, the input/tool state machine (land brush, sea eraser, terrain paint, symbol placement, river/road path drawing, label placement, texture eyedropper, selection, right-click pan) plus `Eyedropper`. This is where mouse/keyboard events become layer edits.
+- **`tools.js`** — `Tools`, the input/tool state machine (land brush, sea eraser, terrain paint, symbol placement, river/road/territory path drawing, label placement, texture eyedropper, selection, right-click pan) plus `Eyedropper`. This is where mouse/keyboard events become layer edits.
 - **`iso.js`** — the isometric building engine (`Iso.Scene`, `Iso.MAT`). Parallel projection `sx=(x-y)*0.866, sy=(x+y)*0.5-z`; solids are depth-sorted with the painter's algorithm. Produces `Sym.part()`-style path data normalized to a 0–100 box.
 - **`catalog.js` / `catalog2.js`** — composite isometric buildings built on top of `Iso.Scene`, organized by theme (`catalog2.js` loads second and pushes additional items + material variants into the same `IsoCatalog.ITEMS` table).
 - **`symbols.js`** — `Sym`, the flat (non-isometric) symbol index (~200+ ink-style symbols as `{d, f, s, lw, tr}` Path2D parts in a 0–100 coordinate space centered at (50,50)), plus custom PNG symbol upload/registration. The same path data draws to canvas via `Path2D` and is written verbatim as `<path>` in SVG export — SVG output is genuinely vector, not embedded bitmap.

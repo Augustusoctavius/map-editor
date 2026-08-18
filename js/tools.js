@@ -225,9 +225,10 @@
           break;
         case 'lake':
         case 'river':
-        case 'road':     this.addPathPoint(p); break;
+        case 'road':
+        case 'territory': this.addPathPoint(p); break;
         case 'label':    this.placeLabel(p); break;
-        case 'select':   this.startSelect(p, ev.shiftKey); break;
+        case 'select':   this.startSelect(p, e.shiftKey); break;
       }
       Cv.requestRender();
     },
@@ -705,7 +706,7 @@
           y: snp.y + Math.sin(angle) * dist * (s.jitter ? 1 : 0),
           size: s.size * (0.78 + Math.random() * 0.44 * (s.jitter ? 1 : 0.2)),
           rot:  s.rot + (Math.random() - 0.5) * 60 * (s.jitter ? 1 : 0.1),
-          hue: s.hue, opacity: s.opacity
+          hue: s.hue, opacity: s.opacity, wear: s.wear || 0
         };
         L.objects.push(o);
       }
@@ -749,7 +750,7 @@
         y:p.y+(Math.random()-0.5)*s.size*0.25*j,
         size:s.size*(1+(Math.random()-0.5)*0.28*j),
         rot:s.rot+(Math.random()-0.5)*10*j,
-        hue:s.hue, opacity:s.opacity
+        hue:s.hue, opacity:s.opacity, wear:s.wear || 0
       };
       L.objects.push(o);
       App.selection = { layerId:'symbols', id:o.id };
@@ -778,10 +779,16 @@
       UI.refreshHistory(); UI.refreshSelection();
     },
 
-    /* ================= NEHİR / YOL ================= */
+    /* ================= NEHİR / YOL / BÖLGE ================= */
+    pathLayerId: function (tool) {
+      if (tool === 'river' || tool === 'lake') return 'rivers';
+      if (tool === 'territory') return 'territories';
+      return 'roads';
+    },
+
     addPathPoint: function (p) {
       var snp = Cv.snapPoint(p);
-      var lid = App.tool === 'river' || App.tool === 'lake' ? 'rivers' : 'roads';
+      var lid = this.pathLayerId(App.tool);
       var L = Layers.get(lid);
       if (L.locked || !L.visible) { UI.msg(UI.t('locked')); return; }
       this.pathPts.push([snp.x, snp.y]);
@@ -789,17 +796,22 @@
     },
 
     finishPath: function () {
-      var minPts = (App.tool === 'lake') ? 3 : 2;
+      var isLake      = App.tool === 'lake';
+      var isTerritory = App.tool === 'territory';
+      var isRiver     = App.tool === 'river';
+      var minPts = (isLake || isTerritory) ? 3 : 2;
       if (this.pathPts.length < minPts) { this.pathPts = []; Cv.requestRender(); return; }
-      var isRiver = App.tool === 'river';
-      var isLake  = App.tool === 'lake';
-      var lid = (isRiver || isLake) ? 'rivers' : 'roads';
+      var lid = this.pathLayerId(App.tool);
       var L = Layers.get(lid);
       var before = JSON.parse(JSON.stringify(L.objects));
       var o;
       if (isLake) {
         o = { id:uid(), kind:'lake', pts:this.pathPts.slice(),
               color:App.lake.color, opacity:App.lake.opacity };
+      } else if (isTerritory) {
+        o = { id:uid(), pts:this.pathPts.slice(), color:App.territory.color,
+              opacity:App.territory.opacity, borderColor:App.territory.borderColor,
+              borderWidth:App.territory.borderWidth };
       } else if (isRiver) {
         o = { id:uid(), pts:this.pathPts.slice(), width:App.river.width, meander:App.river.meander,
               taper:App.river.taper, color:App.river.color, opacity:1 };
@@ -837,7 +849,7 @@
     },
 
     hitTest: function (p) {
-      var order = ['labels','symbols','roads','rivers'];
+      var order = ['labels','symbols','roads','rivers','territories'];
       for (var i=0; i<order.length; i++) {
         var L = Layers.get(order[i]);
         if (!L.visible || L.locked) continue;
@@ -851,6 +863,9 @@
             var lb = Cv.labelBounds(o);
             if (p.x>=lb.x-6 && p.x<=lb.x+lb.w+6 && p.y>=lb.y-6 && p.y<=lb.y+lb.h+6)
               return { layerId:'labels', id:o.id, obj:o };
+          } else if (order[i] === 'territories') {
+            if (o.pts && o.pts.length >= 3 && Cv._pointInPoly(p.x, p.y, Cv.lakeSmoothPts(o.pts, 24)))
+              return { layerId:'territories', id:o.id, obj:o };
           } else {
             var pts = order[i]==='rivers' ? Cv.riverGeometry(o) : Cv.roadGeometry(o);
             if (Geo.distToPolyline(p.x, p.y, pts) < Math.max(8, (o.width||6)*0.9))
@@ -1092,18 +1107,19 @@
         if (this.pathHover) pts.push([this.pathHover.x, this.pathHover.y]);
         var sm = Geo.sample(pts, 14);
         ctx.save();
-        if (App.tool === 'lake') {
-          ctx.strokeStyle = App.lake.color;
-          ctx.fillStyle = App.lake.color;
-          ctx.globalAlpha = 0.35;
-          ctx.lineWidth = 2/z;
+        if (App.tool === 'lake' || App.tool === 'territory') {
+          var isTerr2 = App.tool === 'territory';
+          ctx.strokeStyle = isTerr2 ? App.territory.borderColor : App.lake.color;
+          ctx.fillStyle = isTerr2 ? App.territory.color : App.lake.color;
+          ctx.globalAlpha = isTerr2 ? App.territory.opacity : 0.35;
+          ctx.lineWidth = isTerr2 ? App.territory.borderWidth : 2/z;
           ctx.lineCap = 'round'; ctx.lineJoin = 'round';
           if (pts.length >= 3) {
             var lpath = Geo.polyPath(sm);
             lpath.closePath();
             ctx.fill(lpath);
           }
-          ctx.globalAlpha = 0.75;
+          ctx.globalAlpha = isTerr2 ? 1 : 0.75;
           ctx.stroke(Geo.polyPath(sm));
         } else {
           ctx.strokeStyle = App.tool === 'river' ? App.river.color : App.road.color;
@@ -1159,8 +1175,12 @@
         var sb = Cv.scaleBounds(o);
         ctx.strokeRect(sb.x-4/z, sb.y-4/z, sb.w+8/z, sb.h+8/z);
       } else if (o.pts) {
-        var g = App.selection.layerId==='rivers' ? Cv.riverGeometry(o) : Cv.roadGeometry(o);
-        ctx.stroke(Geo.polyPath(g));
+        var isTerr = App.selection.layerId === 'territories';
+        var g = App.selection.layerId==='rivers' ? Cv.riverGeometry(o) :
+                isTerr ? Cv.lakeSmoothPts(o.pts, 24) : Cv.roadGeometry(o);
+        var gp = Geo.polyPath(g);
+        if (isTerr) gp.closePath();
+        ctx.stroke(gp);
         ctx.setLineDash([]);
         ctx.fillStyle = '#c99a4b';
         for (var k=0; k<o.pts.length; k++) {

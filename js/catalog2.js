@@ -53,7 +53,9 @@
     ['granite','Granit',  'Granite'],
     ['basalt', 'Bazalt',  'Basalt'],
     ['wood',   'Ahşap',   'Timber'],
-    ['stoneD', 'Kara taş','Dark stone']
+    ['stoneD', 'Kara taş','Dark stone'],
+    ['ruin',   'Yıkık',   'Ruined'],
+    ['snow',   'Karlı',   'Snowy']
   ];
   var TOWER_ROOF = [
     [null,    'mazgallı', 'crenelled'],

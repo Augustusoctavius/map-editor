@@ -106,6 +106,12 @@
                 s.push('<path d="'+Geo.svgPolyD(rp)+'" fill="none" stroke="'+(o.color||'#6b4f2a')+
                        '" stroke-width="'+w+'" stroke-linecap="round" stroke-linejoin="round"'+dash+'/>');
               }
+            } else if (l.id === 'territories') {
+              var tpts = Cv.lakeSmoothPts(o.pts, 24);
+              var tdash = o.borderWidth ? ' stroke-dasharray="'+(o.borderWidth*3)+','+(o.borderWidth*2)+'"' : '';
+              s.push('<path d="' + Geo.svgPolyD(tpts, true) + '" fill="' + (o.color||'#8a5a3a') +
+                     '" opacity="' + (o.opacity===undefined?0.30:o.opacity) + '" stroke="' + (o.borderColor||'#5a3a20') +
+                     '" stroke-width="' + (o.borderWidth||2) + '"' + tdash + ' stroke-linejoin="round"/>');
             } else if (l.id === 'symbols') {
               s.push(Sym.toSVG(o.sym, o));
             } else if (l.id === 'labels') {
@@ -131,6 +137,7 @@
 
     windroseSVG: function (wr) {
       if (!wr || !wr.visible) return '';
+      if ((wr.style || 'classic') === 'minimal') return Exporter.windroseMinimalSVG(wr);
       var x = wr.x, y = wr.y, R = wr.size || 120;
       var col = esc(wr.color || '#3a2b18');
       var o = ['<g transform="translate('+x+','+y+')" font-family="Georgia,serif">'];
@@ -155,6 +162,30 @@
       /* N */
       o.push('<text x="0" y="'+(-R*0.70).toFixed(1)+'" font-size="'+(R*0.22).toFixed(1)+
              '" font-weight="bold" fill="'+col+'" text-anchor="middle" dominant-baseline="middle">N</text>');
+      o.push('</g>');
+      return o.join('');
+    },
+
+    windroseMinimalSVG: function (wr) {
+      var x = wr.x, y = wr.y, R = wr.size || 120;
+      var col = esc(wr.color || '#3a2b18');
+      var o = ['<g transform="translate('+x+','+y+')" font-family="Georgia,serif" stroke-linecap="round">'];
+      o.push('<circle r="'+(R*0.46).toFixed(1)+'" fill="none" stroke="'+col+'" stroke-width="'+(R*0.02).toFixed(1)+'" opacity="0.5"/>');
+      o.push('<path d="M0 '+(-R*0.46).toFixed(1)+' L0 '+(R*0.46).toFixed(1)+
+             ' M'+(-R*0.46).toFixed(1)+' 0 L'+(R*0.46).toFixed(1)+' 0" stroke="'+col+
+             '" stroke-width="'+(R*0.022).toFixed(1)+'" opacity="0.85"/>');
+      [45,135,225,315].forEach(function (deg) {
+        var rad = deg*Math.PI/180;
+        var x1 = Math.sin(rad)*R*0.36, y1 = -Math.cos(rad)*R*0.36;
+        var x2 = Math.sin(rad)*R*0.46, y2 = -Math.cos(rad)*R*0.46;
+        o.push('<path d="M'+x1.toFixed(1)+' '+y1.toFixed(1)+' L'+x2.toFixed(1)+' '+y2.toFixed(1)+
+               '" stroke="'+col+'" stroke-width="'+(R*0.014).toFixed(1)+'" opacity="0.5"/>');
+      });
+      o.push('<circle r="'+(R*0.035).toFixed(1)+'" fill="'+col+'"/>');
+      o.push('<path d="M0 '+(-R*0.46).toFixed(1)+' L'+(R*0.045).toFixed(1)+' '+(-R*0.36).toFixed(1)+
+             ' L'+(-R*0.045).toFixed(1)+' '+(-R*0.36).toFixed(1)+' Z" fill="'+col+'"/>');
+      o.push('<text x="0" y="'+(-R*0.60).toFixed(1)+'" font-size="'+(R*0.16).toFixed(1)+
+             '" font-weight="600" fill="'+col+'" text-anchor="middle" dominant-baseline="middle">N</text>');
       o.push('</g>');
       return o.join('');
     },
@@ -236,7 +267,7 @@
         app:'cartographer', version:3,
         W:Cv.W, H:Cv.H,
         parchment:Cv.parchment, grid:Cv.grid,
-        shore:Cv.shore, shoreWidth:Cv.shoreWidth,
+        shore:Cv.shore, shoreWidth:Cv.shoreWidth, shoreStyle:Cv.shoreStyle,
         exportReference:App.exportReference,
         scale:App.scale,
         customSymbols: Sym.serializeCustom(),
@@ -259,6 +290,7 @@
         Cv.grid = !!d.grid;
         Cv.shore = d.shore !== false;
         Cv.shoreWidth = d.shoreWidth || 26;
+        Cv.shoreStyle = d.shoreStyle || 'sandy';
         App.exportReference = !!d.exportReference;
         if (d.scale) App.scale = d.scale;
 
@@ -269,6 +301,7 @@
         document.getElementById('sel-canvas-size').value = String(d.W||2048);
         document.getElementById('shore-w').value = Cv.shoreWidth;
         document.getElementById('v-shore-w').textContent = Cv.shoreWidth;
+        document.getElementById('shore-style').value = Cv.shoreStyle;
 
         if (d.customSymbols) Sym.deserializeCustom(d.customSymbols);
 

@@ -11,11 +11,12 @@
 
     brush:   { size:120, roughness:0.35, color:'#ded0ac' },
     terrain: { type:'grassland', size:160, opacity:0.85, clip:true },
-    symbol:  { id:'ik_knight', size:72, rot:0, hue:0, opacity:1, jitter:false,
+    symbol:  { id:'ik_knight', size:72, rot:0, hue:0, opacity:1, wear:0, jitter:false,
                brushMode:false, brushDensity:0.5 },
     river:   { width:16, meander:0.30, taper:true, color:'#5b8aa6' },
     road:    { width:6, style:'dashed', color:'#6b4f2a' },
     lake:    { color:'#5b8aa6', opacity:0.88 },
+    territory: { color:'#8a5a3a', opacity:0.30, borderColor:'#5a3a20', borderWidth:2 },
     label:   { preset:'region', font:'serif', size:46, color:'#5a4326', outline:true,
                outlineColor:'#f5ecd8', shadow:true, curve:0, track:8, rot:0,
                caps:true, banner:null },

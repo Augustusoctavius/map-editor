@@ -186,7 +186,7 @@
     zoom:1, panX:0, panY:0, dpr:1,
     view:null, ctx:null, mini:null, mctx:null,
     grid:false, gridSize:128, parchment:false,
-    shore:true, shoreWidth:26,
+    shore:true, shoreWidth:26, shoreStyle:'sandy',
     mouse:{x:0,y:0,over:false},
     _raf:0, _miniAt:0,
     shoreCanvas:null, shoreDirty:true,
@@ -268,7 +268,7 @@
       if (!L || !L.canvas) return null;
       var result = Terrain.buildShoreCanvas(
         L.canvas, T ? T.canvas : L.canvas,
-        this.shoreWidth, this.W, this.H
+        this.shoreWidth, this.W, this.H, this.shoreStyle
       );
       this.shoreCanvas = result.canvas;
       this._shoreScW   = result.sw;
@@ -429,6 +429,7 @@
             for (var j = 0; j < l.objects.length; j++) {
               var o = l.objects[j];
               if (l.id === 'roads') this.drawRoad(ctx, o);
+              else if (l.id === 'territories') this.drawTerritory(ctx, o);
               else if (l.id === 'symbols') {
                 if (o.kind === 'group') {
                   o.members.forEach(function(m){ Sym.draw(ctx, m.sym, m, function(){ Cv.requestRender(); }); });
@@ -866,6 +867,27 @@
       ctx.restore();
     },
 
+    /* ---------- bölge/toprak (territory) dolgusu ---------- */
+    drawTerritory: function (ctx, o) {
+      if (!o.pts || o.pts.length < 3) return;
+      var pts = this.lakeSmoothPts(o.pts, 24);
+      ctx.save();
+      ctx.lineJoin = 'round';
+      var path = Geo.polyPath(pts);
+      path.closePath();
+      ctx.globalAlpha *= (o.opacity === undefined ? 0.30 : o.opacity);
+      ctx.fillStyle = o.color || '#8a5a3a';
+      ctx.fill(path);
+      if (o.borderWidth) {
+        ctx.globalAlpha = Math.min(1, (o.opacity === undefined ? 0.30 : o.opacity) * 2.4);
+        ctx.strokeStyle = o.borderColor || '#5a3a20';
+        ctx.lineWidth = o.borderWidth;
+        ctx.setLineDash([o.borderWidth*3, o.borderWidth*2]);
+        ctx.stroke(path);
+      }
+      ctx.restore();
+    },
+
     /* eski drawLake — geriye uyumluluk için yönlendir */
     drawLake: function (ctx, o) {
       this.drawLakeShore(ctx, o);
@@ -883,9 +905,11 @@
     },
 
     drawWindrose: function (ctx, wr) {
+      var style = wr.style || 'classic';
+      if (style === 'minimal') { this.drawWindroseMinimal(ctx, wr); return; }
+
       var x = wr.x, y = wr.y, R = this.windroseSize(wr);
       var col = wr.color || '#3a2b18';
-      var style = wr.style || 'classic';
       ctx.save();
       ctx.translate(x, y);
 
@@ -932,6 +956,63 @@
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('N', 0, -(R * 0.70));
+
+      ctx.restore();
+    },
+
+    /* sade stil: ince artı + dört ana yön ticki + N etiketi, süslemesiz */
+    drawWindroseMinimal: function (ctx, wr) {
+      var x = wr.x, y = wr.y, R = this.windroseSize(wr);
+      var col = wr.color || '#3a2b18';
+      ctx.save();
+      ctx.translate(x, y);
+
+      ctx.strokeStyle = col;
+      ctx.lineCap = 'round';
+
+      /* dış çember */
+      ctx.lineWidth = R * 0.02;
+      ctx.globalAlpha = 0.5;
+      ctx.beginPath(); ctx.arc(0, 0, R * 0.46, 0, Math.PI*2); ctx.stroke();
+
+      /* dört ana eksen çizgisi */
+      ctx.globalAlpha = 0.85;
+      ctx.lineWidth = R * 0.022;
+      ctx.beginPath();
+      ctx.moveTo(0, -R*0.46); ctx.lineTo(0, R*0.46);
+      ctx.moveTo(-R*0.46, 0); ctx.lineTo(R*0.46, 0);
+      ctx.stroke();
+
+      /* ara yön tikleri */
+      ctx.globalAlpha = 0.5;
+      ctx.lineWidth = R * 0.014;
+      [45,135,225,315].forEach(function (deg) {
+        var rad = deg * Math.PI/180;
+        var x1 = Math.sin(rad)*R*0.36, y1 = -Math.cos(rad)*R*0.36;
+        var x2 = Math.sin(rad)*R*0.46, y2 = -Math.cos(rad)*R*0.46;
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      });
+
+      /* merkez nokta */
+      ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.arc(0, 0, R * 0.035, 0, Math.PI*2);
+      ctx.fillStyle = col; ctx.fill();
+
+      /* N ucu ok */
+      ctx.beginPath();
+      ctx.moveTo(0, -R*0.46);
+      ctx.lineTo(R*0.045, -R*0.36);
+      ctx.lineTo(-R*0.045, -R*0.36);
+      ctx.closePath();
+      ctx.fillStyle = col;
+      ctx.fill();
+
+      /* N harfi */
+      ctx.font = '600 ' + Math.round(R*0.16) + 'px Georgia,serif';
+      ctx.fillStyle = col;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('N', 0, -(R * 0.60));
 
       ctx.restore();
     },

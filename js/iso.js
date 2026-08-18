@@ -31,7 +31,7 @@
   var MAT = {
     stone:   { top:'#e2d7bd', left:'#c3b598', right:'#a2937a', line:'#4b3d28', det:'#8d7f66', courses:true  },
     stoneW:  { top:'#efe7d2', left:'#dcd0b6', right:'#bcae93', line:'#4b3d28', det:'#a6987d', courses:true  },
-    stoneD:  { top:'#b0a punkt', left:'#8d8270', right:'#6f6556', line:'#33291b', det:'#5e5648', courses:true },
+    stoneD:  { top:'#b0a693', left:'#8d8270', right:'#6f6556', line:'#33291b', det:'#5e5648', courses:true },
     granite: { top:'#c9c3b6', left:'#a7a094', right:'#847e72', line:'#3a3226', det:'#6f695d', courses:true  },
     basalt:  { top:'#7d7570', left:'#5f5854', right:'#474140', line:'#221d1c', det:'#3b3634', courses:true  },
     wood:    { top:'#c49760', left:'#a37a46', right:'#7f5c33', line:'#3d2914', det:'#6a4a28', planks:true   },
@@ -53,7 +53,6 @@
     crystal: { top:'#b79ad8', left:'#9679bb', right:'#745a95', line:'#33234a', det:'#6b5289' },
     bone:    { top:'#e8e0cc', left:'#cfc6ae', right:'#ada48d', line:'#443c2c', det:'#9a917a' }
   };
-  MAT.stoneD.top = '#b0a693';
 
   function M(k) { return MAT[k] || MAT.stone; }
 

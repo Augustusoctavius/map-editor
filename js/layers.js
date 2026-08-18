@@ -383,7 +383,26 @@
      interpolate et. Basit: küçültülmüş terrain+kara canvas'ından
      ortalama renk al, shore bandını buna göre boya.
      ========================================================= */
-  function buildShoreCanvas(landCanvas, terrainCanvas, shoreWidth, W, H) {
+  /* kıyı stili: blur miktarı (kenar sertliği) + renk doygunluk/parlaklık çarpanı */
+  var SHORE_STYLES = {
+    sandy: { blurMul:1.3, satMul:1.00, lightMul:1.00 },
+    rocky: { blurMul:0.6, satMul:0.45, lightMul:0.82 },
+    reef:  { blurMul:1.9, satMul:1.40, lightMul:1.10 }
+  };
+
+  function shoreStyleAdjust(r, g, b, cfg) {
+    var gray = (r+g+b)/3;
+    var nr = gray + (r-gray)*cfg.satMul, ng = gray + (g-gray)*cfg.satMul, nb = gray + (b-gray)*cfg.satMul;
+    nr *= cfg.lightMul; ng *= cfg.lightMul; nb *= cfg.lightMul;
+    return [
+      nr<0?0:nr>255?255:nr,
+      ng<0?0:ng>255?255:ng,
+      nb<0?0:nb>255?255:nb
+    ];
+  }
+
+  function buildShoreCanvas(landCanvas, terrainCanvas, shoreWidth, W, H, style) {
+    var cfg = SHORE_STYLES[style] || SHORE_STYLES.sandy;
     var MAX = 1024;
     var sc  = Math.min(1, MAX/Math.max(W,H));
     var sw  = Math.max(1,Math.round(W*sc)), sh = Math.max(1,Math.round(H*sc));
@@ -392,7 +411,7 @@
     /* --- kara silüetini bulanıklaştır → kıyı maskesi --- */
     var maskC = document.createElement('canvas'); maskC.width=sw; maskC.height=sh;
     var mctx  = maskC.getContext('2d',{willReadFrequently:true});
-    mctx.filter='blur('+(bw*1.3).toFixed(1)+'px)';
+    mctx.filter='blur('+(bw*cfg.blurMul).toFixed(1)+'px)';
     mctx.drawImage(landCanvas,0,0,sw,sh);
     mctx.drawImage(landCanvas,0,0,sw,sh);
     mctx.filter='none';
@@ -454,6 +473,15 @@
         hasInner = true;
       }
 
+      if (cfg !== SHORE_STYLES.sandy) {
+        var adjO = shoreStyleAdjust(outerR, outerG, outerB, cfg);
+        outerR=adjO[0]; outerG=adjO[1]; outerB=adjO[2];
+        if (hasInner) {
+          var adjI = shoreStyleAdjust(innerR, innerG, innerB, cfg);
+          innerR=adjI[0]; innerG=adjI[1]; innerB=adjI[2];
+        }
+      }
+
       /* dış band (daha şeffaf, geniş) ve iç band (daha opak, dar) */
       var norm = maskA; // 0..1 (kıyıya ne kadar yakın)
       var outerAlpha = norm * 0.55 * (1-landA);
@@ -490,6 +518,7 @@
     { id:'reference', type:'image',  tr:'Referans görsel', en:'Reference image', opacity:0.5, visible:true  },
     { id:'landmass',  type:'raster', tr:'Kara',            en:'Landmass',        opacity:1,   visible:true  },
     { id:'terrain',   type:'raster', tr:'Arazi',           en:'Terrain',         opacity:1,   visible:true  },
+    { id:'territories', type:'vector', tr:'Bölgeler',      en:'Territories',     opacity:1,   visible:true  },
     { id:'rivers',    type:'vector', tr:'Nehirler',        en:'Rivers',          opacity:1,   visible:true  },
     { id:'roads',     type:'vector', tr:'Yollar',          en:'Roads',           opacity:1,   visible:true  },
     { id:'symbols',   type:'vector', tr:'Semboller',       en:'Symbols',         opacity:1,   visible:true  },

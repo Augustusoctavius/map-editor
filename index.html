@@ -72,6 +72,7 @@
       <button class="tool" data-tool="symbol"   title="S"><span class="ico">⛰</span><em data-i18n="t_symbol">Sembol</em></button>
       <button class="tool" data-tool="river"    title="R"><span class="ico">≈</span><em data-i18n="t_river">Nehir</em></button>
       <button class="tool" data-tool="lake"     title="K"><span class="ico">◎</span><em data-i18n="t_lake">Göl</em></button>
+      <button class="tool" data-tool="territory" title="G"><span class="ico">▧</span><em data-i18n="t_territory">Bölge</em></button>
       <button class="tool" data-tool="road"     title="D"><span class="ico">⋯</span><em data-i18n="t_road">Yol</em></button>
       <button class="tool" data-tool="label"    title="L"><span class="ico">A</span><em data-i18n="t_label">Etiket</em></button>
       <button class="tool" data-tool="eyedrop"  title="I"><span class="ico">⊙</span><em data-i18n="t_eyedrop">Örnekle</em></button>
@@ -91,6 +92,12 @@
         <input type="color" id="lm-color" value="#ded0ac">
         <label class="row"><span data-i18n="o_shorew">Kıyı genişliği</span><b id="v-shore-w">26</b></label>
         <input type="range" id="shore-w" min="4" max="90" value="26">
+        <label class="row"><span data-i18n="o_shorestyle">Kıyı stili</span></label>
+        <select id="shore-style" class="sel">
+          <option value="sandy" data-i18n="o_shore_sandy">Kumsal</option>
+          <option value="rocky" data-i18n="o_shore_rocky">Kayalık</option>
+          <option value="reef" data-i18n="o_shore_reef">Resif</option>
+        </select>
         <div class="row2">
           <button class="btn" id="btn-smooth" data-i18n="o_smooth">Kıyıyı yumuşat</button>
           <button class="btn" id="btn-clear-land" data-i18n="o_clearland">Karayı temizle</button>
@@ -122,6 +129,8 @@
         <input type="range" id="sy-hue" min="-180" max="180" value="0">
         <label class="row"><span data-i18n="o_opacity">Opaklık</span><b id="v-sy-op">1</b></label>
         <input type="range" id="sy-op" min="10" max="100" value="100">
+        <label class="row"><span data-i18n="o_wear">Yıpranma</span><b id="v-sy-wear">0</b></label>
+        <input type="range" id="sy-wear" min="0" max="100" value="0">
         <label class="chk"><input type="checkbox" id="sy-jitter"><span data-i18n="o_jitter">Yerleştirmede rastgelelik</span></label>
         <label class="chk"><input type="checkbox" id="sy-brush-mode"><span data-i18n="o_symbbrush">Fırça modu (sürükle)</span></label>
         <label class="row"><span data-i18n="o_symbdensity">Yoğunluk</span><b id="v-sy-br-den">0.50</b></label>
@@ -135,6 +144,20 @@
         <label class="row"><span data-i18n="o_lakecolor">Göl rengi</span></label>
         <input type="color" id="lk-color" value="#5b8aa6">
         <p class="hint" data-i18n="h_lake">Tıklayarak nokta ekle, 3+ nokta sonra Enter ile kapat.</p>
+      </section>
+
+      <!-- TERRITORY -->
+      <section class="opt-group" data-for="territory">
+        <h3 data-i18n="o_territory">Bölge</h3>
+        <label class="row"><span data-i18n="o_territorycolor">Dolgu rengi</span></label>
+        <input type="color" id="tt-color" value="#8a5a3a">
+        <label class="row"><span data-i18n="o_opacity">Opaklık</span><b id="v-tt-op">0.30</b></label>
+        <input type="range" id="tt-op" min="5" max="80" value="30">
+        <label class="row"><span data-i18n="o_territorybcolor">Sınır rengi</span></label>
+        <input type="color" id="tt-bcolor" value="#5a3a20">
+        <label class="row"><span data-i18n="o_width">Kalınlık</span><b id="v-tt-bw">2</b></label>
+        <input type="range" id="tt-bw" min="0" max="10" value="2">
+        <p class="hint" data-i18n="h_territory">Tıklayarak nokta ekle, 3+ nokta sonra Enter ile kapat.</p>
       </section>
 
       <!-- RIVER -->
@@ -243,6 +266,11 @@
         <label class="chk"><input type="checkbox" id="wr-visible"><span data-i18n="o_wrvis">Haritada göster</span></label>
         <label class="row"><span data-i18n="o_wrsize">Boyut</span><b id="v-wr-size">120</b></label>
         <input type="range" id="wr-size" min="40" max="400" value="120">
+        <label class="row"><span data-i18n="o_wrstyle">Stil</span></label>
+        <select id="wr-style" class="sel">
+          <option value="classic" data-i18n="o_wrstyle_classic">Klasik</option>
+          <option value="minimal" data-i18n="o_wrstyle_minimal">Sade</option>
+        </select>
         <label class="row"><span data-i18n="o_wrcolor">Renk</span></label>
         <input type="color" id="wr-color" value="#3a2b18">
         <p class="hint" data-i18n="h_windrose">Haritada sürükleyerek taşı.</p>
@@ -297,6 +325,7 @@
         <input type="file" id="sym-file" accept="image/png,image/jpeg,image/svg+xml,image/webp" multiple hidden>
         <div id="custom-sym-grid" class="sym-grid" style="margin-top:8px"></div>
       </div>
+      <input type="text" id="sym-search" class="sel" data-i18n-placeholder="sym_search" placeholder="Sembol ara...">
       <select id="sym-cat" class="sel"></select>
       <div id="sym-grid" class="sym-grid"></div>
     </div>
