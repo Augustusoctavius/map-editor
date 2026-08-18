@@ -161,6 +161,8 @@
     handleDrag:null,
     symBrushLast:null,
     symBrushBefore:null,
+    lasso:null, floating:null, floatDrag:null, floatRotateDrag:null,
+    LASSO_LAYERS: ['landmass','terrain','elevation'],
 
     bind: function () {
       var v = Cv.view, self = this;
@@ -270,6 +272,7 @@
         case 'resource': this.placeResource(p); break;
         case 'regionlink': this.placeRegionLink(p); break;
         case 'measure':  this.measureFrom = p; break;
+        case 'lasso':    this.onLassoDown(p); break;
         case 'select':   this.startSelect(p, e.shiftKey); break;
       }
       Cv.requestRender();
@@ -283,6 +286,29 @@
       if (this.panning && this.panStart) {
         Cv.panX = this.panStart.px + (e.clientX-this.panStart.x);
         Cv.panY = this.panStart.py + (e.clientY-this.panStart.y);
+        Cv.requestRender();
+        return;
+      }
+
+      if (this.lasso && this.lasso.dragging) {
+        var lpts = this.lasso.pts, lastP = lpts[lpts.length-1];
+        if (Math.hypot(p.x-lastP[0], p.y-lastP[1]) >= 4) lpts.push([p.x, p.y]);
+        Cv.requestRender();
+        return;
+      }
+
+      if (this.floatRotateDrag) {
+        var frd = this.floatRotateDrag, f0 = this.floating;
+        var cx0 = f0.center.x+f0.ox, cy0 = f0.center.y+f0.oy;
+        f0.rot = frd.baseRot + (Math.atan2(p.y-cy0, p.x-cx0) - frd.baseAngle);
+        Cv.requestRender();
+        return;
+      }
+
+      if (this.floatDrag) {
+        var fd = this.floatDrag;
+        this.floating.ox = fd.ox + (p.x-fd.sx);
+        this.floating.oy = fd.oy + (p.y-fd.sy);
         Cv.requestRender();
         return;
       }
@@ -378,6 +404,18 @@
     /* ================= POINTER UP ================= */
     onUp: function () {
       if (this.panning) { this.panning = false; Cv.view.classList.remove('panning'); return; }
+
+      if (this.lasso && this.lasso.dragging) {
+        this.lasso.dragging = false;
+        var pts = this.lasso.pts;
+        this.lasso = null;
+        if (pts.length >= 3) this.liftSelection(pts);
+        Cv.requestRender();
+        return;
+      }
+
+      if (this.floatRotateDrag) { this.floatRotateDrag = null; return; }
+      if (this.floatDrag) { this.floatDrag = null; return; }
 
       if (this.windroseDrag) {
         History.pushWindrose(this.windroseDrag.before, JSON.parse(JSON.stringify(App.windrose)), 'windrose:move');
@@ -789,6 +827,152 @@
         }
       }
       return best || { x:x, y:y };
+    },
+
+    /* ================= RASTER LASSO SEÇİMİ (kaldır / taşı / döndür) =================
+       Kara + Arazi + Yükselti katmanlarını aynı coğrafi bölge için birlikte ele alır:
+       serbest-el lasso ile kapalı bir alan çizilir → o alandaki pikseller üç katmandan
+       da "kaldırılıp" (floating selection) kaynakta boşluk bırakılır → sürükleyerek
+       taşınır / tutamaçla döndürülür (henüz gerçek katmana yazılmaz, yalnızca önizleme)
+       → Enter/başka araca geçiş ile TEK bir History.pushRasterMulti adımında gerçek
+       katmanlara "yapıştırılır", ya da Escape ile iptal edilip eski hâline dönülür. */
+    onLassoDown: function (p) {
+      if (this.floating) {
+        var f = this.floating, cx = f.center.x+f.ox, cy = f.center.y+f.oy;
+        var handleDist = f.bbox.h/2 + 30;
+        var hx = cx + Math.sin(f.rot)*handleDist, hy = cy - Math.cos(f.rot)*handleDist;
+        if (Math.hypot(p.x-hx, p.y-hy) <= 10) {
+          this.floatRotateDrag = { baseRot:f.rot, baseAngle:Math.atan2(p.y-cy, p.x-cx) };
+          return;
+        }
+        var dx = p.x-cx, dy = p.y-cy;
+        var localX = dx*Math.cos(f.rot) + dy*Math.sin(f.rot);
+        var localY = -dx*Math.sin(f.rot) + dy*Math.cos(f.rot);
+        if (Math.abs(localX) <= f.bbox.w/2 && Math.abs(localY) <= f.bbox.h/2) {
+          this.floatDrag = { sx:p.x, sy:p.y, ox:f.ox, oy:f.oy };
+          return;
+        }
+        this.commitFloating();
+        return;
+      }
+      this.lasso = { pts:[[p.x,p.y]], dragging:true };
+    },
+
+    liftSelection: function (pts) {
+      var xs = pts.map(function(pt){return pt[0];}), ys = pts.map(function(pt){return pt[1];});
+      var pad = 4;
+      var bx = Math.max(0, Math.floor(Math.min.apply(null,xs)-pad));
+      var by = Math.max(0, Math.floor(Math.min.apply(null,ys)-pad));
+      var bx1 = Math.min(Cv.W, Math.ceil(Math.max.apply(null,xs)+pad));
+      var by1 = Math.min(Cv.H, Math.ceil(Math.max.apply(null,ys)+pad));
+      var bw = bx1-bx, bh = by1-by;
+      if (bw <= 2 || bh <= 2) return;
+
+      var maskC = document.createElement('canvas'); maskC.width = bw; maskC.height = bh;
+      var mctx = maskC.getContext('2d');
+      mctx.translate(-bx, -by);
+      mctx.fillStyle = '#fff';
+      mctx.beginPath();
+      mctx.moveTo(pts[0][0], pts[0][1]);
+      for (var i = 1; i < pts.length; i++) mctx.lineTo(pts[i][0], pts[i][1]);
+      mctx.closePath();
+      mctx.fill();
+
+      var before = {}, floatingLayers = {};
+      this.LASSO_LAYERS.forEach(function (lid) {
+        var L = Layers.get(lid);
+        if (!L || L.locked || !L.visible) return;
+        before[lid] = snap(L.canvas);
+
+        var patch = document.createElement('canvas'); patch.width = bw; patch.height = bh;
+        var pctx = patch.getContext('2d');
+        pctx.drawImage(L.canvas, bx, by, bw, bh, 0, 0, bw, bh);
+        pctx.globalCompositeOperation = 'destination-in';
+        pctx.drawImage(maskC, 0, 0);
+        floatingLayers[lid] = patch;
+
+        L.ctx.save();
+        L.ctx.globalCompositeOperation = 'destination-out';
+        L.ctx.drawImage(maskC, bx, by);
+        L.ctx.restore();
+      });
+
+      if (!Object.keys(floatingLayers).length) return;
+
+      this.floating = {
+        bbox: { x:bx, y:by, w:bw, h:bh },
+        before: before, layers: floatingLayers,
+        ox: 0, oy: 0, rot: 0,
+        center: { x: bx+bw/2, y: by+bh/2 }
+      };
+      Cv.shoreDirty = true; Cv.elevationDirty = true;
+      Cv.requestRender();
+    },
+
+    commitFloating: function () {
+      var f = this.floating;
+      if (!f) return;
+      var cx = f.center.x+f.ox, cy = f.center.y+f.oy;
+      var hw = f.bbox.w/2, hh = f.bbox.h/2;
+      var corners = [[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh]].map(function (c) {
+        var rx = c[0]*Math.cos(f.rot) - c[1]*Math.sin(f.rot);
+        var ry = c[0]*Math.sin(f.rot) + c[1]*Math.cos(f.rot);
+        return [cx+rx, cy+ry];
+      });
+      var nx0 = Math.min.apply(null, corners.map(function(c){return c[0];}));
+      var nx1 = Math.max.apply(null, corners.map(function(c){return c[0];}));
+      var ny0 = Math.min.apply(null, corners.map(function(c){return c[1];}));
+      var ny1 = Math.max.apply(null, corners.map(function(c){return c[1];}));
+      var unionX0 = Math.min(f.bbox.x, nx0), unionY0 = Math.min(f.bbox.y, ny0);
+      var unionX1 = Math.max(f.bbox.x+f.bbox.w, nx1), unionY1 = Math.max(f.bbox.y+f.bbox.h, ny1);
+
+      var patches = [];
+      Object.keys(f.layers).forEach(function (lid) {
+        var L = Layers.get(lid);
+        L.ctx.save();
+        L.ctx.translate(cx, cy);
+        L.ctx.rotate(f.rot);
+        L.ctx.drawImage(f.layers[lid], -hw, -hh);
+        L.ctx.restore();
+        patches.push({ layerId:lid, beforeCanvas:f.before[lid], afterCanvas:snap(L.canvas) });
+      });
+
+      var box = { x:Math.max(0,Math.floor(unionX0)), y:Math.max(0,Math.floor(unionY0)),
+                  w:Math.ceil(unionX1-unionX0), h:Math.ceil(unionY1-unionY0) };
+      History.pushRasterMulti(patches, box, 'lasso:move');
+      this.floating = null; this.floatDrag = null; this.floatRotateDrag = null;
+      Cv.shoreDirty = true; Cv.elevationDirty = true;
+      UI.refreshHistory();
+      Cv.requestRender();
+    },
+
+    cancelFloating: function () {
+      var f = this.floating;
+      if (!f) return;
+      Object.keys(f.before).forEach(function (lid) {
+        var L = Layers.get(lid);
+        L.ctx.clearRect(0, 0, L.canvas.width, L.canvas.height);
+        L.ctx.drawImage(f.before[lid], 0, 0);
+      });
+      this.floating = null; this.floatDrag = null; this.floatRotateDrag = null;
+      Cv.shoreDirty = true; Cv.elevationDirty = true;
+      Cv.requestRender();
+    },
+
+    /* Escape gibi geri yükleme yapmaz — seçili alanı katmandan kalıcı olarak siler */
+    deleteFloating: function () {
+      var f = this.floating;
+      if (!f) return;
+      var patches = [];
+      Object.keys(f.before).forEach(function (lid) {
+        var L = Layers.get(lid);
+        patches.push({ layerId:lid, beforeCanvas:f.before[lid], afterCanvas:snap(L.canvas) });
+      });
+      History.pushRasterMulti(patches, f.bbox, 'lasso:delete');
+      this.floating = null; this.floatDrag = null; this.floatRotateDrag = null;
+      Cv.shoreDirty = true; Cv.elevationDirty = true;
+      UI.refreshHistory();
+      Cv.requestRender();
     },
 
     /* ---- kova doldurma: kapalı bir kara/deniz sınırının içini tek tıkla doldurur ----
@@ -1522,6 +1706,33 @@
 
       if (this.measureFrom && this.measureTo) {
         Cv.drawMeasure(ctx, { pts:[[this.measureFrom.x,this.measureFrom.y],[this.measureTo.x,this.measureTo.y]] });
+      }
+
+      if (this.lasso && this.lasso.pts.length) {
+        var lp = this.lasso.pts;
+        ctx.save();
+        ctx.strokeStyle = '#78bfff'; ctx.lineWidth = 2/z; ctx.setLineDash([6/z, 4/z]);
+        ctx.beginPath(); ctx.moveTo(lp[0][0], lp[0][1]);
+        for (var li = 1; li < lp.length; li++) ctx.lineTo(lp[li][0], lp[li][1]);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      if (this.floating) {
+        var f = this.floating, cx2 = f.center.x+f.ox, cy2 = f.center.y+f.oy;
+        ctx.save();
+        ctx.translate(cx2, cy2); ctx.rotate(f.rot);
+        this.LASSO_LAYERS.forEach(function (lid) {
+          if (f.layers[lid]) ctx.drawImage(f.layers[lid], -f.bbox.w/2, -f.bbox.h/2);
+        });
+        ctx.strokeStyle = '#78bfff'; ctx.lineWidth = 2/z; ctx.setLineDash([8/z, 5/z]);
+        ctx.strokeRect(-f.bbox.w/2, -f.bbox.h/2, f.bbox.w, f.bbox.h);
+        ctx.setLineDash([]);
+        var handleDist = f.bbox.h/2 + 30/z;
+        ctx.beginPath(); ctx.moveTo(0, -f.bbox.h/2); ctx.lineTo(0, -handleDist); ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, -handleDist, 7/z, 0, Math.PI*2);
+        ctx.fillStyle = '#78bfff'; ctx.fill();
+        ctx.restore();
       }
 
       if (App.tool === 'eyedrop' && Eyedropper.picking && this.eyeStartPos) {

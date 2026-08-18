@@ -10,7 +10,7 @@
     tr: {
       new:'Yeni', open:'Aç', save:'Kaydet', parchment:'Parşömen', grid:'Izgara', shore:'Kıyı',
       t_select:'Seç', t_landmass:'Kara', t_erase:'Deniz', t_fill:'Doldur', t_terrain:'Arazi', t_symbol:'Sembol',
-      t_river:'Nehir', t_road:'Yol', t_label:'Etiket', t_pan:'Kaydır', t_eyedrop:'Örnekle', t_measure:'Ölç', h_measure:'Haritada sürükleyerek iki nokta arası gerçek mesafeyi ölçek çubuğuna göre hesapla. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez.',
+      t_river:'Nehir', t_road:'Yol', t_label:'Etiket', t_pan:'Kaydır', t_eyedrop:'Örnekle', t_measure:'Ölç', h_measure:'Haritada sürükleyerek iki nokta arası gerçek mesafeyi ölçek çubuğuna göre hesapla. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez.', t_lasso:'Kement', h_lasso:'Sürükleyerek kapalı bir alan çiz: Kara + Arazi + Yükselti o alanda birlikte kaldırılıp taşınabilir hâle gelir. Sürükleyerek taşı, üstteki tutamaçla döndür. Enter ile onayla, Escape ile iptal et, Delete ile alanı tamamen sil.',
       o_landmass:'Kara / Kıyı', o_brushsize:'Fırça boyutu', o_rough:'Kıyı sertliği',
       o_landcolor:'Kara rengi', o_shorew:'Kıyı genişliği', o_shorestyle:'Kıyı stili', o_shore_sandy:'Kumsal', o_shore_rocky:'Kayalık', o_shore_reef:'Resif',
       o_smooth:'Kıyıyı yumuşat', o_clearland:'Karayı temizle',
@@ -68,7 +68,7 @@
     en: {
       new:'New', open:'Open', save:'Save', parchment:'Parchment', grid:'Grid', shore:'Shore',
       t_select:'Select', t_landmass:'Land', t_erase:'Sea', t_fill:'Fill', t_terrain:'Terrain', t_symbol:'Symbol',
-      t_river:'River', t_road:'Road', t_label:'Label', t_pan:'Pan', t_eyedrop:'Sample', t_measure:'Measure', h_measure:'Drag on the map to compute the real distance between two points based on the scale bar. Measurement lines can be selected, moved, or deleted; they are excluded from PNG/SVG export.',
+      t_river:'River', t_road:'Road', t_label:'Label', t_pan:'Pan', t_eyedrop:'Sample', t_measure:'Measure', h_measure:'Drag on the map to compute the real distance between two points based on the scale bar. Measurement lines can be selected, moved, or deleted; they are excluded from PNG/SVG export.', t_lasso:'Lasso', h_lasso:'Drag to draw a closed area: Land + Terrain + Elevation are lifted together within it and become movable. Drag to move, use the top handle to rotate. Enter to commit, Escape to cancel, Delete to remove the area entirely.',
       o_landmass:'Landmass / Coast', o_brushsize:'Brush size', o_rough:'Coast roughness',
       o_landcolor:'Land colour', o_shorew:'Shore width', o_shorestyle:'Shore style', o_shore_sandy:'Sandy', o_shore_rocky:'Rocky', o_shore_reef:'Reef',
       o_smooth:'Smooth coastline', o_clearland:'Clear landmass',
@@ -126,7 +126,7 @@
     de: {
       new:'Neu', open:'Öffnen', save:'Speichern', parchment:'Pergament', grid:'Raster', shore:'Küste',
       t_select:'Auswahl', t_landmass:'Land', t_erase:'Meer', t_fill:'Füllen', t_terrain:'Gelände', t_symbol:'Symbol',
-      t_river:'Fluss', t_road:'Straße', t_label:'Beschriftung', t_pan:'Verschieben', t_eyedrop:'Pipette', t_measure:'Messen', h_measure:'Auf der Karte ziehen, um die reale Entfernung zwischen zwei Punkten anhand des Maßstabsbalkens zu berechnen. Messlinien können ausgewählt, verschoben oder gelöscht werden; sie sind vom PNG/SVG-Export ausgeschlossen.',
+      t_river:'Fluss', t_road:'Straße', t_label:'Beschriftung', t_pan:'Verschieben', t_eyedrop:'Pipette', t_measure:'Messen', h_measure:'Auf der Karte ziehen, um die reale Entfernung zwischen zwei Punkten anhand des Maßstabsbalkens zu berechnen. Messlinien können ausgewählt, verschoben oder gelöscht werden; sie sind vom PNG/SVG-Export ausgeschlossen.', t_lasso:'Lasso', h_lasso:'Ziehen, um einen geschlossenen Bereich zu zeichnen: Land + Gelände + Höhenrelief werden darin gemeinsam angehoben und verschiebbar. Ziehen zum Verschieben, oberer Griff zum Drehen. Enter bestätigt, Escape bricht ab, Entf löscht den Bereich vollständig.',
       o_landmass:'Land / Küste', o_brushsize:'Pinselgröße', o_rough:'Küstenrauheit',
       o_landcolor:'Landfarbe', o_shorew:'Küstenbreite', o_shorestyle:'Küstenstil', o_shore_sandy:'Sandig', o_shore_rocky:'Felsig', o_shore_reef:'Riff',
       o_smooth:'Küste glätten', o_clearland:'Land löschen',
@@ -184,7 +184,7 @@
     fr: {
       new:'Nouveau', open:'Ouvrir', save:'Enregistrer', parchment:'Parchemin', grid:'Grille', shore:'Rivage',
       t_select:'Sélection', t_landmass:'Terre', t_erase:'Mer', t_fill:'Remplir', t_terrain:'Terrain', t_symbol:'Symbole',
-      t_river:'Rivière', t_road:'Route', t_label:'Étiquette', t_pan:'Déplacer', t_eyedrop:'Pipette', t_measure:'Mesurer', h_measure:'Faites glisser sur la carte pour calculer la distance réelle entre deux points selon l\'échelle. Les lignes de mesure peuvent être sélectionnées, déplacées ou supprimées ; elles sont exclues de l\'export PNG/SVG.',
+      t_river:'Rivière', t_road:'Route', t_label:'Étiquette', t_pan:'Déplacer', t_eyedrop:'Pipette', t_measure:'Mesurer', h_measure:'Faites glisser sur la carte pour calculer la distance réelle entre deux points selon l\'échelle. Les lignes de mesure peuvent être sélectionnées, déplacées ou supprimées ; elles sont exclues de l\'export PNG/SVG.', t_lasso:'Lasso', h_lasso:'Faites glisser pour tracer une zone fermée : Terre + Terrain + Relief y sont soulevés ensemble et deviennent déplaçables. Glissez pour déplacer, utilisez la poignée du haut pour pivoter. Entrée pour valider, Échap pour annuler, Suppr pour effacer entièrement la zone.',
       o_landmass:'Terre / Côte', o_brushsize:'Taille du pinceau', o_rough:'Irrégularité de la côte',
       o_landcolor:'Couleur de la terre', o_shorew:'Largeur du rivage', o_shorestyle:'Style de côte', o_shore_sandy:'Sablonneuse', o_shore_rocky:'Rocheuse', o_shore_reef:'Récif',
       o_smooth:'Lisser la côte', o_clearland:'Effacer la terre',
@@ -242,7 +242,7 @@
     es: {
       new:'Nuevo', open:'Abrir', save:'Guardar', parchment:'Pergamino', grid:'Cuadrícula', shore:'Costa',
       t_select:'Seleccionar', t_landmass:'Tierra', t_erase:'Mar', t_fill:'Rellenar', t_terrain:'Terreno', t_symbol:'Símbolo',
-      t_river:'Río', t_road:'Camino', t_label:'Etiqueta', t_pan:'Desplazar', t_eyedrop:'Muestra', t_measure:'Medir', h_measure:'Arrastra en el mapa para calcular la distancia real entre dos puntos según la escala. Las líneas de medición se pueden seleccionar, mover o eliminar; se excluyen de la exportación PNG/SVG.',
+      t_river:'Río', t_road:'Camino', t_label:'Etiqueta', t_pan:'Desplazar', t_eyedrop:'Muestra', t_measure:'Medir', h_measure:'Arrastra en el mapa para calcular la distancia real entre dos puntos según la escala. Las líneas de medición se pueden seleccionar, mover o eliminar; se excluyen de la exportación PNG/SVG.', t_lasso:'Lazo', h_lasso:'Arrastra para trazar un área cerrada: Tierra + Terreno + Relieve se levantan juntos dentro de ella y se vuelven movibles. Arrastra para mover, usa el tirador superior para rotar. Intro para confirmar, Esc para cancelar, Supr para eliminar el área por completo.',
       o_landmass:'Tierra / Costa', o_brushsize:'Tamaño del pincel', o_rough:'Rugosidad de la costa',
       o_landcolor:'Color de la tierra', o_shorew:'Ancho de la costa', o_shorestyle:'Estilo de costa', o_shore_sandy:'Arenosa', o_shore_rocky:'Rocosa', o_shore_reef:'Arrecife',
       o_smooth:'Suavizar costa', o_clearland:'Borrar tierra',
@@ -300,7 +300,7 @@
     it: {
       new:'Nuovo', open:'Apri', save:'Salva', parchment:'Pergamena', grid:'Griglia', shore:'Costa',
       t_select:'Seleziona', t_landmass:'Terra', t_erase:'Mare', t_fill:'Riempi', t_terrain:'Terreno', t_symbol:'Simbolo',
-      t_river:'Fiume', t_road:'Strada', t_label:'Etichetta', t_pan:'Sposta', t_eyedrop:'Campiona', t_measure:'Misura', h_measure:'Trascina sulla mappa per calcolare la distanza reale tra due punti in base alla scala. Le linee di misura possono essere selezionate, spostate o eliminate; sono escluse dall\'esportazione PNG/SVG.',
+      t_river:'Fiume', t_road:'Strada', t_label:'Etichetta', t_pan:'Sposta', t_eyedrop:'Campiona', t_measure:'Misura', h_measure:'Trascina sulla mappa per calcolare la distanza reale tra due punti in base alla scala. Le linee di misura possono essere selezionate, spostate o eliminate; sono escluse dall\'esportazione PNG/SVG.', t_lasso:'Laccio', h_lasso:'Trascina per disegnare un\'area chiusa: Terra + Terreno + Rilievo vengono sollevati insieme al suo interno e diventano spostabili. Trascina per spostare, usa la maniglia superiore per ruotare. Invio per confermare, Esc per annullare, Canc per eliminare completamente l\'area.',
       o_landmass:'Terra / Costa', o_brushsize:'Dimensione pennello', o_rough:'Irregolarità della costa',
       o_landcolor:'Colore della terra', o_shorew:'Larghezza della costa', o_shorestyle:'Stile della costa', o_shore_sandy:'Sabbiosa', o_shore_rocky:'Rocciosa', o_shore_reef:'Barriera corallina',
       o_smooth:'Smussa la costa', o_clearland:'Cancella terra',
@@ -358,7 +358,7 @@
     pt: {
       new:'Novo', open:'Abrir', save:'Guardar', parchment:'Pergaminho', grid:'Grelha', shore:'Costa',
       t_select:'Selecionar', t_landmass:'Terra', t_erase:'Mar', t_fill:'Preencher', t_terrain:'Terreno', t_symbol:'Símbolo',
-      t_river:'Rio', t_road:'Estrada', t_label:'Etiqueta', t_pan:'Deslocar', t_eyedrop:'Amostra', t_measure:'Medir', h_measure:'Arraste no mapa para calcular a distância real entre dois pontos com base na escala. As linhas de medição podem ser selecionadas, movidas ou eliminadas; são excluídas da exportação PNG/SVG.',
+      t_river:'Rio', t_road:'Estrada', t_label:'Etiqueta', t_pan:'Deslocar', t_eyedrop:'Amostra', t_measure:'Medir', h_measure:'Arraste no mapa para calcular a distância real entre dois pontos com base na escala. As linhas de medição podem ser selecionadas, movidas ou eliminadas; são excluídas da exportação PNG/SVG.', t_lasso:'Laço', h_lasso:'Arraste para desenhar uma área fechada: Terra + Terreno + Relevo são levantados juntos nessa área e tornam-se móveis. Arraste para mover, use a pega superior para rodar. Enter para confirmar, Esc para cancelar, Delete para eliminar a área por completo.',
       o_landmass:'Terra / Costa', o_brushsize:'Tamanho do pincel', o_rough:'Irregularidade da costa',
       o_landcolor:'Cor da terra', o_shorew:'Largura da costa', o_shorestyle:'Estilo da costa', o_shore_sandy:'Arenosa', o_shore_rocky:'Rochosa', o_shore_reef:'Recife',
       o_smooth:'Suavizar costa', o_clearland:'Limpar terra',
@@ -416,7 +416,7 @@
     nl: {
       new:'Nieuw', open:'Openen', save:'Opslaan', parchment:'Perkament', grid:'Raster', shore:'Kust',
       t_select:'Selecteren', t_landmass:'Land', t_erase:'Zee', t_fill:'Vullen', t_terrain:'Terrein', t_symbol:'Symbool',
-      t_river:'Rivier', t_road:'Weg', t_label:'Label', t_pan:'Verschuiven', t_eyedrop:'Pipet', t_measure:'Meten', h_measure:'Sleep op de kaart om de werkelijke afstand tussen twee punten te berekenen op basis van de schaal. Meetlijnen kunnen worden geselecteerd, verplaatst of verwijderd; ze worden niet meegenomen in de PNG/SVG-export.',
+      t_river:'Rivier', t_road:'Weg', t_label:'Label', t_pan:'Verschuiven', t_eyedrop:'Pipet', t_measure:'Meten', h_measure:'Sleep op de kaart om de werkelijke afstand tussen twee punten te berekenen op basis van de schaal. Meetlijnen kunnen worden geselecteerd, verplaatst of verwijderd; ze worden niet meegenomen in de PNG/SVG-export.', t_lasso:'Lasso', h_lasso:'Sleep om een gesloten gebied te tekenen: Land + Terrein + Reliëf worden daarbinnen samen opgetild en verplaatsbaar. Sleep om te verplaatsen, gebruik de bovenste handgreep om te draaien. Enter om te bevestigen, Escape om te annuleren, Delete om het gebied volledig te verwijderen.',
       o_landmass:'Land / Kust', o_brushsize:'Penseelgrootte', o_rough:'Ruwheid van de kust',
       o_landcolor:'Landkleur', o_shorew:'Kustbreedte', o_shorestyle:'Kuststijl', o_shore_sandy:'Zandig', o_shore_rocky:'Rotsachtig', o_shore_reef:'Rif',
       o_smooth:'Kust gladstrijken', o_clearland:'Land wissen',
@@ -474,7 +474,7 @@
     pl: {
       new:'Nowy', open:'Otwórz', save:'Zapisz', parchment:'Pergamin', grid:'Siatka', shore:'Wybrzeże',
       t_select:'Zaznacz', t_landmass:'Ląd', t_erase:'Morze', t_fill:'Wypełnij', t_terrain:'Teren', t_symbol:'Symbol',
-      t_river:'Rzeka', t_road:'Droga', t_label:'Etykieta', t_pan:'Przesuń', t_eyedrop:'Próbnik', t_measure:'Mierz', h_measure:'Przeciągnij po mapie, aby obliczyć rzeczywistą odległość między dwoma punktami na podstawie skali. Linie pomiarowe można zaznaczać, przesuwać lub usuwać; nie są uwzględniane w eksporcie PNG/SVG.',
+      t_river:'Rzeka', t_road:'Droga', t_label:'Etykieta', t_pan:'Przesuń', t_eyedrop:'Próbnik', t_measure:'Mierz', h_measure:'Przeciągnij po mapie, aby obliczyć rzeczywistą odległość między dwoma punktami na podstawie skali. Linie pomiarowe można zaznaczać, przesuwać lub usuwać; nie są uwzględniane w eksporcie PNG/SVG.', t_lasso:'Lasso', h_lasso:'Przeciągnij, aby narysować zamknięty obszar: Ląd + Teren + Rzeźba terenu są w nim razem podnoszone i stają się przesuwalne. Przeciągnij, aby przesunąć, użyj górnego uchwytu, aby obrócić. Enter zatwierdza, Escape anuluje, Delete całkowicie usuwa obszar.',
       o_landmass:'Ląd / Wybrzeże', o_brushsize:'Rozmiar pędzla', o_rough:'Nieregularność wybrzeża',
       o_landcolor:'Kolor lądu', o_shorew:'Szerokość wybrzeża', o_shorestyle:'Styl wybrzeża', o_shore_sandy:'Piaszczyste', o_shore_rocky:'Skaliste', o_shore_reef:'Rafa',
       o_smooth:'Wygładź wybrzeże', o_clearland:'Wyczyść ląd',
@@ -532,7 +532,7 @@
     ru: {
       new:'Новый', open:'Открыть', save:'Сохранить', parchment:'Пергамент', grid:'Сетка', shore:'Берег',
       t_select:'Выделение', t_landmass:'Суша', t_erase:'Море', t_fill:'Заливка', t_terrain:'Местность', t_symbol:'Символ',
-      t_river:'Река', t_road:'Дорога', t_label:'Надпись', t_pan:'Перемещение', t_eyedrop:'Пипетка', t_measure:'Измерить', h_measure:'Перетаскивайте по карте, чтобы вычислить реальное расстояние между двумя точками по масштабной линейке. Линии измерения можно выделять, перемещать или удалять; они не входят в экспорт PNG/SVG.',
+      t_river:'Река', t_road:'Дорога', t_label:'Надпись', t_pan:'Перемещение', t_eyedrop:'Пипетка', t_measure:'Измерить', h_measure:'Перетаскивайте по карте, чтобы вычислить реальное расстояние между двумя точками по масштабной линейке. Линии измерения можно выделять, перемещать или удалять; они не входят в экспорт PNG/SVG.', t_lasso:'Лассо', h_lasso:'Перетаскивайте, чтобы нарисовать замкнутую область: Суша + Местность + Рельеф поднимаются в ней вместе и становятся перемещаемыми. Перетаскивайте для перемещения, используйте верхний маркер для поворота. Enter — подтвердить, Escape — отменить, Delete — полностью удалить область.',
       o_landmass:'Суша / Берег', o_brushsize:'Размер кисти', o_rough:'Неровность берега',
       o_landcolor:'Цвет суши', o_shorew:'Ширина берега', o_shorestyle:'Стиль берега', o_shore_sandy:'Песчаный', o_shore_rocky:'Скалистый', o_shore_reef:'Риф',
       o_smooth:'Сгладить берег', o_clearland:'Очистить сушу',
@@ -754,6 +754,7 @@
 
     setTool: function (name) {
       var self = this;
+      if (name !== 'lasso' && Tools.floating) Tools.commitFloating();
       App.tool = name;
       Tools.cancelPath();
       document.querySelectorAll('.tool').forEach(function (b) {
@@ -1666,7 +1667,7 @@
       var self = this;
       var map = { v:'select', b:'landmass', e:'erase', t:'terrain', s:'symbol',
                   r:'river', d:'road', l:'label', h:'pan', i:'eyedrop', k:'lake', g:'territory',
-                  u:'elevation', m:'regionlink', y:'resource', f:'fill', q:'measure' };
+                  u:'elevation', m:'regionlink', y:'resource', f:'fill', q:'measure', x:'lasso' };
 
       window.addEventListener('keydown', function (ev) {
         var tag = (ev.target.tagName || '').toLowerCase();
@@ -1695,9 +1696,13 @@
         if (ev.key === 'ArrowUp')    { ev.preventDefault(); Cv.panBy(0,  step); return; }
         if (ev.key === 'ArrowDown')  { ev.preventDefault(); Cv.panBy(0, -step); return; }
 
-        if (ev.key === 'Enter') { Tools.finishPath(); return; }
-        if (ev.key === 'Escape') { Tools.cancelPath(); App.selection = null; self.refreshSelection(); return; }
+        if (ev.key === 'Enter') { if (Tools.floating) Tools.commitFloating(); else Tools.finishPath(); return; }
+        if (ev.key === 'Escape') {
+          if (Tools.floating) { Tools.cancelFloating(); return; }
+          Tools.cancelPath(); App.selection = null; self.refreshSelection(); return;
+        }
         if (ev.key === 'Delete' || ev.key === 'Backspace') {
+          if (Tools.floating) { Tools.deleteFloating(); return; }
           if (!Tools.undoPathPoint()) Tools.deleteSelection();
           return;
         }
