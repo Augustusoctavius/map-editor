@@ -9,7 +9,7 @@
   var DICT = {
     tr: {
       new:'Yeni', open:'Aç', save:'Kaydet', parchment:'Parşömen', grid:'Izgara', shore:'Kıyı',
-      t_select:'Seç', t_landmass:'Kara', t_erase:'Deniz', t_terrain:'Arazi', t_symbol:'Sembol',
+      t_select:'Seç', t_landmass:'Kara', t_erase:'Deniz', t_fill:'Doldur', t_terrain:'Arazi', t_symbol:'Sembol',
       t_river:'Nehir', t_road:'Yol', t_label:'Etiket', t_pan:'Kaydır', t_eyedrop:'Örnekle',
       o_landmass:'Kara / Kıyı', o_brushsize:'Fırça boyutu', o_rough:'Kıyı sertliği',
       o_landcolor:'Kara rengi', o_shorew:'Kıyı genişliği', o_shorestyle:'Kıyı stili', o_shore_sandy:'Kumsal', o_shore_rocky:'Kayalık', o_shore_reef:'Resif',
@@ -46,7 +46,7 @@
       sym_upload:'+ PNG Sembol yükle', sym_upload_done:'sembol yüklendi', sym_del:'Sil', sym_search:'Sembol ara...',
       st_pos:'Konum', st_zoom:'Yakınlık', st_size:'Tuval', st_tool:'Araç',
       cancel:'Vazgeç', ok:'Tamam',
-      locked:'Katman kilitli veya gizli.', needtext:'Önce etiket metnini yaz.', nopathnear:'Yakında nehir/yol bulunamadı.',
+      locked:'Katman kilitli veya gizli.', needtext:'Önce etiket metnini yaz.', nopathnear:'Yakında nehir/yol bulunamadı.', fill_toolarge:'Alan çok büyük — kapalı bir sınır içinde deneyin.',
       exported:'Dışa aktarıldı:', saved:'Proje kaydedildi.', loaded:'Proje yüklendi.',
       badfile:'Geçersiz proje dosyası.', newmap:'Yeni harita oluşturuldu.',
       confirmNew:'Mevcut harita silinecek. Yeni tuval boyutunu seç:',
@@ -67,7 +67,7 @@
     },
     en: {
       new:'New', open:'Open', save:'Save', parchment:'Parchment', grid:'Grid', shore:'Shore',
-      t_select:'Select', t_landmass:'Land', t_erase:'Sea', t_terrain:'Terrain', t_symbol:'Symbol',
+      t_select:'Select', t_landmass:'Land', t_erase:'Sea', t_fill:'Fill', t_terrain:'Terrain', t_symbol:'Symbol',
       t_river:'River', t_road:'Road', t_label:'Label', t_pan:'Pan', t_eyedrop:'Sample',
       o_landmass:'Landmass / Coast', o_brushsize:'Brush size', o_rough:'Coast roughness',
       o_landcolor:'Land colour', o_shorew:'Shore width', o_shorestyle:'Shore style', o_shore_sandy:'Sandy', o_shore_rocky:'Rocky', o_shore_reef:'Reef',
@@ -104,7 +104,7 @@
       sym_upload:'+ Upload PNG Symbol', sym_upload_done:'symbol(s) loaded', sym_del:'Delete', sym_search:'Search symbols...',
       st_pos:'Pos', st_zoom:'Zoom', st_size:'Canvas', st_tool:'Tool',
       cancel:'Cancel', ok:'OK',
-      locked:'Layer is locked or hidden.', needtext:'Type the label text first.', nopathnear:'No river/road found nearby.',
+      locked:'Layer is locked or hidden.', needtext:'Type the label text first.', nopathnear:'No river/road found nearby.', fill_toolarge:'Area too large — try inside a closed boundary.',
       exported:'Exported:', saved:'Project saved.', loaded:'Project loaded.',
       badfile:'Invalid project file.', newmap:'New map created.',
       confirmNew:'The current map will be discarded. Choose a canvas size:',
@@ -125,7 +125,7 @@
     },
     de: {
       new:'Neu', open:'Öffnen', save:'Speichern', parchment:'Pergament', grid:'Raster', shore:'Küste',
-      t_select:'Auswahl', t_landmass:'Land', t_erase:'Meer', t_terrain:'Gelände', t_symbol:'Symbol',
+      t_select:'Auswahl', t_landmass:'Land', t_erase:'Meer', t_fill:'Füllen', t_terrain:'Gelände', t_symbol:'Symbol',
       t_river:'Fluss', t_road:'Straße', t_label:'Beschriftung', t_pan:'Verschieben', t_eyedrop:'Pipette',
       o_landmass:'Land / Küste', o_brushsize:'Pinselgröße', o_rough:'Küstenrauheit',
       o_landcolor:'Landfarbe', o_shorew:'Küstenbreite', o_shorestyle:'Küstenstil', o_shore_sandy:'Sandig', o_shore_rocky:'Felsig', o_shore_reef:'Riff',
@@ -162,7 +162,7 @@
       sym_upload:'+ PNG-Symbol hochladen', sym_upload_done:'Symbol(e) geladen', sym_del:'Löschen', sym_search:'Symbole durchsuchen...',
       st_pos:'Position', st_zoom:'Zoom', st_size:'Leinwand', st_tool:'Werkzeug',
       cancel:'Abbrechen', ok:'OK',
-      locked:'Ebene ist gesperrt oder ausgeblendet.', needtext:'Zuerst den Beschriftungstext eingeben.', nopathnear:'In der Nähe kein Fluss/keine Straße gefunden.',
+      locked:'Ebene ist gesperrt oder ausgeblendet.', needtext:'Zuerst den Beschriftungstext eingeben.', nopathnear:'In der Nähe kein Fluss/keine Straße gefunden.', fill_toolarge:'Fläche zu groß — innerhalb einer geschlossenen Grenze versuchen.',
       exported:'Exportiert:', saved:'Projekt gespeichert.', loaded:'Projekt geladen.',
       badfile:'Ungültige Projektdatei.', newmap:'Neue Karte erstellt.',
       confirmNew:'Die aktuelle Karte wird verworfen. Leinwandgröße wählen:',
@@ -183,7 +183,7 @@
     },
     fr: {
       new:'Nouveau', open:'Ouvrir', save:'Enregistrer', parchment:'Parchemin', grid:'Grille', shore:'Rivage',
-      t_select:'Sélection', t_landmass:'Terre', t_erase:'Mer', t_terrain:'Terrain', t_symbol:'Symbole',
+      t_select:'Sélection', t_landmass:'Terre', t_erase:'Mer', t_fill:'Remplir', t_terrain:'Terrain', t_symbol:'Symbole',
       t_river:'Rivière', t_road:'Route', t_label:'Étiquette', t_pan:'Déplacer', t_eyedrop:'Pipette',
       o_landmass:'Terre / Côte', o_brushsize:'Taille du pinceau', o_rough:'Irrégularité de la côte',
       o_landcolor:'Couleur de la terre', o_shorew:'Largeur du rivage', o_shorestyle:'Style de côte', o_shore_sandy:'Sablonneuse', o_shore_rocky:'Rocheuse', o_shore_reef:'Récif',
@@ -220,7 +220,7 @@
       sym_upload:'+ Importer un symbole PNG', sym_upload_done:'symbole(s) chargé(s)', sym_del:'Supprimer', sym_search:'Rechercher un symbole...',
       st_pos:'Position', st_zoom:'Zoom', st_size:'Toile', st_tool:'Outil',
       cancel:'Annuler', ok:'OK',
-      locked:'Le calque est verrouillé ou masqué.', needtext:"Saisissez d'abord le texte de l'étiquette.", nopathnear:"Aucune rivière/route trouvée à proximité.",
+      locked:'Le calque est verrouillé ou masqué.', needtext:"Saisissez d'abord le texte de l'étiquette.", nopathnear:"Aucune rivière/route trouvée à proximité.", fill_toolarge:'Zone trop grande — essayez à l\'intérieur d\'une limite fermée.',
       exported:'Exporté :', saved:'Projet enregistré.', loaded:'Projet chargé.',
       badfile:'Fichier de projet invalide.', newmap:'Nouvelle carte créée.',
       confirmNew:'La carte actuelle sera abandonnée. Choisissez une taille de toile :',
@@ -241,7 +241,7 @@
     },
     es: {
       new:'Nuevo', open:'Abrir', save:'Guardar', parchment:'Pergamino', grid:'Cuadrícula', shore:'Costa',
-      t_select:'Seleccionar', t_landmass:'Tierra', t_erase:'Mar', t_terrain:'Terreno', t_symbol:'Símbolo',
+      t_select:'Seleccionar', t_landmass:'Tierra', t_erase:'Mar', t_fill:'Rellenar', t_terrain:'Terreno', t_symbol:'Símbolo',
       t_river:'Río', t_road:'Camino', t_label:'Etiqueta', t_pan:'Desplazar', t_eyedrop:'Muestra',
       o_landmass:'Tierra / Costa', o_brushsize:'Tamaño del pincel', o_rough:'Rugosidad de la costa',
       o_landcolor:'Color de la tierra', o_shorew:'Ancho de la costa', o_shorestyle:'Estilo de costa', o_shore_sandy:'Arenosa', o_shore_rocky:'Rocosa', o_shore_reef:'Arrecife',
@@ -278,7 +278,7 @@
       sym_upload:'+ Subir símbolo PNG', sym_upload_done:'símbolo(s) cargado(s)', sym_del:'Borrar', sym_search:'Buscar símbolos...',
       st_pos:'Posición', st_zoom:'Zoom', st_size:'Lienzo', st_tool:'Herramienta',
       cancel:'Cancelar', ok:'Aceptar',
-      locked:'La capa está bloqueada u oculta.', needtext:'Escribe primero el texto de la etiqueta.', nopathnear:'No se encontró ningún río/camino cerca.',
+      locked:'La capa está bloqueada u oculta.', needtext:'Escribe primero el texto de la etiqueta.', nopathnear:'No se encontró ningún río/camino cerca.', fill_toolarge:'Área demasiado grande — pruébalo dentro de un límite cerrado.',
       exported:'Exportado:', saved:'Proyecto guardado.', loaded:'Proyecto cargado.',
       badfile:'Archivo de proyecto no válido.', newmap:'Mapa nuevo creado.',
       confirmNew:'Se descartará el mapa actual. Elige un tamaño de lienzo:',
@@ -299,7 +299,7 @@
     },
     it: {
       new:'Nuovo', open:'Apri', save:'Salva', parchment:'Pergamena', grid:'Griglia', shore:'Costa',
-      t_select:'Seleziona', t_landmass:'Terra', t_erase:'Mare', t_terrain:'Terreno', t_symbol:'Simbolo',
+      t_select:'Seleziona', t_landmass:'Terra', t_erase:'Mare', t_fill:'Riempi', t_terrain:'Terreno', t_symbol:'Simbolo',
       t_river:'Fiume', t_road:'Strada', t_label:'Etichetta', t_pan:'Sposta', t_eyedrop:'Campiona',
       o_landmass:'Terra / Costa', o_brushsize:'Dimensione pennello', o_rough:'Irregolarità della costa',
       o_landcolor:'Colore della terra', o_shorew:'Larghezza della costa', o_shorestyle:'Stile della costa', o_shore_sandy:'Sabbiosa', o_shore_rocky:'Rocciosa', o_shore_reef:'Barriera corallina',
@@ -336,7 +336,7 @@
       sym_upload:'+ Carica simbolo PNG', sym_upload_done:'simbolo/i caricato/i', sym_del:'Elimina', sym_search:'Cerca simboli...',
       st_pos:'Posizione', st_zoom:'Zoom', st_size:'Tela', st_tool:'Strumento',
       cancel:'Annulla', ok:'OK',
-      locked:'Il livello è bloccato o nascosto.', needtext:"Scrivi prima il testo dell'etichetta.", nopathnear:'Nessun fiume/strada trovato nelle vicinanze.',
+      locked:'Il livello è bloccato o nascosto.', needtext:"Scrivi prima il testo dell'etichetta.", nopathnear:'Nessun fiume/strada trovato nelle vicinanze.', fill_toolarge:'Area troppo grande — prova all\'interno di un confine chiuso.',
       exported:'Esportato:', saved:'Progetto salvato.', loaded:'Progetto caricato.',
       badfile:'File di progetto non valido.', newmap:'Nuova mappa creata.',
       confirmNew:'La mappa attuale verrà eliminata. Scegli una dimensione della tela:',
@@ -357,7 +357,7 @@
     },
     pt: {
       new:'Novo', open:'Abrir', save:'Guardar', parchment:'Pergaminho', grid:'Grelha', shore:'Costa',
-      t_select:'Selecionar', t_landmass:'Terra', t_erase:'Mar', t_terrain:'Terreno', t_symbol:'Símbolo',
+      t_select:'Selecionar', t_landmass:'Terra', t_erase:'Mar', t_fill:'Preencher', t_terrain:'Terreno', t_symbol:'Símbolo',
       t_river:'Rio', t_road:'Estrada', t_label:'Etiqueta', t_pan:'Deslocar', t_eyedrop:'Amostra',
       o_landmass:'Terra / Costa', o_brushsize:'Tamanho do pincel', o_rough:'Irregularidade da costa',
       o_landcolor:'Cor da terra', o_shorew:'Largura da costa', o_shorestyle:'Estilo da costa', o_shore_sandy:'Arenosa', o_shore_rocky:'Rochosa', o_shore_reef:'Recife',
@@ -394,7 +394,7 @@
       sym_upload:'+ Carregar símbolo PNG', sym_upload_done:'símbolo(s) carregado(s)', sym_del:'Apagar', sym_search:'Pesquisar símbolos...',
       st_pos:'Posição', st_zoom:'Zoom', st_size:'Tela', st_tool:'Ferramenta',
       cancel:'Cancelar', ok:'OK',
-      locked:'A camada está bloqueada ou oculta.', needtext:'Escreva primeiro o texto da etiqueta.', nopathnear:'Nenhum rio/estrada encontrado nas proximidades.',
+      locked:'A camada está bloqueada ou oculta.', needtext:'Escreva primeiro o texto da etiqueta.', nopathnear:'Nenhum rio/estrada encontrado nas proximidades.', fill_toolarge:'Área demasiado grande — tente dentro de um limite fechado.',
       exported:'Exportado:', saved:'Projeto guardado.', loaded:'Projeto carregado.',
       badfile:'Ficheiro de projeto inválido.', newmap:'Novo mapa criado.',
       confirmNew:'O mapa atual será descartado. Escolha um tamanho de tela:',
@@ -415,7 +415,7 @@
     },
     nl: {
       new:'Nieuw', open:'Openen', save:'Opslaan', parchment:'Perkament', grid:'Raster', shore:'Kust',
-      t_select:'Selecteren', t_landmass:'Land', t_erase:'Zee', t_terrain:'Terrein', t_symbol:'Symbool',
+      t_select:'Selecteren', t_landmass:'Land', t_erase:'Zee', t_fill:'Vullen', t_terrain:'Terrein', t_symbol:'Symbool',
       t_river:'Rivier', t_road:'Weg', t_label:'Label', t_pan:'Verschuiven', t_eyedrop:'Pipet',
       o_landmass:'Land / Kust', o_brushsize:'Penseelgrootte', o_rough:'Ruwheid van de kust',
       o_landcolor:'Landkleur', o_shorew:'Kustbreedte', o_shorestyle:'Kuststijl', o_shore_sandy:'Zandig', o_shore_rocky:'Rotsachtig', o_shore_reef:'Rif',
@@ -452,7 +452,7 @@
       sym_upload:'+ PNG-symbool uploaden', sym_upload_done:'symbo(o)l(en) geladen', sym_del:'Verwijderen', sym_search:'Symbolen zoeken...',
       st_pos:'Positie', st_zoom:'Zoom', st_size:'Canvas', st_tool:'Gereedschap',
       cancel:'Annuleren', ok:'OK',
-      locked:'Laag is vergrendeld of verborgen.', needtext:'Typ eerst de labeltekst.', nopathnear:'Geen rivier/weg in de buurt gevonden.',
+      locked:'Laag is vergrendeld of verborgen.', needtext:'Typ eerst de labeltekst.', nopathnear:'Geen rivier/weg in de buurt gevonden.', fill_toolarge:'Gebied te groot — probeer binnen een gesloten grens.',
       exported:'Geëxporteerd:', saved:'Project opgeslagen.', loaded:'Project geladen.',
       badfile:'Ongeldig projectbestand.', newmap:'Nieuwe kaart aangemaakt.',
       confirmNew:'De huidige kaart wordt verwijderd. Kies een canvasgrootte:',
@@ -473,7 +473,7 @@
     },
     pl: {
       new:'Nowy', open:'Otwórz', save:'Zapisz', parchment:'Pergamin', grid:'Siatka', shore:'Wybrzeże',
-      t_select:'Zaznacz', t_landmass:'Ląd', t_erase:'Morze', t_terrain:'Teren', t_symbol:'Symbol',
+      t_select:'Zaznacz', t_landmass:'Ląd', t_erase:'Morze', t_fill:'Wypełnij', t_terrain:'Teren', t_symbol:'Symbol',
       t_river:'Rzeka', t_road:'Droga', t_label:'Etykieta', t_pan:'Przesuń', t_eyedrop:'Próbnik',
       o_landmass:'Ląd / Wybrzeże', o_brushsize:'Rozmiar pędzla', o_rough:'Nieregularność wybrzeża',
       o_landcolor:'Kolor lądu', o_shorew:'Szerokość wybrzeża', o_shorestyle:'Styl wybrzeża', o_shore_sandy:'Piaszczyste', o_shore_rocky:'Skaliste', o_shore_reef:'Rafa',
@@ -510,7 +510,7 @@
       sym_upload:'+ Wgraj symbol PNG', sym_upload_done:'wczytano symboli', sym_del:'Usuń', sym_search:'Szukaj symboli...',
       st_pos:'Pozycja', st_zoom:'Powiększenie', st_size:'Płótno', st_tool:'Narzędzie',
       cancel:'Anuluj', ok:'OK',
-      locked:'Warstwa jest zablokowana lub ukryta.', needtext:'Najpierw wpisz tekst etykiety.', nopathnear:'Nie znaleziono w pobliżu rzeki/drogi.',
+      locked:'Warstwa jest zablokowana lub ukryta.', needtext:'Najpierw wpisz tekst etykiety.', nopathnear:'Nie znaleziono w pobliżu rzeki/drogi.', fill_toolarge:'Obszar zbyt duży — spróbuj wewnątrz zamkniętej granicy.',
       exported:'Wyeksportowano:', saved:'Projekt zapisany.', loaded:'Projekt wczytany.',
       badfile:'Nieprawidłowy plik projektu.', newmap:'Utworzono nową mapę.',
       confirmNew:'Bieżąca mapa zostanie odrzucona. Wybierz rozmiar płótna:',
@@ -531,7 +531,7 @@
     },
     ru: {
       new:'Новый', open:'Открыть', save:'Сохранить', parchment:'Пергамент', grid:'Сетка', shore:'Берег',
-      t_select:'Выделение', t_landmass:'Суша', t_erase:'Море', t_terrain:'Местность', t_symbol:'Символ',
+      t_select:'Выделение', t_landmass:'Суша', t_erase:'Море', t_fill:'Заливка', t_terrain:'Местность', t_symbol:'Символ',
       t_river:'Река', t_road:'Дорога', t_label:'Надпись', t_pan:'Перемещение', t_eyedrop:'Пипетка',
       o_landmass:'Суша / Берег', o_brushsize:'Размер кисти', o_rough:'Неровность берега',
       o_landcolor:'Цвет суши', o_shorew:'Ширина берега', o_shorestyle:'Стиль берега', o_shore_sandy:'Песчаный', o_shore_rocky:'Скалистый', o_shore_reef:'Риф',
@@ -568,7 +568,7 @@
       sym_upload:'+ Загрузить PNG-символ', sym_upload_done:'символ(ов) загружено', sym_del:'Удалить', sym_search:'Поиск символов...',
       st_pos:'Позиция', st_zoom:'Масштаб', st_size:'Холст', st_tool:'Инструмент',
       cancel:'Отмена', ok:'ОК',
-      locked:'Слой заблокирован или скрыт.', needtext:'Сначала введите текст надписи.', nopathnear:'Река/дорога поблизости не найдена.',
+      locked:'Слой заблокирован или скрыт.', needtext:'Сначала введите текст надписи.', nopathnear:'Река/дорога поблизости не найдена.', fill_toolarge:'Область слишком велика — попробуйте внутри замкнутой границы.',
       exported:'Экспортировано:', saved:'Проект сохранён.', loaded:'Проект загружен.',
       badfile:'Некорректный файл проекта.', newmap:'Создана новая карта.',
       confirmNew:'Текущая карта будет удалена. Выберите размер холста:',
@@ -1646,7 +1646,7 @@
       var self = this;
       var map = { v:'select', b:'landmass', e:'erase', t:'terrain', s:'symbol',
                   r:'river', d:'road', l:'label', h:'pan', i:'eyedrop', k:'lake', g:'territory',
-                  u:'elevation', m:'regionlink', y:'resource' };
+                  u:'elevation', m:'regionlink', y:'resource', f:'fill' };
 
       window.addEventListener('keydown', function (ev) {
         var tag = (ev.target.tagName || '').toLowerCase();

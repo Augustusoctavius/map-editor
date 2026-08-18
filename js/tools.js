@@ -11,6 +11,10 @@
   function $(id){return document.getElementById(id);}
   function snap(c){ var t=document.createElement('canvas'); t.width=c.width; t.height=c.height;
                     t.getContext('2d').drawImage(c,0,0); return t; }
+  function hexToRgb(hex) {
+    var m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex||'#000000');
+    return m ? { r:parseInt(m[1],16), g:parseInt(m[2],16), b:parseInt(m[3],16) } : { r:0, g:0, b:0 };
+  }
 
   /* Fırça vuruşu sırasında (stampTerrain/eyedropStamp) tekrar tekrar canvas
      oluşturmamak için tek seferlik, sadece büyüyen bir scratch canvas havuzu. */
@@ -251,6 +255,7 @@
       switch (App.tool) {
         case 'landmass': this.startRaster('landmass', p, 'paint'); break;
         case 'erase':    this.startRaster('landmass', p, 'erase'); break;
+        case 'fill':     this.floodFill(p.x, p.y); break;
         case 'terrain':  this.startRaster('terrain',  p, 'terrain'); break;
         case 'elevation': this.startRaster('elevation', p, 'elevation'); break;
         case 'symbol':
@@ -761,6 +766,73 @@
         }
       }
       return best || { x:x, y:y };
+    },
+
+    /* ---- kova doldurma: kapalı bir kara/deniz sınırının içini tek tıkla doldurur ----
+       Fırça ile çizilmiş kapalı bir çevrimin (ring) içi hâlâ deniz (şeffaf) kalır;
+       bu araç o boşluğu kara rengiyle doldurur (ya da tersi: kara bölgeyi silmek
+       için deniz üstüne tıklanır — tıklanan pikselin kara/deniz durumuyla aynı
+       bitişik alanı doldurur). Span tabanlı scanline flood fill, tam çözünürlükte. */
+    floodFill: function (x, y) {
+      var L = Layers.get('landmass');
+      if (L.locked) { UI.msg(UI.t('locked')); return; }
+      var w = L.canvas.width, h = L.canvas.height;
+      var sx = Math.round(x), sy = Math.round(y);
+      if (sx < 0 || sy < 0 || sx >= w || sy >= h) return;
+
+      var ctx = L.ctx;
+      var id = ctx.getImageData(0, 0, w, h), d = id.data;
+      var startIdx = (sy*w+sx)*4;
+      var startIsLand = d[startIdx+3] > 128;
+      var col = hexToRgb(App.brush.color);
+      var visited = new Uint8Array(w*h);
+      var maxPixels = Math.round(w*h*0.7); /* kazayla tüm denizi doldurmayı engelle */
+
+      function isTarget(px, py) {
+        var i4 = (py*w+px)*4;
+        return (d[i4+3] > 128) === startIsLand;
+      }
+
+      var stack = [sy], stackX = [sx];
+      var minX=sx, maxX=sx, minY=sy, maxY=sy, filled = 0, aborted = false;
+      while (stackX.length) {
+        var px = stackX.pop(), py = stack.pop();
+        if (px < 0 || px >= w || py < 0 || py >= h) continue;
+        var vidx = py*w+px;
+        if (visited[vidx] || !isTarget(px, py)) continue;
+
+        var xl = px;
+        while (xl > 0 && !visited[py*w+(xl-1)] && isTarget(xl-1, py)) xl--;
+        var xr = px;
+        while (xr < w-1 && !visited[py*w+(xr+1)] && isTarget(xr+1, py)) xr++;
+
+        for (var xx = xl; xx <= xr; xx++) {
+          var vi = py*w+xx;
+          if (visited[vi]) continue;
+          visited[vi] = 1;
+          var i4 = vi*4;
+          d[i4]=col.r; d[i4+1]=col.g; d[i4+2]=col.b; d[i4+3]=255;
+          filled++;
+        }
+        if (filled > maxPixels) { aborted = true; break; }
+        minX=Math.min(minX,xl); maxX=Math.max(maxX,xr); minY=Math.min(minY,py); maxY=Math.max(maxY,py);
+
+        for (var xx2 = xl; xx2 <= xr; xx2++) {
+          if (py>0)   { stack.push(py-1); stackX.push(xx2); }
+          if (py<h-1) { stack.push(py+1); stackX.push(xx2); }
+        }
+      }
+
+      if (aborted) { UI.msg(UI.t('fill_toolarge')); return; }
+      if (!filled) return;
+
+      var before = snap(L.canvas);
+      ctx.putImageData(id, 0, 0);
+      History.pushRaster('landmass', before, L.canvas,
+        { x:minX, y:minY, w:maxX-minX+1, h:maxY-minY+1 }, 'fill');
+      Cv.shoreDirty = true;
+      UI.refreshHistory();
+      Cv.requestRender();
     },
 
     /* ---- kıyı yumuşatma ---- */
