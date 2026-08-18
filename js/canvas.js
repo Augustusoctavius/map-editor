@@ -623,6 +623,7 @@
                 }
               }
               else if (l.id === 'resources') this.drawResource(ctx, o);
+              else if (l.id === 'measures') { if (opt.includeLinks !== false) this.drawMeasure(ctx, o); }
               else if (l.id === 'links') { if (opt.includeLinks !== false) this.drawLink(ctx, o); }
               else if (l.id === 'labels') this.drawLabel(ctx, o);
             }
@@ -1419,6 +1420,67 @@
         return out;
       }
       return out;
+    },
+
+    /* ---------- mesafe/ölçüm cetveli ----------
+       Ölçek çubuğunun px/birim oranını kullanarak gerçek mesafeyi hesaplar. */
+    pxPerScaleUnit: function () {
+      var s = App.scale;
+      var m = /^([\d.,]+)\s*(.*)$/.exec((s.label||'').trim());
+      var num = m ? parseFloat(m[1].replace(',', '.')) : NaN;
+      var unit = m && m[2] ? m[2] : '';
+      if (!num || !isFinite(num) || num <= 0) return { px:1, unit:'' };
+      return { px: s.len/num, unit: unit };
+    },
+
+    measureLength: function (o) {
+      var pts = o.handles ? Geo.sampleBezier(o.pts, o.handles, 18, false) : Geo.sample(o.pts, 18);
+      var len = Geo.polylineLength(pts);
+      var conv = this.pxPerScaleUnit();
+      return { px:len, real: len/conv.px, unit: conv.unit, pts:pts };
+    },
+
+    formatDistance: function (real, unit) {
+      var r = real >= 100 ? Math.round(real) : Math.round(real*10)/10;
+      return r + (unit ? ' ' + unit : '');
+    },
+
+    drawMeasure: function (ctx, o) {
+      var info = this.measureLength(o);
+      var pts = info.pts;
+      if (pts.length < 2) return;
+      ctx.save();
+      ctx.strokeStyle = '#c94b4b';
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([9, 6]);
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      /* uç işaretleri */
+      [pts[0], pts[pts.length-1]].forEach(function (pt) {
+        ctx.beginPath(); ctx.arc(pt[0], pt[1], 5, 0, Math.PI*2);
+        ctx.fillStyle = '#c94b4b'; ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+      });
+
+      /* orta noktada mesafe etiketi */
+      var midIdx = Math.floor(pts.length/2);
+      var mx = pts[midIdx][0], my = pts[midIdx][1];
+      var text = this.formatDistance(info.real, info.unit);
+      ctx.font = '600 20px Georgia, serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      var tw = ctx.measureText(text).width;
+      ctx.fillStyle = 'rgba(245,236,216,0.92)';
+      ctx.strokeStyle = '#c94b4b'; ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(mx-tw/2-8, my-16, tw+16, 32, 6) : ctx.rect(mx-tw/2-8, my-16, tw+16, 32);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#3a2b18';
+      ctx.fillText(text, mx, my+1);
+      ctx.restore();
     },
 
     /* ---------- kaynak/ikon işaretleri (maden, tarım, avlanma, balıkçılık, ticaret, taş ocağı) ---------- */

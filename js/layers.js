@@ -525,6 +525,7 @@
     { id:'symbols',   type:'vector', tr:'Semboller',       en:'Symbols',         opacity:1,   visible:true  },
     { id:'resources', type:'vector', tr:'Kaynaklar',       en:'Resources',       opacity:1,   visible:true  },
     { id:'links',     type:'vector', tr:'Harita bağlantıları', en:'Map links',   opacity:1,   visible:true  },
+    { id:'measures',  type:'vector', tr:'Ölçümler',        en:'Measurements',    opacity:1,   visible:true  },
     { id:'labels',    type:'vector', tr:'Etiketler',       en:'Labels',          opacity:1,   visible:true  },
     { id:'overlay',   type:'overlay',tr:'Kaplama',         en:'Overlay',         opacity:1,   visible:true  }
   ];

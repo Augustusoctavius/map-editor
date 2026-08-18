@@ -63,6 +63,7 @@
       Layers.list.forEach(function (l) {
         if (!l.visible) return;
         if (l.id === 'links') return; /* editör içi gezinme iğneleri, çıktıya dahil edilmez */
+        if (l.id === 'measures') return; /* ölçüm cetvelleri çalışma yardımcısıdır, çıktıya dahil edilmez */
 
         if (l.id === 'reference') {
           if (!App.exportReference || !l.imageData) return;

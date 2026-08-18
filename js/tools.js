@@ -269,6 +269,7 @@
         case 'label':    this.placeLabel(p); break;
         case 'resource': this.placeResource(p); break;
         case 'regionlink': this.placeRegionLink(p); break;
+        case 'measure':  this.measureFrom = p; break;
         case 'select':   this.startSelect(p, e.shiftKey); break;
       }
       Cv.requestRender();
@@ -324,6 +325,12 @@
         App.eyedrop.radius = Math.max(8, ed);
         var el = $('eye-r'); if (el) el.value = Math.min(400, Math.round(ed));
         var vl = $('v-eye-r'); if (vl) vl.textContent = Math.min(400, Math.round(ed));
+        Cv.requestRender();
+        return;
+      }
+
+      if (this.measureFrom) {
+        this.measureTo = p;
         Cv.requestRender();
         return;
       }
@@ -415,6 +422,22 @@
 
       if (this.mode === 'symbolBrush') {
         this.endSymbolBrush();
+        return;
+      }
+
+      if (this.measureFrom) {
+        var mf = this.measureFrom, mt = this.measureTo || p;
+        this.measureFrom = null; this.measureTo = null;
+        if (Math.hypot(mt.x-mf.x, mt.y-mf.y) > 4) {
+          var ML = Layers.get('measures');
+          var mbefore = JSON.parse(JSON.stringify(ML.objects));
+          var mo = { id:uid(), pts:[[mf.x,mf.y],[mt.x,mt.y]] };
+          ML.objects.push(mo);
+          App.selection = { layerId:'measures', id:mo.id };
+          History.pushVector('measures', mbefore, JSON.parse(JSON.stringify(ML.objects)), 'measure');
+          UI.refreshHistory(); UI.refreshSelection();
+        }
+        Cv.requestRender();
         return;
       }
 
@@ -1261,7 +1284,7 @@
     },
 
     hitTest: function (p) {
-      var order = ['links','resources','labels','symbols','roads','rivers','territories'];
+      var order = ['links','resources','labels','symbols','measures','roads','rivers','territories'];
       for (var i=0; i<order.length; i++) {
         var L = Layers.get(order[i]);
         if (!L.visible || L.locked) continue;
@@ -1496,6 +1519,10 @@
     /* ================= ÜST KATMAN ================= */
     drawOverlay: function (ctx) {
       var z = Cv.zoom;
+
+      if (this.measureFrom && this.measureTo) {
+        Cv.drawMeasure(ctx, { pts:[[this.measureFrom.x,this.measureFrom.y],[this.measureTo.x,this.measureTo.y]] });
+      }
 
       if (App.tool === 'eyedrop' && Eyedropper.picking && this.eyeStartPos) {
         var ep = this.eyeStartPos;
