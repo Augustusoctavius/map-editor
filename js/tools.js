@@ -752,6 +752,132 @@
       Cv.requestRender();
     },
 
+    /* ---- prosedürel kara üreteci: tohumlu değer-gürültüsü (value noise) tabanlı fBm,
+       harici kütüphane yok. Küçük bir gridde hesaplanıp büyük tuvale ölçeklenir —
+       bilinear yukarı-örnekleme zaten organik, dalgalı bir kıyı çizgisi verir. ---- */
+    _noiseGrid: function (seed) {
+      var perm = new Array(256);
+      for (var i = 0; i < 256; i++) perm[i] = i;
+      var rnd = seed >>> 0;
+      function next() { rnd = (rnd*1664525 + 1013904223) >>> 0; return rnd / 4294967296; }
+      for (var j = 255; j > 0; j--) {
+        var k = Math.floor(next()*(j+1));
+        var tmp = perm[j]; perm[j] = perm[k]; perm[k] = tmp;
+      }
+      var grad = [];
+      for (var g = 0; g < 256; g++) { var a = next()*Math.PI*2; grad.push([Math.cos(a), Math.sin(a)]); }
+      function fade(t) { return t*t*t*(t*(t*6-15)+10); }
+      function lerp(a,b,t) { return a+(b-a)*t; }
+      function gradAt(ix, iy) { return grad[perm[(ix & 255) ^ perm[iy & 255]] & 255]; }
+      function dot(g, x, y) { return g[0]*x + g[1]*y; }
+      function perlin(x, y) {
+        var x0 = Math.floor(x), y0 = Math.floor(y), x1 = x0+1, y1 = y0+1;
+        var sx = fade(x-x0), sy = fade(y-y0);
+        var n00 = dot(gradAt(x0,y0), x-x0, y-y0);
+        var n10 = dot(gradAt(x1,y0), x-x1, y-y0);
+        var n01 = dot(gradAt(x0,y1), x-x0, y-y1);
+        var n11 = dot(gradAt(x1,y1), x-x1, y-y1);
+        return lerp(lerp(n00,n10,sx), lerp(n01,n11,sx), sy);
+      }
+      return {
+        fbm: function (x, y, octaves, persistence) {
+          var total = 0, amp = 1, freq = 1, maxAmp = 0;
+          for (var o = 0; o < octaves; o++) {
+            total += perlin(x*freq, y*freq) * amp;
+            maxAmp += amp;
+            amp *= persistence; freq *= 2;
+          }
+          return total / maxAmp;
+        },
+        next: next
+      };
+    },
+
+    generateLandmass: function (template, roughness, seed) {
+      var L = Layers.get('landmass');
+      if (L.locked) { UI.msg(UI.t('locked')); return; }
+      var w = L.canvas.width, h = L.canvas.height;
+      var before = snap(L.canvas);
+
+      var N = 220; /* düşük çözünürlüklü gürültü gridi */
+      var noise = this._noiseGrid(seed >>> 0);
+      var octaves = 3 + Math.round(roughness*3);      /* 3..6 */
+      var freq = 2.2 + roughness*4;                    /* pürüzlülük arttıkça daha sık desen */
+
+      /* takımada için birkaç rastgele ada merkezi */
+      var islands = [];
+      if (template === 'archipelago') {
+        var count = 5 + Math.floor(noise.next()*5);
+        for (var ii = 0; ii < count; ii++) {
+          islands.push({
+            x: 0.15 + noise.next()*0.7, y: 0.15 + noise.next()*0.7,
+            r: 0.10 + noise.next()*0.14
+          });
+        }
+      }
+
+      function smoothstep(a, b, t) { t = Math.max(0, Math.min(1, (t-a)/(b-a))); return t*t*(3-2*t); }
+
+      var small = document.createElement('canvas'); small.width = N; small.height = N;
+      var sctx = small.getContext('2d');
+      var img = sctx.createImageData(N, N);
+      for (var gy = 0; gy < N; gy++) {
+        for (var gx = 0; gx < N; gx++) {
+          var nx = gx/N - 0.5, ny = gy/N - 0.5;
+          var base = noise.fbm(gx/N*freq, gy/N*freq, octaves, 0.5);
+          var falloff;
+          if (template === 'island') {
+            var d = Math.sqrt(nx*nx+ny*ny)*2.3;
+            falloff = 1 - smoothstep(0.12, 0.5, d);
+          } else if (template === 'archipelago') {
+            falloff = -1;
+            for (var k=0; k<islands.length; k++) {
+              var isl = islands[k];
+              var dd = Math.hypot(nx+0.5-isl.x, ny+0.5-isl.y)/isl.r;
+              falloff = Math.max(falloff, 1 - smoothstep(0.4, 1.0, dd));
+            }
+          } else { /* continent */
+            var d2 = Math.sqrt(nx*nx+ny*ny)*1.35;
+            falloff = 1 - smoothstep(0.32, 0.78, d2);
+          }
+          var value = (falloff - 0.5) + base*(0.22 + roughness*0.5);
+          var a = Math.max(0, Math.min(1, value/0.12 + 0.5));
+          var idx = (gy*N+gx)*4;
+          img.data[idx] = 20; img.data[idx+1] = 20; img.data[idx+2] = 20;
+          img.data[idx+3] = Math.round(a*255);
+        }
+      }
+      sctx.putImageData(img, 0, 0);
+
+      /* büyük tuvale yumuşak (bilinear) ölçekle, sonra alpha eşiği + düz renk
+         doldurma ile smoothCoast'takiyle aynı temiz-kenar tekniğini uygula */
+      var raw = document.createElement('canvas'); raw.width = w; raw.height = h;
+      var rctx = raw.getContext('2d');
+      rctx.imageSmoothingEnabled = true;
+      rctx.drawImage(small, 0, 0, w, h);
+
+      var big = document.createElement('canvas'); big.width = w; big.height = h;
+      var bctx = big.getContext('2d', { willReadFrequently:true });
+      bctx.filter = 'blur(' + Math.max(2, Math.round(w*0.0015)) + 'px)';
+      bctx.drawImage(raw, 0, 0);
+      bctx.filter = 'none';
+      var bid = bctx.getImageData(0, 0, w, h), bd = bid.data;
+      for (var p = 0; p < bd.length; p += 4) bd[p+3] = bd[p+3] > 128 ? 255 : 0;
+      bctx.putImageData(bid, 0, 0);
+      bctx.globalCompositeOperation = 'source-in';
+      bctx.fillStyle = App.brush.color;
+      bctx.fillRect(0, 0, w, h);
+      bctx.globalCompositeOperation = 'source-over';
+
+      L.ctx.clearRect(0, 0, w, h);
+      L.ctx.drawImage(big, 0, 0);
+
+      History.pushRaster('landmass', before, L.canvas, {x:0,y:0,w:w,h:h}, 'landgen:'+template);
+      Cv.shoreDirty = true;
+      UI.refreshHistory();
+      Cv.requestRender();
+    },
+
     clearRasterLayer: function (id) {
       var L = Layers.get(id);
       if (L.locked) { UI.msg(UI.t('locked')); return; }

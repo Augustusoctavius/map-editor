@@ -14,7 +14,7 @@
       o_landmass:'Kara / Kıyı', o_brushsize:'Fırça boyutu', o_rough:'Kıyı sertliği',
       o_landcolor:'Kara rengi', o_shorew:'Kıyı genişliği', o_shorestyle:'Kıyı stili', o_shore_sandy:'Kumsal', o_shore_rocky:'Kayalık', o_shore_reef:'Resif',
       o_smooth:'Kıyıyı yumuşat', o_clearland:'Karayı temizle',
-      h_landmass:'Sürükleyerek kara çiz. "Deniz" aracı hem karayı hem araziyi siler.',
+      h_landmass:'Sürükleyerek kara çiz. "Deniz" aracı hem karayı hem araziyi siler.', o_landgen:'Rastgele kara üret', o_landgentpl:'Şablon', o_landgen_continent:'Kıta', o_landgen_island:'Ada', o_landgen_archipelago:'Takımada', o_landgenrough:'Detay / pürüzlülük', o_landgen_go:'🎲 Üret', h_landgen:'Mevcut kara katmanının yerine geçer. Aynı ayarlarla tekrar tıklayınca yeni bir rastgele sonuç üretir.',
       o_terrain:'Arazi boyama', o_opacity:'Opaklık', o_clip:'Sadece karaya boya',
       o_clearterrain:'Arazi katmanını temizle',
       h_terrain:'Doku her fırça vuruşunda rastgele serpilir — tekrar eden örüntü oluşmaz.', t_elevation:'Yükselti', o_elevation:'Yükselti', o_elevstrength:'Şiddet', o_elevlower:'Alçaltma modu', o_clearelevation:'Yükseltiyi temizle', o_elevdisplay:'Görünüm', o_elevhillshade:'Gölgelendirme (hillshade)', o_elevcontours:'Kontur çizgileri', o_contourinterval:'Kontur aralığı', h_elevation:'Sürükleyerek yükselt; "Alçaltma modu" işaretliyken çukurlaştırır. Gölgelendirme haritayı otomatik günceller.',
@@ -72,7 +72,7 @@
       o_landmass:'Landmass / Coast', o_brushsize:'Brush size', o_rough:'Coast roughness',
       o_landcolor:'Land colour', o_shorew:'Shore width', o_shorestyle:'Shore style', o_shore_sandy:'Sandy', o_shore_rocky:'Rocky', o_shore_reef:'Reef',
       o_smooth:'Smooth coastline', o_clearland:'Clear landmass',
-      h_landmass:'Drag to paint land. The "Sea" tool erases both land and terrain.',
+      h_landmass:'Drag to paint land. The "Sea" tool erases both land and terrain.', o_landgen:'Generate random land', o_landgentpl:'Template', o_landgen_continent:'Continent', o_landgen_island:'Island', o_landgen_archipelago:'Archipelago', o_landgenrough:'Detail / roughness', o_landgen_go:'🎲 Generate', h_landgen:'Replaces the current land layer. Click again with the same settings for a new random result.',
       o_terrain:'Terrain painting', o_opacity:'Opacity', o_clip:'Paint on land only',
       o_clearterrain:'Clear terrain layer',
       h_terrain:'Marks scatter randomly on every stroke — no repeating pattern.', t_elevation:'Elevation', o_elevation:'Elevation', o_elevstrength:'Strength', o_elevlower:'Lower mode', o_clearelevation:'Clear elevation', o_elevdisplay:'Display', o_elevhillshade:'Hillshade', o_elevcontours:'Contour lines', o_contourinterval:'Contour interval', h_elevation:'Drag to raise terrain; enable "Lower mode" to carve it down. Hillshade updates the map automatically.',
@@ -130,7 +130,7 @@
       o_landmass:'Land / Küste', o_brushsize:'Pinselgröße', o_rough:'Küstenrauheit',
       o_landcolor:'Landfarbe', o_shorew:'Küstenbreite', o_shorestyle:'Küstenstil', o_shore_sandy:'Sandig', o_shore_rocky:'Felsig', o_shore_reef:'Riff',
       o_smooth:'Küste glätten', o_clearland:'Land löschen',
-      h_landmass:'Ziehen, um Land zu malen. Das Werkzeug "Meer" löscht Land und Gelände gleichzeitig.',
+      h_landmass:'Ziehen, um Land zu malen. Das Werkzeug "Meer" löscht Land und Gelände gleichzeitig.', o_landgen:'Zufälliges Land erzeugen', o_landgentpl:'Vorlage', o_landgen_continent:'Kontinent', o_landgen_island:'Insel', o_landgen_archipelago:'Archipel', o_landgenrough:'Detail / Rauheit', o_landgen_go:'🎲 Erzeugen', h_landgen:'Ersetzt die aktuelle Landebene. Erneut klicken mit denselben Einstellungen ergibt ein neues Zufallsergebnis.',
       o_terrain:'Gelände malen', o_opacity:'Deckkraft', o_clip:'Nur auf Land malen',
       o_clearterrain:'Geländeebene löschen',
       h_terrain:'Muster werden bei jedem Pinselstrich zufällig gestreut — kein wiederholtes Muster.', t_elevation:'Höhe', o_elevation:'Höhenrelief', o_elevstrength:'Stärke', o_elevlower:'Absenkmodus', o_clearelevation:'Höhendaten löschen', o_elevdisplay:'Anzeige', o_elevhillshade:'Schummerung (Hillshade)', o_elevcontours:'Höhenlinien', o_contourinterval:'Höhenlinienabstand', h_elevation:'Ziehen zum Anheben; bei aktivem "Absenkmodus" wird das Gelände vertieft. Die Schummerung aktualisiert sich automatisch.',
@@ -188,7 +188,7 @@
       o_landmass:'Terre / Côte', o_brushsize:'Taille du pinceau', o_rough:'Irrégularité de la côte',
       o_landcolor:'Couleur de la terre', o_shorew:'Largeur du rivage', o_shorestyle:'Style de côte', o_shore_sandy:'Sablonneuse', o_shore_rocky:'Rocheuse', o_shore_reef:'Récif',
       o_smooth:'Lisser la côte', o_clearland:'Effacer la terre',
-      h_landmass:"Glisser pour peindre la terre. L'outil « Mer » efface à la fois la terre et le terrain.",
+      h_landmass:"Glisser pour peindre la terre. L'outil « Mer » efface à la fois la terre et le terrain.", o_landgen:'Générer une terre aléatoire', o_landgentpl:'Modèle', o_landgen_continent:'Continent', o_landgen_island:'Île', o_landgen_archipelago:'Archipel', o_landgenrough:'Détail / rugosité', o_landgen_go:'🎲 Générer', h_landgen:'Remplace la couche de terre actuelle. Cliquez à nouveau avec les mêmes réglages pour un nouveau résultat aléatoire.',
       o_terrain:'Peinture de terrain', o_opacity:'Opacité', o_clip:'Peindre uniquement sur la terre',
       o_clearterrain:'Effacer le calque de terrain',
       h_terrain:'Les motifs sont dispersés aléatoirement à chaque coup de pinceau — aucun motif répétitif.', t_elevation:'Relief', o_elevation:'Relief', o_elevstrength:'Intensité', o_elevlower:'Mode abaissement', o_clearelevation:'Effacer le relief', o_elevdisplay:'Affichage', o_elevhillshade:'Estompage (hillshade)', o_elevcontours:'Courbes de niveau', o_contourinterval:'Intervalle des courbes', h_elevation:'Faites glisser pour surélever ; activez le « mode abaissement » pour creuser. L\'estompage se met à jour automatiquement.',
@@ -246,7 +246,7 @@
       o_landmass:'Tierra / Costa', o_brushsize:'Tamaño del pincel', o_rough:'Rugosidad de la costa',
       o_landcolor:'Color de la tierra', o_shorew:'Ancho de la costa', o_shorestyle:'Estilo de costa', o_shore_sandy:'Arenosa', o_shore_rocky:'Rocosa', o_shore_reef:'Arrecife',
       o_smooth:'Suavizar costa', o_clearland:'Borrar tierra',
-      h_landmass:'Arrastra para pintar tierra. La herramienta «Mar» borra tanto la tierra como el terreno.',
+      h_landmass:'Arrastra para pintar tierra. La herramienta «Mar» borra tanto la tierra como el terreno.', o_landgen:'Generar tierra aleatoria', o_landgentpl:'Plantilla', o_landgen_continent:'Continente', o_landgen_island:'Isla', o_landgen_archipelago:'Archipiélago', o_landgenrough:'Detalle / rugosidad', o_landgen_go:'🎲 Generar', h_landgen:'Reemplaza la capa de tierra actual. Vuelve a hacer clic con los mismos ajustes para un nuevo resultado aleatorio.',
       o_terrain:'Pintura de terreno', o_opacity:'Opacidad', o_clip:'Pintar solo sobre tierra',
       o_clearterrain:'Borrar capa de terreno',
       h_terrain:'Los motivos se dispersan aleatoriamente en cada trazo — sin patrones repetidos.', t_elevation:'Relieve', o_elevation:'Relieve', o_elevstrength:'Intensidad', o_elevlower:'Modo de rebajar', o_clearelevation:'Borrar relieve', o_elevdisplay:'Visualización', o_elevhillshade:'Sombreado (hillshade)', o_elevcontours:'Curvas de nivel', o_contourinterval:'Intervalo de curvas', h_elevation:'Arrastra para elevar el terreno; activa el «modo de rebajar» para hundirlo. El sombreado se actualiza automáticamente.',
@@ -304,7 +304,7 @@
       o_landmass:'Terra / Costa', o_brushsize:'Dimensione pennello', o_rough:'Irregolarità della costa',
       o_landcolor:'Colore della terra', o_shorew:'Larghezza della costa', o_shorestyle:'Stile della costa', o_shore_sandy:'Sabbiosa', o_shore_rocky:'Rocciosa', o_shore_reef:'Barriera corallina',
       o_smooth:'Smussa la costa', o_clearland:'Cancella terra',
-      h_landmass:'Trascina per disegnare la terra. Lo strumento «Mare» cancella sia la terra sia il terreno.',
+      h_landmass:'Trascina per disegnare la terra. Lo strumento «Mare» cancella sia la terra sia il terreno.', o_landgen:'Genera terra casuale', o_landgentpl:'Modello', o_landgen_continent:'Continente', o_landgen_island:'Isola', o_landgen_archipelago:'Arcipelago', o_landgenrough:'Dettaglio / rugosità', o_landgen_go:'🎲 Genera', h_landgen:'Sostituisce il livello di terra attuale. Clicca di nuovo con le stesse impostazioni per un nuovo risultato casuale.',
       o_terrain:'Pittura del terreno', o_opacity:'Opacità', o_clip:'Dipingi solo sulla terra',
       o_clearterrain:'Cancella livello terreno',
       h_terrain:'I motivi vengono sparsi casualmente a ogni pennellata — nessun motivo ripetuto.', t_elevation:'Rilievo', o_elevation:'Rilievo', o_elevstrength:'Intensità', o_elevlower:'Modalità abbassamento', o_clearelevation:'Cancella rilievo', o_elevdisplay:'Visualizzazione', o_elevhillshade:'Ombreggiatura (hillshade)', o_elevcontours:'Curve di livello', o_contourinterval:'Intervallo curve di livello', h_elevation:'Trascina per sollevare il terreno; attiva la "modalità abbassamento" per scavarlo. L\'ombreggiatura si aggiorna automaticamente.',
@@ -362,7 +362,7 @@
       o_landmass:'Terra / Costa', o_brushsize:'Tamanho do pincel', o_rough:'Irregularidade da costa',
       o_landcolor:'Cor da terra', o_shorew:'Largura da costa', o_shorestyle:'Estilo da costa', o_shore_sandy:'Arenosa', o_shore_rocky:'Rochosa', o_shore_reef:'Recife',
       o_smooth:'Suavizar costa', o_clearland:'Limpar terra',
-      h_landmass:'Arraste para pintar terra. A ferramenta «Mar» apaga a terra e o terreno em simultâneo.',
+      h_landmass:'Arraste para pintar terra. A ferramenta «Mar» apaga a terra e o terreno em simultâneo.', o_landgen:'Gerar terra aleatória', o_landgentpl:'Modelo', o_landgen_continent:'Continente', o_landgen_island:'Ilha', o_landgen_archipelago:'Arquipélago', o_landgenrough:'Detalhe / rugosidade', o_landgen_go:'🎲 Gerar', h_landgen:'Substitui a camada de terra atual. Clique novamente com as mesmas definições para um novo resultado aleatório.',
       o_terrain:'Pintura de terreno', o_opacity:'Opacidade', o_clip:'Pintar só sobre terra',
       o_clearterrain:'Limpar camada de terreno',
       h_terrain:'Os motivos são espalhados aleatoriamente a cada pincelada — sem padrões repetidos.', t_elevation:'Relevo', o_elevation:'Relevo', o_elevstrength:'Intensidade', o_elevlower:'Modo de rebaixar', o_clearelevation:'Limpar relevo', o_elevdisplay:'Visualização', o_elevhillshade:'Sombreamento (hillshade)', o_elevcontours:'Linhas de contorno', o_contourinterval:'Intervalo das curvas', h_elevation:'Arraste para elevar o terreno; ative o "modo de rebaixar" para escavá-lo. O sombreamento atualiza-se automaticamente.',
@@ -420,7 +420,7 @@
       o_landmass:'Land / Kust', o_brushsize:'Penseelgrootte', o_rough:'Ruwheid van de kust',
       o_landcolor:'Landkleur', o_shorew:'Kustbreedte', o_shorestyle:'Kuststijl', o_shore_sandy:'Zandig', o_shore_rocky:'Rotsachtig', o_shore_reef:'Rif',
       o_smooth:'Kust gladstrijken', o_clearland:'Land wissen',
-      h_landmass:'Sleep om land te tekenen. Het gereedschap "Zee" wist zowel land als terrein.',
+      h_landmass:'Sleep om land te tekenen. Het gereedschap "Zee" wist zowel land als terrein.', o_landgen:'Willekeurig land genereren', o_landgentpl:'Sjabloon', o_landgen_continent:'Continent', o_landgen_island:'Eiland', o_landgen_archipelago:'Archipel', o_landgenrough:'Detail / ruwheid', o_landgen_go:'🎲 Genereren', h_landgen:'Vervangt de huidige landlaag. Klik opnieuw met dezelfde instellingen voor een nieuw willekeurig resultaat.',
       o_terrain:'Terrein schilderen', o_opacity:'Dekking', o_clip:'Alleen op land schilderen',
       o_clearterrain:'Terreinlaag wissen',
       h_terrain:'Patronen worden bij elke penseelstreek willekeurig verspreid — geen herhalend patroon.', t_elevation:'Reliëf', o_elevation:'Reliëf', o_elevstrength:'Sterkte', o_elevlower:'Verlagingsmodus', o_clearelevation:'Reliëf wissen', o_elevdisplay:'Weergave', o_elevhillshade:'Reliëfschaduw (hillshade)', o_elevcontours:'Hoogtelijnen', o_contourinterval:'Interval hoogtelijnen', h_elevation:'Sleep om te verhogen; schakel "Verlagingsmodus" in om te verlagen. De reliëfschaduw wordt automatisch bijgewerkt.',
@@ -478,7 +478,7 @@
       o_landmass:'Ląd / Wybrzeże', o_brushsize:'Rozmiar pędzla', o_rough:'Nieregularność wybrzeża',
       o_landcolor:'Kolor lądu', o_shorew:'Szerokość wybrzeża', o_shorestyle:'Styl wybrzeża', o_shore_sandy:'Piaszczyste', o_shore_rocky:'Skaliste', o_shore_reef:'Rafa',
       o_smooth:'Wygładź wybrzeże', o_clearland:'Wyczyść ląd',
-      h_landmass:'Przeciągnij, aby malować ląd. Narzędzie „Morze” usuwa zarówno ląd, jak i teren.',
+      h_landmass:'Przeciągnij, aby malować ląd. Narzędzie „Morze” usuwa zarówno ląd, jak i teren.', o_landgen:'Generuj losowy ląd', o_landgentpl:'Szablon', o_landgen_continent:'Kontynent', o_landgen_island:'Wyspa', o_landgen_archipelago:'Archipelag', o_landgenrough:'Szczegółowość / chropowatość', o_landgen_go:'🎲 Generuj', h_landgen:'Zastępuje bieżącą warstwę lądu. Kliknij ponownie z tymi samymi ustawieniami, aby uzyskać nowy losowy wynik.',
       o_terrain:'Malowanie terenu', o_opacity:'Krycie', o_clip:'Maluj tylko na lądzie',
       o_clearterrain:'Wyczyść warstwę terenu',
       h_terrain:'Wzory są losowo rozrzucane przy każdym pociągnięciu — bez powtarzającego się wzoru.', t_elevation:'Wysokość', o_elevation:'Rzeźba terenu', o_elevstrength:'Siła', o_elevlower:'Tryb obniżania', o_clearelevation:'Wyczyść rzeźbę terenu', o_elevdisplay:'Wyświetlanie', o_elevhillshade:'Cieniowanie (hillshade)', o_elevcontours:'Warstwice', o_contourinterval:'Odstęp warstwic', h_elevation:'Przeciągnij, aby podnieść teren; włącz „tryb obniżania”, aby go zagłębić. Cieniowanie aktualizuje się automatycznie.',
@@ -536,7 +536,7 @@
       o_landmass:'Суша / Берег', o_brushsize:'Размер кисти', o_rough:'Неровность берега',
       o_landcolor:'Цвет суши', o_shorew:'Ширина берега', o_shorestyle:'Стиль берега', o_shore_sandy:'Песчаный', o_shore_rocky:'Скалистый', o_shore_reef:'Риф',
       o_smooth:'Сгладить берег', o_clearland:'Очистить сушу',
-      h_landmass:'Перетаскивайте, чтобы рисовать сушу. Инструмент «Море» стирает и сушу, и местность.',
+      h_landmass:'Перетаскивайте, чтобы рисовать сушу. Инструмент «Море» стирает и сушу, и местность.', o_landgen:'Сгенерировать случайную сушу', o_landgentpl:'Шаблон', o_landgen_continent:'Континент', o_landgen_island:'Остров', o_landgen_archipelago:'Архипелаг', o_landgenrough:'Детализация / шероховатость', o_landgen_go:'🎲 Сгенерировать', h_landgen:'Заменяет текущий слой суши. Нажмите снова с теми же настройками для нового случайного результата.',
       o_terrain:'Рисование местности', o_opacity:'Непрозрачность', o_clip:'Рисовать только по суше',
       o_clearterrain:'Очистить слой местности',
       h_terrain:'Узоры при каждом мазке разбрасываются случайно — повторяющегося рисунка не будет.', t_elevation:'Высоты', o_elevation:'Рельеф', o_elevstrength:'Сила', o_elevlower:'Режим понижения', o_clearelevation:'Очистить рельеф', o_elevdisplay:'Отображение', o_elevhillshade:'Отмывка рельефа (hillshade)', o_elevcontours:'Горизонтали', o_contourinterval:'Шаг горизонталей', h_elevation:'Перетаскивайте, чтобы поднять рельеф; включите «Режим понижения», чтобы понизить его. Отмывка обновляется автоматически.',
@@ -827,6 +827,15 @@
       });
       on('btn-smooth', 'click', function () { Tools.smoothCoast(6); });
       on('btn-clear-land', 'click', function () { Tools.clearRasterLayer('landmass'); });
+
+      on('lg-template', 'change', function (e) { App.landgen.template = e.target.value; });
+      self.range('lg-rough', 'v-lg-rough', function (v) { App.landgen.roughness = v/100; },
+                 function (v) { return (v/100).toFixed(2); });
+      on('btn-landgen', 'click', function () {
+        self.modal(self.t('o_landgen'), '<p>' + self.t('h_landgen') + '</p>', function () {
+          Tools.generateLandmass(App.landgen.template, App.landgen.roughness, Math.floor(Math.random()*4294967296));
+        });
+      });
 
       /* --- arazi --- */
       this.range('tr-size', 'v-tr-size', function (v) { App.terrain.size = v; });
