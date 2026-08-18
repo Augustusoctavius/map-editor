@@ -844,15 +844,25 @@
       return this._chaikinSmooth(sampled, 1);
     },
 
-    /* ---------- göl yardımcısı: terrain kıyı rengi ---------- */
-    _lakeShoreColor: function (pts) {
+    /* ---------- göl yardımcısı: terrain kıyı rengi ----------
+       getImageData her frame'de senkron GPU okuması yapar; terrain
+       değişmediği sürece (shoreDirty false) sonucu göl id'sine göre
+       önbelleğe alırız — pan/zoom sırasında tekrar tekrar okumayız. */
+    _lakeShoreColorCache: {},
+    _lakeShoreColor: function (pts, lakeId) {
+      var sampleX = Math.round(pts[0][0]), sampleY = Math.round(pts[0][1]);
+      var cache = this._lakeShoreColorCache;
+      var entry = lakeId != null ? cache[lakeId] : null;
+      if (entry && !this.shoreDirty && entry.sx === sampleX && entry.sy === sampleY) {
+        return entry.col;
+      }
+
       var shoreCol = 'rgba(195,178,140,0.75)';
       var tLayer = global.Layers && Layers.get('terrain');
       if (tLayer && tLayer.canvas) {
         try {
           var tc = document.createElement('canvas'); tc.width=1; tc.height=1;
           var tx = tc.getContext('2d');
-          var sampleX = Math.round(pts[0][0]), sampleY = Math.round(pts[0][1]);
           tx.drawImage(tLayer.canvas, sampleX-1, sampleY-1, 3, 3, 0, 0, 1, 1);
           var px = tx.getImageData(0,0,1,1).data;
           if (px[3] > 20) {
@@ -861,6 +871,8 @@
           }
         } catch(e) {}
       }
+
+      if (lakeId != null) cache[lakeId] = { sx:sampleX, sy:sampleY, col:shoreCol };
       return shoreCol;
     },
 
@@ -925,7 +937,7 @@
       }
 
       var pts = this.lakeSmoothPts(o, 8);
-      var shoreCol = this._lakeShoreColor(pts);
+      var shoreCol = this._lakeShoreColor(pts, o.id);
 
       /* maskeyi renklendir: ayrı bir scratch canvas'ta — ana ctx'e
          asla destination-in gibi yıkıcı bir mod uygulanmaz */
@@ -950,7 +962,7 @@
       if (!o.pts || o.pts.length < 3) return;
       var pts = this.lakeSmoothPts(o, 24);
       var col = o.color || '#5b8aa6';
-      var shoreCol = this._lakeShoreColor(pts);
+      var shoreCol = this._lakeShoreColor(pts, o.id);
 
       var cx = 0, cy = 0;
       for (var k=0; k<pts.length; k++) { cx+=pts[k][0]; cy+=pts[k][1]; }

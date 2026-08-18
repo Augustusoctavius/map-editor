@@ -12,6 +12,20 @@
   function snap(c){ var t=document.createElement('canvas'); t.width=c.width; t.height=c.height;
                     t.getContext('2d').drawImage(c,0,0); return t; }
 
+  /* Fırça vuruşu sırasında (stampTerrain/eyedropStamp) tekrar tekrar canvas
+     oluşturmamak için tek seferlik, sadece büyüyen bir scratch canvas havuzu. */
+  var _scratchPool = {};
+  function scratchCanvas(key, w, h) {
+    var s = _scratchPool[key];
+    if (!s) { s = document.createElement('canvas'); _scratchPool[key] = s; }
+    if (s.width < w) s.width = w;
+    if (s.height < h) s.height = h;
+    var ctx = s.getContext('2d');
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0, 0, s.width, s.height);
+    return s;
+  }
+
   /* ====================================================================
      DOKU ÖRNEKLEYİCİ
      ==================================================================== */
@@ -483,8 +497,7 @@
         var by2 = Math.max(0, Math.floor(y - pad2));
         var bw2 = Math.min(layer.canvas.width  - bx2, Math.ceil(pad2*2));
         var bh2 = Math.min(layer.canvas.height - by2, Math.ceil(pad2*2));
-        var tmp2 = document.createElement('canvas');
-        tmp2.width = bw2; tmp2.height = bh2;
+        var tmp2 = scratchCanvas('terrain', bw2, bh2);
         var tmpCtx2 = tmp2.getContext('2d');
         tmpCtx2.translate(-bx2, -by2);
         Terrain.scatter(tmpCtx2, App.terrain.type, x, y, r, App.terrain.opacity);
@@ -492,7 +505,7 @@
         tmpCtx2.globalCompositeOperation = 'destination-in';
         tmpCtx2.drawImage(Lm.canvas, bx2, by2, bw2, bh2, 0, 0, bw2, bh2);
         tmpCtx2.globalCompositeOperation = 'source-over';
-        ctx.drawImage(tmp2, bx2, by2);
+        ctx.drawImage(tmp2, 0, 0, bw2, bh2, bx2, by2, bw2, bh2);
       } else {
         Terrain.scatter(ctx, App.terrain.type, x, y, r, App.terrain.opacity);
       }
@@ -668,8 +681,7 @@
         var eby = Math.max(0, Math.floor(y - epad));
         var ebw = Math.min(layer.canvas.width  - ebx, Math.ceil(epad*2));
         var ebh = Math.min(layer.canvas.height - eby, Math.ceil(epad*2));
-        var tmp = document.createElement('canvas');
-        tmp.width = ebw; tmp.height = ebh;
+        var tmp = scratchCanvas('eyedrop', ebw, ebh);
         var tmpCtx = tmp.getContext('2d');
         tmpCtx.translate(-ebx, -eby);
         Eyedropper.paint(tmpCtx, x, y, r);
@@ -677,7 +689,7 @@
         tmpCtx.globalCompositeOperation = 'destination-in';
         tmpCtx.drawImage(L.canvas, ebx, eby, ebw, ebh, 0, 0, ebw, ebh);
         tmpCtx.globalCompositeOperation = 'source-over';
-        layer.ctx.drawImage(tmp, ebx, eby);
+        layer.ctx.drawImage(tmp, 0, 0, ebw, ebh, ebx, eby, ebw, ebh);
       } else {
         Eyedropper.paint(layer.ctx, x, y, r);
       }
