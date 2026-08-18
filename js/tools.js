@@ -231,6 +231,7 @@
         case 'landmass': this.startRaster('landmass', p, 'paint'); break;
         case 'erase':    this.startRaster('landmass', p, 'erase'); break;
         case 'terrain':  this.startRaster('terrain',  p, 'terrain'); break;
+        case 'elevation': this.startRaster('elevation', p, 'elevation'); break;
         case 'symbol':
           if (App.symbol.brushMode) this.startSymbolBrush(p);
           else this.placeSymbol(p);
@@ -461,7 +462,8 @@
 
     strokeTo: function (p) {
       if (!this.last) { this.last = p; return; }
-      var r = (this.mode === 'terrain' ? App.terrain.size : App.brush.size)/2;
+      var r = (this.mode === 'terrain' ? App.terrain.size :
+                this.mode === 'elevation' ? App.elevation.brushSize : App.brush.size)/2;
       var step = Math.max(1.5, r * 0.26);
       var dx = p.x-this.last.x, dy = p.y-this.last.y;
       var n = Math.max(1, Math.ceil(Math.hypot(dx,dy)/step));
@@ -510,6 +512,29 @@
       /* ---- ARAZİ: prosedürel serpme (tile yok) ---- */
       if (this.mode === 'terrain') {
         this.stampTerrain(x, y);
+        return;
+      }
+
+      /* ---- YÜKSELTİ: yükselt/alçalt fırçası ----
+         'lighten'/'darken' composite ile her darbe sadece o yöndeki
+         piksel değerini iter — üst üste geçiş doğal bir yığılma
+         (dağ/tepe) hissi verir, aşırı doygunluğa gitmez. */
+      if (this.mode === 'elevation') {
+        var er = App.elevation.brushSize/2;
+        var lower = App.elevation.lower;
+        var lvl = Math.round(128 + (lower ? -1 : 1) * App.elevation.strength * 127);
+        ctx.save();
+        ctx.globalCompositeOperation = lower ? 'darken' : 'lighten';
+        var eg = ctx.createRadialGradient(x, y, 0, x, y, er);
+        var col = 'rgb('+lvl+','+lvl+','+lvl+')';
+        eg.addColorStop(0, col);
+        eg.addColorStop(0.7, col);
+        eg.addColorStop(1, 'rgba('+lvl+','+lvl+','+lvl+',0)');
+        ctx.fillStyle = eg;
+        ctx.beginPath(); ctx.arc(x, y, er, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+        Cv.elevationDirty = true;
+        this.expandBox(x, y, er + 4);
         return;
       }
 
@@ -715,6 +740,7 @@
       L.ctx.clearRect(0, 0, w, h);
       History.pushRaster(id, before, L.canvas, {x:0,y:0,w:w,h:h}, 'clear:'+id);
       if (id === 'landmass') Cv.shoreDirty = true;
+      if (id === 'elevation') Cv.elevationDirty = true;
       UI.refreshHistory();
       Cv.requestRender();
     },

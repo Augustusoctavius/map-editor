@@ -17,7 +17,7 @@
       h_landmass:'Sürükleyerek kara çiz. "Deniz" aracı hem karayı hem araziyi siler.',
       o_terrain:'Arazi boyama', o_opacity:'Opaklık', o_clip:'Sadece karaya boya',
       o_clearterrain:'Arazi katmanını temizle',
-      h_terrain:'Doku her fırça vuruşunda rastgele serpilir — tekrar eden örüntü oluşmaz.',
+      h_terrain:'Doku her fırça vuruşunda rastgele serpilir — tekrar eden örüntü oluşmaz.', t_elevation:'Yükselti', o_elevation:'Yükselti', o_elevstrength:'Şiddet', o_elevlower:'Alçaltma modu', o_clearelevation:'Yükseltiyi temizle', o_elevdisplay:'Görünüm', o_elevhillshade:'Gölgelendirme (hillshade)', o_elevcontours:'Kontur çizgileri', o_contourinterval:'Kontur aralığı', h_elevation:'Sürükleyerek yükselt; "Alçaltma modu" işaretliyken çukurlaştırır. Gölgelendirme haritayı otomatik günceller.',
       o_symbol:'Sembol', o_size:'Boyut', o_rot:'Dönüş', o_hue:'Renk tonu',
       o_wear:'Yıpranma', o_jitter:'Yerleştirmede rastgelelik',
       h_symbol:'Kütüphaneden sembol seç, haritaya tıkla. "Seç" aracıyla taşı; Delete ile sil.',
@@ -75,7 +75,7 @@
       h_landmass:'Drag to paint land. The "Sea" tool erases both land and terrain.',
       o_terrain:'Terrain painting', o_opacity:'Opacity', o_clip:'Paint on land only',
       o_clearterrain:'Clear terrain layer',
-      h_terrain:'Marks scatter randomly on every stroke — no repeating pattern.',
+      h_terrain:'Marks scatter randomly on every stroke — no repeating pattern.', t_elevation:'Elevation', o_elevation:'Elevation', o_elevstrength:'Strength', o_elevlower:'Lower mode', o_clearelevation:'Clear elevation', o_elevdisplay:'Display', o_elevhillshade:'Hillshade', o_elevcontours:'Contour lines', o_contourinterval:'Contour interval', h_elevation:'Drag to raise terrain; enable "Lower mode" to carve it down. Hillshade updates the map automatically.',
       o_symbol:'Symbol', o_size:'Size', o_rot:'Rotation', o_hue:'Hue shift',
       o_wear:'Wear', o_jitter:'Randomise placement',
       h_symbol:'Pick a symbol, click the map. Use "Select" to move; Delete to remove.',
@@ -133,7 +133,7 @@
       h_landmass:'Ziehen, um Land zu malen. Das Werkzeug "Meer" löscht Land und Gelände gleichzeitig.',
       o_terrain:'Gelände malen', o_opacity:'Deckkraft', o_clip:'Nur auf Land malen',
       o_clearterrain:'Geländeebene löschen',
-      h_terrain:'Muster werden bei jedem Pinselstrich zufällig gestreut — kein wiederholtes Muster.',
+      h_terrain:'Muster werden bei jedem Pinselstrich zufällig gestreut — kein wiederholtes Muster.', t_elevation:'Höhe', o_elevation:'Höhenrelief', o_elevstrength:'Stärke', o_elevlower:'Absenkmodus', o_clearelevation:'Höhendaten löschen', o_elevdisplay:'Anzeige', o_elevhillshade:'Schummerung (Hillshade)', o_elevcontours:'Höhenlinien', o_contourinterval:'Höhenlinienabstand', h_elevation:'Ziehen zum Anheben; bei aktivem "Absenkmodus" wird das Gelände vertieft. Die Schummerung aktualisiert sich automatisch.',
       o_symbol:'Symbol', o_size:'Größe', o_rot:'Drehung', o_hue:'Farbton',
       o_wear:'Abnutzung', o_jitter:'Zufällige Platzierung',
       h_symbol:'Symbol aus der Bibliothek wählen, auf die Karte klicken. Mit "Auswahl" verschieben; Entf zum Löschen.',
@@ -191,7 +191,7 @@
       h_landmass:"Glisser pour peindre la terre. L'outil « Mer » efface à la fois la terre et le terrain.",
       o_terrain:'Peinture de terrain', o_opacity:'Opacité', o_clip:'Peindre uniquement sur la terre',
       o_clearterrain:'Effacer le calque de terrain',
-      h_terrain:'Les motifs sont dispersés aléatoirement à chaque coup de pinceau — aucun motif répétitif.',
+      h_terrain:'Les motifs sont dispersés aléatoirement à chaque coup de pinceau — aucun motif répétitif.', t_elevation:'Relief', o_elevation:'Relief', o_elevstrength:'Intensité', o_elevlower:'Mode abaissement', o_clearelevation:'Effacer le relief', o_elevdisplay:'Affichage', o_elevhillshade:'Estompage (hillshade)', o_elevcontours:'Courbes de niveau', o_contourinterval:'Intervalle des courbes', h_elevation:'Faites glisser pour surélever ; activez le « mode abaissement » pour creuser. L\'estompage se met à jour automatiquement.',
       o_symbol:'Symbole', o_size:'Taille', o_rot:'Rotation', o_hue:'Teinte',
       o_wear:'Usure', o_jitter:'Placement aléatoire',
       h_symbol:'Choisissez un symbole dans la bibliothèque, cliquez sur la carte. Utilisez « Sélection » pour déplacer ; Suppr pour effacer.',
@@ -249,7 +249,7 @@
       h_landmass:'Arrastra para pintar tierra. La herramienta «Mar» borra tanto la tierra como el terreno.',
       o_terrain:'Pintura de terreno', o_opacity:'Opacidad', o_clip:'Pintar solo sobre tierra',
       o_clearterrain:'Borrar capa de terreno',
-      h_terrain:'Los motivos se dispersan aleatoriamente en cada trazo — sin patrones repetidos.',
+      h_terrain:'Los motivos se dispersan aleatoriamente en cada trazo — sin patrones repetidos.', t_elevation:'Relieve', o_elevation:'Relieve', o_elevstrength:'Intensidad', o_elevlower:'Modo de rebajar', o_clearelevation:'Borrar relieve', o_elevdisplay:'Visualización', o_elevhillshade:'Sombreado (hillshade)', o_elevcontours:'Curvas de nivel', o_contourinterval:'Intervalo de curvas', h_elevation:'Arrastra para elevar el terreno; activa el «modo de rebajar» para hundirlo. El sombreado se actualiza automáticamente.',
       o_symbol:'Símbolo', o_size:'Tamaño', o_rot:'Rotación', o_hue:'Tono',
       o_wear:'Desgaste', o_jitter:'Colocación aleatoria',
       h_symbol:'Elige un símbolo de la biblioteca, haz clic en el mapa. Usa «Seleccionar» para mover; Supr para borrar.',
@@ -307,7 +307,7 @@
       h_landmass:'Trascina per disegnare la terra. Lo strumento «Mare» cancella sia la terra sia il terreno.',
       o_terrain:'Pittura del terreno', o_opacity:'Opacità', o_clip:'Dipingi solo sulla terra',
       o_clearterrain:'Cancella livello terreno',
-      h_terrain:'I motivi vengono sparsi casualmente a ogni pennellata — nessun motivo ripetuto.',
+      h_terrain:'I motivi vengono sparsi casualmente a ogni pennellata — nessun motivo ripetuto.', t_elevation:'Rilievo', o_elevation:'Rilievo', o_elevstrength:'Intensità', o_elevlower:'Modalità abbassamento', o_clearelevation:'Cancella rilievo', o_elevdisplay:'Visualizzazione', o_elevhillshade:'Ombreggiatura (hillshade)', o_elevcontours:'Curve di livello', o_contourinterval:'Intervallo curve di livello', h_elevation:'Trascina per sollevare il terreno; attiva la "modalità abbassamento" per scavarlo. L\'ombreggiatura si aggiorna automaticamente.',
       o_symbol:'Simbolo', o_size:'Dimensione', o_rot:'Rotazione', o_hue:'Tonalità',
       o_wear:'Usura', o_jitter:'Posizionamento casuale',
       h_symbol:'Scegli un simbolo dalla libreria, clicca sulla mappa. Usa «Seleziona» per spostare; Canc per eliminare.',
@@ -365,7 +365,7 @@
       h_landmass:'Arraste para pintar terra. A ferramenta «Mar» apaga a terra e o terreno em simultâneo.',
       o_terrain:'Pintura de terreno', o_opacity:'Opacidade', o_clip:'Pintar só sobre terra',
       o_clearterrain:'Limpar camada de terreno',
-      h_terrain:'Os motivos são espalhados aleatoriamente a cada pincelada — sem padrões repetidos.',
+      h_terrain:'Os motivos são espalhados aleatoriamente a cada pincelada — sem padrões repetidos.', t_elevation:'Relevo', o_elevation:'Relevo', o_elevstrength:'Intensidade', o_elevlower:'Modo de rebaixar', o_clearelevation:'Limpar relevo', o_elevdisplay:'Visualização', o_elevhillshade:'Sombreamento (hillshade)', o_elevcontours:'Linhas de contorno', o_contourinterval:'Intervalo das curvas', h_elevation:'Arraste para elevar o terreno; ative o "modo de rebaixar" para escavá-lo. O sombreamento atualiza-se automaticamente.',
       o_symbol:'Símbolo', o_size:'Tamanho', o_rot:'Rotação', o_hue:'Matiz',
       o_wear:'Desgaste', o_jitter:'Colocação aleatória',
       h_symbol:'Escolha um símbolo na biblioteca, clique no mapa. Use «Selecionar» para mover; Delete para apagar.',
@@ -423,7 +423,7 @@
       h_landmass:'Sleep om land te tekenen. Het gereedschap "Zee" wist zowel land als terrein.',
       o_terrain:'Terrein schilderen', o_opacity:'Dekking', o_clip:'Alleen op land schilderen',
       o_clearterrain:'Terreinlaag wissen',
-      h_terrain:'Patronen worden bij elke penseelstreek willekeurig verspreid — geen herhalend patroon.',
+      h_terrain:'Patronen worden bij elke penseelstreek willekeurig verspreid — geen herhalend patroon.', t_elevation:'Reliëf', o_elevation:'Reliëf', o_elevstrength:'Sterkte', o_elevlower:'Verlagingsmodus', o_clearelevation:'Reliëf wissen', o_elevdisplay:'Weergave', o_elevhillshade:'Reliëfschaduw (hillshade)', o_elevcontours:'Hoogtelijnen', o_contourinterval:'Interval hoogtelijnen', h_elevation:'Sleep om te verhogen; schakel "Verlagingsmodus" in om te verlagen. De reliëfschaduw wordt automatisch bijgewerkt.',
       o_symbol:'Symbool', o_size:'Grootte', o_rot:'Rotatie', o_hue:'Tint',
       o_wear:'Verwering', o_jitter:'Willekeurige plaatsing',
       h_symbol:'Kies een symbool uit de bibliotheek, klik op de kaart. Gebruik "Selecteren" om te verplaatsen; Delete om te wissen.',
@@ -481,7 +481,7 @@
       h_landmass:'Przeciągnij, aby malować ląd. Narzędzie „Morze” usuwa zarówno ląd, jak i teren.',
       o_terrain:'Malowanie terenu', o_opacity:'Krycie', o_clip:'Maluj tylko na lądzie',
       o_clearterrain:'Wyczyść warstwę terenu',
-      h_terrain:'Wzory są losowo rozrzucane przy każdym pociągnięciu — bez powtarzającego się wzoru.',
+      h_terrain:'Wzory są losowo rozrzucane przy każdym pociągnięciu — bez powtarzającego się wzoru.', t_elevation:'Wysokość', o_elevation:'Rzeźba terenu', o_elevstrength:'Siła', o_elevlower:'Tryb obniżania', o_clearelevation:'Wyczyść rzeźbę terenu', o_elevdisplay:'Wyświetlanie', o_elevhillshade:'Cieniowanie (hillshade)', o_elevcontours:'Warstwice', o_contourinterval:'Odstęp warstwic', h_elevation:'Przeciągnij, aby podnieść teren; włącz „tryb obniżania”, aby go zagłębić. Cieniowanie aktualizuje się automatycznie.',
       o_symbol:'Symbol', o_size:'Rozmiar', o_rot:'Obrót', o_hue:'Odcień',
       o_wear:'Zużycie', o_jitter:'Losowe rozmieszczenie',
       h_symbol:'Wybierz symbol z biblioteki, kliknij na mapie. Użyj „Zaznacz”, aby przesunąć; Delete, aby usunąć.',
@@ -539,7 +539,7 @@
       h_landmass:'Перетаскивайте, чтобы рисовать сушу. Инструмент «Море» стирает и сушу, и местность.',
       o_terrain:'Рисование местности', o_opacity:'Непрозрачность', o_clip:'Рисовать только по суше',
       o_clearterrain:'Очистить слой местности',
-      h_terrain:'Узоры при каждом мазке разбрасываются случайно — повторяющегося рисунка не будет.',
+      h_terrain:'Узоры при каждом мазке разбрасываются случайно — повторяющегося рисунка не будет.', t_elevation:'Высоты', o_elevation:'Рельеф', o_elevstrength:'Сила', o_elevlower:'Режим понижения', o_clearelevation:'Очистить рельеф', o_elevdisplay:'Отображение', o_elevhillshade:'Отмывка рельефа (hillshade)', o_elevcontours:'Горизонтали', o_contourinterval:'Шаг горизонталей', h_elevation:'Перетаскивайте, чтобы поднять рельеф; включите «Режим понижения», чтобы понизить его. Отмывка обновляется автоматически.',
       o_symbol:'Символ', o_size:'Размер', o_rot:'Поворот', o_hue:'Оттенок',
       o_wear:'Изношенность', o_jitter:'Случайное размещение',
       h_symbol:'Выберите символ из библиотеки, щёлкните по карте. «Выделение» — для перемещения; Delete — для удаления.',
@@ -833,6 +833,25 @@
                  function (v) { return (v/100).toFixed(2); });
       on('tr-clip', 'change', function (e) { App.terrain.clip = e.target.checked; });
       on('btn-clear-terrain', 'click', function () { Tools.clearRasterLayer('terrain'); });
+
+      /* --- yükselti --- */
+      this.range('el-size', 'v-el-size', function (v) { App.elevation.brushSize = v; });
+      this.range('el-strength', 'v-el-strength', function (v) { App.elevation.strength = v/100; },
+                 function (v) { return (v/100).toFixed(2); });
+      on('el-lower', 'change', function (e) { App.elevation.lower = e.target.checked; });
+      on('btn-clear-elevation', 'click', function () { Tools.clearRasterLayer('elevation'); });
+      on('elev-hillshade', 'change', function (e) {
+        App.elevation.showHillshade = e.target.checked;
+        Cv.elevationDirty = true; Cv.requestRender();
+      });
+      on('elev-contours', 'change', function (e) {
+        App.elevation.showContours = e.target.checked;
+        Cv.elevationDirty = true; Cv.requestRender();
+      });
+      this.range('elev-interval', 'v-elev-interval', function (v) {
+        App.elevation.contourInterval = v;
+        Cv.elevationDirty = true;
+      });
 
       /* --- sembol --- */
       this.range('sy-size', 'v-sy-size', function (v) {
@@ -1575,7 +1594,8 @@
     bindKeys: function () {
       var self = this;
       var map = { v:'select', b:'landmass', e:'erase', t:'terrain', s:'symbol',
-                  r:'river', d:'road', l:'label', h:'pan', i:'eyedrop', k:'lake', g:'territory' };
+                  r:'river', d:'road', l:'label', h:'pan', i:'eyedrop', k:'lake', g:'territory',
+                  u:'elevation' };
 
       window.addEventListener('keydown', function (ev) {
         var tag = (ev.target.tagName || '').toLowerCase();

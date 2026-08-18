@@ -69,6 +69,7 @@
       <button class="tool" data-tool="landmass" title="B"><span class="ico">◕</span><em data-i18n="t_landmass">Kara</em></button>
       <button class="tool" data-tool="erase"    title="E"><span class="ico">◌</span><em data-i18n="t_erase">Deniz</em></button>
       <button class="tool" data-tool="terrain"  title="T"><span class="ico">▨</span><em data-i18n="t_terrain">Arazi</em></button>
+      <button class="tool" data-tool="elevation" title="U"><span class="ico">▲</span><em data-i18n="t_elevation">Yükselti</em></button>
       <button class="tool" data-tool="symbol"   title="S"><span class="ico">⛰</span><em data-i18n="t_symbol">Sembol</em></button>
       <button class="tool" data-tool="river"    title="R"><span class="ico">≈</span><em data-i18n="t_river">Nehir</em></button>
       <button class="tool" data-tool="lake"     title="K"><span class="ico">◎</span><em data-i18n="t_lake">Göl</em></button>
@@ -116,6 +117,23 @@
         <label class="chk"><input type="checkbox" id="tr-clip" checked><span data-i18n="o_clip">Sadece karaya boya</span></label>
         <button class="btn wide" id="btn-clear-terrain" data-i18n="o_clearterrain">Arazi katmanını temizle</button>
         <p class="hint" data-i18n="h_terrain">Doku her fırça vuruşunda rastgele serpilir — tekrar eden örüntü oluşmaz.</p>
+      </section>
+
+      <!-- ELEVATION -->
+      <section class="opt-group" data-for="elevation">
+        <h3 data-i18n="o_elevation">Yükselti</h3>
+        <label class="row"><span data-i18n="o_brushsize">Fırça boyutu</span><b id="v-el-size">220</b></label>
+        <input type="range" id="el-size" min="20" max="900" value="220">
+        <label class="row"><span data-i18n="o_elevstrength">Şiddet</span><b id="v-el-strength">0.50</b></label>
+        <input type="range" id="el-strength" min="5" max="100" value="50">
+        <label class="chk"><input type="checkbox" id="el-lower"><span data-i18n="o_elevlower">Alçaltma modu</span></label>
+        <button class="btn wide" id="btn-clear-elevation" data-i18n="o_clearelevation">Yükseltiyi temizle</button>
+        <h3 style="margin-top:16px" data-i18n="o_elevdisplay">Görünüm</h3>
+        <label class="chk"><input type="checkbox" id="elev-hillshade" checked><span data-i18n="o_elevhillshade">Gölgelendirme (hillshade)</span></label>
+        <label class="chk"><input type="checkbox" id="elev-contours"><span data-i18n="o_elevcontours">Kontur çizgileri</span></label>
+        <label class="row"><span data-i18n="o_contourinterval">Kontur aralığı</span><b id="v-elev-interval">32</b></label>
+        <input type="range" id="elev-interval" min="8" max="80" value="32">
+        <p class="hint" data-i18n="h_elevation">Sürükleyerek yükselt; "Alçaltma modu" işaretliyken çukurlaştırır. Gölgelendirme haritayı otomatik günceller.</p>
       </section>
 
       <!-- SYMBOL -->

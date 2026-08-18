@@ -70,6 +70,16 @@
           return;
         }
 
+        if (l.id === 'elevation') {
+          if (!App.elevation.showHillshade && !App.elevation.showContours) return;
+          if (Cv.elevationDirty || !Cv.elevationCanvas) Cv.buildElevationEffect();
+          if (Cv.elevationCanvas) {
+            s.push('<image x="0" y="0" width="'+W+'" height="'+H+'" opacity="'+l.opacity+
+                   '" xlink:href="'+Cv.elevationCanvas.toDataURL('image/png')+'"/>');
+          }
+          return;
+        }
+
         if (l.type === 'raster') {
           s.push('<image x="0" y="0" width="'+W+'" height="'+H+'" opacity="'+l.opacity+
                  '" xlink:href="'+l.canvas.toDataURL('image/png')+'"/>');
@@ -268,6 +278,9 @@
         W:Cv.W, H:Cv.H,
         parchment:Cv.parchment, grid:Cv.grid,
         shore:Cv.shore, shoreWidth:Cv.shoreWidth, shoreStyle:Cv.shoreStyle,
+        elevShowHillshade:App.elevation.showHillshade,
+        elevShowContours:App.elevation.showContours,
+        elevContourInterval:App.elevation.contourInterval,
         exportReference:App.exportReference,
         scale:App.scale,
         customSymbols: Sym.serializeCustom(),
@@ -291,6 +304,9 @@
         Cv.shore = d.shore !== false;
         Cv.shoreWidth = d.shoreWidth || 26;
         Cv.shoreStyle = d.shoreStyle || 'sandy';
+        App.elevation.showHillshade = d.elevShowHillshade !== false;
+        App.elevation.showContours = !!d.elevShowContours;
+        App.elevation.contourInterval = d.elevContourInterval || 32;
         App.exportReference = !!d.exportReference;
         if (d.scale) App.scale = d.scale;
 
@@ -302,6 +318,10 @@
         document.getElementById('shore-w').value = Cv.shoreWidth;
         document.getElementById('v-shore-w').textContent = Cv.shoreWidth;
         document.getElementById('shore-style').value = Cv.shoreStyle;
+        document.getElementById('elev-hillshade').checked = App.elevation.showHillshade;
+        document.getElementById('elev-contours').checked = App.elevation.showContours;
+        document.getElementById('elev-interval').value = App.elevation.contourInterval;
+        document.getElementById('v-elev-interval').textContent = App.elevation.contourInterval;
 
         if (d.customSymbols) Sym.deserializeCustom(d.customSymbols);
 
@@ -309,6 +329,7 @@
           History.clear();
           App.selection = null;
           Cv.shoreDirty = true;
+          Cv.elevationDirty = true;
           UI.refreshAll();
           Cv.fit();
           UI.msg(UI.t('loaded'));

@@ -63,6 +63,7 @@
     'reference': { de:'Referenzbild', fr:'Image de référence', es:'Imagen de referencia', it:'Immagine di riferimento', pt:'Imagem de referência', nl:'Referentieafbeelding', pl:'Obraz referencyjny', ru:'Референс-изображение' },
     'landmass': { de:'Land', fr:'Terre', es:'Tierra', it:'Terra', pt:'Terra', nl:'Land', pl:'Ląd', ru:'Суша' },
     'terrain': { de:'Gelände', fr:'Terrain', es:'Terreno', it:'Terreno', pt:'Terreno', nl:'Terrein', pl:'Teren', ru:'Местность' },
+    'elevation': { de:'Höhenrelief', fr:'Relief', es:'Relieve', it:'Rilievo', pt:'Relevo', nl:'Reliëf', pl:'Rzeźba terenu', ru:'Рельеф' },
     'territories': { de:'Gebiete', fr:'Territoires', es:'Territorios', it:'Territori', pt:'Territórios', nl:'Gebieden', pl:'Terytoria', ru:'Территории' },
     'rivers': { de:'Flüsse', fr:'Rivières', es:'Ríos', it:'Fiumi', pt:'Rios', nl:'Rivieren', pl:'Rzeki', ru:'Реки' },
     'roads': { de:'Straßen', fr:'Routes', es:'Caminos', it:'Strade', pt:'Estradas', nl:'Wegen', pl:'Drogi', ru:'Дороги' },

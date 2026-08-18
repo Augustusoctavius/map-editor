@@ -232,6 +232,7 @@
     mouse:{x:0,y:0,over:false},
     _raf:0, _miniAt:0,
     shoreCanvas:null, shoreDirty:true,
+    elevationCanvas:null, elevationDirty:true,
 
     init: function (w, h) {
       this.view = document.getElementById('view');
@@ -260,6 +261,8 @@
       Layers.resize(w, h, keep);
       this.shoreDirty = true;
       this.shoreCanvas = null;
+      this.elevationDirty = true;
+      this.elevationCanvas = null;
       this.fit();
     },
 
@@ -319,6 +322,68 @@
       /* kıyı çizgisi değişti — nehir kesim noktaları geçersiz olabilir */
       this._riverCrossingCache = {};
       return result.canvas;
+    },
+
+    /* ---------- YÜKSELTİ EFEKTİ (hillshade + kontur) ----------
+       Yükselti katmanı ham gri tonlama olarak saklanır (fırça:
+       tools.js#stamp). Burada bu veriden eğim tabanlı basit bir
+       gölgeleme (hillshade) ve/veya kontur çizgisi türetilip tek bir
+       önbelleğe alınmış katman olarak terrain'in üstüne, diğer
+       nesnelerin altına bindirilir — kıyı efektiyle aynı mimari. */
+    buildElevationEffect: function () {
+      var Lv = Layers.get('elevation');
+      if (!Lv || !Lv.canvas) return null;
+      var MAX = 1024;
+      var W = this.W, H = this.H;
+      var sc = Math.min(1, MAX/Math.max(W,H));
+      var sw = Math.max(1, Math.round(W*sc)), sh = Math.max(1, Math.round(H*sc));
+
+      var tC = document.createElement('canvas'); tC.width = sw; tC.height = sh;
+      var tctx = tC.getContext('2d', { willReadFrequently:true });
+      tctx.drawImage(Lv.canvas, 0, 0, sw, sh);
+      var data = tctx.getImageData(0, 0, sw, sh).data;
+
+      function heightAt(x, y) {
+        x = x < 0 ? 0 : x >= sw ? sw-1 : x;
+        y = y < 0 ? 0 : y >= sh ? sh-1 : y;
+        var i = (y*sw + x) * 4;
+        var a = data[i+3] / 255;
+        return a > 0.02 ? (data[i]*a + 128*(1-a)) : 128;
+      }
+
+      var showHS = App.elevation.showHillshade;
+      var showCT = App.elevation.showContours;
+      var interval = Math.max(4, App.elevation.contourInterval || 32);
+      var lx = 0.6, ly = -0.5;
+
+      var out = tctx.createImageData(sw, sh);
+      var od = out.data;
+      for (var y = 0; y < sh; y++) {
+        for (var x = 0; x < sw; x++) {
+          var i2 = (y*sw + x) * 4;
+          var r = 0, g = 0, b = 0, al = 0;
+          if (showHS) {
+            var hx = heightAt(x+1, y) - heightAt(x-1, y);
+            var hy = heightAt(x, y+1) - heightAt(x, y-1);
+            var slope = hx*lx + hy*ly;
+            if (slope > 0.5) { al = Math.min(1, slope/40) * 0.5; r = g = b = 255; }
+            else if (slope < -0.5) { al = Math.min(1, -slope/40) * 0.5; r = g = b = 0; }
+          }
+          if (showCT) {
+            var hC = heightAt(x, y), hR = heightAt(x+1, y), hD = heightAt(x, y+1);
+            var bC = Math.floor(hC/interval), bR = Math.floor(hR/interval), bD = Math.floor(hD/interval);
+            if (bC !== bR || bC !== bD) {
+              r = 74; g = 58; b = 34;
+              al = Math.max(al, 0.55);
+            }
+          }
+          od[i2] = r; od[i2+1] = g; od[i2+2] = b; od[i2+3] = Math.round(al*255);
+        }
+      }
+      tctx.putImageData(out, 0, 0);
+      this.elevationCanvas = tC;
+      this.elevationDirty = false;
+      return tC;
     },
 
     /* ---------- ana render ---------- */
@@ -429,6 +494,19 @@
           ctx.globalAlpha = l.opacity;
           ctx.drawImage(l.image, 0, 0, W, H);
           ctx.restore();
+          continue;
+        }
+
+        if (l.id === 'elevation') {
+          if (App.elevation && (App.elevation.showHillshade || App.elevation.showContours)) {
+            if (this.elevationDirty || !this.elevationCanvas) this.buildElevationEffect();
+            if (this.elevationCanvas) {
+              ctx.save();
+              ctx.globalAlpha = l.opacity;
+              ctx.drawImage(this.elevationCanvas, 0, 0, W, H);
+              ctx.restore();
+            }
+          }
           continue;
         }
 
@@ -1347,6 +1425,7 @@
       var t = App.tool, r = 0;
       if (t === 'landmass' || t === 'erase') r = App.brush.size/2;
       else if (t === 'terrain') r = App.terrain.size/2;
+      else if (t === 'elevation') r = App.elevation.brushSize/2;
       else if (t === 'symbol') r = App.symbol.size/2;
       else if (t === 'eyedrop') r = App.eyedrop.painting ? App.eyedrop.brushRadius : 0;
       if (!r) return;

@@ -17,6 +17,8 @@
     road:    { width:6, style:'dashed', color:'#6b4f2a' },
     lake:    { color:'#5b8aa6', opacity:0.88 },
     territory: { color:'#8a5a3a', opacity:0.30, borderColor:'#5a3a20', borderWidth:2 },
+    elevation: { brushSize:220, strength:0.5, lower:false,
+                 showHillshade:true, showContours:false, contourInterval:32 },
     label:   { preset:'region', font:'serif', size:46, color:'#5a4326', outline:true,
                outlineColor:'#f5ecd8', shadow:true, curve:0, track:8, rot:0,
                caps:true, banner:null },

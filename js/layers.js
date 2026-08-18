@@ -518,6 +518,7 @@
     { id:'reference', type:'image',  tr:'Referans görsel', en:'Reference image', opacity:0.5, visible:true  },
     { id:'landmass',  type:'raster', tr:'Kara',            en:'Landmass',        opacity:1,   visible:true  },
     { id:'terrain',   type:'raster', tr:'Arazi',           en:'Terrain',         opacity:1,   visible:true  },
+    { id:'elevation', type:'raster', tr:'Yükselti',        en:'Elevation',       opacity:1,   visible:true  },
     { id:'territories', type:'vector', tr:'Bölgeler',      en:'Territories',     opacity:1,   visible:true  },
     { id:'rivers',    type:'vector', tr:'Nehirler',        en:'Rivers',          opacity:1,   visible:true  },
     { id:'roads',     type:'vector', tr:'Yollar',          en:'Roads',           opacity:1,   visible:true  },

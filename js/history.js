@@ -122,6 +122,7 @@
         cx.drawImage(im, x, y);
         cx.restore();
         if (layerId === 'landmass' && global.Cv) Cv.shoreDirty = true;
+        if (layerId === 'elevation' && global.Cv) Cv.elevationDirty = true;
       });
     },
 
