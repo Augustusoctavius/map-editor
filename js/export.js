@@ -71,6 +71,18 @@
           return;
         }
 
+        if (l.id === 'resources') {
+          /* özel ikon çizimleri Path2D verisi olarak tutulmuyor — katmanı
+             tek seferde rasterize edip görüntü olarak göm */
+          if (!l.objects.length) return;
+          var rc = document.createElement('canvas'); rc.width = W; rc.height = H;
+          var rctx2 = rc.getContext('2d');
+          l.objects.forEach(function (o) { Cv.drawResource(rctx2, o); });
+          s.push('<image x="0" y="0" width="'+W+'" height="'+H+'" opacity="'+l.opacity+
+                 '" xlink:href="'+rc.toDataURL('image/png')+'"/>');
+          return;
+        }
+
         if (l.id === 'elevation') {
           if (!App.elevation.showHillshade && !App.elevation.showContours) return;
           if (Cv.elevationDirty || !Cv.elevationCanvas) Cv.buildElevationEffect();
@@ -140,6 +152,12 @@
 
       if (App.scale && App.scale.visible) s.push(Exporter.scaleSVG(App.scale));
       if (App.windrose && App.windrose.visible) s.push(Exporter.windroseSVG(App.windrose));
+
+      if (Cv.frame && Cv.frame.style !== 'none') {
+        var fc = document.createElement('canvas'); fc.width = W; fc.height = H;
+        Cv.drawFrame(fc.getContext('2d'));
+        s.push('<image x="0" y="0" width="'+W+'" height="'+H+'" xlink:href="'+fc.toDataURL('image/png')+'"/>');
+      }
 
       s.push('</svg>');
       download(new Blob([s.join('\n')], { type:'image/svg+xml' }), 'harita-' + stamp() + '.svg');
@@ -293,7 +311,7 @@
         app:'cartographer', version:3,
         W:Cv.W, H:Cv.H,
         parchment:Cv.parchment, grid:Cv.grid,
-        shore:Cv.shore, shoreWidth:Cv.shoreWidth, shoreStyle:Cv.shoreStyle,
+        shore:Cv.shore, shoreWidth:Cv.shoreWidth, shoreStyle:Cv.shoreStyle, frame:Cv.frame,
         elevShowHillshade:App.elevation.showHillshade,
         elevShowContours:App.elevation.showContours,
         elevContourInterval:App.elevation.contourInterval,
@@ -321,6 +339,7 @@
         Cv.shore = d.shore !== false;
         Cv.shoreWidth = d.shoreWidth || 26;
         Cv.shoreStyle = d.shoreStyle || 'sandy';
+        if (d.frame) Cv.frame = d.frame;
         App.elevation.showHillshade = d.elevShowHillshade !== false;
         App.elevation.showContours = !!d.elevShowContours;
         App.elevation.contourInterval = d.elevContourInterval || 32;
@@ -339,6 +358,10 @@
         document.getElementById('elev-contours').checked = App.elevation.showContours;
         document.getElementById('elev-interval').value = App.elevation.contourInterval;
         document.getElementById('v-elev-interval').textContent = App.elevation.contourInterval;
+        document.getElementById('frame-style').value = Cv.frame.style;
+        document.getElementById('frame-color').value = Cv.frame.color;
+        document.getElementById('frame-w').value = Cv.frame.width;
+        document.getElementById('v-frame-w').textContent = Cv.frame.width;
 
         if (d.customSymbols) Sym.deserializeCustom(d.customSymbols);
 

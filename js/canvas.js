@@ -273,6 +273,7 @@
     view:null, ctx:null, mini:null, mctx:null,
     grid:false, gridSize:128, parchment:false,
     shore:true, shoreWidth:26, shoreStyle:'sandy',
+    frame:{ style:'none', color:'#3a2b18', width:24 },
     mouse:{x:0,y:0,over:false},
     _raf:0, _miniAt:0,
     shoreCanvas:null, shoreDirty:true,
@@ -666,6 +667,66 @@
       if (global.App && App.scale && App.scale.visible) this.drawScaleBar(ctx, App.scale);
       /* --- windrose --- */
       if (global.App && App.windrose && App.windrose.visible) this.drawWindrose(ctx, App.windrose);
+      /* --- dekoratif harita çerçevesi (en üstte, PNG/SVG çıktısına dahil) --- */
+      if (this.frame && this.frame.style !== 'none') this.drawFrame(ctx);
+    },
+
+    /* ---------- dekoratif harita çerçevesi ---------- */
+    drawFrame: function (ctx) {
+      var f = this.frame, W = this.W, H = this.H, w = f.width || 24;
+      ctx.save();
+      if (f.style === 'simple') {
+        ctx.strokeStyle = f.color; ctx.lineWidth = w*0.18;
+        ctx.strokeRect(w*0.5, w*0.5, W-w, H-w);
+        ctx.lineWidth = w*0.06;
+        ctx.strokeRect(w*0.9, w*0.9, W-w*1.8, H-w*1.8);
+      } else if (f.style === 'rope') {
+        ctx.strokeStyle = f.color; ctx.lineWidth = w*0.7; ctx.lineCap = 'round';
+        ctx.strokeRect(w*0.5, w*0.5, W-w, H-w);
+        var seg = w*1.1, peri = 2*(W+H)-8*w, n = Math.round(peri/seg);
+        ctx.fillStyle = f.color;
+        for (var i = 0; i < n; i++) {
+          var t = i/n, pt = this._perimeterPoint(t, W, H, w*0.5);
+          ctx.beginPath(); ctx.arc(pt.x, pt.y, w*0.16, 0, Math.PI*2); ctx.fill();
+        }
+      } else if (f.style === 'ornate') {
+        ctx.strokeStyle = f.color; ctx.lineWidth = w*0.14;
+        ctx.strokeRect(w*0.5, w*0.5, W-w, H-w);
+        ctx.strokeRect(w*1.15, w*1.15, W-w*2.3, H-w*2.3);
+        ctx.fillStyle = f.color;
+        var corners = [[w*0.8,w*0.8],[W-w*0.8,w*0.8],[w*0.8,H-w*0.8],[W-w*0.8,H-w*0.8]];
+        corners.forEach(function (c) {
+          ctx.save(); ctx.translate(c[0], c[1]);
+          ctx.beginPath();
+          for (var k = 0; k < 4; k++) {
+            var ang = k*Math.PI/2;
+            ctx.moveTo(0,0);
+            ctx.arc(0, 0, w*1.15, ang-0.28, ang+0.28);
+          }
+          ctx.fill('evenodd');
+          ctx.beginPath(); ctx.arc(0, 0, w*0.32, 0, Math.PI*2); ctx.fill();
+          ctx.restore();
+        });
+        /* kenar ortası küçük yaprak motifleri */
+        var mids = [[W/2,w*0.8],[W/2,H-w*0.8],[w*0.8,H/2],[W-w*0.8,H/2]];
+        mids.forEach(function (m) {
+          ctx.beginPath(); ctx.arc(m[0], m[1], w*0.4, 0, Math.PI*2); ctx.fill();
+        });
+      }
+      ctx.restore();
+    },
+
+    _perimeterPoint: function (t, W, H, inset) {
+      var peri = 2*((W-inset*2)+(H-inset*2));
+      var d = t*peri;
+      var w2 = W-inset*2, h2 = H-inset*2;
+      if (d < w2) return { x:inset+d, y:inset };
+      d -= w2;
+      if (d < h2) return { x:W-inset, y:inset+d };
+      d -= h2;
+      if (d < w2) return { x:W-inset-d, y:H-inset };
+      d -= w2;
+      return { x:inset, y:H-inset-d };
     },
 
     get_: function (id) { return Layers.get(id); },

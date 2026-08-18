@@ -62,7 +62,7 @@
       o_symbbrush:'Fırça modu', o_symbdensity:'Yoğunluk', o_clipland:'Karaya kenetle (fırça)',
       o_windrose:'Pusula Gülü', o_wrvis:'Haritada göster', o_wrsize:'Boyut',
       o_wrstyle_classic:'Klasik', o_wrstyle_minimal:'Sade', o_wrstyle:'Stil', o_wrcolor:'Renk', h_windrose:'Haritada sürükleyerek taşı.',
-      o_snap:'Izgaraya yapış', o_snapsize:'Izgara boyutu',
+      o_snap:'Izgaraya yapış', o_snapsize:'Izgara boyutu', o_frame:'Harita çerçevesi', o_frame_none:'Yok', o_frame_simple:'Sade çizgi', o_frame_rope:'Halat', o_frame_ornate:'Süslü', o_frame_color:'Renk',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     },
     en: {
@@ -120,7 +120,7 @@
       o_symbbrush:'Brush mode', o_symbdensity:'Density', o_clipland:'Clip to land (brush)',
       o_windrose:'Windrose', o_wrvis:'Show on map', o_wrsize:'Size',
       o_wrstyle_classic:'Classic', o_wrstyle_minimal:'Minimal', o_wrstyle:'Style', o_wrcolor:'Colour', h_windrose:'Drag on the map to reposition.',
-      o_snap:'Snap to grid', o_snapsize:'Grid size',
+      o_snap:'Snap to grid', o_snapsize:'Grid size', o_frame:'Map frame', o_frame_none:'None', o_frame_simple:'Simple line', o_frame_rope:'Rope', o_frame_ornate:'Ornate', o_frame_color:'Colour',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     },
     de: {
@@ -178,7 +178,7 @@
       o_symbbrush:'Pinselmodus', o_symbdensity:'Dichte', o_clipland:'An Land klemmen (Pinsel)',
       o_windrose:'Windrose', o_wrvis:'Auf der Karte anzeigen', o_wrsize:'Größe',
       o_wrstyle_classic:'Klassisch', o_wrstyle_minimal:'Schlicht', o_wrstyle:'Stil', o_wrcolor:'Farbe', h_windrose:'Auf der Karte ziehen, um sie zu verschieben.',
-      o_snap:'Am Raster ausrichten', o_snapsize:'Rastergröße',
+      o_snap:'Am Raster ausrichten', o_snapsize:'Rastergröße', o_frame:'Kartenrahmen', o_frame_none:'Kein', o_frame_simple:'Einfache Linie', o_frame_rope:'Seil', o_frame_ornate:'Verziert', o_frame_color:'Farbe',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     },
     fr: {
@@ -236,7 +236,7 @@
       o_symbbrush:'Mode pinceau', o_symbdensity:'Densité', o_clipland:'Limiter à la terre (pinceau)',
       o_windrose:'Rose des vents', o_wrvis:'Afficher sur la carte', o_wrsize:'Taille',
       o_wrstyle_classic:'Classique', o_wrstyle_minimal:'Minimaliste', o_wrstyle:'Style', o_wrcolor:'Couleur', h_windrose:'Faites glisser sur la carte pour repositionner.',
-      o_snap:'Aligner sur la grille', o_snapsize:'Taille de la grille',
+      o_snap:'Aligner sur la grille', o_snapsize:'Taille de la grille', o_frame:'Cadre de la carte', o_frame_none:'Aucun', o_frame_simple:'Ligne simple', o_frame_rope:'Corde', o_frame_ornate:'Orné', o_frame_color:'Couleur',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     },
     es: {
@@ -294,7 +294,7 @@
       o_symbbrush:'Modo pincel', o_symbdensity:'Densidad', o_clipland:'Ajustar a tierra (pincel)',
       o_windrose:'Rosa de los vientos', o_wrvis:'Mostrar en el mapa', o_wrsize:'Tamaño',
       o_wrstyle_classic:'Clásico', o_wrstyle_minimal:'Minimalista', o_wrstyle:'Estilo', o_wrcolor:'Color', h_windrose:'Arrastra en el mapa para reposicionarla.',
-      o_snap:'Ajustar a la cuadrícula', o_snapsize:'Tamaño de la cuadrícula',
+      o_snap:'Ajustar a la cuadrícula', o_snapsize:'Tamaño de la cuadrícula', o_frame:'Marco del mapa', o_frame_none:'Ninguno', o_frame_simple:'Línea simple', o_frame_rope:'Cuerda', o_frame_ornate:'Ornamentado', o_frame_color:'Color',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     },
     it: {
@@ -352,7 +352,7 @@
       o_symbbrush:'Modalità pennello', o_symbdensity:'Densità', o_clipland:'Limita alla terra (pennello)',
       o_windrose:'Rosa dei venti', o_wrvis:'Mostra sulla mappa', o_wrsize:'Dimensione',
       o_wrstyle_classic:'Classico', o_wrstyle_minimal:'Minimalista', o_wrstyle:'Stile', o_wrcolor:'Colore', h_windrose:'Trascina sulla mappa per riposizionarla.',
-      o_snap:'Aggancia alla griglia', o_snapsize:'Dimensione griglia',
+      o_snap:'Aggancia alla griglia', o_snapsize:'Dimensione griglia', o_frame:'Cornice della mappa', o_frame_none:'Nessuna', o_frame_simple:'Linea semplice', o_frame_rope:'Corda', o_frame_ornate:'Ornata', o_frame_color:'Colore',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     },
     pt: {
@@ -410,7 +410,7 @@
       o_symbbrush:'Modo pincel', o_symbdensity:'Densidade', o_clipland:'Restringir à terra (pincel)',
       o_windrose:'Rosa dos ventos', o_wrvis:'Mostrar no mapa', o_wrsize:'Tamanho',
       o_wrstyle_classic:'Clássico', o_wrstyle_minimal:'Minimalista', o_wrstyle:'Estilo', o_wrcolor:'Cor', h_windrose:'Arraste no mapa para reposicionar.',
-      o_snap:'Alinhar à grelha', o_snapsize:'Tamanho da grelha',
+      o_snap:'Alinhar à grelha', o_snapsize:'Tamanho da grelha', o_frame:'Moldura do mapa', o_frame_none:'Nenhuma', o_frame_simple:'Linha simples', o_frame_rope:'Corda', o_frame_ornate:'Ornamentada', o_frame_color:'Cor',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     },
     nl: {
@@ -468,7 +468,7 @@
       o_symbbrush:'Penseelmodus', o_symbdensity:'Dichtheid', o_clipland:'Beperken tot land (penseel)',
       o_windrose:'Windroos', o_wrvis:'Tonen op de kaart', o_wrsize:'Grootte',
       o_wrstyle_classic:'Klassiek', o_wrstyle_minimal:'Minimalistisch', o_wrstyle:'Stijl', o_wrcolor:'Kleur', h_windrose:'Sleep op de kaart om te verplaatsen.',
-      o_snap:'Uitlijnen op raster', o_snapsize:'Rastergrootte',
+      o_snap:'Uitlijnen op raster', o_snapsize:'Rastergrootte', o_frame:'Kaartlijst', o_frame_none:'Geen', o_frame_simple:'Eenvoudige lijn', o_frame_rope:'Touw', o_frame_ornate:'Versierd', o_frame_color:'Kleur',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     },
     pl: {
@@ -526,7 +526,7 @@
       o_symbbrush:'Tryb pędzla', o_symbdensity:'Gęstość', o_clipland:'Ogranicz do lądu (pędzel)',
       o_windrose:'Róża wiatrów', o_wrvis:'Pokaż na mapie', o_wrsize:'Rozmiar',
       o_wrstyle_classic:'Klasyczny', o_wrstyle_minimal:'Minimalistyczny', o_wrstyle:'Styl', o_wrcolor:'Kolor', h_windrose:'Przeciągnij na mapie, aby przesunąć.',
-      o_snap:'Przyciągaj do siatki', o_snapsize:'Rozmiar siatki',
+      o_snap:'Przyciągaj do siatki', o_snapsize:'Rozmiar siatki', o_frame:'Ramka mapy', o_frame_none:'Brak', o_frame_simple:'Prosta linia', o_frame_rope:'Lina', o_frame_ornate:'Zdobiona', o_frame_color:'Kolor',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     },
     ru: {
@@ -584,7 +584,7 @@
       o_symbbrush:'Режим кисти', o_symbdensity:'Плотность', o_clipland:'Привязать к суше (кисть)',
       o_windrose:'Роза ветров', o_wrvis:'Показывать на карте', o_wrsize:'Размер',
       o_wrstyle_classic:'Классический', o_wrstyle_minimal:'Минималистичный', o_wrstyle:'Стиль', o_wrcolor:'Цвет', h_windrose:'Перетащите по карте, чтобы переместить.',
-      o_snap:'Привязка к сетке', o_snapsize:'Размер сетки',
+      o_snap:'Привязка к сетке', o_snapsize:'Размер сетки', o_frame:'Рамка карты', o_frame_none:'Нет', o_frame_simple:'Простая линия', o_frame_rope:'Канат', o_frame_ornate:'Узорная', o_frame_color:'Цвет',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     }
   };
@@ -1070,6 +1070,11 @@
       /* --- snap --- */
       on('snap-enabled', 'change', function (e) { App.snap.enabled = e.target.checked; });
       self.range('snap-size', 'v-snap-size', function (v) { App.snap.size = Math.round(v); });
+
+      /* --- harita çerçevesi --- */
+      on('frame-style', 'change', function (e) { Cv.frame.style = e.target.value; Cv.requestRender(); });
+      on('frame-color', 'input', function (e) { Cv.frame.color = e.target.value; Cv.requestRender(); });
+      self.range('frame-w', 'v-frame-w', function (v) { Cv.frame.width = v; });
 
       /* --- PNG export ölçeği --- */
       on('btn-export-png2', 'click', function () { Exporter.png(2); });

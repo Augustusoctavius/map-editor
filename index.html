@@ -337,6 +337,18 @@
         <label class="chk"><input type="checkbox" id="snap-enabled"><span data-i18n="o_snap">Aktif</span></label>
         <label class="row"><span data-i18n="o_snapsize">Izgara boyutu</span><b id="v-snap-size">64</b></label>
         <input type="range" id="snap-size" min="16" max="256" value="64">
+
+        <h3 style="margin-top:20px" data-i18n="o_frame">Harita çerçevesi</h3>
+        <select id="frame-style" class="sel">
+          <option value="none" data-i18n="o_frame_none">Yok</option>
+          <option value="simple" data-i18n="o_frame_simple">Sade çizgi</option>
+          <option value="rope" data-i18n="o_frame_rope">Halat</option>
+          <option value="ornate" data-i18n="o_frame_ornate">Süslü</option>
+        </select>
+        <label class="row"><span data-i18n="o_frame_color">Renk</span></label>
+        <input type="color" id="frame-color" value="#3a2b18">
+        <label class="row"><span data-i18n="o_width">Kalınlık</span><b id="v-frame-w">24</b></label>
+        <input type="range" id="frame-w" min="6" max="80" value="24">
       </section>
 
       <!-- PAN -->
