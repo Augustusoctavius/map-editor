@@ -620,6 +620,7 @@
                   Sym.draw(ctx, o.sym, o, function(){ Cv.requestRender(); });
                 }
               }
+              else if (l.id === 'resources') this.drawResource(ctx, o);
               else if (l.id === 'links') { if (opt.includeLinks !== false) this.drawLink(ctx, o); }
               else if (l.id === 'labels') this.drawLabel(ctx, o);
             }
@@ -1343,6 +1344,72 @@
         return out;
       }
       return out;
+    },
+
+    /* ---------- kaynak/ikon işaretleri (maden, tarım, avlanma, balıkçılık, ticaret, taş ocağı) ---------- */
+    RESOURCE_TYPES: {
+      mine:     { color:'#8a7a5a', icon: function (ctx, r) {
+        ctx.save(); ctx.rotate(-Math.PI/4);
+        ctx.beginPath(); ctx.moveTo(0,-r*0.55); ctx.lineTo(0,r*0.15); ctx.lineWidth = r*0.16; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-r*0.3,-r*0.55); ctx.lineTo(r*0.3,-r*0.55); ctx.lineTo(0,-r*0.15); ctx.closePath(); ctx.fill();
+        ctx.restore();
+        ctx.save(); ctx.rotate(Math.PI/4);
+        ctx.beginPath(); ctx.moveTo(0,-r*0.55); ctx.lineTo(0,r*0.15); ctx.lineWidth = r*0.16; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-r*0.3,-r*0.55); ctx.lineTo(r*0.3,-r*0.55); ctx.lineTo(0,-r*0.15); ctx.closePath(); ctx.fill();
+        ctx.restore();
+      }},
+      farm:     { color:'#8a9a4a', icon: function (ctx, r) {
+        for (var i=-1; i<=1; i++) {
+          ctx.beginPath();
+          ctx.moveTo(i*r*0.28, r*0.5);
+          ctx.quadraticCurveTo(i*r*0.5, 0, i*r*0.14, -r*0.55);
+          ctx.lineWidth = r*0.13; ctx.lineCap = 'round'; ctx.stroke();
+        }
+      }},
+      hunting:  { color:'#7a4a30', icon: function (ctx, r) {
+        ctx.save(); ctx.rotate(Math.PI/4);
+        ctx.beginPath(); ctx.moveTo(0,-r*0.6); ctx.lineTo(0,r*0.6); ctx.lineWidth = r*0.13; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,-r*0.6); ctx.lineTo(-r*0.24,-r*0.28); ctx.moveTo(0,-r*0.6); ctx.lineTo(r*0.24,-r*0.28);
+        ctx.lineWidth = r*0.11; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-r*0.2,r*0.4); ctx.lineTo(0,r*0.6); ctx.lineTo(r*0.2,r*0.4);
+        ctx.lineWidth = r*0.11; ctx.stroke();
+        ctx.restore();
+      }},
+      fishing:  { color:'#4a7a95', icon: function (ctx, r) {
+        ctx.beginPath();
+        ctx.moveTo(-r*0.55, 0);
+        ctx.quadraticCurveTo(-r*0.15,-r*0.4, r*0.45, 0);
+        ctx.quadraticCurveTo(-r*0.15, r*0.4, -r*0.55, 0);
+        ctx.fill();
+        ctx.beginPath(); ctx.moveTo(r*0.45,0); ctx.lineTo(r*0.68,-r*0.22); ctx.lineTo(r*0.68,r*0.22); ctx.closePath(); ctx.fill();
+      }},
+      trade:    { color:'#c9a44b', icon: function (ctx, r) {
+        ctx.beginPath(); ctx.arc(0, 0, r*0.48, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = r*0.07;
+        ctx.beginPath(); ctx.arc(0, 0, r*0.48, 0, Math.PI*2); ctx.stroke();
+      }},
+      quarry:   { color:'#8a8a8a', icon: function (ctx, r) {
+        ctx.beginPath();
+        ctx.moveTo(-r*0.5,r*0.35); ctx.lineTo(-r*0.25,-r*0.4); ctx.lineTo(r*0.15,-r*0.5);
+        ctx.lineTo(r*0.5,-r*0.05); ctx.lineTo(r*0.25,r*0.45); ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = r*0.05;
+        ctx.beginPath(); ctx.moveTo(-r*0.25,-r*0.4); ctx.lineTo(r*0.1,r*0.1); ctx.lineTo(r*0.25,r*0.45); ctx.stroke();
+      }}
+    },
+
+    drawResource: function (ctx, o) {
+      var def = this.RESOURCE_TYPES[o.type] || this.RESOURCE_TYPES.mine;
+      var r = (o.size||36)*0.5;
+      ctx.save();
+      ctx.translate(o.x, o.y);
+      ctx.shadowColor = 'rgba(20,15,5,0.45)'; ctx.shadowBlur = r*0.35; ctx.shadowOffsetY = r*0.08;
+      ctx.fillStyle = '#f5ecd8'; ctx.strokeStyle = 'rgba(58,43,24,0.6)'; ctx.lineWidth = Math.max(1, r*0.1);
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+      ctx.fillStyle = def.color; ctx.strokeStyle = def.color;
+      def.icon(ctx, r);
+      ctx.restore();
     },
 
     /* ---------- bölge haritası bağlantı iğnesi ---------- */

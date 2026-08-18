@@ -75,6 +75,7 @@
       <button class="tool" data-tool="lake"     title="K"><span class="ico">◎</span><em data-i18n="t_lake">Göl</em></button>
       <button class="tool" data-tool="territory" title="G"><span class="ico">▧</span><em data-i18n="t_territory">Bölge</em></button>
       <button class="tool" data-tool="regionlink" title="M"><span class="ico">◈</span><em data-i18n="t_regionlink">Bölge bağlantısı</em></button>
+      <button class="tool" data-tool="resource" title="Y"><span class="ico">⛏</span><em data-i18n="t_resource">Kaynak</em></button>
       <button class="tool" data-tool="road"     title="D"><span class="ico">⋯</span><em data-i18n="t_road">Yol</em></button>
       <button class="tool" data-tool="label"    title="L"><span class="ico">A</span><em data-i18n="t_label">Etiket</em></button>
       <button class="tool" data-tool="eyedrop"  title="I"><span class="ico">⊙</span><em data-i18n="t_eyedrop">Örnekle</em></button>
@@ -196,6 +197,23 @@
       <section class="opt-group" data-for="regionlink">
         <h3 data-i18n="t_regionlink">Bölge bağlantısı</h3>
         <p class="hint" data-i18n="h_regionlink">Haritaya tıkla, isim ver: yeni ve boş bir bölge haritası oluşturulur. Seç aracıyla iğneye çift tıklayarak o bölgeye gir, sol üstteki "Geri" ile dünya haritasına dön.</p>
+      </section>
+
+      <!-- RESOURCE -->
+      <section class="opt-group" data-for="resource">
+        <h3 data-i18n="t_resource">Kaynak</h3>
+        <label class="row"><span data-i18n="o_resourcetype">Tür</span></label>
+        <select id="rs-type" class="sel">
+          <option value="mine" data-i18n="rs_mine">Maden</option>
+          <option value="farm" data-i18n="rs_farm">Tarım</option>
+          <option value="hunting" data-i18n="rs_hunting">Avlanma</option>
+          <option value="fishing" data-i18n="rs_fishing">Balıkçılık</option>
+          <option value="trade" data-i18n="rs_trade">Ticaret</option>
+          <option value="quarry" data-i18n="rs_quarry">Taş ocağı</option>
+        </select>
+        <label class="row"><span data-i18n="o_size">Boyut</span><b id="v-rs-size">36</b></label>
+        <input type="range" id="rs-size" min="14" max="90" value="36">
+        <p class="hint" data-i18n="h_resource">Haritaya tıklayarak seçili türde bir kaynak işareti yerleştir.</p>
       </section>
 
       <!-- RIVER -->

@@ -69,6 +69,7 @@
     'roads': { de:'Straßen', fr:'Routes', es:'Caminos', it:'Strade', pt:'Estradas', nl:'Wegen', pl:'Drogi', ru:'Дороги' },
     'symbols': { de:'Symbole', fr:'Symboles', es:'Símbolos', it:'Simboli', pt:'Símbolos', nl:'Symbolen', pl:'Symbole', ru:'Символы' },
     'links': { de:'Kartenverknüpfungen', fr:'Liens de carte', es:'Enlaces de mapa', it:'Collegamenti mappa', pt:'Ligações de mapa', nl:'Kaartkoppelingen', pl:'Odnośniki mapy', ru:'Ссылки карт' },
+    'resources': { de:'Ressourcen', fr:'Ressources', es:'Recursos', it:'Risorse', pt:'Recursos', nl:'Grondstoffen', pl:'Zasoby', ru:'Ресурсы' },
     'labels': { de:'Beschriftungen', fr:'Étiquettes', es:'Etiquetas', it:'Etichette', pt:'Etiquetas', nl:'Labels', pl:'Etykiety', ru:'Надписи' },
     'overlay': { de:'Überlagerung', fr:'Superposition', es:'Superposición', it:'Sovrapposizione', pt:'Sobreposição', nl:'Overlay', pl:'Nakładka', ru:'Наложение' },
     'cas_castle': { de:'Burg', fr:'Château', es:'Castillo', it:'Castello', pt:'Castelo', nl:'Kasteel', pl:'Zamek', ru:'Замок' },

@@ -262,6 +262,7 @@
         case 'road':
         case 'territory': this.addPathPoint(p); break;
         case 'label':    this.placeLabel(p); break;
+        case 'resource': this.placeResource(p); break;
         case 'regionlink': this.placeRegionLink(p); break;
         case 'select':   this.startSelect(p, e.shiftKey); break;
       }
@@ -1022,6 +1023,19 @@
       UI.refreshHistory(); UI.refreshSelection();
     },
 
+    /* ================= KAYNAK İŞARETİ ================= */
+    placeResource: function (p) {
+      var L = Layers.get('resources');
+      if (L.locked || !L.visible) { UI.msg(UI.t('locked')); return; }
+      var before = JSON.parse(JSON.stringify(L.objects));
+      var o = { id: uid(), x: p.x, y: p.y, size: App.resource.size, type: App.resource.type };
+      L.objects.push(o);
+      App.selection = { layerId:'resources', id:o.id };
+      History.pushVector('resources', before, JSON.parse(JSON.stringify(L.objects)), 'resource');
+      UI.refreshHistory(); UI.refreshSelection();
+      Cv.requestRender();
+    },
+
     /* ================= BÖLGE HARİTASI BAĞLANTISI ================= */
     placeRegionLink: function (p) {
       var L = Layers.get('links');
@@ -1129,16 +1143,16 @@
     },
 
     hitTest: function (p) {
-      var order = ['links','labels','symbols','roads','rivers','territories'];
+      var order = ['links','resources','labels','symbols','roads','rivers','territories'];
       for (var i=0; i<order.length; i++) {
         var L = Layers.get(order[i]);
         if (!L.visible || L.locked) continue;
         for (var j=L.objects.length-1; j>=0; j--) {
           var o = L.objects[j];
-          if (order[i] === 'links') {
+          if (order[i] === 'links' || order[i] === 'resources') {
             var dxl = p.x-o.x, dyl = p.y-o.y;
             if (dxl*dxl + dyl*dyl <= (o.size||40)*(o.size||40)*0.36)
-              return { layerId:'links', id:o.id, obj:o };
+              return { layerId:order[i], id:o.id, obj:o };
           } else if (order[i] === 'symbols') {
             var b = Sym.bounds(o);
             if (p.x>=b.x && p.x<=b.x+b.w && p.y>=b.y && p.y<=b.y+b.h)
@@ -1479,7 +1493,7 @@
         var gx1=Math.max.apply(null,gbs.map(function(b){return b.x+b.w;}));
         var gy1=Math.max.apply(null,gbs.map(function(b){return b.y+b.h;}));
         ctx.strokeRect(gx0-6/z, gy0-6/z, gx1-gx0+12/z, gy1-gy0+12/z);
-      } else if (App.selection.layerId === 'links') {
+      } else if (App.selection.layerId === 'links' || App.selection.layerId === 'resources') {
         var r5 = (o.size||40)*0.6;
         ctx.beginPath(); ctx.arc(o.x, o.y, r5+4/z, 0, Math.PI*2); ctx.stroke();
       } else {

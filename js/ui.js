@@ -57,7 +57,7 @@
       o_fwd:'Öne getir', o_bwd:'Arkaya gönder',
       o_group:'Grupla', o_ungroup:'Grubu çöz',
       selMulti:'nesne seçili',
-      t_lake:'Göl', o_lake:'Göl', h_lake:'Tıklayarak nokta ekle, 3+ nokta sonra Enter ile kapat.', t_territory:'Bölge', o_territory:'Bölge', o_territorycolor:'Dolgu rengi', o_territorybcolor:'Sınır rengi', h_territory:'Tıklayarak nokta ekle, 3+ nokta sonra Enter ile kapat.', t_regionlink:'Bölge bağlantısı', h_regionlink:'Haritaya tıkla, isim ver: yeni ve boş bir bölge haritası oluşturulur. Seç aracıyla iğneye çift tıklayarak o bölgeye gir, sol üstteki "Geri" ile dünya haritasına dön.', rl_newtitle:'Yeni bölge haritası', rl_placeholder:'Bölge adı', rl_default:'Adsız bölge', rl_open:'Bölgeye gir →', bc_back:'Geri', bc_world:'Dünya haritası',
+      t_lake:'Göl', o_lake:'Göl', h_lake:'Tıklayarak nokta ekle, 3+ nokta sonra Enter ile kapat.', t_territory:'Bölge', o_territory:'Bölge', o_territorycolor:'Dolgu rengi', o_territorybcolor:'Sınır rengi', h_territory:'Tıklayarak nokta ekle, 3+ nokta sonra Enter ile kapat.', t_regionlink:'Bölge bağlantısı', h_regionlink:'Haritaya tıkla, isim ver: yeni ve boş bir bölge haritası oluşturulur. Seç aracıyla iğneye çift tıklayarak o bölgeye gir, sol üstteki "Geri" ile dünya haritasına dön.', rl_newtitle:'Yeni bölge haritası', rl_placeholder:'Bölge adı', rl_default:'Adsız bölge', rl_open:'Bölgeye gir →', bc_back:'Geri', bc_world:'Dünya haritası', t_resource:'Kaynak', o_resourcetype:'Tür', rs_mine:'Maden', rs_farm:'Tarım', rs_hunting:'Avlanma', rs_fishing:'Balıkçılık', rs_trade:'Ticaret', rs_quarry:'Taş ocağı', h_resource:'Haritaya tıklayarak seçili türde bir kaynak işareti yerleştir.',
       o_lakecolor:'Göl rengi',
       o_symbbrush:'Fırça modu', o_symbdensity:'Yoğunluk', o_clipland:'Karaya kenetle (fırça)',
       o_windrose:'Pusula Gülü', o_wrvis:'Haritada göster', o_wrsize:'Boyut',
@@ -115,7 +115,7 @@
       o_fwd:'Bring forward', o_bwd:'Send backward',
       o_group:'Group', o_ungroup:'Ungroup',
       selMulti:'objects selected',
-      t_lake:'Lake', o_lake:'Lake', h_lake:'Click to add points, 3+ points then Enter to close.', t_territory:'Territory', o_territory:'Territory', o_territorycolor:'Fill colour', o_territorybcolor:'Border colour', h_territory:'Click to add points, 3+ points then Enter to close.', t_regionlink:'Region link', h_regionlink:'Click the map and name it: a new, blank region map is created. Double-click the pin with the Select tool to enter it; use "Back" top-left to return to the world map.', rl_newtitle:'New region map', rl_placeholder:'Region name', rl_default:'Unnamed region', rl_open:'Enter region →', bc_back:'Back', bc_world:'World map',
+      t_lake:'Lake', o_lake:'Lake', h_lake:'Click to add points, 3+ points then Enter to close.', t_territory:'Territory', o_territory:'Territory', o_territorycolor:'Fill colour', o_territorybcolor:'Border colour', h_territory:'Click to add points, 3+ points then Enter to close.', t_regionlink:'Region link', h_regionlink:'Click the map and name it: a new, blank region map is created. Double-click the pin with the Select tool to enter it; use "Back" top-left to return to the world map.', rl_newtitle:'New region map', rl_placeholder:'Region name', rl_default:'Unnamed region', rl_open:'Enter region →', bc_back:'Back', bc_world:'World map', t_resource:'Resource', o_resourcetype:'Type', rs_mine:'Mine', rs_farm:'Farmland', rs_hunting:'Hunting ground', rs_fishing:'Fishing spot', rs_trade:'Trade post', rs_quarry:'Quarry', h_resource:'Click the map to place a resource marker of the selected type.',
       o_lakecolor:'Lake colour',
       o_symbbrush:'Brush mode', o_symbdensity:'Density', o_clipland:'Clip to land (brush)',
       o_windrose:'Windrose', o_wrvis:'Show on map', o_wrsize:'Size',
@@ -173,7 +173,7 @@
       o_fwd:'Eine Ebene vor', o_bwd:'Eine Ebene zurück',
       o_group:'Gruppieren', o_ungroup:'Gruppierung aufheben',
       selMulti:'Objekte ausgewählt',
-      t_lake:'See', o_lake:'See', h_lake:'Klicken, um Punkte hinzuzufügen, ab 3 Punkten mit Enter schließen.', t_territory:'Gebiet', o_territory:'Gebiet', o_territorycolor:'Füllfarbe', o_territorybcolor:'Randfarbe', h_territory:'Klicken, um Punkte hinzuzufügen, ab 3 Punkten mit Enter schließen.', t_regionlink:'Regionsverknüpfung', h_regionlink:'Auf die Karte klicken und benennen: Es wird eine neue, leere Regionskarte erstellt. Mit dem Auswahlwerkzeug per Doppelklick auf die Nadel diese Region betreten; oben links mit "Zurück" zur Weltkarte zurückkehren.', rl_newtitle:'Neue Regionskarte', rl_placeholder:'Regionsname', rl_default:'Unbenannte Region', rl_open:'Region betreten →', bc_back:'Zurück', bc_world:'Weltkarte',
+      t_lake:'See', o_lake:'See', h_lake:'Klicken, um Punkte hinzuzufügen, ab 3 Punkten mit Enter schließen.', t_territory:'Gebiet', o_territory:'Gebiet', o_territorycolor:'Füllfarbe', o_territorybcolor:'Randfarbe', h_territory:'Klicken, um Punkte hinzuzufügen, ab 3 Punkten mit Enter schließen.', t_regionlink:'Regionsverknüpfung', h_regionlink:'Auf die Karte klicken und benennen: Es wird eine neue, leere Regionskarte erstellt. Mit dem Auswahlwerkzeug per Doppelklick auf die Nadel diese Region betreten; oben links mit "Zurück" zur Weltkarte zurückkehren.', rl_newtitle:'Neue Regionskarte', rl_placeholder:'Regionsname', rl_default:'Unbenannte Region', rl_open:'Region betreten →', bc_back:'Zurück', bc_world:'Weltkarte', t_resource:'Ressource', o_resourcetype:'Typ', rs_mine:'Mine', rs_farm:'Ackerland', rs_hunting:'Jagdgrund', rs_fishing:'Fischgrund', rs_trade:'Handelsposten', rs_quarry:'Steinbruch', h_resource:'Auf die Karte klicken, um eine Ressourcenmarkierung des gewählten Typs zu platzieren.',
       o_lakecolor:'Seefarbe',
       o_symbbrush:'Pinselmodus', o_symbdensity:'Dichte', o_clipland:'An Land klemmen (Pinsel)',
       o_windrose:'Windrose', o_wrvis:'Auf der Karte anzeigen', o_wrsize:'Größe',
@@ -231,7 +231,7 @@
       o_fwd:'Avancer', o_bwd:'Reculer',
       o_group:'Grouper', o_ungroup:'Dissocier',
       selMulti:'objets sélectionnés',
-      t_lake:'Lac', o_lake:'Lac', h_lake:'Cliquez pour ajouter des points, puis Entrée (3 points min.) pour fermer.', t_territory:'Territoire', o_territory:'Territoire', o_territorycolor:'Couleur de remplissage', o_territorybcolor:'Couleur de bordure', h_territory:'Cliquez pour ajouter des points, puis Entrée (3 points min.) pour fermer.', t_regionlink:'Lien de région', h_regionlink:'Cliquez sur la carte et nommez-la : une nouvelle carte de région vierge est créée. Double-cliquez sur l\'épingle avec l\'outil Sélection pour y entrer ; utilisez « Retour » en haut à gauche pour revenir à la carte du monde.', rl_newtitle:'Nouvelle carte de région', rl_placeholder:'Nom de la région', rl_default:'Région sans nom', rl_open:'Entrer dans la région →', bc_back:'Retour', bc_world:'Carte du monde',
+      t_lake:'Lac', o_lake:'Lac', h_lake:'Cliquez pour ajouter des points, puis Entrée (3 points min.) pour fermer.', t_territory:'Territoire', o_territory:'Territoire', o_territorycolor:'Couleur de remplissage', o_territorybcolor:'Couleur de bordure', h_territory:'Cliquez pour ajouter des points, puis Entrée (3 points min.) pour fermer.', t_regionlink:'Lien de région', h_regionlink:'Cliquez sur la carte et nommez-la : une nouvelle carte de région vierge est créée. Double-cliquez sur l\'épingle avec l\'outil Sélection pour y entrer ; utilisez « Retour » en haut à gauche pour revenir à la carte du monde.', rl_newtitle:'Nouvelle carte de région', rl_placeholder:'Nom de la région', rl_default:'Région sans nom', rl_open:'Entrer dans la région →', bc_back:'Retour', bc_world:'Carte du monde', t_resource:'Ressource', o_resourcetype:'Type', rs_mine:'Mine', rs_farm:'Terres agricoles', rs_hunting:'Terrain de chasse', rs_fishing:'Zone de pêche', rs_trade:'Comptoir commercial', rs_quarry:'Carrière', h_resource:'Cliquez sur la carte pour placer un marqueur de ressource du type sélectionné.',
       o_lakecolor:'Couleur du lac',
       o_symbbrush:'Mode pinceau', o_symbdensity:'Densité', o_clipland:'Limiter à la terre (pinceau)',
       o_windrose:'Rose des vents', o_wrvis:'Afficher sur la carte', o_wrsize:'Taille',
@@ -289,7 +289,7 @@
       o_fwd:'Avanzar', o_bwd:'Retroceder',
       o_group:'Agrupar', o_ungroup:'Desagrupar',
       selMulti:'objetos seleccionados',
-      t_lake:'Lago', o_lake:'Lago', h_lake:'Haz clic para añadir puntos; con 3 o más, pulsa Intro para cerrar.', t_territory:'Territorio', o_territory:'Territorio', o_territorycolor:'Color de relleno', o_territorybcolor:'Color del borde', h_territory:'Haz clic para añadir puntos; con 3 o más, pulsa Intro para cerrar.', t_regionlink:'Enlace de región', h_regionlink:'Haz clic en el mapa y dale un nombre: se crea un nuevo mapa de región en blanco. Haz doble clic en el pin con la herramienta Selección para entrar; usa «Atrás» arriba a la izquierda para volver al mapa del mundo.', rl_newtitle:'Nuevo mapa de región', rl_placeholder:'Nombre de la región', rl_default:'Región sin nombre', rl_open:'Entrar en la región →', bc_back:'Atrás', bc_world:'Mapa del mundo',
+      t_lake:'Lago', o_lake:'Lago', h_lake:'Haz clic para añadir puntos; con 3 o más, pulsa Intro para cerrar.', t_territory:'Territorio', o_territory:'Territorio', o_territorycolor:'Color de relleno', o_territorybcolor:'Color del borde', h_territory:'Haz clic para añadir puntos; con 3 o más, pulsa Intro para cerrar.', t_regionlink:'Enlace de región', h_regionlink:'Haz clic en el mapa y dale un nombre: se crea un nuevo mapa de región en blanco. Haz doble clic en el pin con la herramienta Selección para entrar; usa «Atrás» arriba a la izquierda para volver al mapa del mundo.', rl_newtitle:'Nuevo mapa de región', rl_placeholder:'Nombre de la región', rl_default:'Región sin nombre', rl_open:'Entrar en la región →', bc_back:'Atrás', bc_world:'Mapa del mundo', t_resource:'Recurso', o_resourcetype:'Tipo', rs_mine:'Mina', rs_farm:'Tierras de cultivo', rs_hunting:'Zona de caza', rs_fishing:'Zona de pesca', rs_trade:'Puesto comercial', rs_quarry:'Cantera', h_resource:'Haz clic en el mapa para colocar un marcador de recurso del tipo seleccionado.',
       o_lakecolor:'Color del lago',
       o_symbbrush:'Modo pincel', o_symbdensity:'Densidad', o_clipland:'Ajustar a tierra (pincel)',
       o_windrose:'Rosa de los vientos', o_wrvis:'Mostrar en el mapa', o_wrsize:'Tamaño',
@@ -347,7 +347,7 @@
       o_fwd:'Avanti di uno', o_bwd:'Indietro di uno',
       o_group:'Raggruppa', o_ungroup:'Separa',
       selMulti:'oggetti selezionati',
-      t_lake:'Lago', o_lake:'Lago', h_lake:'Clicca per aggiungere punti, con 3+ punti premi Invio per chiudere.', t_territory:'Territorio', o_territory:'Territorio', o_territorycolor:'Colore di riempimento', o_territorybcolor:'Colore del bordo', h_territory:'Clicca per aggiungere punti, con 3+ punti premi Invio per chiudere.', t_regionlink:'Collegamento regione', h_regionlink:'Clicca sulla mappa e assegna un nome: viene creata una nuova mappa regionale vuota. Fai doppio clic sullo spillo con lo strumento Seleziona per entrarci; usa "Indietro" in alto a sinistra per tornare alla mappa del mondo.', rl_newtitle:'Nuova mappa regionale', rl_placeholder:'Nome della regione', rl_default:'Regione senza nome', rl_open:'Entra nella regione →', bc_back:'Indietro', bc_world:'Mappa del mondo',
+      t_lake:'Lago', o_lake:'Lago', h_lake:'Clicca per aggiungere punti, con 3+ punti premi Invio per chiudere.', t_territory:'Territorio', o_territory:'Territorio', o_territorycolor:'Colore di riempimento', o_territorybcolor:'Colore del bordo', h_territory:'Clicca per aggiungere punti, con 3+ punti premi Invio per chiudere.', t_regionlink:'Collegamento regione', h_regionlink:'Clicca sulla mappa e assegna un nome: viene creata una nuova mappa regionale vuota. Fai doppio clic sullo spillo con lo strumento Seleziona per entrarci; usa "Indietro" in alto a sinistra per tornare alla mappa del mondo.', rl_newtitle:'Nuova mappa regionale', rl_placeholder:'Nome della regione', rl_default:'Regione senza nome', rl_open:'Entra nella regione →', bc_back:'Indietro', bc_world:'Mappa del mondo', t_resource:'Risorsa', o_resourcetype:'Tipo', rs_mine:'Miniera', rs_farm:'Terreno agricolo', rs_hunting:'Terreno di caccia', rs_fishing:'Zona di pesca', rs_trade:'Posto di commercio', rs_quarry:'Cava', h_resource:'Clicca sulla mappa per posizionare un indicatore di risorsa del tipo selezionato.',
       o_lakecolor:'Colore del lago',
       o_symbbrush:'Modalità pennello', o_symbdensity:'Densità', o_clipland:'Limita alla terra (pennello)',
       o_windrose:'Rosa dei venti', o_wrvis:'Mostra sulla mappa', o_wrsize:'Dimensione',
@@ -405,7 +405,7 @@
       o_fwd:'Avançar', o_bwd:'Recuar',
       o_group:'Agrupar', o_ungroup:'Desagrupar',
       selMulti:'objetos selecionados',
-      t_lake:'Lago', o_lake:'Lago', h_lake:'Clique para adicionar pontos; com 3+ pontos, prima Enter para fechar.', t_territory:'Território', o_territory:'Território', o_territorycolor:'Cor de preenchimento', o_territorybcolor:'Cor do contorno', h_territory:'Clique para adicionar pontos; com 3+ pontos, prima Enter para fechar.', t_regionlink:'Ligação de região', h_regionlink:'Clique no mapa e dê um nome: é criado um novo mapa de região em branco. Faça duplo clique no marcador com a ferramenta Selecionar para entrar; use "Voltar" no canto superior esquerdo para regressar ao mapa do mundo.', rl_newtitle:'Novo mapa de região', rl_placeholder:'Nome da região', rl_default:'Região sem nome', rl_open:'Entrar na região →', bc_back:'Voltar', bc_world:'Mapa do mundo',
+      t_lake:'Lago', o_lake:'Lago', h_lake:'Clique para adicionar pontos; com 3+ pontos, prima Enter para fechar.', t_territory:'Território', o_territory:'Território', o_territorycolor:'Cor de preenchimento', o_territorybcolor:'Cor do contorno', h_territory:'Clique para adicionar pontos; com 3+ pontos, prima Enter para fechar.', t_regionlink:'Ligação de região', h_regionlink:'Clique no mapa e dê um nome: é criado um novo mapa de região em branco. Faça duplo clique no marcador com a ferramenta Selecionar para entrar; use "Voltar" no canto superior esquerdo para regressar ao mapa do mundo.', rl_newtitle:'Novo mapa de região', rl_placeholder:'Nome da região', rl_default:'Região sem nome', rl_open:'Entrar na região →', bc_back:'Voltar', bc_world:'Mapa do mundo', t_resource:'Recurso', o_resourcetype:'Tipo', rs_mine:'Mina', rs_farm:'Terra agrícola', rs_hunting:'Terreno de caça', rs_fishing:'Zona de pesca', rs_trade:'Posto de comércio', rs_quarry:'Pedreira', h_resource:'Clique no mapa para colocar um marcador de recurso do tipo selecionado.',
       o_lakecolor:'Cor do lago',
       o_symbbrush:'Modo pincel', o_symbdensity:'Densidade', o_clipland:'Restringir à terra (pincel)',
       o_windrose:'Rosa dos ventos', o_wrvis:'Mostrar no mapa', o_wrsize:'Tamanho',
@@ -463,7 +463,7 @@
       o_fwd:'Naar voren', o_bwd:'Naar achteren',
       o_group:'Groeperen', o_ungroup:'Groepering opheffen',
       selMulti:'objecten geselecteerd',
-      t_lake:'Meer', o_lake:'Meer', h_lake:'Klik om punten toe te voegen, druk vanaf 3 punten op Enter om te sluiten.', t_territory:'Gebied', o_territory:'Gebied', o_territorycolor:'Vulkleur', o_territorybcolor:'Randkleur', h_territory:'Klik om punten toe te voegen, druk vanaf 3 punten op Enter om te sluiten.', t_regionlink:'Regiokoppeling', h_regionlink:'Klik op de kaart en geef een naam: er wordt een nieuwe, lege regiokaart gemaakt. Dubbelklik met het selectiegereedschap op de speld om deze te openen; gebruik linksboven "Terug" om naar de wereldkaart te gaan.', rl_newtitle:'Nieuwe regiokaart', rl_placeholder:'Regionaam', rl_default:'Naamloze regio', rl_open:'Regio openen →', bc_back:'Terug', bc_world:'Wereldkaart',
+      t_lake:'Meer', o_lake:'Meer', h_lake:'Klik om punten toe te voegen, druk vanaf 3 punten op Enter om te sluiten.', t_territory:'Gebied', o_territory:'Gebied', o_territorycolor:'Vulkleur', o_territorybcolor:'Randkleur', h_territory:'Klik om punten toe te voegen, druk vanaf 3 punten op Enter om te sluiten.', t_regionlink:'Regiokoppeling', h_regionlink:'Klik op de kaart en geef een naam: er wordt een nieuwe, lege regiokaart gemaakt. Dubbelklik met het selectiegereedschap op de speld om deze te openen; gebruik linksboven "Terug" om naar de wereldkaart te gaan.', rl_newtitle:'Nieuwe regiokaart', rl_placeholder:'Regionaam', rl_default:'Naamloze regio', rl_open:'Regio openen →', bc_back:'Terug', bc_world:'Wereldkaart', t_resource:'Grondstof', o_resourcetype:'Type', rs_mine:'Mijn', rs_farm:'Landbouwgrond', rs_hunting:'Jachtgebied', rs_fishing:'Visgebied', rs_trade:'Handelspost', rs_quarry:'Steengroeve', h_resource:'Klik op de kaart om een grondstofmarkering van het geselecteerde type te plaatsen.',
       o_lakecolor:'Kleur van het meer',
       o_symbbrush:'Penseelmodus', o_symbdensity:'Dichtheid', o_clipland:'Beperken tot land (penseel)',
       o_windrose:'Windroos', o_wrvis:'Tonen op de kaart', o_wrsize:'Grootte',
@@ -521,7 +521,7 @@
       o_fwd:'Przenieś wyżej', o_bwd:'Przenieś niżej',
       o_group:'Grupuj', o_ungroup:'Rozgrupuj',
       selMulti:'zaznaczonych obiektów',
-      t_lake:'Jezioro', o_lake:'Jezioro', h_lake:'Kliknij, aby dodać punkty; od 3 punktów naciśnij Enter, aby zamknąć.', t_territory:'Terytorium', o_territory:'Terytorium', o_territorycolor:'Kolor wypełnienia', o_territorybcolor:'Kolor obramowania', h_territory:'Kliknij, aby dodać punkty; od 3 punktów naciśnij Enter, aby zamknąć.', t_regionlink:'Łącze regionu', h_regionlink:'Kliknij mapę i nadaj nazwę: zostanie utworzona nowa, pusta mapa regionu. Kliknij dwukrotnie na pinezkę narzędziem Zaznacz, aby wejść; użyj "Wstecz" w lewym górnym rogu, aby wrócić do mapy świata.', rl_newtitle:'Nowa mapa regionu', rl_placeholder:'Nazwa regionu', rl_default:'Region bez nazwy', rl_open:'Wejdź do regionu →', bc_back:'Wstecz', bc_world:'Mapa świata',
+      t_lake:'Jezioro', o_lake:'Jezioro', h_lake:'Kliknij, aby dodać punkty; od 3 punktów naciśnij Enter, aby zamknąć.', t_territory:'Terytorium', o_territory:'Terytorium', o_territorycolor:'Kolor wypełnienia', o_territorybcolor:'Kolor obramowania', h_territory:'Kliknij, aby dodać punkty; od 3 punktów naciśnij Enter, aby zamknąć.', t_regionlink:'Łącze regionu', h_regionlink:'Kliknij mapę i nadaj nazwę: zostanie utworzona nowa, pusta mapa regionu. Kliknij dwukrotnie na pinezkę narzędziem Zaznacz, aby wejść; użyj "Wstecz" w lewym górnym rogu, aby wrócić do mapy świata.', rl_newtitle:'Nowa mapa regionu', rl_placeholder:'Nazwa regionu', rl_default:'Region bez nazwy', rl_open:'Wejdź do regionu →', bc_back:'Wstecz', bc_world:'Mapa świata', t_resource:'Zasób', o_resourcetype:'Typ', rs_mine:'Kopalnia', rs_farm:'Ziemia uprawna', rs_hunting:'Teren łowiecki', rs_fishing:'Łowisko', rs_trade:'Placówka handlowa', rs_quarry:'Kamieniołom', h_resource:'Kliknij mapę, aby umieścić znacznik zasobu wybranego typu.',
       o_lakecolor:'Kolor jeziora',
       o_symbbrush:'Tryb pędzla', o_symbdensity:'Gęstość', o_clipland:'Ogranicz do lądu (pędzel)',
       o_windrose:'Róża wiatrów', o_wrvis:'Pokaż na mapie', o_wrsize:'Rozmiar',
@@ -579,7 +579,7 @@
       o_fwd:'Переместить выше', o_bwd:'Переместить ниже',
       o_group:'Сгруппировать', o_ungroup:'Разгруппировать',
       selMulti:'объектов выделено',
-      t_lake:'Озеро', o_lake:'Озеро', h_lake:'Щёлкайте, чтобы добавить точки; от 3 точек — Enter, чтобы замкнуть.', t_territory:'Территория', o_territory:'Территория', o_territorycolor:'Цвет заливки', o_territorybcolor:'Цвет границы', h_territory:'Щёлкайте, чтобы добавить точки; от 3 точек — Enter, чтобы замкнуть.', t_regionlink:'Ссылка на регион', h_regionlink:'Щёлкните по карте и задайте имя: будет создана новая, пустая карта региона. Дважды щёлкните по метке инструментом «Выбор», чтобы войти; используйте «Назад» в левом верхнем углу, чтобы вернуться на карту мира.', rl_newtitle:'Новая карта региона', rl_placeholder:'Название региона', rl_default:'Регион без названия', rl_open:'Войти в регион →', bc_back:'Назад', bc_world:'Карта мира',
+      t_lake:'Озеро', o_lake:'Озеро', h_lake:'Щёлкайте, чтобы добавить точки; от 3 точек — Enter, чтобы замкнуть.', t_territory:'Территория', o_territory:'Территория', o_territorycolor:'Цвет заливки', o_territorybcolor:'Цвет границы', h_territory:'Щёлкайте, чтобы добавить точки; от 3 точек — Enter, чтобы замкнуть.', t_regionlink:'Ссылка на регион', h_regionlink:'Щёлкните по карте и задайте имя: будет создана новая, пустая карта региона. Дважды щёлкните по метке инструментом «Выбор», чтобы войти; используйте «Назад» в левом верхнем углу, чтобы вернуться на карту мира.', rl_newtitle:'Новая карта региона', rl_placeholder:'Название региона', rl_default:'Регион без названия', rl_open:'Войти в регион →', bc_back:'Назад', bc_world:'Карта мира', t_resource:'Ресурс', o_resourcetype:'Тип', rs_mine:'Рудник', rs_farm:'Пахотная земля', rs_hunting:'Охотничьи угодья', rs_fishing:'Место рыбной ловли', rs_trade:'Торговый пост', rs_quarry:'Каменоломня', h_resource:'Щёлкните по карте, чтобы разместить метку ресурса выбранного типа.',
       o_lakecolor:'Цвет озера',
       o_symbbrush:'Режим кисти', o_symbdensity:'Плотность', o_clipland:'Привязать к суше (кисть)',
       o_windrose:'Роза ветров', o_wrvis:'Показывать на карте', o_wrsize:'Размер',
@@ -672,6 +672,10 @@
       on('btn-undo', 'click', function () { History.undo(); });
       on('btn-redo', 'click', function () { History.redo(); });
       on('btn-map-back', 'click', function () { App.exitMap(); });
+
+      /* --- kaynak işareti --- */
+      on('rs-type', 'change', function (e) { App.resource.type = e.target.value; });
+      self.range('rs-size', 'v-rs-size', function (v) { App.resource.size = v; });
       on('btn-export-png', 'click', function () { Exporter.png(1); });
       on('btn-export-svg', 'click', function () { Exporter.svg(); });
 
@@ -1505,6 +1509,7 @@
       if (kind === 'symbols') desc += ' · ' + o.sym + ' · ' + Math.round(o.size) + 'px';
       else if (kind === 'labels') desc += ' · "' + (o.text||'').slice(0,18) + '"';
       else if (kind === 'links') desc += ' · "' + (o.name||'').slice(0,18) + '"';
+      else if (kind === 'resources') desc += ' · ' + this.t('rs_'+o.type);
       else desc += ' · ' + o.pts.length + ' pt';
       box.textContent = desc;
 
@@ -1631,7 +1636,7 @@
       var self = this;
       var map = { v:'select', b:'landmass', e:'erase', t:'terrain', s:'symbol',
                   r:'river', d:'road', l:'label', h:'pan', i:'eyedrop', k:'lake', g:'territory',
-                  u:'elevation', m:'regionlink' };
+                  u:'elevation', m:'regionlink', y:'resource' };
 
       window.addEventListener('keydown', function (ev) {
         var tag = (ev.target.tagName || '').toLowerCase();
