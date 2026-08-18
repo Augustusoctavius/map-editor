@@ -531,6 +531,13 @@
       var layer = Layers.get(this.activeLayerId);
       var ctx = layer.ctx;
 
+      /* ---- İZ SÜRME MODU: referans görseldeki en yakın güçlü kenara (kıyı
+         çizgisi) fırça noktasını kenetle — sadece kara/deniz fırçasında ---- */
+      if ((this.mode === 'paint' || this.mode === 'erase') && App.reference && App.reference.traceMode) {
+        var snapped = this.snapToRefEdge(x, y);
+        x = snapped.x; y = snapped.y;
+      }
+
       /* ---- ARAZİ: prosedürel serpme (tile yok) ---- */
       if (this.mode === 'terrain') {
         this.stampTerrain(x, y);
@@ -715,6 +722,45 @@
       var n = Math.max(1, Math.ceil(Math.hypot(dx,dy)/step));
       for (var i=1; i<=n; i++) this.eyedropStamp(this.last.x+dx*i/n, this.last.y+dy*i/n);
       this.last = p;
+    },
+
+    /* ---- iz sürme modu: referans görselin gri tonlama önbelleği + kenar arama ---- */
+    _refTraceCache: null,
+    _buildRefTrace: function () {
+      var L = Layers.get('reference');
+      if (!L || !L.image) { this._refTraceCache = null; return null; }
+      var w = Cv.W, h = Cv.H;
+      var c = document.createElement('canvas'); c.width = w; c.height = h;
+      var cx = c.getContext('2d', { willReadFrequently:true });
+      cx.drawImage(L.image, 0, 0, w, h);
+      var d = cx.getImageData(0, 0, w, h).data;
+      var lum = new Float32Array(w*h);
+      for (var i = 0, p = 0; i < d.length; i += 4, p++) lum[p] = d[i]*0.299 + d[i+1]*0.587 + d[i+2]*0.114;
+      this._refTraceCache = { lum:lum, w:w, h:h, image:L.image };
+      return this._refTraceCache;
+    },
+
+    snapToRefEdge: function (x, y) {
+      var cache = this._refTraceCache;
+      if (!cache || cache.image !== (Layers.get('reference')||{}).image) cache = this._buildRefTrace();
+      if (!cache) return { x:x, y:y };
+      var w = cache.w, h = cache.h, lum = cache.lum;
+      var radius = 18, step = 2, best = null, bestScore = 14; /* eşik altı kenar sayılmaz */
+      var cx0 = Math.round(x), cy0 = Math.round(y);
+      for (var dy = -radius; dy <= radius; dy += step) {
+        var yy = cy0 + dy;
+        if (yy < 1 || yy >= h-1) continue;
+        for (var dx = -radius; dx <= radius; dx += step) {
+          var xx = cx0 + dx;
+          if (xx < 1 || xx >= w-1) continue;
+          var idx = yy*w + xx;
+          var gx = lum[idx+1] - lum[idx-1];
+          var gy = lum[idx+w] - lum[idx-w];
+          var score = Math.abs(gx) + Math.abs(gy) - Math.hypot(dx, dy)*0.6; /* uzaklık cezası */
+          if (score > bestScore) { bestScore = score; best = { x:xx, y:yy }; }
+        }
+      }
+      return best || { x:x, y:y };
     },
 
     /* ---- kıyı yumuşatma ---- */

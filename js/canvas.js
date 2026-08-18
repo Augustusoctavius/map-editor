@@ -465,7 +465,7 @@
       ctx.fillRect(0, 0, this.W, this.H);
       ctx.restore();
 
-      this.renderMap(ctx, { includeReference:true });
+      this.renderMap(ctx, { includeReference:true, trace:true });
 
       ctx.strokeStyle = 'rgba(0,0,0,0.6)';
       ctx.lineWidth = 1/this.zoom;
@@ -645,6 +645,19 @@
           g.addColorStop(1, 'rgba(60,40,15,0.75)');
           ctx.fillStyle = g;
           ctx.fillRect(0, 0, W, H);
+          ctx.restore();
+        }
+      }
+
+      /* --- iz sürme modu: referans görseli, boyanan katmanların üstünde
+         yarı saydam olarak tekrar çiz — opak fırça darbeleri referansı
+         gizlemesin diye. Yalnızca interaktif görünümde (export'ta değil). */
+      if (opt.trace && App.reference && App.reference.traceMode) {
+        var refL = Layers.get('reference');
+        if (refL && refL.image) {
+          ctx.save();
+          ctx.globalAlpha = 0.4;
+          ctx.drawImage(refL.image, 0, 0, W, H);
           ctx.restore();
         }
       }

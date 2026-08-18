@@ -42,7 +42,7 @@
       o_view:'Görünüm', o_fit:'Ekrana sığdır', o_100:'%100',
       h_pan:'Sağ tık + sürükle, orta tık, Space + sürükle veya yön tuşları ile kaydır.',
       tab_layers:'Katmanlar', tab_library:'Kütüphane', tab_history:'Geçmiş',
-      ref_title:'Referans görsel', ref_export:"Export'a dahil et", ref_clear:'Referansı kaldır',
+      ref_title:'Referans görsel', ref_export:"Export'a dahil et", ref_clear:'Referansı kaldır', ref_trace:'İz sürme modu (üstte göster + kıyı kenetleme)',
       sym_upload:'+ PNG Sembol yükle', sym_upload_done:'sembol yüklendi', sym_del:'Sil', sym_search:'Sembol ara...',
       st_pos:'Konum', st_zoom:'Yakınlık', st_size:'Tuval', st_tool:'Araç',
       cancel:'Vazgeç', ok:'Tamam',
@@ -100,7 +100,7 @@
       o_view:'View', o_fit:'Fit to screen', o_100:'100%',
       h_pan:'Right-click drag, middle-click, Space + drag, or arrow keys to pan.',
       tab_layers:'Layers', tab_library:'Library', tab_history:'History',
-      ref_title:'Reference image', ref_export:'Include in export', ref_clear:'Remove reference',
+      ref_title:'Reference image', ref_export:'Include in export', ref_clear:'Remove reference', ref_trace:'Trace mode (show on top + coastline snap)',
       sym_upload:'+ Upload PNG Symbol', sym_upload_done:'symbol(s) loaded', sym_del:'Delete', sym_search:'Search symbols...',
       st_pos:'Pos', st_zoom:'Zoom', st_size:'Canvas', st_tool:'Tool',
       cancel:'Cancel', ok:'OK',
@@ -158,7 +158,7 @@
       o_view:'Ansicht', o_fit:'An Fenster anpassen', o_100:'100 %',
       h_pan:'Rechtsklick + ziehen, Mittelklick, Leertaste + ziehen oder Pfeiltasten zum Verschieben.',
       tab_layers:'Ebenen', tab_library:'Bibliothek', tab_history:'Verlauf',
-      ref_title:'Referenzbild', ref_export:'In Export einschließen', ref_clear:'Referenz entfernen',
+      ref_title:'Referenzbild', ref_export:'In Export einschließen', ref_clear:'Referenz entfernen', ref_trace:'Nachzeichenmodus (oben anzeigen + Küstenlinie einrasten)',
       sym_upload:'+ PNG-Symbol hochladen', sym_upload_done:'Symbol(e) geladen', sym_del:'Löschen', sym_search:'Symbole durchsuchen...',
       st_pos:'Position', st_zoom:'Zoom', st_size:'Leinwand', st_tool:'Werkzeug',
       cancel:'Abbrechen', ok:'OK',
@@ -216,7 +216,7 @@
       o_view:'Vue', o_fit:"Ajuster à l'écran", o_100:'100 %',
       h_pan:'Clic droit + glisser, clic molette, Espace + glisser, ou flèches pour vous déplacer.',
       tab_layers:'Calques', tab_library:'Bibliothèque', tab_history:'Historique',
-      ref_title:'Image de référence', ref_export:"Inclure dans l'export", ref_clear:'Retirer la référence',
+      ref_title:'Image de référence', ref_export:"Inclure dans l'export", ref_clear:'Retirer la référence', ref_trace:'Mode de calque (afficher au-dessus + accrochage au littoral)',
       sym_upload:'+ Importer un symbole PNG', sym_upload_done:'symbole(s) chargé(s)', sym_del:'Supprimer', sym_search:'Rechercher un symbole...',
       st_pos:'Position', st_zoom:'Zoom', st_size:'Toile', st_tool:'Outil',
       cancel:'Annuler', ok:'OK',
@@ -274,7 +274,7 @@
       o_view:'Vista', o_fit:'Ajustar a la pantalla', o_100:'100 %',
       h_pan:'Clic derecho + arrastrar, clic central, Espacio + arrastrar, o flechas para desplazarte.',
       tab_layers:'Capas', tab_library:'Biblioteca', tab_history:'Historial',
-      ref_title:'Imagen de referencia', ref_export:'Incluir en la exportación', ref_clear:'Quitar referencia',
+      ref_title:'Imagen de referencia', ref_export:'Incluir en la exportación', ref_clear:'Quitar referencia', ref_trace:'Modo de calco (mostrar encima + ajuste a la costa)',
       sym_upload:'+ Subir símbolo PNG', sym_upload_done:'símbolo(s) cargado(s)', sym_del:'Borrar', sym_search:'Buscar símbolos...',
       st_pos:'Posición', st_zoom:'Zoom', st_size:'Lienzo', st_tool:'Herramienta',
       cancel:'Cancelar', ok:'Aceptar',
@@ -332,7 +332,7 @@
       o_view:'Visualizza', o_fit:'Adatta allo schermo', o_100:'100%',
       h_pan:'Clic destro + trascina, clic centrale, Spazio + trascina, o frecce per spostarti.',
       tab_layers:'Livelli', tab_library:'Libreria', tab_history:'Cronologia',
-      ref_title:'Immagine di riferimento', ref_export:"Includi nell'esportazione", ref_clear:'Rimuovi riferimento',
+      ref_title:'Immagine di riferimento', ref_export:"Includi nell'esportazione", ref_clear:'Rimuovi riferimento', ref_trace:'Modalità ricalco (mostra sopra + aggancio alla costa)',
       sym_upload:'+ Carica simbolo PNG', sym_upload_done:'simbolo/i caricato/i', sym_del:'Elimina', sym_search:'Cerca simboli...',
       st_pos:'Posizione', st_zoom:'Zoom', st_size:'Tela', st_tool:'Strumento',
       cancel:'Annulla', ok:'OK',
@@ -390,7 +390,7 @@
       o_view:'Vista', o_fit:'Ajustar ao ecrã', o_100:'100%',
       h_pan:'Clique direito + arrastar, clique do meio, Espaço + arrastar, ou setas para deslocar.',
       tab_layers:'Camadas', tab_library:'Biblioteca', tab_history:'Histórico',
-      ref_title:'Imagem de referência', ref_export:'Incluir na exportação', ref_clear:'Remover referência',
+      ref_title:'Imagem de referência', ref_export:'Incluir na exportação', ref_clear:'Remover referência', ref_trace:'Modo de decalque (mostrar por cima + fixação ao litoral)',
       sym_upload:'+ Carregar símbolo PNG', sym_upload_done:'símbolo(s) carregado(s)', sym_del:'Apagar', sym_search:'Pesquisar símbolos...',
       st_pos:'Posição', st_zoom:'Zoom', st_size:'Tela', st_tool:'Ferramenta',
       cancel:'Cancelar', ok:'OK',
@@ -448,7 +448,7 @@
       o_view:'Weergave', o_fit:'Passend maken', o_100:'100%',
       h_pan:'Rechtsklikken + slepen, middelklik, Spatie + slepen, of pijltjestoetsen om te verschuiven.',
       tab_layers:'Lagen', tab_library:'Bibliotheek', tab_history:'Geschiedenis',
-      ref_title:'Referentieafbeelding', ref_export:'Opnemen in export', ref_clear:'Referentie verwijderen',
+      ref_title:'Referentieafbeelding', ref_export:'Opnemen in export', ref_clear:'Referentie verwijderen', ref_trace:'Overtrekmodus (bovenop tonen + kustlijn uitlijnen)',
       sym_upload:'+ PNG-symbool uploaden', sym_upload_done:'symbo(o)l(en) geladen', sym_del:'Verwijderen', sym_search:'Symbolen zoeken...',
       st_pos:'Positie', st_zoom:'Zoom', st_size:'Canvas', st_tool:'Gereedschap',
       cancel:'Annuleren', ok:'OK',
@@ -506,7 +506,7 @@
       o_view:'Widok', o_fit:'Dopasuj do ekranu', o_100:'100%',
       h_pan:'Prawy przycisk + przeciągnij, środkowy przycisk, Spacja + przeciągnij lub strzałki, aby przesuwać.',
       tab_layers:'Warstwy', tab_library:'Biblioteka', tab_history:'Historia',
-      ref_title:'Obraz referencyjny', ref_export:'Uwzględnij w eksporcie', ref_clear:'Usuń obraz referencyjny',
+      ref_title:'Obraz referencyjny', ref_export:'Uwzględnij w eksporcie', ref_clear:'Usuń obraz referencyjny', ref_trace:'Tryb kalkowania (pokaż na wierzchu + przyciąganie do linii brzegowej)',
       sym_upload:'+ Wgraj symbol PNG', sym_upload_done:'wczytano symboli', sym_del:'Usuń', sym_search:'Szukaj symboli...',
       st_pos:'Pozycja', st_zoom:'Powiększenie', st_size:'Płótno', st_tool:'Narzędzie',
       cancel:'Anuluj', ok:'OK',
@@ -564,7 +564,7 @@
       o_view:'Вид', o_fit:'По размеру экрана', o_100:'100%',
       h_pan:'ПКМ + перетаскивание, СКМ, Пробел + перетаскивание или стрелки для перемещения.',
       tab_layers:'Слои', tab_library:'Библиотека', tab_history:'История',
-      ref_title:'Референс-изображение', ref_export:'Включить в экспорт', ref_clear:'Убрать референс',
+      ref_title:'Референс-изображение', ref_export:'Включить в экспорт', ref_clear:'Убрать референс', ref_trace:'Режим трассировки (показать сверху + привязка к береговой линии)',
       sym_upload:'+ Загрузить PNG-символ', sym_upload_done:'символ(ов) загружено', sym_del:'Удалить', sym_search:'Поиск символов...',
       st_pos:'Позиция', st_zoom:'Масштаб', st_size:'Холст', st_tool:'Инструмент',
       cancel:'Отмена', ok:'ОК',
@@ -1098,9 +1098,14 @@
         e.target.value = '';
       });
       on('ref-export', 'change', function (e) { App.exportReference = e.target.checked; });
+      on('ref-trace', 'change', function (e) {
+        App.reference.traceMode = e.target.checked;
+        Cv.requestRender();
+      });
       on('btn-ref-clear', 'click', function () {
         var L = Layers.get('reference');
         L.image = null; L.imageData = null;
+        Tools._refTraceCache = null;
         Cv.requestRender();
       });
 
