@@ -141,6 +141,7 @@ textarea{font-family:var(--f-display);font-size:13px}
 .li-btn:hover{color:var(--brass)}
 .li-btn.off{color:#5a6259}
 .layer-op{width:100%;margin-top:4px}
+.layer-blend{width:100%;margin-top:4px;font-size:10.5px;background:var(--ink-800);border:1px solid var(--line);border-radius:3px;color:var(--text-dim);padding:2px 4px}
 .layer-extra{border-top:1px solid var(--line);padding-top:10px}
 .layer-extra input[type=file]{width:100%;font-size:11px;margin-bottom:6px}
 

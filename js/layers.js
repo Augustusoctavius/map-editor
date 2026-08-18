@@ -536,7 +536,7 @@
     init: function(w,h){
       this.list = DEFS.map(function(d){
         var l={id:d.id,type:d.type,tr:d.tr,en:d.en,
-               visible:d.visible,locked:false,opacity:d.opacity,
+               visible:d.visible,locked:false,opacity:d.opacity,blend:'source-over',
                canvas:null,ctx:null,objects:[],image:null,imageData:null};
         if(d.type==='raster'){
           l.canvas=document.createElement('canvas');
@@ -578,7 +578,7 @@
 
     meta: function(){
       return this.list.map(function(l){
-        return{id:l.id,visible:l.visible,locked:l.locked,opacity:l.opacity};
+        return{id:l.id,visible:l.visible,locked:l.locked,opacity:l.opacity,blend:l.blend};
       });
     },
 
@@ -586,7 +586,7 @@
       var self=this, ordered=[];
       m.forEach(function(e){
         var l=self.get(e.id); if(!l)return;
-        l.visible=e.visible; l.locked=e.locked; l.opacity=e.opacity;
+        l.visible=e.visible; l.locked=e.locked; l.opacity=e.opacity; l.blend=e.blend||'source-over';
         ordered.push(l);
       });
       if(ordered.length===this.list.length) this.list=ordered;
@@ -594,7 +594,7 @@
 
     serialize: function(includeRef){
       return this.list.map(function(l){
-        var o={id:l.id,type:l.type,visible:l.visible,locked:l.locked,opacity:l.opacity};
+        var o={id:l.id,type:l.type,visible:l.visible,locked:l.locked,opacity:l.opacity,blend:l.blend};
         if(l.type==='raster') o.data=l.canvas.toDataURL('image/png');
         if(l.type==='vector') o.objects=l.objects;
         if(l.type==='image'&&l.imageData&&includeRef!==false) o.data=l.imageData;
@@ -606,7 +606,7 @@
       var self=this, jobs=[], ordered=[];
       arr.forEach(function(e){
         var l=self.get(e.id); if(!l)return;
-        l.visible=e.visible; l.locked=e.locked; l.opacity=e.opacity;
+        l.visible=e.visible; l.locked=e.locked; l.opacity=e.opacity; l.blend=e.blend||'source-over';
         if(l.type==='vector') l.objects=e.objects||[];
         if(l.type==='raster'){
           l.ctx.clearRect(0,0,l.canvas.width,l.canvas.height);

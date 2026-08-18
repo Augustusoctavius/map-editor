@@ -576,6 +576,7 @@
         if (l.type === 'raster') {
           ctx.save();
           ctx.globalAlpha = l.opacity;
+          ctx.globalCompositeOperation = l.blend || 'source-over';
           ctx.drawImage(l.canvas, 0, 0, W, H);
           ctx.restore();
           continue;
