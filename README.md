@@ -37,7 +37,7 @@ Her araç, sağ paneldeki ilgili seçenekler bölümünü açar ve tuşlarla da 
 | Araç | Tuş | İşlev |
 |---|---|---|
 | **Seç** | `V` | Vektör nesneleri (nehir, yol, göl, bölge, sembol, etiket) seçmek, taşımak, düzenlemek için. Seçili bir yol/göl/bölgenin bezier tutamaçları (handle) buradan sürüklenir. |
-| **Kara** | `B` | Kara kütlesi fırçası — karayı boyar, deniz ile arasına otomatik kıyı efekti (glow) uygulanır. |
+| **Kara** | `B` | Kara kütlesi fırçası — karayı boyar, deniz ile arasına otomatik kıyı efekti (glow) uygulanır. Aynı panelde **prosedürel kara üreteci** de bulunur: Kıta / Ada / Takımada şablonlarından biriyle, tohumlu Perlin gürültüsüne dayalı tek tıkla rastgele kıyı çizgisi üretir (detay/pürüzlülük ayarlanabilir, harici kütüphane kullanılmaz). |
 | **Deniz** | `E` | Silgi — boyanmış karayı (ve üzerindeki arazi dokusunu) tek adımda kaldırır. |
 | **Arazi** | `T` | 20 arazi tipinden biriyle doku boyar (otlak, orman, karanlık orman, tayga, bozkır, savan, çöl, bataklık, kayalık, kar/buz vb.). Her fırça darbesinde desen rastgele serpilir; iki darbe asla birebir aynı görünmez. Fırçanın kara sınırlarını aşmaması otomatik sağlanır. |
 | **Yükselti** | `U` | Yükseklik/elevation fırçası — sürükleyerek araziyi yükseltir; "Alçaltma modu" işaretliyken çukurlaştırır. Sonuç, gölgelendirme (hillshade) ve/veya kontur çizgileri olarak otomatik render edilir; ayarlanabilir kontur aralığı vardır. |
@@ -46,6 +46,7 @@ Her araç, sağ paneldeki ilgili seçenekler bölümünü açar ve tuşlarla da 
 | **Göl** | `K` | Kapalı bir gölet/deniz gölü şekli çizer; kıyı rengi altındaki arazi dokusuna göre otomatik uyarlanır. |
 | **Bölge** | `G` | Toprak/bölge (territory) doldurma aracı — kesikli kenarlıklı, yarı saydam dolgulu kapalı bir alan çizer; sınır/siyasi harita amaçlı. |
 | **Bölge bağlantısı** | `M` | Haritaya tıklayıp isim vererek yeni, boş bir **alt harita** (bölge/şehir haritası) oluşturur ve üzerine bir bağlantı iğnesi yerleştirir. Bkz. aşağıdaki "Çoklu harita" bölümü. |
+| **Kaynak** | `Y` | Maden, tarım, avlanma, balıkçılık, ticaret ve taş ocağı olmak üzere 6 türden birini seçip haritaya oyun-tasarımı amaçlı kaynak işareti yerleştirir (kervan/ticaret temalı haritalar için). |
 | **Yol** | `D` | Kervan güzergâhı / kara yolu çizim aracı, nehirle aynı mantıkta. |
 | **Etiket** | `L` | Metin etiketi yerleştirir; hazır stil (başlık, şehir adı, bölge adı vb.) ön ayarları mevcuttur. **"Yola oturt"** işaretliyse ve tıklama bir nehre/yola yakınsa, etiket o çizginin gerçek şekline harf harf oturur (dairesel yay değil, çizilmiş eğrinin kendisi). |
 | **Örnekle** | `I` | Doku eyedropper — haritanın bir bölgesinden dokuyu örnekleyip başka bir yere aynı stille "boyayabilme" aracı; ① alan seç → ② boyamaya başla akışıyla çalışır. |
@@ -67,11 +68,13 @@ Bağlantı iğneleri yalnızca editör içi gezinme yardımcısıdır; PNG/SVG �
 
 Seçili araca göre değişen ayarlar burada görünür: fırça boyutu, opaklık, renk, kenarlık rengi/kalınlığı, kıyı stili (kumlu / kayalık / resif), yükselti gücü ve alçaltma modu, pusula gülü stili, ölçek çubuğu ayarları, ızgaraya yapış (snap-to-grid) açma/kapama, referans görsel yükleme/opaklık ve görünüm (yakınlaştır/sığdır) kontrolleri.
 
+**Referans görsel — iz sürme (trace) modu:** Bir referans görsel yüklendikten sonra "İz sürme modu" işaretlenirse, görsel boyanan kara/arazi katmanlarının üstünde yarı saydam olarak gösterilmeye devam eder (normalde opak fırça darbeleri altında kalırdı) ve kara/deniz fırçası, referanstaki en yakın belirgin kenara (elle çizilmiş kıyı hattı gibi) otomatik kenetlenir. Bu mod yalnızca ekranda geçerlidir, PNG/SVG çıktısını etkilemez.
+
 Bir nesne seçildiğinde ek işlemler görünür: **Çoğalt**, **Sil**, öne/arkaya getir, en öne/en arkaya gönder, gruplama/grup çözme.
 
 ## Alt/yan panel sekmeleri
 
-- **Katmanlar** — Referans görsel, Kara, Arazi, Yükselti, Bölgeler, Nehirler, Yollar, Semboller, Harita bağlantıları, Etiketler, Kaplama olmak üzere 11 katman; her biri görünürlük ve opaklık kontrolüyle açılıp kapatılabilir, sıralanabilir.
+- **Katmanlar** — Referans görsel, Kara, Arazi, Yükselti, Bölgeler, Nehirler, Yollar, Semboller, Kaynaklar, Harita bağlantıları, Etiketler, Kaplama olmak üzere 12 katman; her biri görünürlük ve opaklık kontrolüyle açılıp kapatılabilir, sıralanabilir.
 - **Kütüphane** — Tüm sembol/bina kataloğu; kategoriye göre gezinilebilir ve arama kutusuyla filtrelenebilir. Kendi PNG sembolünüzü de yükleyip kütüphaneye ekleyebilirsiniz.
 - **Geçmiş** — Yapılan işlemlerin (fırça darbesi, nesne ekleme/silme vb.) kronolojik listesi; herhangi bir adıma geri dönülebilir.
 
