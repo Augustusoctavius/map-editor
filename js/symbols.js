@@ -620,6 +620,72 @@
       {id:'msc_scroll',tr:'Tomar',en:'Scroll',parts:[
         part(F.scroll,'fill2','ink',3),part(F.scrollLine,null,'ink3',1.8)]},
     ]},
+
+    /* ------------------------------------------------------------------
+       CANLILAR — nüfus/kalabalık işaretleri ve jenerik fantazya ırkları
+       (§ catalog2.js'teki izometrik ırk binalarıyla aynı jenerik/isimsiz
+       yaklaşım) artı birkaç yaygın hayvan. Basit, tek-silüet mürekkep
+       ikonlar — harita ölçeğinde okunaklı kalması için ayrıntı az. */
+    beings:{ tr:'Canlılar', en:'Beings', items:[
+      {id:'bg_person',tr:'İnsan',en:'Human',parts:[
+        part('M41 21 A9 9 0 1 1 59 21 A9 9 0 1 1 41 21 Z','fill','ink',2.6),
+        part('M50 29 L37 48 L41 90 H59 L63 48 Z','shade','ink',2.6)]},
+      {id:'bg_crowd',tr:'Kalabalık',en:'Crowd',parts:c([
+        [part('M32 30 A7 7 0 1 1 46 30 A7 7 0 1 1 32 30 Z','shade2','ink',2.2),
+         part('M39 37 L28 52 L31 84 H47 L50 52 Z','shade2','ink',2.2)],
+        [part('M54 26 A7 7 0 1 1 68 26 A7 7 0 1 1 54 26 Z','fill','ink',2.4),
+         part('M61 33 L50 50 L53 88 H69 L72 50 Z','shade','ink',2.4)],
+        [part('M70 32 A6 6 0 1 1 82 32 A6 6 0 1 1 70 32 Z','shade2','ink',2.2),
+         part('M76 38 L67 52 L70 80 H82 L85 52 Z','shade2','ink',2.2)]])},
+      {id:'bg_elf',tr:'Elf',en:'Elf',parts:[
+        part('M41 21 A9 9 0 1 1 59 21 A9 9 0 1 1 41 21 Z','fill','ink',2.6),
+        part('M40 18 L32 12 L38 24 Z M60 18 L68 12 L62 24 Z','fill','ink',2),
+        part('M50 29 L38 47 L42 90 H58 L62 47 Z','green','ink',2.6)]},
+      {id:'bg_dwarf',tr:'Cüce',en:'Dwarf',parts:[
+        part('M41 20 A8 8 0 1 1 57 20 A8 8 0 1 1 41 20 Z','fill','ink',2.6),
+        part('M50 34 L35 50 L39 88 H61 L65 50 Z','stoned','ink',2.6),
+        part('M41 24 L38 44 L49 52 L60 44 L57 24 Z','shade3','ink',2.4)]},
+      {id:'bg_orc',tr:'Ork',en:'Orc',parts:[
+        part('M40 22 A9 9 0 1 1 60 22 A9 9 0 1 1 40 22 Z','green2','ink',2.6),
+        part('M44 28 L42 34 L47 30 Z M56 28 L58 34 L53 30 Z','fill','ink',1.8),
+        part('M50 31 L34 50 L39 90 H61 L66 50 Z','shade3','ink',2.8)]},
+      {id:'bg_halfling',tr:'Küçük halk',en:'Little folk',parts:[
+        part('M43 24 A7 7 0 1 1 57 24 A7 7 0 1 1 43 24 Z','fill','ink',2.4),
+        part('M50 31 L41 46 L44 82 H56 L59 46 Z','gold','ink',2.4)]},
+      {id:'bg_gnome',tr:'Cin ustası',en:'Gnome',parts:[
+        part('M43 26 A7 7 0 1 1 57 26 A7 7 0 1 1 43 26 Z','fill','ink',2.4),
+        part('M50 6 L43 18 H57 Z','red','ink',2),
+        part('M50 33 L41 46 L44 82 H56 L59 46 Z','blue','ink',2.4)]},
+      {id:'bg_horse',tr:'At',en:'Horse',parts:[
+        part('M26 55 A22 12 0 1 1 70 55 A22 12 0 1 1 26 55 Z','shade2','ink',2.4),
+        part('M56 48 L62 24 L70 24 L66 48 Z','shade2','ink',2.2),
+        part('M57 20 A7 7 0 1 1 71 20 A7 7 0 1 1 57 20 Z','fill','ink',2.2),
+        part('M60 14 L58 8 L64 13 Z','fill','ink',1.6),
+        part('M62 26 L57 22 M64 30 L59 26 M66 34 L61 30',null,'ink3',2),
+        part('M56 62 H60 V84 H56 Z M64 62 H68 V84 H64 Z M30 62 H34 V84 H30 Z M38 62 H42 V84 H38 Z','shade3','ink',2),
+        part('M27 50 Q18 54 21 66',null,'ink3',2.4)]},
+      {id:'bg_wolf',tr:'Kurt',en:'Wolf',parts:[
+        part('M28 58 Q14 54 18 40 Q26 44 30 54 Z','stoned','ink',2.2),
+        part('M28 60 A18 9 0 1 1 62 60 A18 9 0 1 1 28 60 Z','stoned','ink',2.4),
+        part('M60 52 A6 6 0 1 1 72 52 A6 6 0 1 1 60 52 Z','stoned','ink',2.2),
+        part('M70 52 L79 55 L70 59 Z','stoned','ink',1.8),
+        part('M62 47 L60 39 L67 46 Z M68 47 L71 39 L73 47 Z','stoned','ink',1.8),
+        part('M32 66 H36 V82 H32 Z M40 66 H44 V82 H40 Z M48 66 H52 V82 H48 Z M56 66 H60 V82 H56 Z','shade3','ink',2)]},
+      {id:'bg_deer',tr:'Geyik',en:'Deer',parts:[
+        part('M28 58 A18 9 0 1 1 62 58 A18 9 0 1 1 28 58 Z','shade3','ink',2.4),
+        part('M54 52 L60 28 L66 28 L62 52 Z','shade3','ink',2.2),
+        part('M55 24 A6 6 0 1 1 67 24 A6 6 0 1 1 55 24 Z','shade3','ink',2),
+        part('M58 20 L54 10 M58 20 L56 14 L52 12 M64 20 L68 10 M64 20 L66 14 L70 12',null,'ink3',2),
+        part('M32 64 H36 V82 H32 Z M40 64 H44 V82 H40 Z M48 64 H52 V82 H48 Z M56 64 H60 V82 H56 Z','wood','ink',2)]},
+      {id:'bg_sheep',tr:'Koyun',en:'Sheep',parts:[
+        part('M24 60 Q22 46 36 44 Q40 38 52 40 Q64 38 70 46 Q80 46 80 58 Q80 64 72 64 L70 82 L64 82 L65 66 L34 66 L34 82 L28 82 L29 64 Q24 66 24 60 Z','fill3','ink',2.6),
+        part('M74 44 A6 6 0 1 1 86 44 A6 6 0 1 1 74 44 Z','shade2','ink',2)]},
+      {id:'bg_birdflock',tr:'Kuş sürüsü',en:'Bird flock',parts:[
+        part('M20 40 Q26 34 32 40 Q38 34 44 40',null,'ink',2.6),
+        part('M46 56 Q54 48 62 56 Q70 48 78 56',null,'ink',2.6),
+        part('M30 68 Q35 63 40 68 Q45 63 50 68',null,'ink',2.2),
+        part('M58 30 Q63 25 68 30 Q73 25 78 30',null,'ink',2.2)]},
+    ]},
   };
 
 

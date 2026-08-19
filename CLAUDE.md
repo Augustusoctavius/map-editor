@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Wayborne Map Editor (aka "Cartographer") — a fantasy/medieval map editor. Vanilla JS + Canvas 2D only: no framework, no build step, no bundler, no npm dependencies, no CDN assets. Everything (838 symbols, 28 terrain types, isometric buildings) is generated in code, not loaded from files.
+Wayborne Map Editor (aka "Cartographer") — a fantasy/medieval map editor. Vanilla JS + Canvas 2D only: no framework, no build step, no bundler, no npm dependencies, no CDN assets. Everything (850 symbols, 28 terrain types, isometric buildings) is generated in code, not loaded from files.
 
 Source comments and UI strings are primarily Turkish (this is a Turkish-authored project with TR/EN i18n built in via `js/ui.js`'s `DICT`). Keep that convention in mind when reading/writing comments.
 
