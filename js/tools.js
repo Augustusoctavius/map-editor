@@ -392,6 +392,12 @@
             o.pts[i][0] = this.dragging.orig[i][0]+dx;
             o.pts[i][1] = this.dragging.orig[i][1]+dy;
           }
+        } else if (o.kind === 'group' && this.dragging.groupOrig) {
+          var go = this.dragging.groupOrig;
+          for (var gi=0; gi<o.members.length; gi++) {
+            o.members[gi].x = go[gi].x+dx;
+            o.members[gi].y = go[gi].y+dy;
+          }
         } else { o.x = this.dragging.ox+dx; o.y = this.dragging.oy+dy; }
         Cv.requestRender();
         return;
@@ -1552,6 +1558,7 @@
         layerId:hit.layerId, obj:hit.obj, sx:p.x, sy:p.y,
         ox:hit.obj.x, oy:hit.obj.y,
         orig:hit.obj.pts ? JSON.parse(JSON.stringify(hit.obj.pts)) : null,
+        groupOrig: hit.obj.kind === 'group' ? hit.obj.members.map(function(m){ return {x:m.x, y:m.y}; }) : null,
         before:JSON.parse(JSON.stringify(L.objects))
       };
       UI.refreshSelection();
@@ -1851,13 +1858,8 @@
           ctx.beginPath(); ctx.arc(o.pts[k][0], o.pts[k][1], 4/z, 0, Math.PI*2); ctx.fill();
         }
       } else if (o.kind === 'group') {
-        /* grup bbox */
-        var gbs = o.members.map(function(m){ return Sym.bounds(m); });
-        var gx0=Math.min.apply(null,gbs.map(function(b){return b.x;}));
-        var gy0=Math.min.apply(null,gbs.map(function(b){return b.y;}));
-        var gx1=Math.max.apply(null,gbs.map(function(b){return b.x+b.w;}));
-        var gy1=Math.max.apply(null,gbs.map(function(b){return b.y+b.h;}));
-        ctx.strokeRect(gx0-6/z, gy0-6/z, gx1-gx0+12/z, gy1-gy0+12/z);
+        var gb = Sym.bounds(o);
+        ctx.strokeRect(gb.x-6/z, gb.y-6/z, gb.w+12/z, gb.h+12/z);
       } else if (App.selection.layerId === 'links' || App.selection.layerId === 'resources') {
         var r5 = (o.size||40)*0.6;
         ctx.beginPath(); ctx.arc(o.x, o.y, r5+4/z, 0, Math.PI*2); ctx.stroke();

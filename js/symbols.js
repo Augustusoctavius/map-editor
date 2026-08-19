@@ -878,7 +878,18 @@
     return out;
   }
 
-  function bounds(o){var h=(o.size||64)/2;return{x:o.x-h,y:o.y-h,w:h*2,h:h*2};}
+  function bounds(o){
+    if (o.kind === 'group') {
+      if (!o.members || !o.members.length) return { x:0, y:0, w:0, h:0 };
+      var bs = o.members.map(bounds);
+      var x0 = Math.min.apply(null, bs.map(function(b){return b.x;}));
+      var y0 = Math.min.apply(null, bs.map(function(b){return b.y;}));
+      var x1 = Math.max.apply(null, bs.map(function(b){return b.x+b.w;}));
+      var y1 = Math.max.apply(null, bs.map(function(b){return b.y+b.h;}));
+      return { x:x0, y:y0, w:x1-x0, h:y1-y0 };
+    }
+    var h=(o.size||64)/2;return{x:o.x-h,y:o.y-h,w:h*2,h:h*2};
+  }
 
   function count(){
     var n=0;

@@ -1001,6 +1001,12 @@
       /* --- seçim --- */
       on('btn-del', 'click', function () { Tools.deleteSelection(); });
       on('btn-dup', 'click', function () { Tools.duplicateSelection(); });
+      on('btn-group',   'click', function () { Tools.groupSelection(); });
+      on('btn-ungroup', 'click', function () { Tools.ungroupSelection(); });
+      on('btn-fwd',   'click', function () { Tools.bringForward(); });
+      on('btn-bwd',   'click', function () { Tools.sendBackward(); });
+      on('btn-front', 'click', function () { Tools.bringToFront(); });
+      on('btn-back',  'click', function () { Tools.sendToBack(); });
 
       /* --- ölçek çubuğu --- */
       on('sc-visible', 'change', function (e) {
@@ -1536,7 +1542,8 @@
       }
 
       var kind = App.selection.layerId, desc = kind;
-      if (kind === 'symbols') desc += ' · ' + o.sym + ' · ' + Math.round(o.size) + 'px';
+      if (kind === 'symbols' && o.kind === 'group') desc += ' · ' + o.members.length + ' ' + this.t('symbols');
+      else if (kind === 'symbols') desc += ' · ' + o.sym + ' · ' + Math.round(o.size) + 'px';
       else if (kind === 'labels') desc += ' · "' + (o.text||'').slice(0,18) + '"';
       else if (kind === 'links') desc += ' · "' + (o.name||'').slice(0,18) + '"';
       else if (kind === 'resources') desc += ' · ' + this.t('rs_'+o.type);
@@ -1550,7 +1557,7 @@
         if (kind === 'links') openBtn.onclick = function () { App.enterMap(o.targetMapId, o.name); };
       }
 
-      if (kind === 'symbols') {
+      if (kind === 'symbols' && o.kind !== 'group') {
         $('sy-size').value = o.size;  $('v-sy-size').textContent = Math.round(o.size);
         $('sy-rot').value = o.rot;    $('v-sy-rot').textContent = Math.round(o.rot)+'°';
         $('sy-hue').value = o.hue;    $('v-sy-hue').textContent = Math.round(o.hue)+'°';
