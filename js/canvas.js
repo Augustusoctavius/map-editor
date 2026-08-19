@@ -543,19 +543,6 @@
         }
       }
 
-      /* Yollar varsayılan olarak nehirlerin ALTINDA kalır (köprü olmadan
-         geçiş doğal görünsün). Panel sırasını değiştirmeden, sadece
-         render sırasında yolları nehirlerden önce çiziyoruz. */
-      var roadsLayerEarly = Layers.get('roads');
-      if (roadsLayerEarly && roadsLayerEarly.visible) {
-        ctx.save();
-        ctx.globalAlpha = roadsLayerEarly.opacity;
-        for (var ri = 0; ri < roadsLayerEarly.objects.length; ri++) {
-          this.drawRoad(ctx, roadsLayerEarly.objects[ri]);
-        }
-        ctx.restore();
-      }
-
       for (var i = 0; i < Layers.list.length; i++) {
         var l = Layers.list[i];
         if (!l.visible) continue;
@@ -597,6 +584,36 @@
           ctx.globalAlpha = l.opacity;
           var self_ = this;
           if (l.id === 'rivers') {
+            /* Yollar, kara/arazi/yükselti/bölgeler (bu noktada zaten çizilmiş)
+               ÜSTÜNDE ama nehirlerin ALTINDA görünmeli (köprü olmadan geçiş
+               doğal görünsün) — panel sırasını değiştirmeden, yalnızca
+               render sırasında yolları burada, nehirlerden hemen önce çiziyoruz. */
+            var roadsLayerNow = Layers.get('roads');
+            if (roadsLayerNow && roadsLayerNow.visible) {
+              /* Yollar da denizi geçmemeli — köprüsüz bir yol denizin
+               ortasında asılı kalmasın; nehir/göl ile aynı kara-kırpma
+               tekniği (bkz. aşağıdaki 'rivers' bloğu). */
+              var Lm2 = Layers.get('landmass');
+              var rc2 = (Lm2 && Lm2.canvas) ? document.createElement('canvas') : null;
+              var rdctx = ctx;
+              if (rc2) { rc2.width = W; rc2.height = H; rdctx = rc2.getContext('2d'); }
+              else { ctx.save(); ctx.globalAlpha = roadsLayerNow.opacity; }
+              for (var ri = 0; ri < roadsLayerNow.objects.length; ri++) {
+                this.drawRoad(rdctx, roadsLayerNow.objects[ri]);
+              }
+              if (rc2) {
+                rdctx.globalCompositeOperation = 'destination-in';
+                rdctx.drawImage(Lm2.canvas, 0, 0);
+                rdctx.globalCompositeOperation = 'source-over';
+                ctx.save();
+                ctx.globalAlpha = roadsLayerNow.opacity;
+                ctx.drawImage(rc2, 0, 0);
+                ctx.restore();
+              } else {
+                ctx.restore();
+              }
+            }
+
             /* Nehirler ve göller sadece kara üzerinde var olmalı — denizde
                yüzen bir göl ya da denize taşan bir nehir ağzı olmamalı.
                Tüm katmanı önce ayrı bir scratch canvas'a çizip, sonra
@@ -641,8 +658,7 @@
           } else {
             for (var j = 0; j < l.objects.length; j++) {
               var o = l.objects[j];
-              if (l.id === 'roads') this.drawRoad(ctx, o);
-              else if (l.id === 'territories') this.drawTerritory(ctx, o);
+              if (l.id === 'territories') this.drawTerritory(ctx, o);
               else if (l.id === 'symbols') {
                 if (o.clip && !this.isOnLand(o.x, o.y)) { /* kara sınırı dışına taştı — çizme */ }
                 else if (o.kind === 'group') {

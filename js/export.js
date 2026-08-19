@@ -110,7 +110,7 @@
         }
 
         if (l.type === 'vector') {
-          var maskAttr = (l.id === 'rivers' && landL && landL.canvas) ? ' mask="url(#landMask)"' : '';
+          var maskAttr = ((l.id === 'rivers' || l.id === 'roads') && landL && landL.canvas) ? ' mask="url(#landMask)"' : '';
           s.push('<g opacity="'+l.opacity+'"'+maskAttr+'>');
           l.objects.forEach(function (o) {
             if (l.id === 'rivers' && o.kind === 'lake') {
