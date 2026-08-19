@@ -23,7 +23,7 @@ Tarayıcıda `http://localhost:8000/` adresini açın. **`index.html`'i doğruda
 Uygulama artık düz editör yerine, üstte dört sekmeli bir karşılama ekranıyla açılır:
 
 - **Ana Sayfa** — proje tanıtımı ve "Haritana başla" butonu.
-- **Tuval** — hazır ölçülerden veya özel genişlik/yükseklikten yeni bir tuval oluşturur, `.json` dosyasından proje içe aktarır, ve bu tarayıcıda daha önce kaydedilmiş tuvalleri listeler (açma/silme). Kayıtlar tarayıcının `localStorage`'ında tutulur — backend yoktur, bu yüzden başka bir cihazdan görünmez; gerçek yedekleme/taşıma için hâlâ `.json` dışa/içe aktarma kullanılır. Editördeki "Kaydet" butonu `.json` indirmeye ek olarak bu listeyi de otomatik günceller.
+- **Tuval** — hazır ölçülerden veya özel genişlik/yükseklikten yeni bir tuval oluşturur, `.json` dosyasından proje içe aktarır, ve bu tarayıcıda daha önce kaydedilmiş tuvalleri listeler (açma/silme). Kayıtlar tarayıcının `localStorage`'ında tutulur — backend yoktur, bu yüzden başka bir cihazdan görünmez; gerçek yedekleme/taşıma için hâlâ `.json` dışa/içe aktarma kullanılır. Editördeki "Kaydet" butonu `.json` indirmeye ek olarak bu listeyi de otomatik günceller. Ayrıca sessiz oto-kayıt vardır: editörden Ana Sayfa/Tuval gibi başka bir sekmeye geçildiğinde ve editördeyken her 10 dakikada bir, üzerinde çizim yapılmış tuval otomatik olarak bu listeye kaydedilir.
 - **Rehber** — sol araç çubuğundaki her aracın kısa açıklaması.
 - **Topluluk** — proje hakkında ve GitHub bağlantısı.
 
@@ -63,7 +63,7 @@ Her araç, sağ paneldeki ilgili seçenekler bölümünü açar ve tuşlarla da 
 | **Etiket** | `L` | Metin etiketi yerleştirir; hazır stil (başlık, şehir adı, bölge adı vb.) ön ayarları mevcuttur. **"Yola oturt"** işaretliyse ve tıklama bir nehre/yola yakınsa, etiket o çizginin gerçek şekline harf harf oturur (dairesel yay değil, çizilmiş eğrinin kendisi). |
 | **Örnekle** | `I` | Doku eyedropper — haritanın bir bölgesinden dokuyu örnekleyip başka bir yere aynı stille "boyayabilme" aracı; ① alan seç → ② boyamaya başla akışıyla çalışır. |
 | **Ölç** | `Q` | Sürüklenebilir mesafe cetveli — iki nokta arası gerçek mesafeyi ölçek çubuğuna göre hesaplayıp gösterir. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez. |
-| **Kement** | `X` | Raster lasso seçim — sürükleyerek kapalı bir alan çiz; Kara + Arazi + Yükselti katmanlarındaki o bölge birlikte kaldırılıp taşınabilir/döndürülebilir hâle gelir (tutamaçla döndür). `Enter` ile onayla (tek adımlık geri alınabilir işlem), `Escape` ile iptal et, `Delete` ile alanı tamamen sil. |
+| **Kement** | `X` | Raster lasso seçim — sürükleyerek kapalı bir alan çiz; Kara + Arazi + Yükselti katmanlarındaki o bölge, üzerinde duran semboller/kaynaklar/etiketler/harita bağlantılarıyla BİRLİKTE kaldırılıp taşınabilir/döndürülebilir hâle gelir (tutamaçla döndür). `Enter` ile onayla (tek adımlık geri alınabilir işlem), `Escape` ile iptal et, `Delete` ile alanı tamamen sil. |
 | **Kaydır** | `Space` (basılı tutarak) | Tuvali sürükleyerek kaydırma; sağ tık ile de her araçtan bağımsız pan yapılabilir. |
 
 Tüm çizim yolları (nehir/yol/göl/bölge) isteğe bağlı **bezier tutamaç** düzenlemeyi destekler: bir noktayı seçip tutamaçlarını sürükleyerek eğriyi elle şekillendirebilirsiniz; tutamaç eklenmemiş eski projeler otomatik (Catmull-Rom eşdeğeri) eğriyle bire bir aynı görünmeye devam eder.
@@ -98,7 +98,8 @@ Bir nesne seçildiğinde ek işlemler görünür: **Çoğalt**, **Sil**, öne/ar
 
 ## Diğer özellikler
 
-- **Ölçek çubuğu** — Haritada sürüklenip yeniden boyutlandırılabilen, birim/etiket özelleştirilebilir interaktif ölçek göstergesi.
+- **Ölçek çubuğu** — Haritada sürüklenip yeniden boyutlandırılabilen, birim/etiket özelleştirilebilir interaktif ölçek göstergesi (varsayılan etiket evrensel "km", dil değişse de anlamı korunur).
+- **Sembol boyutlandırma** — Seçili bir sembolün köşelerinde çıkan tutamaçlardan sürükleyerek büyüt/küçült, çoğu tasarım programındaki gibi; döndürülmüş semboller için de doğru çalışır.
 - **Pusula gülü (windrose)** — Klasik veya minimal stilde, haritaya yerleştirilebilen yön göstergesi.
 - **Izgaraya yapış** — Sembol/nokta yerleştirmeyi belirli bir aralığa hizalar.
 - **Minimap** — Sağ altta, tüm haritanın küçük genel görünümü ve hızlı gezinme.

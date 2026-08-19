@@ -536,9 +536,9 @@
           if (!ro.pts || ro.pts.length < 2) continue;
           var fp = self0.riverGeometry(ro);
           var wE = ro.width || 12;
-          var crossing0 = self0._findSeaCrossingCached(ro, fp);
-          if (crossing0) {
-            self0._drawRiverPlume(ctx, ro, crossing0, fp, ro.color || '#5b8aa6', wE);
+          var crossings0 = self0._findAllSeaCrossingsCached(ro, fp);
+          for (var ci = 0; ci < crossings0.length; ci++) {
+            self0._drawRiverPlume(ctx, ro, crossings0[ci], fp, ro.color || '#5b8aa6', wE);
           }
         }
       }
@@ -820,13 +820,19 @@
       ctx.restore();
     },
 
-    /* karadan denize geçiş noktasını bulur. SONUÇ CACHE'LENİR —
-       her karede yeniden hesaplanmaz, sadece nehir noktaları değişince. */
+    /* karadan denize geçiş noktalarını bulur (BİRDEN FAZLA olabilir — nehir
+       kara/deniz sınırını birden çok kez kesebilir, her kesişim ayrı bir
+       "ağız" sayılır). SONUÇ CACHE'LENİR — her karede yeniden hesaplanmaz,
+       sadece nehir noktaları değişince. */
     _riverCrossingCache: {},
 
-    _findSeaCrossing: function (pts) {
+    /* pts dizisindeki TÜM kara/deniz geçişlerini bulur. Her geçiş için
+       çapa noktası her zaman DENİZ tarafındaki noktadır (yön farketmeksizin,
+       karadan denize çıkış ya da denizden karaya giriş) — böylece ağız
+       lekesi her zaman deniz yönüne doğru yayılır. */
+    _findAllSeaCrossings: function (pts) {
       var lmLayer = global.Layers && Layers.get('landmass');
-      if (!lmLayer || !lmLayer.canvas) return null;
+      if (!lmLayer || !lmLayer.canvas || pts.length < 2) return [];
       var tc = document.createElement('canvas'); tc.width=1; tc.height=1;
       var tx = tc.getContext('2d');
       function isLand(x, y) {
@@ -836,28 +842,27 @@
           return tx.getImageData(0,0,1,1).data[3] >= 80;
         } catch(e) { return true; }
       }
-      /* SONDAN BAŞA doğru tara: "karada olunan SON nokta"yı bul.
-         İlk geçişi aramak yerine bunu yapmamızın sebebi: kıyı düzensiz
-         olduğunda meander sapması nehri kısa süreliğine "deniz" sayılan
-         bir noktaya değdirebilir — ilk geçişi kesim noktası sayarsak
-         nehri erken ve yanlış yerden keseriz. Sondan taramak, nehrin
-         kalıcı olarak karayı terk ettiği GERÇEK noktayı bulur. */
-      var lastLandIdx = -1;
-      for (var i = pts.length - 1; i >= 0; i--) {
-        if (isLand(pts[i][0], pts[i][1])) { lastLandIdx = i; break; }
+      var crossings = [];
+      var prevLand = isLand(pts[0][0], pts[0][1]);
+      for (var i = 1; i < pts.length; i++) {
+        var land = isLand(pts[i][0], pts[i][1]);
+        if (land !== prevLand) {
+          var seaIdx = land ? i - 1 : i;
+          var landIdx = land ? i : i - 1;
+          crossings.push({ index: seaIdx, prevIndex: landIdx, point: pts[seaIdx] });
+          prevLand = land;
+        }
       }
-      if (lastLandIdx === -1) return null;               /* hiç kara yok — nehir tamamen denizde, gösterme */
-      if (lastLandIdx === pts.length - 1) return null;     /* nehir tamamen karada, deniz hiç görmüyor */
-      return { index: lastLandIdx + 1, point: pts[lastLandIdx + 1] };
+      return crossings;
     },
 
-    _findSeaCrossingCached: function (o, fullPts) {
+    _findAllSeaCrossingsCached: function (o, fullPts) {
       var key = JSON.stringify(o.pts);
       var c = this._riverCrossingCache[o.id];
-      if (c && c.key === key) return c.crossing;
-      var crossing = this._findSeaCrossing(fullPts);
-      this._riverCrossingCache[o.id] = { key: key, crossing: crossing };
-      return crossing;
+      if (c && c.key === key) return c.crossings;
+      var crossings = this._findAllSeaCrossings(fullPts);
+      this._riverCrossingCache[o.id] = { key: key, crossings: crossings };
+      return crossings;
     },
 
     drawRiver: function (ctx, o) {
@@ -868,11 +873,12 @@
       var col = o.color || '#5b8aa6';
       var baseAlpha = (o.opacity === undefined ? 1 : o.opacity);
 
-      /* kıyı geçişini bul (cache'li) — nehri SADECE karada kalan
-         kısmıyla çiz, deniz üzerindeki kısmı tamamen at */
-      var crossing = this._findSeaCrossingCached(o, fullPts);
-      var pts = crossing ? fullPts.slice(0, crossing.index + 1) : fullPts;
-      if (pts.length < 2) pts = fullPts.slice(0, 2);
+      /* Nehrin tüm uzunluğu çizilir — kara/deniz kırpması burada değil,
+         çağıran renderMap() tarafında tek noktadan (destination-in maskesi)
+         uygulanıyor. Bu sayede nehir kara/deniz sınırını birden çok kez
+         kesse bile (birden fazla "ağız") her kara parçası doğru çizilir;
+         sondan-tek-kesişim varsayımı yapmaz. */
+      var pts = fullPts;
 
       var poly = Geo.ribbon(pts, wStart, wEnd);
 
@@ -896,7 +902,7 @@
        Deterministik seed → her render'da aynı görünüm.               */
     _drawRiverPlume: function (ctx, o, crossing, fullPts, col, wEnd) {
       var mouth = crossing.point;
-      var prevIdx = Math.max(0, crossing.index - 1);
+      var prevIdx = (crossing.prevIndex !== undefined) ? crossing.prevIndex : Math.max(0, crossing.index - 1);
       var prevPt = fullPts[prevIdx];
       var dx = mouth[0]-prevPt[0], dy = mouth[1]-prevPt[1];
       var dlen = Math.hypot(dx,dy) || 1; dx/=dlen; dy/=dlen;

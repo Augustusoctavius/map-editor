@@ -159,10 +159,14 @@
     rubberBand:null,
     windroseDrag:null,
     handleDrag:null,
+    resizeDrag:null,
     symBrushLast:null,
     symBrushBefore:null,
     lasso:null, floating:null, floatDrag:null, floatRotateDrag:null,
     LASSO_LAYERS: ['landmass','terrain','elevation'],
+    /* nokta-tabanlı vektör katmanlar — kement alanının içine düşen semboller,
+       kaynaklar, etiketler ve harita bağlantıları da rasterle BİRLİKTE taşınır. */
+    LASSO_VECTOR_LAYERS: ['symbols', 'resources', 'labels', 'links'],
 
     bind: function () {
       var v = Cv.view, self = this;
@@ -250,6 +254,13 @@
           var Lh = Layers.get(App.selection.layerId);
           this.handleDrag = { obj:hh.obj, index:hh.index, dir:hh.dir, closed:hh.closed,
                                before: JSON.parse(JSON.stringify(Lh.objects)) };
+          return;
+        }
+        /* köşe büyütme tutamacı (seçili sembol) */
+        var rh = this.hitTestResizeHandle(p);
+        if (rh) {
+          var Lr = Layers.get('symbols');
+          this.resizeDrag = { obj:rh.obj, before: JSON.parse(JSON.stringify(Lr.objects)) };
           return;
         }
       }
@@ -342,6 +353,19 @@
           if (!e.altKey) { hnext.ox = -hdx; hnext.oy = -hdy; }
         }
         ho.handles[hd.index] = hnext;
+        Cv.requestRender();
+        return;
+      }
+
+      if (this.resizeDrag) {
+        var ro2 = this.resizeDrag.obj;
+        var rot2 = (ro2.rot||0) * Math.PI/180;
+        var dx2 = p.x-ro2.x, dy2 = p.y-ro2.y;
+        /* imleci sembolün YEREL (döndürülmemiş) eksenine çevir, böylece
+           döndürülmüş bir sembolde de köşe sürüklemesi doğru davranır */
+        var lx = dx2*Math.cos(-rot2) - dy2*Math.sin(-rot2);
+        var ly = dx2*Math.sin(-rot2) + dy2*Math.cos(-rot2);
+        ro2.size = Math.max(8, Math.min(2000, Math.max(Math.abs(lx), Math.abs(ly))*2));
         Cv.requestRender();
         return;
       }
@@ -441,6 +465,14 @@
         var hd2 = this.handleDrag; this.handleDrag = null;
         var Lh2 = Layers.get(App.selection.layerId);
         History.pushVector(App.selection.layerId, hd2.before, JSON.parse(JSON.stringify(Lh2.objects)), 'handle');
+        UI.refreshHistory();
+        return;
+      }
+
+      if (this.resizeDrag) {
+        var rd2 = this.resizeDrag; this.resizeDrag = null;
+        var Lr2 = Layers.get('symbols');
+        History.pushVector('symbols', rd2.before, JSON.parse(JSON.stringify(Lr2.objects)), 'resize');
         UI.refreshHistory();
         return;
       }
@@ -903,11 +935,36 @@
         L.ctx.restore();
       });
 
-      if (!Object.keys(floatingLayers).length) return;
+      /* kement alanına düşen nokta-tabanlı vektör nesneleri (semboller,
+         kaynaklar, etiketler, bağlantılar) de rasterle birlikte kaldırılır —
+         böylece üstlerinde duran nesneler yerinde kalmaz, hep beraber taşınır. */
+      var vectorBefore = {}, vectorItems = {};
+      this.LASSO_VECTOR_LAYERS.forEach(function (lid) {
+        var L = Layers.get(lid);
+        if (!L || L.locked || !L.visible || !L.objects) return;
+        var kept = [], lifted = [];
+        L.objects.forEach(function (o) {
+          if (lid === 'labels' && o.pathPts) { kept.push(o); return; } /* yol üstü etiket taşınmaz */
+          var cx, cy;
+          if (lid === 'symbols' && o.kind === 'group') {
+            var gb = Sym.bounds(o); cx = gb.x + gb.w/2; cy = gb.y + gb.h/2;
+          } else { cx = o.x; cy = o.y; }
+          if (cx === undefined || cy === undefined) { kept.push(o); return; }
+          if (Cv._pointInPoly(cx, cy, pts)) lifted.push(o); else kept.push(o);
+        });
+        if (lifted.length) {
+          vectorBefore[lid] = JSON.parse(JSON.stringify(L.objects));
+          L.objects = kept;
+          vectorItems[lid] = lifted;
+        }
+      });
+
+      if (!Object.keys(floatingLayers).length && !Object.keys(vectorItems).length) return;
 
       this.floating = {
         bbox: { x:bx, y:by, w:bw, h:bh },
         before: before, layers: floatingLayers,
+        vectorBefore: vectorBefore, vectorItems: vectorItems,
         ox: 0, oy: 0, rot: 0,
         center: { x: bx+bw/2, y: by+bh/2 }
       };
@@ -943,9 +1000,30 @@
         patches.push({ layerId:lid, beforeCanvas:f.before[lid], afterCanvas:snap(L.canvas) });
       });
 
+      /* kaldırılmış vektör nesnelerini (semboller/kaynaklar/etiketler/
+         bağlantılar) yeni konum + dönüşle katmanlarına geri yaz */
+      var cosR = Math.cos(f.rot), sinR = Math.sin(f.rot);
+      var vectorParts = [];
+      Object.keys(f.vectorItems || {}).forEach(function (lid) {
+        var L = Layers.get(lid);
+        function xform(pt) {
+          var dx0 = pt.x - f.center.x, dy0 = pt.y - f.center.y;
+          pt.x = cx + dx0*cosR - dy0*sinR;
+          pt.y = cy + dx0*sinR + dy0*cosR;
+          if (typeof pt.rot === 'number') pt.rot += f.rot * 180 / Math.PI;
+        }
+        f.vectorItems[lid].forEach(function (o) {
+          if (o.kind === 'group' && o.members) o.members.forEach(xform);
+          else xform(o);
+          L.objects.push(o);
+        });
+        vectorParts.push({ layerId: lid, before: f.vectorBefore[lid], after: JSON.parse(JSON.stringify(L.objects)) });
+      });
+
       var box = { x:Math.max(0,Math.floor(unionX0)), y:Math.max(0,Math.floor(unionY0)),
                   w:Math.ceil(unionX1-unionX0), h:Math.ceil(unionY1-unionY0) };
-      History.pushRasterMulti(patches, box, 'lasso:move');
+      if (vectorParts.length) History.pushCombo(patches, box, vectorParts, 'lasso:move');
+      else History.pushRasterMulti(patches, box, 'lasso:move');
       this.floating = null; this.floatDrag = null; this.floatRotateDrag = null;
       Cv.shoreDirty = true; Cv.elevationDirty = true;
       UI.refreshHistory();
@@ -959,6 +1037,10 @@
         var L = Layers.get(lid);
         L.ctx.clearRect(0, 0, L.canvas.width, L.canvas.height);
         L.ctx.drawImage(f.before[lid], 0, 0);
+      });
+      Object.keys(f.vectorBefore || {}).forEach(function (lid) {
+        var L = Layers.get(lid);
+        if (L) L.objects = JSON.parse(JSON.stringify(f.vectorBefore[lid]));
       });
       this.floating = null; this.floatDrag = null; this.floatRotateDrag = null;
       Cv.shoreDirty = true; Cv.elevationDirty = true;
@@ -974,7 +1056,13 @@
         var L = Layers.get(lid);
         patches.push({ layerId:lid, beforeCanvas:f.before[lid], afterCanvas:snap(L.canvas) });
       });
-      History.pushRasterMulti(patches, f.bbox, 'lasso:delete');
+      var vectorParts = [];
+      Object.keys(f.vectorBefore || {}).forEach(function (lid) {
+        var L = Layers.get(lid);
+        vectorParts.push({ layerId:lid, before:f.vectorBefore[lid], after: JSON.parse(JSON.stringify(L.objects)) });
+      });
+      if (vectorParts.length) History.pushCombo(patches, f.bbox, vectorParts, 'lasso:delete');
+      else History.pushRasterMulti(patches, f.bbox, 'lasso:delete');
       this.floating = null; this.floatDrag = null; this.floatRotateDrag = null;
       Cv.shoreDirty = true; Cv.elevationDirty = true;
       UI.refreshHistory();
@@ -1741,6 +1829,24 @@
         this.LASSO_LAYERS.forEach(function (lid) {
           if (f.layers[lid]) ctx.drawImage(f.layers[lid], -f.bbox.w/2, -f.bbox.h/2);
         });
+        /* taşınan semboller/kaynaklar/etiketler/bağlantılar — bbox merkezine
+           göre bağıl konumlarında, aynı çeviri+döndürme uzayı içinde önizlenir */
+        Object.keys(f.vectorItems || {}).forEach(function (lid) {
+          f.vectorItems[lid].forEach(function (o) {
+            var rel = (lid === 'symbols' && o.kind === 'group')
+              ? { kind:'group', members: o.members.map(function (m) {
+                  return Object.assign({}, m, { x:m.x-f.center.x, y:m.y-f.center.y });
+                }) }
+              : Object.assign({}, o, { x:o.x-f.center.x, y:o.y-f.center.y });
+            if (lid === 'symbols') {
+              if (rel.kind === 'group') {
+                rel.members.forEach(function (m) { Sym.draw(ctx, m.sym, m); });
+              } else Sym.draw(ctx, o.sym, rel);
+            } else if (lid === 'resources') Cv.drawResource(ctx, rel);
+            else if (lid === 'labels') Cv.drawLabel(ctx, rel);
+            else if (lid === 'links') Cv.drawLink(ctx, rel);
+          });
+        });
         ctx.strokeStyle = '#78bfff'; ctx.lineWidth = 2/z; ctx.setLineDash([8/z, 5/z]);
         ctx.strokeRect(-f.bbox.w/2, -f.bbox.h/2, f.bbox.w, f.bbox.h);
         ctx.setLineDash([]);
@@ -1866,7 +1972,45 @@
       } else {
         var b = App.selection.layerId==='labels' ? Cv.labelBounds(o) : Sym.bounds(o);
         ctx.strokeRect(b.x-4/z, b.y-4/z, b.w+8/z, b.h+8/z);
+        if (App.selection.layerId === 'symbols') this.drawResizeHandles(ctx, o, z);
       }
+      ctx.restore();
+    },
+
+    /* seçili sembolün (döndürülmüş) köşe konumlarını dünya koordinatında verir */
+    resizeHandlePositions: function (o) {
+      var b = Sym.bounds(o);
+      var hw = b.w/2, hh = b.h/2;
+      var rot = (o.rot||0) * Math.PI/180;
+      var cosR = Math.cos(rot), sinR = Math.sin(rot);
+      return [[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh]].map(function (c) {
+        return { x: o.x + c[0]*cosR - c[1]*sinR, y: o.y + c[0]*sinR + c[1]*cosR };
+      });
+    },
+
+    /* seçili tek sembolün köşesine tıklandı mı? (grup ve çoklu seçimde yok) */
+    hitTestResizeHandle: function (p) {
+      if (!App.selection || App.selection.multi || App.selection.layerId !== 'symbols') return null;
+      var o = this.selected();
+      if (!o || o.kind === 'group') return null;
+      var pts = this.resizeHandlePositions(o);
+      var r = 8/Cv.zoom;
+      for (var i = 0; i < pts.length; i++) {
+        if (Math.hypot(p.x-pts[i].x, p.y-pts[i].y) <= r) return { obj:o, corner:i };
+      }
+      return null;
+    },
+
+    /* seçili sembolün köşelerine büyütme tutamacı çizer (diğer programlardaki gibi) */
+    drawResizeHandles: function (ctx, o, z) {
+      var pts = this.resizeHandlePositions(o);
+      ctx.save();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#78bfff'; ctx.strokeStyle = '#1c221e'; ctx.lineWidth = 1/z;
+      pts.forEach(function (pt) {
+        ctx.fillRect(pt.x-5/z, pt.y-5/z, 10/z, 10/z);
+        ctx.strokeRect(pt.x-5/z, pt.y-5/z, 10/z, 10/z);
+      });
       ctx.restore();
     },
 

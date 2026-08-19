@@ -81,6 +81,28 @@
       this.push({ kind:'rasterMulti', items:items, label:label || 'raster' });
     },
 
+    /* ---- karma yama: raster katman(lar) + vektör katman(lar) TEK adımda ----
+       (kement ile taşıma: kara/arazi/yükselti rasteri + üstündeki sembol/
+       kaynak/etiket/bağlantı nesneleri birlikte, tek undo/redo adımıyla) */
+    pushCombo: function (rasterPatches, box, vectorParts, label) {
+      var items = [];
+      for (var i = 0; i < rasterPatches.length; i++) {
+        var p = rasterPatches[i];
+        var b = clampBox(box, p.afterCanvas);
+        if (b.w <= 0 || b.h <= 0) continue;
+        items.push({
+          layerId: p.layerId, x:b.x, y:b.y, w:b.w, h:b.h,
+          before: cropDataURL(p.beforeCanvas, b.x, b.y, b.w, b.h),
+          after:  cropDataURL(p.afterCanvas,  b.x, b.y, b.w, b.h)
+        });
+      }
+      var vitems = (vectorParts || []).map(function (v) {
+        return { layerId: v.layerId, before: JSON.stringify(v.before), after: JSON.stringify(v.after) };
+      });
+      if (!items.length && !vitems.length) return;
+      this.push({ kind:'combo', items:items, vitems:vitems, label: label || 'combo' });
+    },
+
     pushVector: function (layerId, beforeArr, afterArr, label) {
       this.push({
         kind:'vector', layerId:layerId, label:label || 'vector',
@@ -145,6 +167,18 @@
         if (l) l.objects = JSON.parse(entry[pick]);
         if (global.App) App.selection = null;
         return Promise.resolve();
+      }
+
+      if (entry.kind === 'combo') {
+        var proms = entry.items.map(function (it) {
+          return self._applyPatch(it.layerId, it[pick], it.x, it.y, it.w, it.h);
+        });
+        entry.vitems.forEach(function (v) {
+          var lv = Layers.get(v.layerId);
+          if (lv) lv.objects = JSON.parse(v[pick]);
+        });
+        if (entry.vitems.length && global.App) App.selection = null;
+        return Promise.all(proms);
       }
 
       if (entry.kind === 'meta') {

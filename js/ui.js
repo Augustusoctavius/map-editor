@@ -749,6 +749,11 @@
       });
       on('btn-shell-back', 'click', function () { self.showView('canvas'); });
 
+      /* editördeyken her 10 dakikada bir sessiz oto-kayıt */
+      setInterval(function () {
+        if (self._currentView === 'editor') Exporter.autoSave();
+      }, 600000);
+
       on('cv-size-preset', 'change', function (e) {
         $('cv-custom-wh').classList.toggle('hidden', e.target.value !== 'custom');
       });
@@ -777,6 +782,10 @@
     },
 
     showView: function (name) {
+      /* editörden ayrılırken (ör. ana sayfaya dönüş) sessizce oto-kaydet —
+         böylece "Tuval" sekmesindeki kayıtlı tuvaller listesinde görünür */
+      if (this._currentView === 'editor' && name !== 'editor') Exporter.autoSave();
+      this._currentView = name;
       document.querySelectorAll('.shell-view').forEach(function (v) { v.classList.add('hidden'); });
       var target = $('view-' + name);
       if (target) target.classList.remove('hidden');

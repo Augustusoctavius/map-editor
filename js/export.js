@@ -346,6 +346,16 @@
       UI.msg(UI.t('saved'));
     },
 
+    /* sessiz oto-kayıt: .json indirmez, mesaj göstermez — sadece tarayıcı
+       kütüphanesini günceller. Ana sayfaya dönüşte ve her 10 dakikada bir
+       (bkz. UI.initShell) çağrılır. Hiç çizim yapılmamış boş tuvali
+       gereksiz yere kütüphaneye eklememek için History boşsa atlanır. */
+    autoSave: function () {
+      if (!global.History || !History.canUndo()) return;
+      var id = this.libSave(App.currentCanvasName, App.currentLibId);
+      if (id) App.currentLibId = id;
+    },
+
     /* bir proje veri nesnesini (dosyadan ya da localStorage'dan) uygulanmış
        hâle getirir — döndürdüğü Promise, raster katmanların (görsel)
        yüklenmesi tamamlandığında çözülür */
