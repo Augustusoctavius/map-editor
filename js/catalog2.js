@@ -1289,7 +1289,7 @@
     s.box(42, 5.5, 0, 6, 5, 6, 'stoneD', { plain:true });
     return s;
   });
-  reg('passes', 'iq_woodbridge', 'Ahşap köprü', 'Wooden bridge', function () {
+  reg('passes', 'iq_plankbridge', 'Tahta köprü', 'Plank bridge', function () {
     var s = S(); s.pad(26, 10, 34, 'dirt');
     s.box(0, 4, 3, 48, 6, 1, 'wood', { plain:true });
     s.box(0, 3.5, 4, 48, 0.8, 2, 'woodD', { plain:true });

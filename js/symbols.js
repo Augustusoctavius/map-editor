@@ -19,7 +19,6 @@
   };
 
   function part(d,f,s,lw,tr){return{d:d,f:f||null,s:s||null,lw:lw||0,tr:tr||null};}
-  function p2d(d){return new Path2D(d);}
 
   /* ---- shared path fragments ---- */
   var F={

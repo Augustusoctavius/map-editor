@@ -49,13 +49,13 @@
     dirt:    { top:'#a98d63', left:'#8b7250', right:'#6d583c', line:'#33261a', det:'#6a5638' },
     grass:   { top:'#8ca35c', left:'#708447', right:'#556634', line:'#26301a', det:'#5c7038' },
     dark:    { top:'#4a4038', left:'#37302a', right:'#26211d', line:'#120f0d', det:'#231e1a' },
-    ruin:    { top:'#c4b89e', left:'#a3987f', right:'#847a64', line:'#3c3225', det:'#7a705c', courses:true, broken:true },
+    ruin:    { top:'#c4b89e', left:'#a3987f', right:'#847a64', line:'#3c3225', det:'#7a705c', courses:true },
     crystal: { top:'#b79ad8', left:'#9679bb', right:'#745a95', line:'#33234a', det:'#6b5289' },
     bone:    { top:'#e8e0cc', left:'#cfc6ae', right:'#ada48d', line:'#443c2c', det:'#9a917a' },
 
     /* ---- yaşlanma / hava etkisi varyantları ---- */
     mossy:   { top:'#8a9a68', left:'#6d7f4f', right:'#535f3a', line:'#242c18', det:'#4d5c34', courses:true },
-    scorched:{ top:'#5a4f48', left:'#453b35', right:'#302823', line:'#161210', det:'#2b241f', courses:true, broken:true },
+    scorched:{ top:'#5a4f48', left:'#453b35', right:'#302823', line:'#161210', det:'#2b241f', courses:true },
     weathered:{ top:'#b8ac93', left:'#9c9078', right:'#7c715c', line:'#383124', det:'#867a63', planks:true },
     bleached:{ top:'#dcd3ba', left:'#c2b89e', right:'#a2977e', line:'#4a4130', det:'#948a70', shingle:true },
 
