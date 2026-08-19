@@ -1062,4 +1062,212 @@
       });
     });
 
+  /* ============================================================
+     9) KENTSEL YAPI KİTİ (han, taverna, kütüphane, çeşme/kuyu,
+     pazar tezgâhı, demirci, fırın, köprü) — Inkarnate tarzı bir
+     şehir haritasını TEK TEK yerleştirilebilir parçalarla kurmak
+     için: her biri kendi başına bağımsız, tekrar tekrar
+     kullanılabilen atomik bir bina/nesne (mevcut "Han"/"Kervansaray"
+     gibi hazır bütün sahnelerden farklı olarak).
+     ============================================================ */
+  function signpost(s, x, y, z, h, col) {
+    s.box(x, y, z, 1.6, 1.6, h, 'woodD', { plain:true });
+    s.flag(x - 0.2, y - 0.2, z + h * 0.5, h * 0.42, col);
+  }
+  function chimney(s, x, y, z, h, mat) {
+    s.box(x, y, z, 3, 3, h, mat || 'stoneD', { plain:true });
+  }
+  function barrel(s, x, y, z) { s.cyl(x, y, z, 2.1, 4, 'wood'); }
+  function tableProp(s, x, y, z) {
+    s.box(x, y, z + 2.4, 5, 3, 1, 'wood', { plain:true });
+    s.box(x + 0.3, y + 0.3, z, 0.8, 0.8, 2.4, 'woodD', { plain:true });
+    s.box(x + 3.9, y + 1.9, z, 0.8, 0.8, 2.4, 'woodD', { plain:true });
+  }
+
+  /* ---- Han (Inn) — 3 varyant ---- */
+  reg('towns', 'ic_inn_tudor', 'Han · Ahşap çerçeveli', 'Inn · Timber-framed', function () {
+    var s = S(); s.pad(20, 18, 32, 'dirt');
+    hut(s, 2, 4, 26, 20, 16, 'wood', 'tileR', { win:3 });
+    chimney(s, 4, 5, 16, 7, 'stone');
+    signpost(s, 29, 8, 0, 13, 'tileR');
+    return s;
+  });
+  reg('towns', 'ic_inn_stone', 'Han · Taş, iki katlı', 'Inn · Stone, two-storey', function () {
+    var s = S(); s.pad(22, 20, 36, 'dirt');
+    hut(s, 2, 4, 28, 21, 19, 'stone', 'tileB', { win:4 });
+    chimney(s, 25, 6, 19, 8, 'stoneD');
+    signpost(s, 31, 10, 0, 15, 'tileB');
+    s.box(0, 24, 0, 8, 6, 8, 'wood', { plain:true });
+    s.hip(-1, 23, 8, 10, 8, 5, 'thatch');
+    return s;
+  });
+  reg('towns', 'ic_inn_desert', 'Han · Kerpiç kervan hanı', 'Inn · Adobe caravan inn', function () {
+    var s = S(); s.pad(20, 18, 32, 'dirt');
+    hut(s, 2, 4, 24, 18, 14, 'adobeW', 'tileD', { win:2 });
+    signpost(s, 27, 8, 0, 12, 'gold');
+    s.palisade(0, 22, 0, 22, 4, 8, 'wood', { corner:false });
+    return s;
+  });
+
+  /* ---- Taverna (Tavern) — 3 varyant, dış mekân masa/fıçılarla ---- */
+  reg('towns', 'ic_tavern_common', 'Taverna', 'Tavern', function () {
+    var s = S(); s.pad(20, 18, 32, 'dirt');
+    hut(s, 2, 6, 20, 16, 13, 'woodD', 'tileR', { win:2 });
+    chimney(s, 4, 7, 13, 6, 'stone');
+    barrel(s, 24, 8, 0); barrel(s, 27, 11, 0);
+    tableProp(s, 24, 16, 0);
+    signpost(s, 22, 4, 0, 11, 'tileD');
+    return s;
+  });
+  reg('towns', 'ic_tavern_riverside', 'Taverna · Nehir kenarı', 'Tavern · Riverside', function () {
+    var s = S(); s.pad(24, 20, 38, 'dirt');
+    hut(s, 2, 6, 20, 16, 13, 'wood', 'tileB', { win:2 });
+    s.box(22, 6, 0, 14, 10, 1, 'woodD', { plain:true });
+    barrel(s, 24, 16, 1); barrel(s, 28, 18, 1);
+    signpost(s, 20, 4, 0, 11, 'tileB');
+    return s;
+  });
+  reg('towns', 'ic_tavern_mountain', 'Taverna · Dağ hanı', 'Tavern · Mountain lodge', function () {
+    var s = S(); s.pad(20, 18, 32, 'dirt');
+    hut(s, 2, 6, 20, 16, 12, 'stoneD', 'thatch', { win:2 });
+    chimney(s, 3, 7, 12, 7, 'basalt');
+    barrel(s, 23, 8, 0);
+    tableProp(s, 22, 14, 0);
+    return s;
+  });
+
+  /* ---- Kütüphane (Library) — 3 varyant ---- */
+  reg('towns', 'ic_library_stone', 'Kütüphane · Taş', 'Library · Stone', function () {
+    var s = S(); s.pad(20, 18, 32, 'dirt');
+    s.box(2, 3, 0, 22, 18, 22, 'stoneW', { win:4, door:true, doorH:0.65 });
+    s.hip(0, 1, 22, 26, 22, 10, 'tileD');
+    s.dome(13, 12, 32, 4.5, 5, 'tileD');
+    return s;
+  });
+  reg('towns', 'ic_library_wood', 'Kütüphane · Ahşap, tırmanan merdiven', 'Library · Timber, external stair', function () {
+    var s = S(); s.pad(19, 17, 30, 'dirt');
+    hut(s, 2, 3, 22, 17, 17, 'wood', 'tileG', { win:3 });
+    s.box(24, 4, 0, 5, 3, 1, 'woodD', { plain:true });
+    s.box(24, 4, 8, 5, 3, 1, 'woodD', { plain:true });
+    s.box(28, 5, 0, 1, 1, 17, 'woodD', { plain:true });
+    return s;
+  });
+  reg('towns', 'ic_library_grand', 'Kütüphane · Büyük, kubbeli', 'Library · Grand, domed', function () {
+    var s = S(); s.pad(26, 24, 44, 'dirt');
+    s.box(2, 3, 0, 30, 22, 20, 'stoneW', { win:5, door:true, doorH:0.6 });
+    s.dome(17, 14, 20, 12, 13, 'gold');
+    s.box(-2, 8, 0, 4, 10, 16, 'stoneW', { plain:true });
+    s.box(30, 8, 0, 4, 10, 16, 'stoneW', { plain:true });
+    return s;
+  });
+
+  /* ---- Çeşme / Kuyu (Fountain / Well) ---- */
+  reg('misc', 'ic_well_covered', 'Kuyu · Çatılı', 'Well · Covered', function () {
+    var s = S(); s.pad(12, 11, 20, 'grass');
+    s.cyl(10, 9, 0, 5, 5, 'stone');
+    s.box(4, 3, 5, 1.4, 1.4, 9, 'wood', { plain:true });
+    s.box(15, 3, 5, 1.4, 1.4, 9, 'wood', { plain:true });
+    s.box(4, 14, 5, 1.4, 1.4, 9, 'wood', { plain:true });
+    s.box(15, 14, 5, 1.4, 1.4, 9, 'wood', { plain:true });
+    s.hip(2, 1, 14, 17, 15, 6, 'tileR');
+    return s;
+  });
+  reg('misc', 'ic_well_plain', 'Kuyu · Sade', 'Well · Plain', function () {
+    var s = S(); s.pad(10, 9, 16, 'grass');
+    s.cyl(8, 7, 0, 4.5, 4, 'stoneD');
+    s.box(2, 2, 4, 1, 1, 6, 'woodD', { plain:true });
+    s.box(13, 2, 4, 1, 1, 6, 'woodD', { plain:true });
+    s.box(2, 2, 10, 12, 1, 1, 'woodD', { plain:true });
+    return s;
+  });
+  reg('misc', 'ic_fountain_plaza', 'Çeşme · Meydan', 'Fountain · Plaza', function () {
+    var s = S(); s.pad(16, 15, 26, 'stoneW');
+    s.cyl(14, 13, 0, 13, 2.4, 'stoneW');
+    s.cyl(14, 13, 2.4, 8, 3, 'stoneW');
+    s.cyl(14, 13, 5.4, 4.5, 4, 'ice');
+    s.cyl(14, 13, 9.4, 1.4, 4, 'stoneW');
+    return s;
+  });
+  reg('misc', 'ic_fountain_grand', 'Çeşme · Süslü, heykelli', 'Fountain · Ornate, statued', function () {
+    var s = S(); s.pad(20, 19, 34, 'stoneW');
+    s.cyl(18, 17, 0, 17, 2.6, 'stoneW');
+    s.cyl(18, 17, 2.6, 10, 3.4, 'stoneW');
+    s.cyl(18, 17, 6, 6, 4.4, 'ice');
+    s.cyl(18, 17, 10.4, 2.4, 6, 'stoneW');
+    s.box(15.5, 14.5, 16.4, 5, 5, 5, 'gold');
+    return s;
+  });
+
+  /* ---- Pazar tezgâhı (Market stall) — 4 tente rengi ---- */
+  [['tileR', 'Kızıl', 'Crimson'], ['tileB', 'Mavi', 'Blue'],
+   ['tileG', 'Yeşil', 'Green'], ['canvasT', 'Bej', 'Canvas']].forEach(function (m, i) {
+    reg('misc', 'ic_stall_' + i, 'Pazar tezgâhı · ' + m[1], 'Market stall · ' + m[2], function () {
+      var s = S(); s.pad(13, 9, 18, 'dirt');
+      s.box(1, 1, 0, 11, 6, 3.4, 'wood', { plain:true });
+      s.box(1, 1, 3.4, 1, 1, 6.6, 'woodD', { plain:true });
+      s.box(11, 1, 3.4, 1, 1, 6.6, 'woodD', { plain:true });
+      s.box(1, 6, 3.4, 1, 1, 6.6, 'woodD', { plain:true });
+      s.box(11, 6, 3.4, 1, 1, 6.6, 'woodD', { plain:true });
+      s.gable(-1, -1, 10, 15, 9, 4.5, m[0]);
+      return s;
+    });
+  });
+
+  /* ---- Demirci (Blacksmith) — 2 varyant ---- */
+  reg('towns', 'ic_smithy', 'Demirci', 'Blacksmith', function () {
+    var s = S(); s.pad(18, 16, 30, 'dirt');
+    hut(s, 2, 4, 18, 14, 12, 'stoneD', 'tileD', { win:1 });
+    chimney(s, 3, 5, 12, 9, 'basalt');
+    s.box(21, 5, 0, 6, 5, 1, 'basalt', { plain:true });
+    s.box(21, 5, 1, 2, 2, 1, 'tileR', { plain:true });
+    return s;
+  });
+  reg('towns', 'ic_smithy_open', 'Demirci · Açık ocaklı', 'Blacksmith · Open forge', function () {
+    var s = S(); s.pad(18, 16, 28, 'dirt');
+    s.box(2, 4, 0, 16, 12, 8, 'woodD', { plain:true });
+    s.hip(0, 2, 8, 20, 16, 6, 'tileD');
+    chimney(s, 4, 5, 8, 8, 'stoneD');
+    s.box(6, 8, 0, 4, 4, 1.4, 'tileR', { plain:true });
+    return s;
+  });
+
+  /* ---- Fırın (Bakery) — 2 varyant ---- */
+  reg('towns', 'ic_bakery', 'Fırın', 'Bakery', function () {
+    var s = S(); s.pad(18, 16, 28, 'dirt');
+    hut(s, 2, 4, 18, 14, 12, 'stoneW', 'tileR', { win:2 });
+    chimney(s, 4, 5, 12, 8, 'stone');
+    s.cyl(20, 10, 0, 4, 5, 'stoneD');
+    s.dome(20, 10, 5, 4.2, 3, 'stoneD');
+    return s;
+  });
+  reg('towns', 'ic_bakery_stall', 'Fırın · Tezgâhlı', 'Bakery · With stall', function () {
+    var s = S(); s.pad(20, 17, 32, 'dirt');
+    hut(s, 2, 4, 16, 13, 11, 'adobeW', 'tileD', { win:1 });
+    chimney(s, 3, 5, 11, 7, 'stoneD');
+    s.box(18, 5, 0, 8, 4, 2.6, 'wood', { plain:true });
+    s.gable(17, 3, 2.6, 10, 8, 3.6, 'canvasT');
+    return s;
+  });
+
+  /* ---- Şehir köprüsü (Town bridge) — nehir/kanal üzerine tek parça ---- */
+  reg('passes', 'iq_stonebridge', 'Taş köprü', 'Stone bridge', function () {
+    var s = S(); s.pad(30, 12, 40, 'dirt');
+    s.box(0, 4, 6, 56, 8, 2, 'stoneW', { plain:true });
+    s.box(0, 3, 8, 56, 1, 2.4, 'stoneW', { plain:true });
+    s.box(0, 9, 8, 56, 1, 2.4, 'stoneW', { plain:true });
+    s.box(6, 5.5, 0, 6, 5, 6, 'stoneD', { plain:true });
+    s.box(24, 5.5, 0, 6, 5, 6, 'stoneD', { plain:true });
+    s.box(42, 5.5, 0, 6, 5, 6, 'stoneD', { plain:true });
+    return s;
+  });
+  reg('passes', 'iq_woodbridge', 'Ahşap köprü', 'Wooden bridge', function () {
+    var s = S(); s.pad(26, 10, 34, 'dirt');
+    s.box(0, 4, 3, 48, 6, 1, 'wood', { plain:true });
+    s.box(0, 3.5, 4, 48, 0.8, 2, 'woodD', { plain:true });
+    s.box(0, 9.7, 4, 48, 0.8, 2, 'woodD', { plain:true });
+    s.box(4, 5.5, 0, 2, 2, 3, 'woodD', { plain:true });
+    s.box(42, 5.5, 0, 2, 2, 3, 'woodD', { plain:true });
+    return s;
+  });
+
 })(window);
