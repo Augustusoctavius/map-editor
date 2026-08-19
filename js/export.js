@@ -51,6 +51,15 @@
              'width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">');
       s.push('<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#7ba8bd"/>');
 
+      /* nehir/göl kırpma maskesi: kara alfa kanalını referans alır — SVG'de de
+         PNG'deki gibi nehir/göl yalnızca kara üzerinde görünsün diye */
+      var landL = Layers.get('landmass');
+      if (landL && landL.canvas) {
+        s.push('<defs><mask id="landMask" maskUnits="userSpaceOnUse" x="0" y="0" width="'+W+'" height="'+H+
+               '" style="mask-type:alpha"><image x="0" y="0" width="'+W+'" height="'+H+
+               '" xlink:href="'+landL.canvas.toDataURL('image/png')+'"/></mask></defs>');
+      }
+
       /* kıyı efekti */
       if (Cv.shore) {
         if (Cv.shoreDirty || !Cv.shoreCanvas) Cv.buildShore();
@@ -101,7 +110,8 @@
         }
 
         if (l.type === 'vector') {
-          s.push('<g opacity="'+l.opacity+'">');
+          var maskAttr = (l.id === 'rivers' && landL && landL.canvas) ? ' mask="url(#landMask)"' : '';
+          s.push('<g opacity="'+l.opacity+'"'+maskAttr+'>');
           l.objects.forEach(function (o) {
             if (l.id === 'rivers' && o.kind === 'lake') {
               /* göl SVG */

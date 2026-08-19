@@ -587,27 +587,46 @@
           ctx.globalAlpha = l.opacity;
           var self_ = this;
           if (l.id === 'rivers') {
+            /* Nehirler ve göller sadece kara üzerinde var olmalı — denizde
+               yüzen bir göl ya da denize taşan bir nehir ağzı olmamalı.
+               Tüm katmanı önce ayrı bir scratch canvas'a çizip, sonra
+               kara maskesiyle (destination-in) kırpıp asıl ctx'e composite
+               ediyoruz; böylece mevcut 4 geçişli çizim mantığına dokunmadan
+               tek noktadan kırpma uygulanmış oluyor. */
+            var Lm_ = Layers.get('landmass');
+            var rc = (Lm_ && Lm_.canvas) ? document.createElement('canvas') : null;
+            var rctx3 = rc;
+            if (rc) { rc.width = W; rc.height = H; rctx3 = rc.getContext('2d'); }
+            var dctx = rctx3 || ctx;
+
             /* 1. pass: göl kıyı bantları — nehirlerin altında */
             for (var j = 0; j < l.objects.length; j++) {
-              if (l.objects[j].kind === 'lake') self_.drawLakeShore(ctx, l.objects[j]);
+              if (l.objects[j].kind === 'lake') self_.drawLakeShore(dctx, l.objects[j]);
             }
             /* 2. pass: nehirler — göl kıyısının üstünde */
             for (var j = 0; j < l.objects.length; j++) {
-              if (l.objects[j].kind !== 'lake') self_.drawRiver(ctx, l.objects[j]);
+              if (l.objects[j].kind !== 'lake') self_.drawRiver(dctx, l.objects[j]);
             }
             /* 3. pass: göl dolguları — nehirlerin üstünde */
             for (var j = 0; j < l.objects.length; j++) {
-              if (l.objects[j].kind === 'lake') self_.drawLakeFill(ctx, l.objects[j]);
+              if (l.objects[j].kind === 'lake') self_.drawLakeFill(dctx, l.objects[j]);
             }
             /* 4. pass: nehir-göl birleşim yerinde delta/plume karışım efekti */
             for (var j = 0; j < l.objects.length; j++) {
               if (l.objects[j].kind !== 'lake') {
                 for (var k2 = 0; k2 < l.objects.length; k2++) {
                   if (l.objects[k2].kind === 'lake') {
-                    self_.drawRiverLakeConfluence(ctx, l.objects[j], l.objects[k2]);
+                    self_.drawRiverLakeConfluence(dctx, l.objects[j], l.objects[k2]);
                   }
                 }
               }
+            }
+
+            if (rc) {
+              rctx3.globalCompositeOperation = 'destination-in';
+              rctx3.drawImage(Lm_.canvas, 0, 0);
+              rctx3.globalCompositeOperation = 'source-over';
+              ctx.drawImage(rc, 0, 0);
             }
           } else {
             for (var j = 0; j < l.objects.length; j++) {
