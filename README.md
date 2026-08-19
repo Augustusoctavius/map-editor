@@ -1,6 +1,6 @@
 # Wayborne Map Editor (Cartographer)
 
-Fantastik / ortaçağ tarzı, tarayıcı üzerinde çalışan bir harita editörü. Tamamen vanilla JavaScript ve Canvas 2D ile yazılmıştır — framework, build adımı, bundler, npm bağımlılığı veya CDN varlığı yoktur. Karada, denizde, kıyıda, arazi dokularında, izometrik binalarda kullanılan her şey (820 sembol, 20 arazi tipi, onlarca izometrik yapı) kodun içinde üretilir; dışarıdan görsel dosyası yüklenmez.
+Fantastik / ortaçağ tarzı, tarayıcı üzerinde çalışan bir harita editörü. Tamamen vanilla JavaScript ve Canvas 2D ile yazılmıştır — framework, build adımı, bundler, npm bağımlılığı veya CDN varlığı yoktur. Karada, denizde, kıyıda, arazi dokularında, izometrik binalarda kullanılan her şey (838 sembol, 20 arazi tipi, onlarca izometrik yapı) kodun içinde üretilir; dışarıdan görsel dosyası yüklenmez.
 
 Arayüz 10 dilde kullanılabilir: Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, İtalyanca, Portekizce, Hollandaca, Lehçe, Rusça. Sağ üstteki 🌐 simgesinden değiştirilir.
 

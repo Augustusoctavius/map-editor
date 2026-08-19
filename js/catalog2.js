@@ -177,9 +177,18 @@
 
   /* ============================================================
      3) SUR / ÇİT PARÇALARI
+     WALL_MATS burada tanımlanıp §9c'deki T-kavşağı/kuleli-köşe
+     bloğuyla da PAYLAŞILIYOR — aynı indeks aynı malzemeye karşılık
+     gelsin diye (ör. iwl_straight_5 ile iwl_tjunc_5 aynı malzeme).
+     Kalın ahşap tomruk sur (kültürel: Kuzey/frontier) ve kerpiç sur
+     (kültürel: Akdeniz/Orta Doğu) eklendi — önceki 5 taş türüne ek.
      ============================================================ */
-  [['stone','Taş','Stone'],['stoneW','Ak taş','White'],['granite','Granit','Granite'],
-   ['basalt','Bazalt','Basalt'],['stoneD','Kara taş','Dark']].forEach(function (m, i) {
+  var WALL_MATS = [
+    ['stone','Taş','Stone'],['stoneW','Ak taş','White'],['granite','Granit','Granite'],
+    ['basalt','Bazalt','Basalt'],['stoneD','Kara taş','Dark'],
+    ['woodD','Tomruk','Log'],['adobeW','Kerpiç','Adobe']
+  ];
+  WALL_MATS.forEach(function (m, i) {
     reg('castles', 'iwl_straight_' + i, 'Sur · ' + m[1], 'Wall · ' + m[2], function () {
       var s = S(); s.pad(24, 12, 42, 'dirt');
       wall(s, 0, 6, 0, 48, 12, 16, m[0], { slit:3 });
@@ -201,21 +210,26 @@
     });
   });
 
-  ['woodD', 'wood'].forEach(function (m, i) {
-    reg('castles', 'ipl_straight_' + i, i ? 'Kazık çit · açık' : 'Kazık çit · koyu',
-        i ? 'Palisade · light' : 'Palisade · dark', function () {
+  var PALISADE_MATS = [
+    ['woodD',   'Koyu',    'Dark'],
+    ['wood',    'Açık',    'Light'],
+    ['bambooW', 'Bambu',   'Bamboo'],
+    ['mossy',   'Yosunlu', 'Mossy']
+  ];
+  PALISADE_MATS.forEach(function (mm, i) {
+    var m = mm[0];
+    reg('castles', 'ipl_straight_' + i, 'Kazık çit · ' + mm[1], 'Palisade · ' + mm[2], function () {
       var s = S(); s.pad(24, 10, 42, 'dirt');
       s.palisade(0, 6, 0, 48, 6, 16, m, { corner:false });
       return s;
     });
-    reg('castles', 'ipl_gate_' + i, i ? 'Kazık kapı · açık' : 'Kazık kapı · koyu',
-        i ? 'Palisade gate · light' : 'Palisade gate · dark', function () {
+    reg('castles', 'ipl_gate_' + i, 'Kazık kapı · ' + mm[1], 'Palisade gate · ' + mm[2], function () {
       var s = S(); s.pad(24, 12, 42, 'dirt');
       s.palisade(0, 6, 0, 16, 6, 16, m, { corner:false });
       s.palisade(32, 6, 0, 16, 6, 16, m, { corner:false });
-      s.box(14, 4, 0, 6, 6, 22, 'woodD');
-      s.box(28, 4, 0, 6, 6, 22, 'woodD');
-      s.box(14, 4, 22, 20, 6, 4, 'woodD', { plain:true });
+      s.box(14, 4, 0, 6, 6, 22, m === 'wood' ? 'woodD' : m);
+      s.box(28, 4, 0, 6, 6, 22, m === 'wood' ? 'woodD' : m);
+      s.box(14, 4, 22, 20, 6, 4, m === 'wood' ? 'woodD' : m, { plain:true });
       return s;
     });
   });
@@ -1012,8 +1026,7 @@
      düz/köşe/kapı zaten mevcuttu, T-kavşak ve kuleyle birleşen sur
      köşesi burada tamamlanıyor.
      ============================================================ */
-  [['stone','Taş','Stone'],['stoneW','Ak taş','White'],['granite','Granit','Granite'],
-   ['basalt','Bazalt','Basalt'],['stoneD','Kara taş','Dark']].forEach(function (m, i) {
+  WALL_MATS.forEach(function (m, i) {
     reg('castles', 'iwl_tjunc_' + i, 'Sur T-kavşağı · ' + m[1], 'Wall T-junction · ' + m[2], function () {
       var s = S(); s.pad(24, 24, 42, 'dirt');
       wall(s, 0, 26, 0, 52, 12, 16, m[0]);
@@ -1515,8 +1528,7 @@
   /* ============================================================
      10a-3) BAĞIMSIZ KAPI KULESİ + KÜLTÜREL KÖPRÜ VARYANTLARI
      ============================================================ */
-  [['stone','Taş','Stone'],['stoneW','Ak taş','White'],['granite','Granit','Granite'],
-   ['basalt','Bazalt','Basalt'],['stoneD','Kara taş','Dark']].forEach(function (m, i) {
+  WALL_MATS.forEach(function (m, i) {
     reg('castles', 'ik_freegate_' + i, 'Kapı kulesi · ' + m[1], 'Gate tower · ' + m[2], function () {
       var s = S(); s.pad(24, 14, 42, 'dirt');
       wall(s, 0, 6, 0, 16, 12, 15, m[0]);
