@@ -990,4 +990,76 @@
     return s;
   });
 
+  /* ============================================================
+     7) SUR KAVŞAKLARI (T-kavşak + kule birleşimi)
+     "sur parçaları" isteğinde eksik kalan iki bağlantı parçası —
+     düz/köşe/kapı zaten mevcuttu, T-kavşak ve kuleyle birleşen sur
+     köşesi burada tamamlanıyor.
+     ============================================================ */
+  [['stone','Taş','Stone'],['stoneW','Ak taş','White'],['granite','Granit','Granite'],
+   ['basalt','Bazalt','Basalt'],['stoneD','Kara taş','Dark']].forEach(function (m, i) {
+    reg('castles', 'iwl_tjunc_' + i, 'Sur T-kavşağı · ' + m[1], 'Wall T-junction · ' + m[2], function () {
+      var s = S(); s.pad(24, 24, 42, 'dirt');
+      wall(s, 0, 26, 0, 52, 12, 16, m[0]);
+      wall(s, 40, 0, 0, 12, 28, 16, m[0]);
+      return s;
+    });
+    reg('castles', 'iwl_towercorner_' + i, 'Kuleli sur köşesi · ' + m[1], 'Wall corner with tower · ' + m[2], function () {
+      var s = S(); s.pad(24, 22, 40, 'dirt');
+      wall(s, 18, 30, 0, 34, 11, 15, m[0]);
+      wall(s, 30, 0, 0, 11, 32, 15, m[0]);
+      towerSq(s, 2, 2, 0, 17, 26, m[0], { roof:false, slit:2 });
+      return s;
+    });
+  });
+
+  /* yıkık sur parçaları — mevcut düz/köşe/kapı setinin harabe versiyonu */
+  reg('ruins', 'iwl_ruin_straight', 'Yıkık sur parçası', 'Ruined wall segment', function () {
+    var s = S(); s.pad(24, 12, 42, 'dirt');
+    s.box(0, 6, 0, 48, 12, 10, 'ruin', { slit:2 });
+    s.box(6, 7, 10, 10, 10, 4, 'ruin', { plain:true });
+    s.box(30, 8, 10, 8, 8, 3, 'ruin', { plain:true });
+    s.rock(38, 2, 0, 5, 3, 'stoneD');
+    return s;
+  });
+  reg('ruins', 'iwl_ruin_gate', 'Yıkık sur kapısı', 'Ruined wall gate', function () {
+    var s = S(); s.pad(24, 14, 42, 'dirt');
+    s.box(0, 6, 0, 14, 12, 12, 'ruin');
+    s.box(34, 6, 0, 14, 12, 9, 'ruin');
+    s.rock(16, 4, 0, 6, 4, 'stoneD');
+    s.rock(24, 10, 0, 5, 3, 'stoneD');
+    return s;
+  });
+
+  /* ============================================================
+     8) DAĞLIK YERLEŞKE (terraced taş köy — kültürel/coğrafi varyant)
+     Kayalık zeminde farklı yüksekliklerde teraslanmış taş evler;
+     "dağ kabilesi" (cultures/ix_mountaintribe) daha ilkel/göçebe bir
+     kampı temsil ederken bu, kalıcı mimari bir dağ yerleşimini verir.
+     ============================================================ */
+  function terraceHut(s, x, y, z, w, mat, roof) {
+    s.rock(x - 2, y - 2, 0, w * 0.75, z, 'stoneD');
+    hut(s, x, y, w, w * 0.82, 11, mat, roof, { z:z, win:1 });
+  }
+  [['small', 'Küçük', 'Small', 2], ['medium', 'Orta', 'Medium', 3], ['large', 'Büyük', 'Large', 4]]
+    .forEach(function (sizeDef) {
+      reg('mountains', 'ims_' + sizeDef[0], 'Dağlık yerleşke · ' + sizeDef[1], 'Mountain settlement · ' + sizeDef[2], function () {
+        var n = sizeDef[3];
+        var s = S(); s.pad(15 + n * 9, 15 + n * 7, 26 + n * 12, 'stoneD');
+        var mats = ['stone', 'stoneW', 'stoneD'];
+        /* 2 sütunlu ızgara — her satır bir üst terası temsil eder (z artar);
+           sütun ve satır aralığı yeterince geniş tutuluyor ki izometrik
+           izdüşümde evler ekranda üst üste binmesin */
+        for (var i = 0; i < n; i++) {
+          var col = i % 2, row = Math.floor(i / 2);
+          var hx = 4 + col * 24;
+          var hy = 4 + row * 24;
+          var hz = row * 11 + col * 4;
+          terraceHut(s, hx, hy, hz, 15, mats[i % mats.length], i % 2 ? 'tileD' : 'thatch');
+        }
+        s.box(2, 2 + n * 4, n * 5 - 3, n * 8, 4, 3, 'stoneD', { plain:true });
+        return s;
+      });
+    });
+
 })(window);
