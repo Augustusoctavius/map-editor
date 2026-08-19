@@ -2059,4 +2059,32 @@
     return s;
   });
 
+  /* ---- kalan 3 ırkın köprüsü (cüce/elf zaten vardı) — köprü ailesini
+     tamamlıyor ve ırk kapsamını 5/5'e çıkarıyor ---- */
+  reg('cultures', 'ix_orc_bridge', 'Ork köprüsü · Halat ve kütük', 'Orc bridge · Rope and log', function () {
+    var s = S(); s.pad(24, 10, 34, 'dirt');
+    s.box(0, 4, 3, 44, 6, 1, 'woodD', { plain:true });
+    s.box(2, 4, 0, 1.4, 1.4, 4, 'woodD', { plain:true });
+    s.box(40, 4, 0, 1.4, 1.4, 4, 'woodD', { plain:true });
+    s.box(2, 2, 5, 1.4, 1.4, 12, 'hide', { plain:true });
+    s.box(40, 2, 5, 1.4, 1.4, 12, 'hide', { plain:true });
+    return s;
+  });
+  reg('cultures', 'ix_halfling_bridge', 'Küçük halk köprüsü', 'Little-folk footbridge', function () {
+    var s = S(); s.pad(18, 8, 24, 'dirt');
+    s.box(0, 3, 3, 30, 5, 0.8, 'wood', { plain:true });
+    s.box(0, 2.6, 3.8, 30, 0.6, 1.6, 'woodD', { plain:true });
+    s.box(0, 7.4, 3.8, 30, 0.6, 1.6, 'woodD', { plain:true });
+    return s;
+  });
+  reg('cultures', 'ix_gnome_bridge', 'Cin köprüsü · Dişli mekanizmalı', 'Gnome bridge · Clockwork', function () {
+    var s = S(); s.pad(22, 10, 32, 'dirt');
+    s.box(0, 4, 4, 40, 6, 1, 'stoneW', { plain:true });
+    s.box(0, 3.4, 5.4, 40, 0.8, 2, 'basalt', { plain:true });
+    s.box(0, 9.4, 5.4, 40, 0.8, 2, 'basalt', { plain:true });
+    s.cyl(10, 2, 4, 1.6, 4, 'basalt');
+    s.cyl(30, 2, 4, 1.6, 4, 'basalt');
+    return s;
+  });
+
 })(window);
