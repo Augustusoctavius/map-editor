@@ -1,6 +1,6 @@
 /* ============================================================
    Medieval Map Editor — layers.js  v4
-   • 20 terrain tipi, Don't Starve tarzı toprak tonları
+   • 28 terrain tipi, Don't Starve tarzı toprak tonları
    • Prosedürel scatter (tile/pattern yok)
    • Terrain-aware kıyı rengi (shore rengi terrain'e göre)
    • Yumuşak kenar geçişi için feather mask
@@ -125,6 +125,47 @@
       tr:'Kıyı ormanı', en:'Coastal',
       base:'#7a9e68', dark:'#4a6a40', mark:'#2e4e26', mark2:'#4a6a3c', kind:'mangrove',density:1.05,
       shore:['#4a6840','#7a9a60']
+    },
+    /* --- ŞEHİR İÇİ / SOKAK --- */
+    cobblestone: {
+      tr:'Arnavut kaldırımı', en:'Cobblestone',
+      base:'#9a9488', dark:'#6e685e', mark:'#524c44', mark2:'#7a746a', kind:'cobble', density:1.35,
+      shore:['#726c62','#a29c90']
+    },
+    brokenroad: {
+      tr:'Kırık taş yol', en:'Broken stone road',
+      base:'#a89a80', dark:'#7a6e56', mark:'#564c38', mark2:'#8a7c60', kind:'crack', density:0.85,
+      shore:['#7c7058','#ac9e82']
+    },
+    mudroad: {
+      tr:'Çamur yol', en:'Mud road',
+      base:'#6e5636', dark:'#48381e', mark:'#3a2c16', mark2:'#5a4626', kind:'mud', density:0.75,
+      shore:['#4a3a20','#70583a']
+    },
+    gutter: {
+      tr:'Pis su akıntısı', en:'Sewage gutter',
+      base:'#54503a', dark:'#302e20', mark:'#1e2016', mark2:'#42402e', kind:'gutter', density:0.90,
+      shore:['#302e20','#565236']
+    },
+    flowerbed: {
+      tr:'Süs çiçeği tarhı', en:'Flower bed',
+      base:'#7a9c5c', dark:'#547038', mark:'#c85a78', mark2:'#d8b840', kind:'flower', density:1.25,
+      shore:['#567238','#7e9e60']
+    },
+    hedgerow: {
+      tr:'Çalı bordürü', en:'Hedgerow',
+      base:'#5c7a48', dark:'#384e28', mark:'#26381a', mark2:'#44602e', kind:'shrub', density:1.40,
+      shore:['#3a5028','#5e7c4a']
+    },
+    courtyard: {
+      tr:'Toprak avlu', en:'Packed courtyard',
+      base:'#b8a888', dark:'#8e7c5c', mark:'#6e5e40', mark2:'#a2926e', kind:'sparse', density:0.45,
+      shore:['#90805e','#bcac8c']
+    },
+    plaza: {
+      tr:'Mermer meydan', en:'Marble plaza',
+      base:'#d8d2c4', dark:'#aca690', mark:'#928c78', mark2:'#c0bcac', kind:'crack', density:0.55,
+      shore:['#aea892','#dcd6c8']
     }
   };
 
@@ -282,6 +323,38 @@
         ctx.beginPath();
         ctx.arc(0,-2.4,2.6,Math.PI*1.0,Math.PI*2.0);
         ctx.stroke();
+        break;
+
+      case 'cobble':
+        /* arnavut kaldırımı: birbirine yaslanmış yuvarlatılmış taşlar */
+        ctx.beginPath();
+        ctx.ellipse(-2.6,-1.6,1.9,1.4,0.3,0,Math.PI*2);
+        ctx.ellipse( 1.9,-2.0,1.7,1.3,-0.2,0,Math.PI*2);
+        ctx.ellipse(-1.1, 2.0,1.8,1.3,0.15,0,Math.PI*2);
+        ctx.ellipse( 2.7, 1.7,1.6,1.2,0.4,0,Math.PI*2);
+        ctx.stroke();
+        break;
+
+      case 'mud':
+        /* çamur birikintisi + sıçrama izleri */
+        ctx.beginPath();
+        ctx.ellipse(0,1.4,4.2,2.0,0,0,Math.PI*2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(-4.6,-3.2); ctx.lineTo(-3.6,-1.2);
+        ctx.moveTo( 4.2,-3.0); ctx.lineTo( 3.3,-0.9);
+        ctx.stroke();
+        break;
+
+      case 'gutter':
+        /* pis su akıntısı: dalgalı koyu iz + birikinti damlaları */
+        ctx.beginPath();
+        ctx.moveTo(-5.2,-1.2); ctx.quadraticCurveTo(-2.0,2.2,0,-0.6); ctx.quadraticCurveTo(2.2,-3.2,5.2,0.4);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(-3.2,3.0,0.8,0,Math.PI*2);
+        ctx.arc( 3.0,3.4,0.6,0,Math.PI*2);
+        ctx.fill();
         break;
     }
   }
