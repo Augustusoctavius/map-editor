@@ -1587,6 +1587,12 @@
       }
       var L = Layers.get(s.layerId);
       var before = JSON.parse(JSON.stringify(L.objects));
+      /* bölge bağlantısı silinince o bağlantının işaret ettiği alt harita
+         verisi de temizlenir — yoksa proje dosyasında sonsuza dek öksüz kalır */
+      if (s.layerId === 'links') {
+        var delObj = L.objects.filter(function (o) { return o.id === s.id; })[0];
+        if (delObj && App.maps[delObj.targetMapId]) delete App.maps[delObj.targetMapId];
+      }
       L.objects = L.objects.filter(function (o) { return o.id !== s.id; });
       App.selection = null;
       History.pushVector(s.layerId, before, JSON.parse(JSON.stringify(L.objects)), 'delete');
@@ -1600,6 +1606,9 @@
       var before = JSON.parse(JSON.stringify(L.objects));
       var c = JSON.parse(JSON.stringify(o));
       c.id = uid();
+      /* bölge bağlantısı çoğaltılınca aynı alt haritayı paylaşmasın —
+         her iğne kendi (boş) haritasına açılsın */
+      if (App.selection.layerId === 'links') c.targetMapId = uid();
       var off = 40;
       if (c.pts) c.pts = c.pts.map(function (p) { return [p[0]+off, p[1]+off]; });
       else { c.x += off; c.y += off; }
