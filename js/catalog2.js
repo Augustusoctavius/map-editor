@@ -1059,6 +1059,38 @@
     s.rock(24, 10, 0, 5, 3, 'stoneD');
     return s;
   });
+  reg('ruins', 'iwl_ruin_corner', 'Yıkık sur köşesi', 'Ruined wall corner', function () {
+    var s = S(); s.pad(20, 18, 34, 'dirt');
+    s.box(0, 26, 0, 32, 12, 9, 'ruin', { slit:1 });
+    s.box(28, 0, 0, 12, 22, 8, 'ruin', { slit:1 });
+    s.rock(8, 30, 0, 5, 3, 'stoneD');
+    s.rock(32, 4, 0, 4, 3, 'stoneD');
+    return s;
+  });
+  reg('ruins', 'iwl_ruin_tjunc', 'Yıkık sur T-kavşağı', 'Ruined wall T-junction', function () {
+    var s = S(); s.pad(24, 24, 42, 'dirt');
+    s.box(0, 26, 0, 40, 12, 9, 'ruin', { slit:2 });
+    s.box(40, 0, 0, 12, 22, 8, 'ruin', { slit:1 });
+    s.rock(18, 30, 0, 5, 3, 'stoneD');
+    s.rock(42, 8, 0, 4, 3, 'stoneD');
+    return s;
+  });
+  reg('ruins', 'iwl_ruin_towercorner', 'Yıkık kuleli sur köşesi', 'Ruined wall corner with tower', function () {
+    var s = S(); s.pad(24, 22, 40, 'dirt');
+    s.box(18, 30, 0, 26, 11, 8, 'ruin');
+    s.box(30, 0, 0, 11, 24, 7, 'ruin');
+    towerSq(s, 2, 2, 0, 17, 15, 'ruin', { roof:false, crenel:false, slit:1 });
+    s.rock(6, 16, 15, 6, 3, 'stoneD');
+    return s;
+  });
+  reg('ruins', 'iwl_ruin_freegate', 'Yıkık kapı kulesi', 'Ruined gate tower', function () {
+    var s = S(); s.pad(24, 14, 42, 'dirt');
+    s.box(0, 6, 0, 15, 12, 10, 'ruin');
+    s.box(33, 6, 0, 15, 12, 14, 'ruin', { slit:1 });
+    s.rock(14, 3, 0, 6, 4, 'stoneD');
+    s.rock(30, 9, 0, 5, 3, 'stoneD');
+    return s;
+  });
 
   /* ============================================================
      8) DAĞLIK YERLEŞKE (terraced taş köy — kültürel/coğrafi varyant)
@@ -1847,6 +1879,183 @@
     s.gable(-1, -1, 9, 14, 8, 4, 'tileB');
     s.cyl(11, 6, 0, 1.4, 4, 'basalt');
     s.cone(11, 6, 4, 1.6, 2, 'gold');
+    return s;
+  });
+
+  /* ============================================================
+     12) IRK × BİNA — "ZENGİN" EŞLENİKLER
+     Envanter raporunda işaret edilen tutarsızlık: medeni binalar
+     (han/taverna/kütüphane) 25 varyant derinliğindeyken §11'deki 17
+     ırk kesişimi tek örnekti. Her birine büyük/gösterişli bir eşlenik
+     eklendi — tam 25'lik ızgara değil (çoğu ırk kesişimi tekil bir
+     "yer imi" niteliğinde, ev gibi tekrar tekrar dizilmiyor) ama en
+     azından sıradan/zengin ayrımı her tipte var artık.
+     ============================================================ */
+  reg('cultures', 'ix_dwarf_smithy_grand', 'Cüce demircisi · Büyük ocaklı', 'Dwarf smithy · Grand forge', function () {
+    var s = S(); s.pad(26, 21, 40, 'stoneD');
+    s.rock(0, 2, 0, 19, 17, 'basalt');
+    s.box(2, 4, 0, 22, 16, 12, 'basalt', { door:true, doorH:0.5, win:1 });
+    s.hip(0, 2, 12, 26, 20, 6, 'stoneD');
+    chimney(s, 5, 6, 12, 11, 'basalt');
+    chimney(s, 20, 6, 12, 9, 'basalt');
+    s.box(24, 7, 0, 6, 5, 1, 'basalt', { plain:true });
+    s.box(24, 7, 1, 2, 2, 1, 'tileR', { plain:true });
+    s.flag(2, 18, 12, 10, 'tileR');
+    return s;
+  });
+  reg('cultures', 'ix_dwarf_tower_grand', 'Cüce dağ kulesi · Kalın burçlu', 'Dwarf mountain tower · Fortified', function () {
+    var s = S(); s.pad(26, 22, 46, 'stoneD');
+    s.rock(0, 2, 0, 20, 40, 'granite');
+    towerSq(s, 4, 4, 0, 19, 34, 'basalt', { roof:false, slit:2, crenel:true });
+    towerSq(s, 26, 10, 0, 10, 22, 'stoneD', { roof:false, slit:1, crenel:true });
+    return s;
+  });
+  reg('cultures', 'ix_dwarf_hall_grand', 'Cüce bira locali · Büyük salon', 'Dwarf mead hall · Great hall', function () {
+    var s = S(); s.pad(28, 24, 42, 'stoneD');
+    hut(s, 2, 6, 26, 19, 15, 'granite', 'stoneD', { win:2 });
+    chimney(s, 4, 7, 15, 10, 'basalt');
+    barrel(s, 29, 8, 0); barrel(s, 32, 11, 0); barrel(s, 29, 15, 0);
+    s.flag(4, 22, 15, 10, 'tileB');
+    return s;
+  });
+  reg('cultures', 'ix_dwarf_bridge_grand', 'Cüce taş köprüsü · Kuleli', 'Dwarf stone bridge · Towered', function () {
+    var s = S(); s.pad(30, 14, 42, 'dirt');
+    s.box(0, 5, 6, 56, 8, 2.4, 'granite', { plain:true });
+    s.box(0, 4.2, 8.4, 56, 1, 2.4, 'stoneD', { plain:true });
+    s.box(0, 11.2, 8.4, 56, 1, 2.4, 'stoneD', { plain:true });
+    towerSq(s, 4, 3, 0, 10, 20, 'basalt', { roof:false, slit:1 });
+    towerSq(s, 42, 3, 0, 10, 20, 'basalt', { roof:false, slit:1 });
+    return s;
+  });
+
+  reg('cultures', 'ix_elf_library_grand', 'Elf arşiv ağacı · Büyük', 'Elf archive tree · Grand', function () {
+    var s = S(); s.pad(26, 22, 44, 'grass');
+    s.tree(4, 4, 0, 38, 'round', 'tileG');
+    s.dome(14, 12, 20, 13, 11, 'tileG');
+    s.box(7, 7, 18, 13, 12, 7, 'bambooW', { win:3 });
+    s.box(24, 7, 15, 1, 1, 10, 'woodD', { plain:true });
+    s.box(24, 20, 15, 1, 1, 10, 'woodD', { plain:true });
+    return s;
+  });
+  reg('cultures', 'ix_elf_shrine_grand', 'Elf doğa mabedi · Kutsal koru', 'Elf nature shrine · Sacred grove', function () {
+    var s = S(); s.pad(24, 20, 36, 'grass');
+    s.tree(14, 12, 0, 28, 'round', 'tileG');
+    s.tree(2, 4, 0, 18, 'round', 'tileG');
+    s.tree(24, 6, 0, 18, 'round', 'tileG');
+    s.rock(4, 16, 0, 5, 3, 'stoneW');
+    s.rock(20, 18, 0, 5, 3, 'stoneW');
+    s.cyl(14, 12, 4, 3.5, 1, 'ice');
+    return s;
+  });
+  reg('cultures', 'ix_elf_inn_grand', 'Elf yolcu hanı · Büyük', 'Elf wayfarer inn · Grand', function () {
+    var s = S(); s.pad(26, 22, 40, 'grass');
+    s.tree(4, 4, 0, 32, 'round', 'tileR');
+    s.tree(20, 8, 0, 20, 'round', 'tileG');
+    s.box(9, 7, 16, 11, 11, 7, 'wood', { win:3 });
+    s.dome(14, 12, 23, 11, 8, 'tileR');
+    signpost(s, 27, 10, 0, 14, 'tileG');
+    barrel(s, 25, 15, 0);
+    return s;
+  });
+  reg('cultures', 'ix_elf_bridge_grand', 'Elf örgü köprüsü · Fenerli', 'Elf woven bridge · Lantern-lit', function () {
+    var s = S(); s.pad(28, 11, 36, 'dirt');
+    s.box(0, 4, 4, 50, 4, 0.8, 'bambooW', { plain:true });
+    s.box(0, 3.7, 4.8, 50, 0.6, 2.2, 'woodD', { plain:true });
+    s.box(0, 7.7, 4.8, 50, 0.6, 2.2, 'woodD', { plain:true });
+    s.tree(2, -2, 0, 18, 'round', 'tileG');
+    s.tree(42, 6, 0, 18, 'round', 'tileG');
+    s.cyl(14, 4, 5, 0.6, 3, 'wood'); s.cone(14, 4, 8, 1.4, 1.6, 'gold');
+    s.cyl(34, 4, 5, 0.6, 3, 'wood'); s.cone(34, 4, 8, 1.4, 1.6, 'gold');
+    return s;
+  });
+
+  reg('cultures', 'ix_orc_palisade_grand', 'Ork çiti · Gözcü kuleli', 'Orc palisade · Watchtower', function () {
+    var s = S(); s.pad(28, 14, 46, 'dirt');
+    s.palisade(0, 4, 0, 44, 5, 13, 'woodD', { corner:false });
+    towerSq(s, 46, 2, 0, 12, 20, 'woodD', { roof:false, crenel:false, slit:1 });
+    s.flag(50, 4, 20, 8, 'dark');
+    return s;
+  });
+  reg('cultures', 'ix_orc_smithy_grand', 'Ork demircisi · Savaş ocağı', 'Orc smithy · War forge', function () {
+    var s = S(); s.pad(24, 20, 34, 'dirt');
+    s.box(2, 4, 0, 20, 15, 10, 'woodD', { door:true });
+    s.box(1, 3, 10, 22, 17, 1, 'dark', { plain:true });
+    chimney(s, 3, 5, 10, 9, 'stoneD');
+    chimney(s, 17, 5, 10, 8, 'stoneD');
+    s.box(23, 7, 0, 5, 5, 1, 'basalt', { plain:true });
+    s.box(23, 7, 1, 1.6, 1.6, 1, 'tileR', { plain:true });
+    s.box(1, 20, 0, 2, 2, 14, 'bone', { plain:true });
+    return s;
+  });
+  reg('cultures', 'ix_orc_stall_grand', 'Ork tezgâhı · Ganimet yığını', 'Orc stall · Spoils cache', function () {
+    var s = S(); s.pad(18, 12, 26, 'dirt');
+    s.box(1, 1, 0, 13, 7, 3, 'woodD', { plain:true });
+    s.box(1, 1, 3, 1, 1, 6, 'woodD', { plain:true });
+    s.box(13, 1, 3, 1, 1, 6, 'woodD', { plain:true });
+    s.box(1, 7, 3, 1, 1, 6, 'woodD', { plain:true });
+    s.box(13, 7, 3, 1, 1, 6, 'woodD', { plain:true });
+    s.box(0, 0, 9, 15, 9, 1, 'hide', { plain:true });
+    s.rock(15, 6, 0, 4, 4, 'stoneD');
+    s.rock(15, 2, 0, 3, 3, 'gold');
+    return s;
+  });
+
+  reg('cultures', 'ix_halfling_inn_grand', 'Küçük halk hanı · Büyük', 'Little-folk inn · Grand', function () {
+    var s = S(); s.pad(26, 22, 38, 'grass');
+    s.dome(13, 11, 0, 15, 10, 'grass');
+    s.cyl(7, 7, 0, 3.4, 0.7, 'wood');
+    signpost(s, 26, 10, 0, 12, 'tileR');
+    barrel(s, 24, 15, 0); barrel(s, 27, 12, 0);
+    chimney(s, 18, 3, 8, 6, 'stoneD');
+    return s;
+  });
+  reg('cultures', 'ix_halfling_bakery_grand', 'Küçük halk fırını · Çift ocaklı', 'Little-folk bakery · Twin ovens', function () {
+    var s = S(); s.pad(22, 18, 30, 'grass');
+    s.dome(11, 9, 0, 13, 8, 'grass');
+    s.cyl(6.5, 6.5, 0, 3.2, 0.6, 'woodD');
+    chimney(s, 18, 4, 5, 7, 'stoneD');
+    s.cyl(20, 9, 0, 3.4, 3.4, 'stoneD'); s.dome(20, 9, 3.4, 3.6, 2.4, 'stoneD');
+    s.cyl(20, 15, 0, 2.6, 2.6, 'stoneD'); s.dome(20, 15, 2.6, 2.8, 1.8, 'stoneD');
+    return s;
+  });
+  reg('cultures', 'ix_halfling_stall_grand', 'Küçük halk pazar tezgâhı · Büyük', 'Little-folk market stall · Grand', function () {
+    var s = S(); s.pad(16, 11, 20, 'grass');
+    s.box(1, 1, 0, 13, 7, 3, 'wood', { plain:true });
+    s.box(1, 1, 3, 1, 1, 5, 'woodD', { plain:true });
+    s.box(13, 1, 3, 1, 1, 5, 'woodD', { plain:true });
+    s.box(1, 7, 3, 1, 1, 5, 'woodD', { plain:true });
+    s.box(13, 7, 3, 1, 1, 5, 'woodD', { plain:true });
+    s.gable(-1, -1, 8, 17, 9, 4, 'tileG');
+    s.flag(15, 8, 8, 6, 'gold');
+    return s;
+  });
+
+  reg('cultures', 'ix_gnome_mill_grand', 'Cin dişli değirmeni · Çift kanatlı', 'Gnome gear mill · Twin-vane', function () {
+    var s = S(); s.pad(18, 18, 36, 'grass');
+    s.cyl(11, 10, 0, 7.5, 18, 'stoneW');
+    s.cone(11, 10, 18, 8, 6, 'tileD');
+    s.cyl(11, 10, 20, 1.2, 4, 'gold');
+    s.box(10, -3, 25, 2, 28, 1.2, 'basalt', { plain:true });
+    s.box(-3, 9, 25, 28, 2, 1.2, 'basalt', { plain:true });
+    s.box(3, 3, 8, 3, 3, 6, 'wood', { plain:true });
+    return s;
+  });
+  reg('cultures', 'ix_gnome_library_grand', 'Cin atölye-kütüphanesi · Gözlemevi', 'Gnome workshop-library · Observatory', function () {
+    var s = S(); s.pad(22, 19, 34, 'grass');
+    s.box(2, 3, 0, 20, 15, 13, 'stoneW', { win:4, door:true, doorH:0.6 });
+    s.hip(0, 1, 13, 24, 19, 7, 'tileB');
+    s.dome(22, 5, 13, 4.5, 5, 'gold');
+    s.cyl(22, 5, 0, 2.4, 13, 'basalt');
+    return s;
+  });
+  reg('cultures', 'ix_gnome_stall_grand', 'Cin gadget tezgâhı · Çift kuleli', 'Gnome gadget stall · Twin-tower', function () {
+    var s = S(); s.pad(17, 12, 22, 'grass');
+    s.box(1, 1, 0, 13, 7, 3, 'wood', { plain:true });
+    s.box(1, 1, 3, 1, 1, 6, 'woodD', { plain:true });
+    s.box(13, 1, 3, 1, 1, 6, 'woodD', { plain:true });
+    s.gable(-1, -1, 9, 17, 9, 4, 'tileB');
+    s.cyl(14, 7, 0, 1.4, 4, 'basalt'); s.cone(14, 7, 4, 1.6, 2, 'gold');
+    s.cyl(3, 8, 0, 1.2, 3, 'basalt'); s.cone(3, 8, 3, 1.4, 1.6, 'gold');
     return s;
   });
 
