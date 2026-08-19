@@ -1,6 +1,6 @@
 # Wayborne Map Editor (Cartographer)
 
-Fantastik / ortaçağ tarzı, tarayıcı üzerinde çalışan bir harita editörü. Tamamen vanilla JavaScript ve Canvas 2D ile yazılmıştır — framework, build adımı, bundler, npm bağımlılığı veya CDN varlığı yoktur. Karada, denizde, kıyıda, arazi dokularında, izometrik binalarda kullanılan her şey (472 sembol, 20 arazi tipi, onlarca izometrik yapı) kodun içinde üretilir; dışarıdan görsel dosyası yüklenmez.
+Fantastik / ortaçağ tarzı, tarayıcı üzerinde çalışan bir harita editörü. Tamamen vanilla JavaScript ve Canvas 2D ile yazılmıştır — framework, build adımı, bundler, npm bağımlılığı veya CDN varlığı yoktur. Karada, denizde, kıyıda, arazi dokularında, izometrik binalarda kullanılan her şey (556 sembol, 20 arazi tipi, onlarca izometrik yapı) kodun içinde üretilir; dışarıdan görsel dosyası yüklenmez.
 
 Arayüz 10 dilde kullanılabilir: Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, İtalyanca, Portekizce, Hollandaca, Lehçe, Rusça. Sağ üstteki 🌐 simgesinden değiştirilir.
 
@@ -82,7 +82,7 @@ Bir nesne seçildiğinde ek işlemler görünür: **Çoğalt**, **Sil**, öne/ar
 ## Alt/yan panel sekmeleri
 
 - **Katmanlar** — Referans görsel, Kara, Arazi, Yükselti, Bölgeler, Nehirler, Yollar, Semboller, Kaynaklar, Harita bağlantıları, Ölçümler, Etiketler, Kaplama olmak üzere 13 katman; her biri görünürlük ve opaklık kontrolüyle açılıp kapatılabilir, sıralanabilir.
-- **Kütüphane** — Tüm sembol/bina kataloğu; kategoriye göre gezinilebilir ve arama kutusuyla filtrelenebilir. Kendi PNG sembolünüzü de yükleyip kütüphaneye ekleyebilirsiniz.
+- **Kütüphane** — Tüm sembol/bina kataloğu; kategoriye göre gezinilebilir ve arama kutusuyla filtrelenebilir. Kendi PNG sembolünüzü de yükleyip kütüphaneye ekleyebilirsiniz. İzometrik binalarda malzeme/çatı varyantları arasında yaşlanma (yosunlu, yanık, yıpranmış) ve kültürel çeşitlilik (kilden/kerpiç, bambu, Doğu Asya pagoda kuleleri) temaları da bulunur; binaların altında artık yuvarlak zemin diski yok.
 - **Geçmiş** — Yapılan işlemlerin (fırça darbesi, nesne ekleme/silme vb.) kronolojik listesi; herhangi bir adıma geri dönülebilir.
 
 ## Diğer özellikler
