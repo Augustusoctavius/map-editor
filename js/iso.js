@@ -98,9 +98,12 @@
     return this.add({ t:'onion', x:x, y:y, z:z, r:r, h:h, m:mat||'gold', o:opt||{} });
   };
 
-  /** zemin yastığı (elips) */
-  Scene.prototype.pad = function (x, y, r, mat, opt) {
-    return this.add({ t:'pad', x:x, y:y, z:0, r:r, h:0, m:mat||'dirt', o:opt||{} });
+  /** zemin yastığı (elips) — kaldırıldı: her arazi dokusuna uymuyordu ve
+      bazı binalarda görsel olarak kötü duruyordu. Katalogdaki 239 çağrı
+      noktasını tek tek değiştirmemek için burada no-op yapıldı; build()
+      zaten sıfır zemin nesnesiyle sorunsuz çalışıyor. */
+  Scene.prototype.pad = function () {
+    return this;
   };
 
   /** düzensiz kaya */
