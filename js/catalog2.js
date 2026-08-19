@@ -125,32 +125,48 @@
   });
 
   /* ============================================================
-     2) EV VARYANTLARI  (duvar × çatı)
+     2) EV VARYANTLARI  (duvar × çatı → zenginlik katmanı × kültürel
+     bölge olarak ETİKETLENİR). 54 kombinasyon zaten mevcuttu — yeni
+     geometri EKLENMEDİ, sadece "1.Yoksul / Batı Avrupa" gibi okunabilir
+     bir isimlendirme katmanı bindirildi (bkz. sembol envanteri notu:
+     sorun eksik sembol değil, gruplama/etiketleme boşluğuydu).
      ============================================================ */
+  var TIER_NAMES = [
+    null,
+    ['Yoksul', 'Poor'],
+    ['Sıradan', 'Common'],
+    ['Müreffeh', 'Comfortable'],
+    ['Zengin', 'Wealthy'],
+    ['Soylu', 'Noble']
+  ];
   var HOUSE_WALL = [
-    ['wood',   'Ahşap',  'Timber'],
-    ['stone',  'Taş',    'Stone'],
-    ['stoneW', 'Ak taş', 'Whitewashed'],
-    ['dirt',   'Kerpiç', 'Adobe'],
-    ['woodD',  'Kara ahşap','Dark timber'],
-    ['mossy',    'Yosunlu',    'Mossy'],
-    ['weathered','Yıpranmış',  'Weathered'],
-    ['bambooW',  'Bambu',      'Bamboo'],
-    ['adobeW',   'Ak kerpiç',  'White adobe']
+    /* [mat, tr, en, temel katman(1-5), kültürel bölge tr, kültürel bölge en] */
+    ['wood',      'Ahşap',      'Timber',        2, 'Batı Avrupa',        'Western'],
+    ['stone',     'Taş',        'Stone',         3, 'Batı Avrupa',        'Western'],
+    ['stoneW',    'Ak taş',     'Whitewashed',   4, 'Batı Avrupa',        'Western'],
+    ['dirt',      'Kerpiç',     'Adobe',         1, 'Akdeniz / D.Doğu',   'Mediterranean'],
+    ['woodD',     'Kara ahşap', 'Dark timber',   2, 'Kuzey',              'Northern'],
+    ['mossy',     'Yosunlu',    'Mossy',         1, 'Kuzey',              'Northern'],
+    ['weathered', 'Yıpranmış',  'Weathered',     1, 'Batı Avrupa',        'Western'],
+    ['bambooW',   'Bambu',      'Bamboo',        3, 'Doğu Asya',          'East Asian'],
+    ['adobeW',    'Ak kerpiç',  'White adobe',   4, 'Akdeniz / D.Doğu',   'Mediterranean']
   ];
   var HOUSE_ROOF = [
-    ['thatch','saz',   'thatch'],
-    ['tileR', 'kiremit','tiled'],
-    ['tileB', 'mavi',  'blue'],
-    ['tileG', 'yeşil', 'green'],
-    ['snow',  'karlı', 'snowy'],
-    ['tileD', 'arduvaz','slate']
+    /* [mat, tr, en, katman düzeltmesi] */
+    ['thatch','saz',    'thatch', -1],
+    ['tileR', 'kiremit', 'tiled',   0],
+    ['tileB', 'mavi',    'blue',   +1],
+    ['tileG', 'yeşil',   'green',  +1],
+    ['snow',  'karlı',   'snowy',   0],
+    ['tileD', 'arduvaz', 'slate',  +1]
   ];
   HOUSE_WALL.forEach(function (w, wi) {
     HOUSE_ROOF.forEach(function (r, ri) {
+      var tier = Math.max(1, Math.min(5, w[3] + r[3]));
+      var tn = TIER_NAMES[tier];
       reg('villages', 'ivh_' + wi + '_' + ri,
-        'Ev · ' + w[1] + ' / ' + r[1],
-        'House · ' + w[2] + ' / ' + r[2],
+        'Ev · ' + tier + '.' + tn[0] + ' · ' + w[4] + ' (' + w[1] + ' / ' + r[1] + ')',
+        'House · ' + tier + '.' + tn[1] + ' · ' + w[5] + ' (' + w[2] + ' / ' + r[2] + ')',
         function () {
           var s = S(); s.pad(16, 14, 26, 'grass');
           hut(s, 4, 4, 24, 18, 14, w[0], r[0], { win:2 });
@@ -1268,6 +1284,269 @@
     s.box(4, 5.5, 0, 2, 2, 3, 'woodD', { plain:true });
     s.box(42, 5.5, 0, 2, 2, 3, 'woodD', { plain:true });
     return s;
+  });
+
+  /* ============================================================
+     10b) HAN / TAVERNA / KÜTÜPHANE — 5 zenginlik × 5 kültür matrisi
+     Envanterde işaret edilen asıl boşluk: bu üç bina tipinin sadece
+     2-3 el yapımı varyantı vardı. Ortak bir CULTURE(5)×TIER(5) ızgara
+     ile 25'e tamamlanıyor — Ev'deki aynı iki eksen (bkz. §2) burada
+     GEOMETRİYE de yansıtılıyor (sadece etiket değil): kültür duvar+
+     çatı imzasını, katman ölçek+aksan malzemesini belirliyor.
+     ============================================================ */
+  var CIVIC_CULTURE = [
+    { key:'western', tr:'Batı Avrupa',      en:'Western',       wall:'wood',    roof:'tileR' },
+    { key:'med',      tr:'Akdeniz / D.Doğu', en:'Mediterranean', wall:'adobeW',  roof:'tileD' },
+    { key:'north',    tr:'Kuzey',            en:'Northern',      wall:'woodD',   roof:'snow'  },
+    { key:'east',     tr:'Doğu Asya',        en:'East Asian',    wall:'bambooW', roof:'lacquerR' },
+    { key:'stone',    tr:'Taş Kültürü',      en:'Stonecraft',    wall:'stone',   roof:'tileB' }
+  ];
+  var CIVIC_TIER = [
+    { n:1, tr:'Yoksul',   en:'Poor',        scale:0.82, accent:null },
+    { n:2, tr:'Sıradan',  en:'Common',      scale:1.0,  accent:null },
+    { n:3, tr:'Müreffeh', en:'Comfortable', scale:1.12, accent:'tileB' },
+    { n:4, tr:'Zengin',   en:'Wealthy',     scale:1.28, accent:'stoneW' },
+    { n:5, tr:'Soylu',    en:'Noble',       scale:1.45, accent:'gold' }
+  ];
+  function civicLabel(base, baseEn, cul, tier) {
+    return {
+      tr: base + ' · ' + tier.n + '.' + tier.tr + ' · ' + cul.tr,
+      en: baseEn + ' · ' + tier.n + '.' + tier.en + ' · ' + cul.en
+    };
+  }
+
+  function innScene(cul, tier) {
+    var s = S(), sc = tier.scale;
+    var w = Math.round(22 * sc), dp = Math.round(17 * sc), h = Math.round(13 * sc);
+    var wallMat = tier.n >= 4 ? 'stoneW' : cul.wall;
+    s.pad(w, dp, w + dp);
+    hut(s, 2, 4, w, dp, h, wallMat, cul.roof, { win: tier.n >= 3 ? 4 : 2 });
+    chimney(s, 4, 5, h, 6 + sc * 2, tier.accent || 'stoneD');
+    signpost(s, w + 3, 8, 0, 9 + sc * 3, tier.accent || cul.roof);
+    if (tier.n >= 4) {
+      s.box(w + 2, 6, 0, Math.round(7 * sc), Math.round(dp * 0.55), Math.round(h * 0.72), wallMat, { win:1 });
+      s.hip(w, 5, Math.round(h * 0.72), Math.round(11 * sc), Math.round(dp * 0.55) + 4, Math.round(h * 0.4), cul.roof);
+    }
+    return s;
+  }
+  function tavernScene(cul, tier) {
+    var s = S(), sc = tier.scale;
+    var w = Math.round(19 * sc), dp = Math.round(15 * sc), h = Math.round(12 * sc);
+    var wallMat = tier.n >= 4 ? 'stoneW' : cul.wall;
+    s.pad(w, dp, w + dp);
+    hut(s, 2, 6, w, dp, h, wallMat, cul.roof, { win:2 });
+    chimney(s, 4, 7, h, 6, tier.accent || 'stone');
+    barrel(s, w + 2, 8, 0);
+    barrel(s, w + 5, 11, 0);
+    tableProp(s, w + 2, 16, 0);
+    signpost(s, w, 4, 0, 10, tier.accent || cul.roof);
+    if (tier.n <= 2) { s.box(w + 1, 15, 0, 5, 4, 3, 'woodD', { plain:true }); } /* yoksul: fıçı istifi */
+    return s;
+  }
+  function libraryScene(cul, tier) {
+    var s = S(), sc = tier.scale;
+    var w = Math.round(19 * sc), dp = Math.round(15 * sc), h = Math.round(17 * sc);
+    var wallMat = tier.n >= 3 ? 'stoneW' : cul.wall;
+    s.pad(w, dp, w + dp + h);
+    s.box(2, 3, 0, w, dp, h, wallMat, { win:4, door:true, doorH:0.6 });
+    s.hip(0, 1, h, w + 4, dp + 4, Math.round(h * 0.42), cul.roof);
+    s.dome(w / 2 + 1, dp / 2, h + Math.round(h * 0.42), Math.max(3, w * 0.17), Math.max(3, w * 0.17), tier.accent || 'gold');
+    if (tier.n >= 4) {
+      s.box(-2, 5, 0, 4, Math.round(dp * 0.6), Math.round(h * 0.85), wallMat, { plain:true });
+      s.box(w + 2, 5, 0, 4, Math.round(dp * 0.6), Math.round(h * 0.85), wallMat, { plain:true });
+    }
+    return s;
+  }
+
+  CIVIC_CULTURE.forEach(function (cul) {
+    CIVIC_TIER.forEach(function (tier) {
+      var idSuf = cul.key + '_' + tier.n;
+      var lIn = civicLabel('Han', 'Inn', cul, tier);
+      reg('towns', 'ic_inn_' + idSuf, lIn.tr, lIn.en, function () { return innScene(cul, tier); });
+      var lTv = civicLabel('Taverna', 'Tavern', cul, tier);
+      reg('towns', 'ic_tavern_' + idSuf, lTv.tr, lTv.en, function () { return tavernScene(cul, tier); });
+      var lLb = civicLabel('Kütüphane', 'Library', cul, tier);
+      reg('towns', 'ic_library_' + idSuf, lLb.tr, lLb.en, function () { return libraryScene(cul, tier); });
+    });
+  });
+
+  /* ============================================================
+     10a) KÜÇÜK TAPINAK / KUYU / PAZAR TEZGÂHI — aynı matris, daha
+     küçük ölçekli sivil yapılar için 3-katmanlı (yoksul/sıradan/soylu)
+     alt küme kullanılıyor (küçük bir objenin 5 tam katmana ihtiyacı yok).
+     ============================================================ */
+  var CIVIC_TIER3 = [CIVIC_TIER[0], CIVIC_TIER[2], CIVIC_TIER[4]]; /* 1, 3, 5 */
+
+  function shrineScene(cul, tier) {
+    var s = S(), sc = tier.scale;
+    var w = Math.round(13 * sc), dp = Math.round(11 * sc), h = Math.round(10 * sc);
+    var wallMat = tier.n >= 4 ? 'stoneW' : cul.wall;
+    s.pad(w, dp, w + dp + h);
+    s.box(2, 2, 0, w, dp, h, wallMat, { door:true, doorH:0.72, win:1 });
+    s.gable(0, 0, h, w + 4, dp + 4, Math.round(h * 0.75), cul.roof);
+    s.box(w / 2, dp / 2, h + Math.round(h * 0.75), 1.3, 1.3, Math.round(4 * sc), tier.accent || 'gold');
+    return s;
+  }
+  CIVIC_CULTURE.forEach(function (cul) {
+    CIVIC_TIER.forEach(function (tier) {
+      var l = civicLabel('Küçük tapınak', 'Small shrine', cul, tier);
+      reg('temples', 'ip_shrine_' + cul.key + '_' + tier.n, l.tr, l.en, function () { return shrineScene(cul, tier); });
+    });
+  });
+
+  function wellScene(cul, tier) {
+    var s = S(), sc = tier.scale;
+    var r = Math.round(4.5 * sc * 10) / 10;
+    var wallMat = tier.n >= 4 ? 'stoneW' : 'stoneD';
+    s.pad(r * 2.5, r * 2.2, r * 4);
+    s.cyl(r + 2, r + 1, 0, r, 4, wallMat);
+    if (tier.n >= 2) {
+      s.box(2, 2, 4, 1.2, 1.2, 7, cul.wall, { plain:true });
+      s.box(2 + r * 2 - 2, 2, 4, 1.2, 1.2, 7, cul.wall, { plain:true });
+      s.hip(0, 0, 11, r * 2 + 4, r * 2 + 2, 4, cul.roof);
+    }
+    return s;
+  }
+  CIVIC_CULTURE.forEach(function (cul) {
+    CIVIC_TIER3.forEach(function (tier) {
+      var l = civicLabel('Kuyu', 'Well', cul, tier);
+      reg('misc', 'ic_well_' + cul.key + '_' + tier.n, l.tr, l.en, function () { return wellScene(cul, tier); });
+    });
+  });
+
+  function stallScene2(cul, tier) {
+    var s = S(), sc = tier.scale;
+    var w = Math.round(11 * sc), dp = Math.round(6 * sc);
+    s.pad(w + 2, dp + 3, w + dp);
+    s.box(1, 1, 0, w, dp, 3.4, cul.wall, { plain:true });
+    s.box(1, 1, 3.4, 1, 1, 6.6, 'woodD', { plain:true });
+    s.box(w, 1, 3.4, 1, 1, 6.6, 'woodD', { plain:true });
+    s.box(1, dp, 3.4, 1, 1, 6.6, 'woodD', { plain:true });
+    s.box(w, dp, 3.4, 1, 1, 6.6, 'woodD', { plain:true });
+    s.gable(-1, -1, 10, w + 4, dp + 4, 4.5, cul.roof);
+    if (tier.n >= 4) s.flag(w + 2, 1, 10, 5, tier.accent || cul.roof);
+    return s;
+  }
+  CIVIC_CULTURE.forEach(function (cul) {
+    CIVIC_TIER3.forEach(function (tier) {
+      var l = civicLabel('Pazar tezgâhı', 'Market stall', cul, tier);
+      reg('misc', 'ic_stall2_' + cul.key + '_' + tier.n, l.tr, l.en, function () { return stallScene2(cul, tier); });
+    });
+  });
+
+  /* ============================================================
+     10a-2) DEMİRCİ / FIRIN / DEĞİRMEN / AMBAR — zanaat/ekonomi
+     binaları, 3-katmanlı alt küme.
+     ============================================================ */
+  function smithyScene2(cul, tier) {
+    var s = S(), sc = tier.scale;
+    var w = Math.round(15 * sc), dp = Math.round(12 * sc), h = Math.round(9 * sc);
+    var wallMat = tier.n >= 4 ? 'stoneW' : cul.wall;
+    s.pad(w, dp, w + dp);
+    hut(s, 2, 4, w, dp, h, wallMat, cul.roof, { win:1 });
+    chimney(s, 4, 5, h, 7 + sc * 2, 'basalt');
+    s.box(w + 3, 5, 0, 5, 4, 1, 'basalt', { plain:true });
+    s.box(w + 3, 5, 1, 1.6, 1.6, 1, tier.accent || 'tileR', { plain:true });
+    return s;
+  }
+  function bakeryScene2(cul, tier) {
+    var s = S(), sc = tier.scale;
+    var w = Math.round(15 * sc), dp = Math.round(12 * sc), h = Math.round(9 * sc);
+    var wallMat = tier.n >= 4 ? 'stoneW' : cul.wall;
+    s.pad(w, dp, w + dp);
+    hut(s, 2, 4, w, dp, h, wallMat, cul.roof, { win:2 });
+    chimney(s, 4, 5, h, 7, 'stone');
+    s.cyl(w + 2, 6, 0, 3.5, 4, 'stoneD');
+    s.dome(w + 2, 6, 4, 3.7, 2.6, 'stoneD');
+    return s;
+  }
+  CIVIC_CULTURE.forEach(function (cul) {
+    CIVIC_TIER3.forEach(function (tier) {
+      var lS = civicLabel('Demirci', 'Blacksmith', cul, tier);
+      reg('towns', 'ic_smithy2_' + cul.key + '_' + tier.n, lS.tr, lS.en, function () { return smithyScene2(cul, tier); });
+      var lB = civicLabel('Fırın', 'Bakery', cul, tier);
+      reg('towns', 'ic_bakery2_' + cul.key + '_' + tier.n, lB.tr, lB.en, function () { return bakeryScene2(cul, tier); });
+    });
+  });
+
+  function millScene(cul, kind) {
+    var s = S();
+    if (kind === 'wind') {
+      s.pad(16, 16, 32);
+      s.cyl(11, 10, 0, 6.5, 17, cul.wall);
+      s.cone(11, 10, 17, 7, 6, cul.roof);
+      s.box(10.2, -3, 21, 1.6, 26, 0.9, 'woodD', { plain:true });
+      s.box(-2, 9.2, 21, 26, 1.6, 0.9, 'woodD', { plain:true });
+    } else {
+      s.pad(20, 15, 32);
+      hut(s, 2, 4, 16, 12, 11, cul.wall, cul.roof, { win:1 });
+      s.cyl(19, 6, 4, 4.4, 1.2, 'woodD');
+      s.box(22.4, 5, 0, 1, 3, 9, 'woodD', { plain:true });
+    }
+    return s;
+  }
+  CIVIC_CULTURE.forEach(function (cul) {
+    ['wind', 'water'].forEach(function (kind) {
+      var base = kind === 'wind' ? ['Yel değirmeni', 'Windmill'] : ['Su değirmeni', 'Watermill'];
+      reg('mines', 'ic_mill_' + cul.key + '_' + kind,
+        base[0] + ' · ' + cul.tr, base[1] + ' · ' + cul.en,
+        function () { return millScene(cul, kind); });
+    });
+  });
+
+  function granaryScene(cul, big) {
+    var s = S();
+    var w = big ? 22 : 15, dp = big ? 17 : 12, h = big ? 12 : 9;
+    s.pad(w, dp, w + dp);
+    s.box(2, 3, 0, w, dp, h, cul.wall, { win:0 });
+    s.hip(0, 1, h, w + 4, dp + 4, Math.round(h * 0.55), cul.roof);
+    s.box(4, 4, 0, 1, 1, h, 'woodD', { plain:true });
+    s.box(w - 1, dp + 1, 0, 1, 1, h, 'woodD', { plain:true });
+    return s;
+  }
+  CIVIC_CULTURE.forEach(function (cul) {
+    [['small', false, 'Küçük', 'Small'], ['large', true, 'Büyük', 'Large']].forEach(function (sz) {
+      reg('mines', 'ic_granary_' + cul.key + '_' + sz[0],
+        'Ambar · ' + sz[2] + ' · ' + cul.tr, 'Granary · ' + sz[3] + ' · ' + cul.en,
+        function () { return granaryScene(cul, sz[1]); });
+    });
+  });
+
+  /* ============================================================
+     10a-3) BAĞIMSIZ KAPI KULESİ + KÜLTÜREL KÖPRÜ VARYANTLARI
+     ============================================================ */
+  [['stone','Taş','Stone'],['stoneW','Ak taş','White'],['granite','Granit','Granite'],
+   ['basalt','Bazalt','Basalt'],['stoneD','Kara taş','Dark']].forEach(function (m, i) {
+    reg('castles', 'ik_freegate_' + i, 'Kapı kulesi · ' + m[1], 'Gate tower · ' + m[2], function () {
+      var s = S(); s.pad(24, 14, 42, 'dirt');
+      wall(s, 0, 6, 0, 16, 12, 15, m[0]);
+      wall(s, 32, 6, 0, 16, 12, 15, m[0]);
+      s.box(14, 3, 0, 20, 18, 21, m[0], { door:true, doorH:0.66, slit:2 });
+      s.crenel(12, 1, 21, 24, 22, 5, 7, m[0]);
+      return s;
+    });
+    reg('castles', 'ik_freegate_grand_' + i, 'Kapı kulesi · Kuleli, ' + m[1], 'Gate tower · Twin-towered, ' + m[2], function () {
+      var s = S(); s.pad(30, 18, 50, 'dirt');
+      wall(s, 0, 8, 0, 14, 12, 16, m[0]);
+      wall(s, 36, 8, 0, 14, 12, 16, m[0]);
+      s.box(13, 4, 0, 24, 20, 22, m[0], { door:true, doorH:0.6, slit:2 });
+      s.crenel(11, 2, 22, 28, 24, 5, 7, m[0]);
+      towerSq(s, 8, -2, 0, 10, 32, m[0], { roof:false, slit:2 });
+      towerSq(s, 32, -2, 0, 10, 32, m[0], { roof:false, slit:2 });
+      return s;
+    });
+  });
+
+  CIVIC_CULTURE.forEach(function (cul) {
+    reg('passes', 'iq_culturebridge_' + cul.key, 'Köprü · ' + cul.tr, 'Bridge · ' + cul.en, function () {
+      var s = S(); s.pad(28, 11, 38, 'dirt');
+      s.box(0, 4, 5, 52, 7, 1.6, cul.wall, { plain:true });
+      s.box(0, 3.4, 6.6, 52, 0.9, 2, cul.wall === 'stone' ? 'stoneD' : 'woodD', { plain:true });
+      s.box(0, 9.7, 6.6, 52, 0.9, 2, cul.wall === 'stone' ? 'stoneD' : 'woodD', { plain:true });
+      s.box(5, 5.5, 0, 5, 4, 5, cul.roof, { plain:true });
+      s.box(40, 5.5, 0, 5, 4, 5, cul.roof, { plain:true });
+      return s;
+    });
   });
 
   /* ============================================================
