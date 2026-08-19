@@ -55,7 +55,11 @@
     ['wood',   'Ahşap',   'Timber'],
     ['stoneD', 'Kara taş','Dark stone'],
     ['ruin',   'Yıkık',   'Ruined'],
-    ['snow',   'Karlı',   'Snowy']
+    ['snow',   'Karlı',   'Snowy'],
+    ['mossy',    'Yosunlu',  'Mossy'],
+    ['scorched', 'Yanık',    'Scorched'],
+    ['clayR',    'Kilden',   'Terracotta'],
+    ['adobeW',   'Kerpiç',   'Adobe']
   ];
   var TOWER_ROOF = [
     [null,    'mazgallı', 'crenelled'],
@@ -86,6 +90,41 @@
   });
 
   /* ============================================================
+     1b) PAGODA KULE VARYANTLARI (kültürel çeşitlilik — Doğu Asya
+     mimarisi; çok katlı, kavisli saçaklı çatı ailesi)
+     ============================================================ */
+  var PAGODA_WALL = [
+    ['wood',    'Ahşap',      'Timber'],
+    ['woodD',   'Kara ahşap', 'Dark timber'],
+    ['bambooW', 'Bambu',      'Bamboo'],
+    ['stoneW',  'Ak taş',     'White stone']
+  ];
+  var PAGODA_ROOF = [
+    ['tileB',    'Mavi',      'Blue'],
+    ['tileR',    'Kızıl',     'Crimson'],
+    ['lacquerR', 'Laka kızıl','Lacquer red'],
+    ['tileD',    'Arduvaz',   'Slate'],
+    ['gold',     'Altın',     'Gilded']
+  ];
+  PAGODA_WALL.forEach(function (w, wi) {
+    PAGODA_ROOF.forEach(function (r, ri) {
+      reg('temples', 'ipg_' + wi + '_' + ri,
+        'Pagoda kulesi · ' + w[1] + ' ' + r[1],
+        'Pagoda tower · ' + w[2] + ' ' + r[2],
+        function () {
+          var s = S(), z = 0, wsz = 22;
+          for (var i = 0; i < 3; i++) {
+            s.box(15 - wsz/2, 15 - wsz/2, z, wsz, wsz, 9, w[0], { win: i === 0 ? 2 : 1, door: i === 0 });
+            s.pagoda(15 - (wsz+6)/2, 15 - (wsz+6)/2, z + 9, wsz + 6, wsz + 6, 7, r[0], 1);
+            z += 16; wsz -= 4;
+          }
+          s.cyl(15, 15, z, 1.2, 7, 'gold');
+          return s;
+        });
+    });
+  });
+
+  /* ============================================================
      2) EV VARYANTLARI  (duvar × çatı)
      ============================================================ */
   var HOUSE_WALL = [
@@ -93,7 +132,11 @@
     ['stone',  'Taş',    'Stone'],
     ['stoneW', 'Ak taş', 'Whitewashed'],
     ['dirt',   'Kerpiç', 'Adobe'],
-    ['woodD',  'Kara ahşap','Dark timber']
+    ['woodD',  'Kara ahşap','Dark timber'],
+    ['mossy',    'Yosunlu',    'Mossy'],
+    ['weathered','Yıpranmış',  'Weathered'],
+    ['bambooW',  'Bambu',      'Bamboo'],
+    ['adobeW',   'Ak kerpiç',  'White adobe']
   ];
   var HOUSE_ROOF = [
     ['thatch','saz',   'thatch'],

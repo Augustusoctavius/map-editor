@@ -51,7 +51,19 @@
     dark:    { top:'#4a4038', left:'#37302a', right:'#26211d', line:'#120f0d', det:'#231e1a' },
     ruin:    { top:'#c4b89e', left:'#a3987f', right:'#847a64', line:'#3c3225', det:'#7a705c', courses:true, broken:true },
     crystal: { top:'#b79ad8', left:'#9679bb', right:'#745a95', line:'#33234a', det:'#6b5289' },
-    bone:    { top:'#e8e0cc', left:'#cfc6ae', right:'#ada48d', line:'#443c2c', det:'#9a917a' }
+    bone:    { top:'#e8e0cc', left:'#cfc6ae', right:'#ada48d', line:'#443c2c', det:'#9a917a' },
+
+    /* ---- yaşlanma / hava etkisi varyantları ---- */
+    mossy:   { top:'#8a9a68', left:'#6d7f4f', right:'#535f3a', line:'#242c18', det:'#4d5c34', courses:true },
+    scorched:{ top:'#5a4f48', left:'#453b35', right:'#302823', line:'#161210', det:'#2b241f', courses:true, broken:true },
+    weathered:{ top:'#b8ac93', left:'#9c9078', right:'#7c715c', line:'#383124', det:'#867a63', planks:true },
+    bleached:{ top:'#dcd3ba', left:'#c2b89e', right:'#a2977e', line:'#4a4130', det:'#948a70', shingle:true },
+
+    /* ---- kültürel çeşitlilik: sıcak/kilden (Akdeniz, Orta Doğu), doğu (bambu) tonları ---- */
+    clayR:   { top:'#d4823f', left:'#b76a2f', right:'#914f21', line:'#3f240d', det:'#8a4c22', shingle:true },
+    adobeW:  { top:'#e8d9b0', left:'#d0c095', right:'#ac9c73', line:'#4a3c22', det:'#a1906a', courses:true },
+    bambooW: { top:'#d9c481', left:'#bda65e', right:'#987f42', line:'#3f331a', det:'#8a7238', planks:true },
+    lacquerR:{ top:'#8f2f2f', left:'#742323', right:'#571818', line:'#280c0c', det:'#601c1c', shingle:true }
   };
 
   function M(k) { return MAT[k] || MAT.stone; }
