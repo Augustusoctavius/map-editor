@@ -444,6 +444,16 @@
         }
       }
       tctx.putImageData(out, 0, 0);
+
+      /* yükselti gölgelendirmesi/konturları da sadece kara üzerinde görünmeli —
+         denizde asılı bir tepe gölgesi/kontur çizgisi olmasın */
+      var LvLand = Layers.get('landmass');
+      if (LvLand && LvLand.canvas) {
+        tctx.globalCompositeOperation = 'destination-in';
+        tctx.drawImage(LvLand.canvas, 0, 0, sw, sh);
+        tctx.globalCompositeOperation = 'source-over';
+      }
+
       this.elevationCanvas = tC;
       this.elevationDirty = false;
       return tC;
