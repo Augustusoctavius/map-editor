@@ -7,10 +7,121 @@
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/toolbar.css">
 <link rel="stylesheet" href="css/canvas.css">
+<link rel="stylesheet" href="css/shell.css">
 </head>
 <body>
 
+<nav id="shell-nav">
+  <div class="shell-brand" data-view-link="home">
+    <span class="brand-mark">⚔</span>
+    <span class="brand-name">Wayborne</span>
+  </div>
+  <div class="shell-tabs">
+    <button class="shell-tab active" data-view-link="home" data-i18n="nav_home">Ana Sayfa</button>
+    <button class="shell-tab" data-view-link="canvas" data-i18n="nav_canvas">Tuval</button>
+    <button class="shell-tab" data-view-link="tutorial" data-i18n="nav_tutorial">Rehber</button>
+    <button class="shell-tab" data-view-link="community" data-i18n="nav_community">Topluluk</button>
+  </div>
+  <div class="lang-switch" id="lang-switch-shell">
+    <button class="tb-btn lang" id="btn-lang-shell" title="Language / Dil" aria-label="Language">🌐</button>
+    <ul class="lang-menu hidden" id="lang-menu-shell"></ul>
+  </div>
+</nav>
+
+<!-- ============ HOMEPAGE ============ -->
+<div id="view-home" class="shell-view">
+  <div class="page-scroll">
+    <section class="hero">
+      <div class="hero-mark">⚔</div>
+      <h1>Wayborne Map Editor</h1>
+      <p class="hero-tagline" data-i18n="home_tagline">Fantastik dünyalar için tarayıcı tabanlı harita editörü</p>
+      <p class="hero-desc" data-i18n="home_desc">
+        Kara ve deniz sınırlarını çiz, ormanları ve dağları boya, kaleler ve köyler yerleştir,
+        nehirler ve yollar döşe — hepsi tek bir tuvalde, kurulum gerektirmeden tarayıcında.
+      </p>
+      <button class="btn primary big" data-view-link="canvas" data-i18n="home_cta">Haritana başla</button>
+    </section>
+    <section class="home-video">
+      <div class="video-placeholder">
+        <div class="video-placeholder-inner">
+          <span class="video-play">▶</span>
+          <span data-i18n="home_video_caption">Tanıtım videosu yakında</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ============ CANVAS (tuval kütüphanesi) ============ -->
+<div id="view-canvas" class="shell-view hidden">
+  <div class="page-scroll">
+    <section class="canvas-new">
+      <h2 data-i18n="canvas_new_title">Yeni tuval oluştur</h2>
+      <div class="canvas-new-form">
+        <select id="cv-size-preset" class="sel">
+          <option value="1024">1024 × 1024</option>
+          <option value="2048" selected>2048 × 2048</option>
+          <option value="4096">4096 × 4096</option>
+          <option value="8192">8192 × 8192</option>
+          <option value="custom" data-i18n="canvas_custom">Özel ölçü…</option>
+        </select>
+        <div id="cv-custom-wh" class="cv-wh hidden">
+          <input type="number" id="cv-w" min="256" max="16384" step="1" value="2048">
+          <span>×</span>
+          <input type="number" id="cv-h" min="256" max="16384" step="1" value="2048">
+        </div>
+        <input type="text" id="cv-name" data-i18n-placeholder="canvas_name_ph" placeholder="Harita adı">
+        <button class="btn primary" id="btn-cv-create" data-i18n="canvas_create">Oluştur</button>
+      </div>
+      <label class="btn wide" for="file-open-canvas" data-i18n="canvas_import">.json dosyasından içe aktar</label>
+      <input type="file" id="file-open-canvas" accept="application/json,.json" hidden>
+    </section>
+    <section class="canvas-saved">
+      <h2 data-i18n="canvas_saved_title">Kayıtlı tuvaller</h2>
+      <div id="cv-list" class="cv-grid"></div>
+      <p class="hint" id="cv-empty-hint" data-i18n="canvas_empty">Bu tarayıcıda henüz kayıtlı bir tuval yok. Editördeyken "Kaydet" ile otomatik burada listelenir.</p>
+    </section>
+  </div>
+</div>
+
+<!-- ============ TUTORIAL ============ -->
+<div id="view-tutorial" class="shell-view hidden">
+  <div class="page-scroll">
+    <section class="tutorial-intro">
+      <h2 data-i18n="tutorial_title">Rehber</h2>
+      <p data-i18n="tutorial_intro">Sol araç çubuğundaki her araç, sağ panelde kendi ayarlarını açar. Aşağıda her aracın ne işe yaradığının kısa özeti var.</p>
+    </section>
+    <section id="tutorial-list" class="tutorial-list"></section>
+  </div>
+</div>
+
+<!-- ============ COMMUNITY ============ -->
+<div id="view-community" class="shell-view hidden">
+  <div class="page-scroll">
+    <section class="community-intro">
+      <h2 data-i18n="community_title">Topluluk</h2>
+      <p data-i18n="community_desc">Wayborne Map Editor açık kaynaklı, sürekli gelişen bir projedir.</p>
+    </section>
+    <section class="community-links">
+      <a class="community-card" href="https://github.com/ulubatuhan/wayborne-map-editor" target="_blank" rel="noopener">
+        <span class="community-card-ico">⌥</span>
+        <span class="community-card-title">GitHub</span>
+        <span class="community-card-desc" data-i18n="community_github_desc">Kaynak kod, hata bildirimi ve katkı</span>
+      </a>
+      <div class="community-card disabled">
+        <span class="community-card-ico">◈</span>
+        <span class="community-card-title">Discord</span>
+        <span class="community-card-desc" data-i18n="community_soon">Yakında</span>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ============ EDITOR ============ -->
+<div id="view-editor" class="shell-view hidden">
+
 <header id="topbar">
+  <button class="tb-btn" id="btn-shell-back" title="Homepage">🏠</button>
   <div class="brand">
     <span class="brand-mark">⚔</span>
     <span class="brand-name">Wayborne Map Editor</span>
@@ -434,6 +545,8 @@
   <span class="st right" id="st-msg"></span>
   <span class="st right" style="opacity:0.45;font-size:11px;letter-spacing:0.04em">v0.47</span>
 </footer>
+
+</div><!-- /view-editor -->
 
 <div id="modal" class="modal hidden">
   <div class="modal-box">

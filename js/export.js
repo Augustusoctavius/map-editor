@@ -314,11 +314,13 @@
       return out.join('');
     },
 
-    saveProject: function () {
+    /* proje verisini bellekte bir nesne olarak üretir — dosyaya indirmeden
+       (localStorage tuval kütüphanesi de bunu kullanır) */
+    buildProjectData: function () {
       /* aktif haritayı da App.maps'e senkronize et ki dünya + tüm bölge
          haritaları tek bir .json içinde tam olarak saklansın */
       App.maps[App.currentMapId] = Layers.serialize(true);
-      var data = {
+      return {
         app:'cartographer', version:3,
         W:Cv.W, H:Cv.H,
         parchment:Cv.parchment, grid:Cv.grid,
@@ -332,76 +334,93 @@
         maps: App.maps,
         layers: App.maps.root || Layers.serialize(true)
       };
+    },
+
+    saveProject: function () {
+      var data = this.buildProjectData();
       download(new Blob([JSON.stringify(data)], { type:'application/json' }), 'harita-'+stamp()+'.json');
+      /* .json indirmeye ek olarak tarayıcı kütüphanesine de sessizce kaydet —
+         "Canvas" sekmesinde otomatik listelensin diye */
+      var id = this.libSave(App.currentCanvasName, App.currentLibId);
+      if (id) App.currentLibId = id;
       UI.msg(UI.t('saved'));
     },
 
+    /* bir proje veri nesnesini (dosyadan ya da localStorage'dan) uygulanmış
+       hâle getirir — döndürdüğü Promise, raster katmanların (görsel)
+       yüklenmesi tamamlandığında çözülür */
+    applyProjectData: function (d) {
+      Cv.setSize(d.W||2048, d.H||2048, false);
+      Cv.parchment = !!d.parchment;
+      Cv.grid = !!d.grid;
+      Cv.shore = d.shore !== false;
+      Cv.shoreWidth = d.shoreWidth || 26;
+      Cv.shoreStyle = d.shoreStyle || 'sandy';
+      Cv.frame = d.frame || { style:'none', color:'#3a2b18', width:24 };
+      App.elevation.showHillshade = d.elevShowHillshade !== false;
+      App.elevation.showContours = !!d.elevShowContours;
+      App.elevation.contourInterval = d.elevContourInterval || 32;
+      App.exportReference = !!d.exportReference;
+      if (d.scale) App.scale = d.scale;
+
+      document.getElementById('chk-parchment').checked = Cv.parchment;
+      document.getElementById('chk-grid').checked = Cv.grid;
+      document.getElementById('chk-shore').checked = Cv.shore;
+      document.getElementById('ref-export').checked = App.exportReference;
+      document.getElementById('sel-canvas-size').value = String(d.W||2048);
+      document.getElementById('shore-w').value = Cv.shoreWidth;
+      document.getElementById('v-shore-w').textContent = Cv.shoreWidth;
+      document.getElementById('shore-style').value = Cv.shoreStyle;
+      document.getElementById('elev-hillshade').checked = App.elevation.showHillshade;
+      document.getElementById('elev-contours').checked = App.elevation.showContours;
+      document.getElementById('elev-interval').value = App.elevation.contourInterval;
+      document.getElementById('v-elev-interval').textContent = App.elevation.contourInterval;
+      document.getElementById('frame-style').value = Cv.frame.style;
+      document.getElementById('frame-color').value = Cv.frame.color;
+      document.getElementById('frame-w').value = Cv.frame.width;
+      document.getElementById('v-frame-w').textContent = Cv.frame.width;
+
+      if (d.customSymbols) Sym.deserializeCustom(d.customSymbols);
+
+      App.maps = d.maps || {};
+      App.mapStack = [];
+      App.currentMapId = 'root';
+      App.currentMapLabel = '';
+
+      return Layers.deserialize(App.maps.root || d.layers || []).then(function () {
+        History.clear();
+        App.selection = null;
+        Cv.shoreDirty = true;
+        Cv.elevationDirty = true;
+        UI.refreshAll();
+        UI.refreshBreadcrumb();
+        Cv.fit();
+      });
+    },
+
     loadProject: function (file) {
+      var self = this;
       var r = new FileReader();
       r.onload = function () {
         var d;
         try { d = JSON.parse(r.result); }
         catch (e) { UI.msg(UI.t('badfile')); return; }
         if (!d || d.app !== 'cartographer') { UI.msg(UI.t('badfile')); return; }
-
-        Cv.setSize(d.W||2048, d.H||2048, false);
-        Cv.parchment = !!d.parchment;
-        Cv.grid = !!d.grid;
-        Cv.shore = d.shore !== false;
-        Cv.shoreWidth = d.shoreWidth || 26;
-        Cv.shoreStyle = d.shoreStyle || 'sandy';
-        if (d.frame) Cv.frame = d.frame;
-        App.elevation.showHillshade = d.elevShowHillshade !== false;
-        App.elevation.showContours = !!d.elevShowContours;
-        App.elevation.contourInterval = d.elevContourInterval || 32;
-        App.exportReference = !!d.exportReference;
-        if (d.scale) App.scale = d.scale;
-
-        document.getElementById('chk-parchment').checked = Cv.parchment;
-        document.getElementById('chk-grid').checked = Cv.grid;
-        document.getElementById('chk-shore').checked = Cv.shore;
-        document.getElementById('ref-export').checked = App.exportReference;
-        document.getElementById('sel-canvas-size').value = String(d.W||2048);
-        document.getElementById('shore-w').value = Cv.shoreWidth;
-        document.getElementById('v-shore-w').textContent = Cv.shoreWidth;
-        document.getElementById('shore-style').value = Cv.shoreStyle;
-        document.getElementById('elev-hillshade').checked = App.elevation.showHillshade;
-        document.getElementById('elev-contours').checked = App.elevation.showContours;
-        document.getElementById('elev-interval').value = App.elevation.contourInterval;
-        document.getElementById('v-elev-interval').textContent = App.elevation.contourInterval;
-        document.getElementById('frame-style').value = Cv.frame.style;
-        document.getElementById('frame-color').value = Cv.frame.color;
-        document.getElementById('frame-w').value = Cv.frame.width;
-        document.getElementById('v-frame-w').textContent = Cv.frame.width;
-
-        if (d.customSymbols) Sym.deserializeCustom(d.customSymbols);
-
-        App.maps = d.maps || {};
-        App.mapStack = [];
-        App.currentMapId = 'root';
-        App.currentMapLabel = '';
-
-        Layers.deserialize(App.maps.root || d.layers || []).then(function () {
-          History.clear();
-          App.selection = null;
-          Cv.shoreDirty = true;
-          Cv.elevationDirty = true;
-          UI.refreshAll();
-          UI.refreshBreadcrumb();
-          Cv.fit();
-          UI.msg(UI.t('loaded'));
-        });
+        self.applyProjectData(d).then(function () { UI.msg(UI.t('loaded')); });
       };
       r.readAsText(file);
     },
 
-    newProject: function (size) {
-      Layers.init(size, size);
+    newProject: function (w, h, name) {
+      h = h || w;
+      Layers.init(w, h);
       App._blankSnapshot = App._snapshotLayers();
       App.maps = {}; App.mapStack = []; App.currentMapId = 'root'; App.currentMapLabel = '';
-      Cv.setSize(size, size, false);
-      App.scale.x = Math.round(size*0.06);
-      App.scale.y = Math.round(size*0.92);
+      App.currentLibId = null; App.currentCanvasName = name || 'Adsız harita';
+      Cv.frame = { style:'none', color:'#3a2b18', width:24 };
+      Cv.setSize(w, h, false);
+      App.scale.x = Math.round(w*0.06);
+      App.scale.y = Math.round(h*0.92);
       History.clear();
       App.selection = null;
       Tools.cancelPath();
@@ -411,6 +430,55 @@
       UI.refreshBreadcrumb();
       Cv.fit();
       UI.msg(UI.t('newmap'));
+    },
+
+    /* ================= TARAYICI TUVAL KÜTÜPHANESİ (localStorage) =================
+       Backend yok — 'kayıtlı tuvaller' tarayıcının localStorage'ında saklanır.
+       .json dışa/içe aktarma (saveProject/loadProject) gerçek yedekleme/taşıma
+       yoludur; bu kütüphane sadece "son kaldığın yerden devam et" kolaylığı. */
+    LIB_KEY: 'wayborne_canvases',
+
+    libList: function () {
+      try {
+        var raw = localStorage.getItem(this.LIB_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) { return []; }
+    },
+
+    libSave: function (name, existingId) {
+      var list = this.libList();
+      var data = this.buildProjectData();
+      var id = existingId || ('cv' + Date.now().toString(36) + Math.floor(Math.random()*1e6).toString(36));
+      var entry = { id:id, name:name || 'Adsız harita', updatedAt:Date.now(), W:Cv.W, H:Cv.H, data:data };
+      var idx = list.findIndex(function (e) { return e.id === id; });
+      if (idx >= 0) list[idx] = entry; else list.unshift(entry);
+      try {
+        localStorage.setItem(this.LIB_KEY, JSON.stringify(list));
+        return id;
+      } catch (e) {
+        UI.msg(UI.t('lib_full'));
+        return null;
+      }
+    },
+
+    libOpen: function (id) {
+      var list = this.libList();
+      var entry = list.filter(function (e) { return e.id === id; })[0];
+      if (!entry) return Promise.reject('not found');
+      return this.applyProjectData(entry.data);
+    },
+
+    libDelete: function (id) {
+      var list = this.libList().filter(function (e) { return e.id !== id; });
+      try { localStorage.setItem(this.LIB_KEY, JSON.stringify(list)); } catch (e) {}
+    },
+
+    libRename: function (id, name) {
+      var list = this.libList();
+      var entry = list.filter(function (e) { return e.id === id; })[0];
+      if (!entry) return;
+      entry.name = name;
+      try { localStorage.setItem(this.LIB_KEY, JSON.stringify(list)); } catch (e) {}
     }
   };
 

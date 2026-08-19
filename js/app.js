@@ -26,6 +26,7 @@
     eyedrop: { radius:60, brushRadius:80, targetLayer:'terrain', hasSample:false, painting:false },
     resource:{ type:'mine', size:36 },
     reference:{ traceMode:false },
+    currentLibId: null, currentCanvasName: 'Adsız harita',
     scale:   { visible:true, x:120, y:1880, len:420, size:26, segs:4, label:'200 fersah' },
     windrose:{ visible:false, x:0, y:0, size:120, style:'classic', color:'#3a2b18' },
     snap:    { enabled:false, size:64 },

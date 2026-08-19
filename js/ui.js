@@ -42,7 +42,7 @@
       o_view:'Görünüm', o_fit:'Ekrana sığdır', o_100:'%100',
       h_pan:'Sağ tık + sürükle, orta tık, Space + sürükle veya yön tuşları ile kaydır.',
       tab_layers:'Katmanlar', tab_library:'Kütüphane', tab_history:'Geçmiş',
-      ref_title:'Referans görsel', ref_export:"Export'a dahil et", ref_clear:'Referansı kaldır', ref_trace:'İz sürme modu (üstte göster + kıyı kenetleme)', blend_sourceover:'Normal', blend_multiply:'Çarpma', blend_overlay:'Bindirme', blend_softlight:'Yumuşak ışık', blend_screen:'Ekranlama',
+      ref_title:'Referans görsel', ref_export:"Export'a dahil et", ref_clear:'Referansı kaldır', ref_trace:'İz sürme modu (üstte göster + kıyı kenetleme)', blend_sourceover:'Normal', blend_multiply:'Çarpma', blend_overlay:'Bindirme', blend_softlight:'Yumuşak ışık', blend_screen:'Ekranlama', nav_home:'Ana Sayfa', nav_canvas:'Tuval', nav_tutorial:'Rehber', nav_community:'Topluluk', home_tagline:'Fantastik dünyalar için tarayıcı tabanlı harita editörü', home_desc:'Kara ve deniz sınırlarını çiz, ormanları ve dağları boya, kaleler ve köyler yerleştir, nehirler ve yollar döşe — hepsi tek bir tuvalde, kurulum gerektirmeden tarayıcında.', home_cta:'Haritana başla', home_video_caption:'Tanıtım videosu yakında', canvas_new_title:'Yeni tuval oluştur', canvas_custom:'Özel ölçü…', canvas_name_ph:'Harita adı', canvas_create:'Oluştur', canvas_import:'.json dosyasından içe aktar', canvas_saved_title:'Kayıtlı tuvaller', canvas_empty:'Bu tarayıcıda henüz kayıtlı bir tuval yok. Editördeyken "Kaydet" ile otomatik burada listelenir.', canvas_open:'Aç', canvas_delete:'Sil', canvas_delete_confirm:'Bu tuvali silmek istediğine emin misin? Bu işlem geri alınamaz.', canvas_unnamed:'Adsız harita', tutorial_title:'Rehber', tutorial_intro:'Sol araç çubuğundaki her araç, sağ panelde kendi ayarlarını açar. Aşağıda her aracın ne işe yaradığının kısa özeti var.', community_title:'Topluluk', community_desc:'Wayborne Map Editor açık kaynaklı, sürekli gelişen bir projedir.', community_github_desc:'Kaynak kod, hata bildirimi ve katkı', community_soon:'Yakında', lib_full:'Tarayıcı depolama alanı dolu — eski bir tuvali sil ya da .json olarak dışa aktar.', tut_h_select:'Nesneleri seç, taşı, döndür; Shift ile çoklu seçim yap.', tut_h_erase:'Boyanmış karayı ve üzerindeki arazi dokusunu tek adımda siler.', tut_h_fill:'Kapalı bir kıyı çevriminin içini tek tıkla doldurur.', tut_h_river:'Tıklayarak nokta ekle, akarsu çiz; Enter ile bitir.', tut_h_road:'Tıklayarak nokta ekle, yol çiz; Enter ile bitir.',
       sym_upload:'+ PNG Sembol yükle', sym_upload_done:'sembol yüklendi', sym_del:'Sil', sym_search:'Sembol ara...',
       st_pos:'Konum', st_zoom:'Yakınlık', st_size:'Tuval', st_tool:'Araç',
       cancel:'Vazgeç', ok:'Tamam',
@@ -100,7 +100,7 @@
       o_view:'View', o_fit:'Fit to screen', o_100:'100%',
       h_pan:'Right-click drag, middle-click, Space + drag, or arrow keys to pan.',
       tab_layers:'Layers', tab_library:'Library', tab_history:'History',
-      ref_title:'Reference image', ref_export:'Include in export', ref_clear:'Remove reference', ref_trace:'Trace mode (show on top + coastline snap)', blend_sourceover:'Normal', blend_multiply:'Multiply', blend_overlay:'Overlay', blend_softlight:'Soft light', blend_screen:'Screen',
+      ref_title:'Reference image', ref_export:'Include in export', ref_clear:'Remove reference', ref_trace:'Trace mode (show on top + coastline snap)', blend_sourceover:'Normal', blend_multiply:'Multiply', blend_overlay:'Overlay', blend_softlight:'Soft light', blend_screen:'Screen', nav_home:'Home', nav_canvas:'Canvas', nav_tutorial:'Tutorial', nav_community:'Community', home_tagline:'A browser-based map editor for fantasy worlds', home_desc:'Draw land and sea boundaries, paint forests and mountains, place castles and villages, lay down rivers and roads — all on one canvas, in your browser, no install required.', home_cta:'Start your map', home_video_caption:'Intro video coming soon', canvas_new_title:'Create a new canvas', canvas_custom:'Custom size…', canvas_name_ph:'Map name', canvas_create:'Create', canvas_import:'Import from .json file', canvas_saved_title:'Saved canvases', canvas_empty:'No canvases saved in this browser yet. They\'re listed here automatically when you hit "Save" in the editor.', canvas_open:'Open', canvas_delete:'Delete', canvas_delete_confirm:'Delete this canvas? This cannot be undone.', canvas_unnamed:'Untitled map', tutorial_title:'Tutorial', tutorial_intro:'Each tool in the left toolbar opens its own settings in the right panel. Below is a quick summary of what each tool does.', community_title:'Community', community_desc:'Wayborne Map Editor is an open-source, actively evolving project.', community_github_desc:'Source code, bug reports and contributions', community_soon:'Coming soon', lib_full:'Browser storage is full — delete an old canvas or export it as .json.', tut_h_select:'Select, move and rotate objects; Shift-click for multi-select.', tut_h_erase:'Erases painted land and the terrain texture on top of it in one step.', tut_h_fill:'Fills the inside of a closed coastline outline with one click.', tut_h_river:'Click to add points and draw a river; Enter to finish.', tut_h_road:'Click to add points and draw a road; Enter to finish.',
       sym_upload:'+ Upload PNG Symbol', sym_upload_done:'symbol(s) loaded', sym_del:'Delete', sym_search:'Search symbols...',
       st_pos:'Pos', st_zoom:'Zoom', st_size:'Canvas', st_tool:'Tool',
       cancel:'Cancel', ok:'OK',
@@ -158,7 +158,7 @@
       o_view:'Ansicht', o_fit:'An Fenster anpassen', o_100:'100 %',
       h_pan:'Rechtsklick + ziehen, Mittelklick, Leertaste + ziehen oder Pfeiltasten zum Verschieben.',
       tab_layers:'Ebenen', tab_library:'Bibliothek', tab_history:'Verlauf',
-      ref_title:'Referenzbild', ref_export:'In Export einschließen', ref_clear:'Referenz entfernen', ref_trace:'Nachzeichenmodus (oben anzeigen + Küstenlinie einrasten)', blend_sourceover:'Normal', blend_multiply:'Multiplizieren', blend_overlay:'Überlagern', blend_softlight:'Weiches Licht', blend_screen:'Negativ multiplizieren',
+      ref_title:'Referenzbild', ref_export:'In Export einschließen', ref_clear:'Referenz entfernen', ref_trace:'Nachzeichenmodus (oben anzeigen + Küstenlinie einrasten)', blend_sourceover:'Normal', blend_multiply:'Multiplizieren', blend_overlay:'Überlagern', blend_softlight:'Weiches Licht', blend_screen:'Negativ multiplizieren', nav_home:'Startseite', nav_canvas:'Leinwand', nav_tutorial:'Anleitung', nav_community:'Community', home_tagline:'Ein browserbasierter Karteneditor für Fantasiewelten', home_desc:'Zeichne Land- und Meeresgrenzen, male Wälder und Berge, platziere Burgen und Dörfer, lege Flüsse und Straßen an — alles auf einer Leinwand, im Browser, ohne Installation.', home_cta:'Karte starten', home_video_caption:'Vorstellungsvideo folgt bald', canvas_new_title:'Neue Leinwand erstellen', canvas_custom:'Benutzerdefiniert…', canvas_name_ph:'Kartenname', canvas_create:'Erstellen', canvas_import:'Aus .json-Datei importieren', canvas_saved_title:'Gespeicherte Leinwände', canvas_empty:'In diesem Browser sind noch keine Leinwände gespeichert. Sie erscheinen hier automatisch, sobald du im Editor auf "Speichern" klickst.', canvas_open:'Öffnen', canvas_delete:'Löschen', canvas_delete_confirm:'Diese Leinwand löschen? Das kann nicht rückgängig gemacht werden.', canvas_unnamed:'Unbenannte Karte', tutorial_title:'Anleitung', tutorial_intro:'Jedes Werkzeug in der linken Werkzeugleiste öffnet seine eigenen Einstellungen im rechten Panel. Unten eine kurze Übersicht, was jedes Werkzeug macht.', community_title:'Community', community_desc:'Wayborne Map Editor ist ein quelloffenes, stetig weiterentwickeltes Projekt.', community_github_desc:'Quellcode, Fehlermeldungen und Beiträge', community_soon:'Demnächst', lib_full:'Der Browserspeicher ist voll — lösche eine alte Leinwand oder exportiere sie als .json.', tut_h_select:'Objekte auswählen, verschieben, drehen; Shift-Klick für Mehrfachauswahl.', tut_h_erase:'Löscht bemaltes Land und die darüberliegende Geländetextur in einem Schritt.', tut_h_fill:'Füllt das Innere eines geschlossenen Küstenumrisses mit einem Klick.', tut_h_river:'Klicken, um Punkte hinzuzufügen und einen Fluss zu zeichnen; Enter zum Beenden.', tut_h_road:'Klicken, um Punkte hinzuzufügen und eine Straße zu zeichnen; Enter zum Beenden.',
       sym_upload:'+ PNG-Symbol hochladen', sym_upload_done:'Symbol(e) geladen', sym_del:'Löschen', sym_search:'Symbole durchsuchen...',
       st_pos:'Position', st_zoom:'Zoom', st_size:'Leinwand', st_tool:'Werkzeug',
       cancel:'Abbrechen', ok:'OK',
@@ -216,7 +216,7 @@
       o_view:'Vue', o_fit:"Ajuster à l'écran", o_100:'100 %',
       h_pan:'Clic droit + glisser, clic molette, Espace + glisser, ou flèches pour vous déplacer.',
       tab_layers:'Calques', tab_library:'Bibliothèque', tab_history:'Historique',
-      ref_title:'Image de référence', ref_export:"Inclure dans l'export", ref_clear:'Retirer la référence', ref_trace:'Mode de calque (afficher au-dessus + accrochage au littoral)', blend_sourceover:'Normal', blend_multiply:'Produit', blend_overlay:'Incrustation', blend_softlight:'Lumière douce', blend_screen:'Superposition',
+      ref_title:'Image de référence', ref_export:"Inclure dans l'export", ref_clear:'Retirer la référence', ref_trace:'Mode de calque (afficher au-dessus + accrochage au littoral)', blend_sourceover:'Normal', blend_multiply:'Produit', blend_overlay:'Incrustation', blend_softlight:'Lumière douce', blend_screen:'Superposition', nav_home:'Accueil', nav_canvas:'Toile', nav_tutorial:'Tutoriel', nav_community:'Communauté', home_tagline:'Un éditeur de cartes pour mondes fantastiques, dans le navigateur', home_desc:'Dessinez les frontières terre/mer, peignez forêts et montagnes, placez châteaux et villages, tracez rivières et routes — tout sur une seule toile, dans votre navigateur, sans installation.', home_cta:'Commencer votre carte', home_video_caption:'Vidéo de présentation bientôt disponible', canvas_new_title:'Créer une nouvelle toile', canvas_custom:'Taille personnalisée…', canvas_name_ph:'Nom de la carte', canvas_create:'Créer', canvas_import:'Importer depuis un fichier .json', canvas_saved_title:'Toiles enregistrées', canvas_empty:'Aucune toile enregistrée dans ce navigateur pour l\'instant. Elles apparaissent ici automatiquement dès que vous cliquez sur « Enregistrer » dans l\'éditeur.', canvas_open:'Ouvrir', canvas_delete:'Supprimer', canvas_delete_confirm:'Supprimer cette toile ? Cette action est irréversible.', canvas_unnamed:'Carte sans titre', tutorial_title:'Tutoriel', tutorial_intro:'Chaque outil de la barre latérale gauche ouvre ses propres réglages dans le panneau de droite. Voici un résumé rapide du rôle de chaque outil.', community_title:'Communauté', community_desc:'Wayborne Map Editor est un projet open source en constante évolution.', community_github_desc:'Code source, rapports de bugs et contributions', community_soon:'Bientôt disponible', lib_full:'Le stockage du navigateur est plein — supprimez une ancienne toile ou exportez-la en .json.', tut_h_select:'Sélectionnez, déplacez et faites pivoter des objets ; Maj+clic pour la sélection multiple.', tut_h_erase:'Efface la terre peinte et la texture de terrain qui s\'y trouve, en une seule fois.', tut_h_fill:'Remplit l\'intérieur d\'un contour côtier fermé en un clic.', tut_h_river:'Cliquez pour ajouter des points et tracer une rivière ; Entrée pour terminer.', tut_h_road:'Cliquez pour ajouter des points et tracer une route ; Entrée pour terminer.',
       sym_upload:'+ Importer un symbole PNG', sym_upload_done:'symbole(s) chargé(s)', sym_del:'Supprimer', sym_search:'Rechercher un symbole...',
       st_pos:'Position', st_zoom:'Zoom', st_size:'Toile', st_tool:'Outil',
       cancel:'Annuler', ok:'OK',
@@ -274,7 +274,7 @@
       o_view:'Vista', o_fit:'Ajustar a la pantalla', o_100:'100 %',
       h_pan:'Clic derecho + arrastrar, clic central, Espacio + arrastrar, o flechas para desplazarte.',
       tab_layers:'Capas', tab_library:'Biblioteca', tab_history:'Historial',
-      ref_title:'Imagen de referencia', ref_export:'Incluir en la exportación', ref_clear:'Quitar referencia', ref_trace:'Modo de calco (mostrar encima + ajuste a la costa)', blend_sourceover:'Normal', blend_multiply:'Multiplicar', blend_overlay:'Superposición', blend_softlight:'Luz suave', blend_screen:'Trama',
+      ref_title:'Imagen de referencia', ref_export:'Incluir en la exportación', ref_clear:'Quitar referencia', ref_trace:'Modo de calco (mostrar encima + ajuste a la costa)', blend_sourceover:'Normal', blend_multiply:'Multiplicar', blend_overlay:'Superposición', blend_softlight:'Luz suave', blend_screen:'Trama', nav_home:'Inicio', nav_canvas:'Lienzo', nav_tutorial:'Tutorial', nav_community:'Comunidad', home_tagline:'Un editor de mapas para mundos de fantasía, en el navegador', home_desc:'Dibuja los límites entre tierra y mar, pinta bosques y montañas, coloca castillos y aldeas, traza ríos y caminos — todo en un solo lienzo, en tu navegador, sin instalación.', home_cta:'Empieza tu mapa', home_video_caption:'Vídeo de presentación próximamente', canvas_new_title:'Crear un nuevo lienzo', canvas_custom:'Tamaño personalizado…', canvas_name_ph:'Nombre del mapa', canvas_create:'Crear', canvas_import:'Importar desde archivo .json', canvas_saved_title:'Lienzos guardados', canvas_empty:'Aún no hay lienzos guardados en este navegador. Se listan aquí automáticamente al pulsar «Guardar» en el editor.', canvas_open:'Abrir', canvas_delete:'Eliminar', canvas_delete_confirm:'¿Eliminar este lienzo? Esta acción no se puede deshacer.', canvas_unnamed:'Mapa sin título', tutorial_title:'Tutorial', tutorial_intro:'Cada herramienta de la barra izquierda abre sus propios ajustes en el panel derecho. Aquí tienes un resumen rápido de lo que hace cada una.', community_title:'Comunidad', community_desc:'Wayborne Map Editor es un proyecto de código abierto en constante evolución.', community_github_desc:'Código fuente, reportes de errores y contribuciones', community_soon:'Próximamente', lib_full:'El almacenamiento del navegador está lleno — elimina un lienzo antiguo o expórtalo como .json.', tut_h_select:'Selecciona, mueve y rota objetos; Mayús+clic para selección múltiple.', tut_h_erase:'Borra la tierra pintada y la textura de terreno que tiene encima, en un solo paso.', tut_h_fill:'Rellena el interior de un contorno costero cerrado con un solo clic.', tut_h_river:'Haz clic para añadir puntos y dibujar un río; Intro para terminar.', tut_h_road:'Haz clic para añadir puntos y dibujar un camino; Intro para terminar.',
       sym_upload:'+ Subir símbolo PNG', sym_upload_done:'símbolo(s) cargado(s)', sym_del:'Borrar', sym_search:'Buscar símbolos...',
       st_pos:'Posición', st_zoom:'Zoom', st_size:'Lienzo', st_tool:'Herramienta',
       cancel:'Cancelar', ok:'Aceptar',
@@ -332,7 +332,7 @@
       o_view:'Visualizza', o_fit:'Adatta allo schermo', o_100:'100%',
       h_pan:'Clic destro + trascina, clic centrale, Spazio + trascina, o frecce per spostarti.',
       tab_layers:'Livelli', tab_library:'Libreria', tab_history:'Cronologia',
-      ref_title:'Immagine di riferimento', ref_export:"Includi nell'esportazione", ref_clear:'Rimuovi riferimento', ref_trace:'Modalità ricalco (mostra sopra + aggancio alla costa)', blend_sourceover:'Normale', blend_multiply:'Moltiplica', blend_overlay:'Overlay', blend_softlight:'Luce soffusa', blend_screen:'Scherma',
+      ref_title:'Immagine di riferimento', ref_export:"Includi nell'esportazione", ref_clear:'Rimuovi riferimento', ref_trace:'Modalità ricalco (mostra sopra + aggancio alla costa)', blend_sourceover:'Normale', blend_multiply:'Moltiplica', blend_overlay:'Overlay', blend_softlight:'Luce soffusa', blend_screen:'Scherma', nav_home:'Home', nav_canvas:'Tela', nav_tutorial:'Guida', nav_community:'Community', home_tagline:'Un editor di mappe per mondi fantasy, nel browser', home_desc:'Disegna i confini tra terra e mare, colora foreste e montagne, posiziona castelli e villaggi, traccia fiumi e strade — tutto su un\'unica tela, nel browser, senza installazione.', home_cta:'Inizia la tua mappa', home_video_caption:'Video di presentazione in arrivo', canvas_new_title:'Crea una nuova tela', canvas_custom:'Dimensione personalizzata…', canvas_name_ph:'Nome della mappa', canvas_create:'Crea', canvas_import:'Importa da file .json', canvas_saved_title:'Tele salvate', canvas_empty:'Nessuna tela salvata in questo browser. Vengono elencate qui automaticamente quando premi "Salva" nell\'editor.', canvas_open:'Apri', canvas_delete:'Elimina', canvas_delete_confirm:'Eliminare questa tela? L\'operazione non può essere annullata.', canvas_unnamed:'Mappa senza titolo', tutorial_title:'Guida', tutorial_intro:'Ogni strumento nella barra laterale sinistra apre le proprie impostazioni nel pannello destro. Di seguito un breve riepilogo di cosa fa ciascuno strumento.', community_title:'Community', community_desc:'Wayborne Map Editor è un progetto open source in continua evoluzione.', community_github_desc:'Codice sorgente, segnalazioni di bug e contributi', community_soon:'Prossimamente', lib_full:'La memoria del browser è piena — elimina una tela vecchia oppure esportala come .json.', tut_h_select:'Seleziona, sposta e ruota gli oggetti; Shift+clic per la selezione multipla.', tut_h_erase:'Cancella la terra dipinta e la texture del terreno sovrastante in un solo passaggio.', tut_h_fill:'Riempie l\'interno di un contorno costiero chiuso con un clic.', tut_h_river:'Clicca per aggiungere punti e disegnare un fiume; Invio per terminare.', tut_h_road:'Clicca per aggiungere punti e disegnare una strada; Invio per terminare.',
       sym_upload:'+ Carica simbolo PNG', sym_upload_done:'simbolo/i caricato/i', sym_del:'Elimina', sym_search:'Cerca simboli...',
       st_pos:'Posizione', st_zoom:'Zoom', st_size:'Tela', st_tool:'Strumento',
       cancel:'Annulla', ok:'OK',
@@ -390,7 +390,7 @@
       o_view:'Vista', o_fit:'Ajustar ao ecrã', o_100:'100%',
       h_pan:'Clique direito + arrastar, clique do meio, Espaço + arrastar, ou setas para deslocar.',
       tab_layers:'Camadas', tab_library:'Biblioteca', tab_history:'Histórico',
-      ref_title:'Imagem de referência', ref_export:'Incluir na exportação', ref_clear:'Remover referência', ref_trace:'Modo de decalque (mostrar por cima + fixação ao litoral)', blend_sourceover:'Normal', blend_multiply:'Multiplicar', blend_overlay:'Sobrepor', blend_softlight:'Luz suave', blend_screen:'Ecrã',
+      ref_title:'Imagem de referência', ref_export:'Incluir na exportação', ref_clear:'Remover referência', ref_trace:'Modo de decalque (mostrar por cima + fixação ao litoral)', blend_sourceover:'Normal', blend_multiply:'Multiplicar', blend_overlay:'Sobrepor', blend_softlight:'Luz suave', blend_screen:'Ecrã', nav_home:'Início', nav_canvas:'Tela', nav_tutorial:'Tutorial', nav_community:'Comunidade', home_tagline:'Um editor de mapas para mundos de fantasia, no navegador', home_desc:'Desenha as fronteiras entre terra e mar, pinta florestas e montanhas, posiciona castelos e aldeias, traça rios e estradas — tudo numa só tela, no navegador, sem instalação.', home_cta:'Começa o teu mapa', home_video_caption:'Vídeo de apresentação brevemente', canvas_new_title:'Criar nova tela', canvas_custom:'Tamanho personalizado…', canvas_name_ph:'Nome do mapa', canvas_create:'Criar', canvas_import:'Importar de ficheiro .json', canvas_saved_title:'Telas guardadas', canvas_empty:'Ainda não há telas guardadas neste navegador. São listadas aqui automaticamente ao clicar em "Guardar" no editor.', canvas_open:'Abrir', canvas_delete:'Eliminar', canvas_delete_confirm:'Eliminar esta tela? Esta ação não pode ser desfeita.', canvas_unnamed:'Mapa sem título', tutorial_title:'Tutorial', tutorial_intro:'Cada ferramenta na barra lateral esquerda abre as suas próprias definições no painel direito. Abaixo, um breve resumo do que cada uma faz.', community_title:'Comunidade', community_desc:'Wayborne Map Editor é um projeto de código aberto em constante evolução.', community_github_desc:'Código-fonte, relatórios de erros e contribuições', community_soon:'Brevemente', lib_full:'O armazenamento do navegador está cheio — elimina uma tela antiga ou exporta-a como .json.', tut_h_select:'Seleciona, move e roda objetos; Shift+clique para seleção múltipla.', tut_h_erase:'Apaga a terra pintada e a textura de terreno sobre ela, num só passo.', tut_h_fill:'Preenche o interior de um contorno costeiro fechado com um clique.', tut_h_river:'Clica para adicionar pontos e desenhar um rio; Enter para terminar.', tut_h_road:'Clica para adicionar pontos e desenhar uma estrada; Enter para terminar.',
       sym_upload:'+ Carregar símbolo PNG', sym_upload_done:'símbolo(s) carregado(s)', sym_del:'Apagar', sym_search:'Pesquisar símbolos...',
       st_pos:'Posição', st_zoom:'Zoom', st_size:'Tela', st_tool:'Ferramenta',
       cancel:'Cancelar', ok:'OK',
@@ -448,7 +448,7 @@
       o_view:'Weergave', o_fit:'Passend maken', o_100:'100%',
       h_pan:'Rechtsklikken + slepen, middelklik, Spatie + slepen, of pijltjestoetsen om te verschuiven.',
       tab_layers:'Lagen', tab_library:'Bibliotheek', tab_history:'Geschiedenis',
-      ref_title:'Referentieafbeelding', ref_export:'Opnemen in export', ref_clear:'Referentie verwijderen', ref_trace:'Overtrekmodus (bovenop tonen + kustlijn uitlijnen)', blend_sourceover:'Normaal', blend_multiply:'Vermenigvuldigen', blend_overlay:'Overlay', blend_softlight:'Zacht licht', blend_screen:'Zeef',
+      ref_title:'Referentieafbeelding', ref_export:'Opnemen in export', ref_clear:'Referentie verwijderen', ref_trace:'Overtrekmodus (bovenop tonen + kustlijn uitlijnen)', blend_sourceover:'Normaal', blend_multiply:'Vermenigvuldigen', blend_overlay:'Overlay', blend_softlight:'Zacht licht', blend_screen:'Zeef', nav_home:'Home', nav_canvas:'Canvas', nav_tutorial:'Handleiding', nav_community:'Community', home_tagline:'Een browsergebaseerde kaarteditor voor fantasiewerelden', home_desc:'Teken land- en zeegrenzen, schilder bossen en bergen, plaats kastelen en dorpen, leg rivieren en wegen aan — alles op één canvas, in je browser, zonder installatie.', home_cta:'Begin je kaart', home_video_caption:'Introductievideo binnenkort', canvas_new_title:'Nieuw canvas maken', canvas_custom:'Aangepaste afmeting…', canvas_name_ph:'Kaartnaam', canvas_create:'Aanmaken', canvas_import:'Importeren uit .json-bestand', canvas_saved_title:'Opgeslagen canvassen', canvas_empty:'Nog geen opgeslagen canvassen in deze browser. Ze verschijnen hier automatisch zodra je in de editor op "Opslaan" klikt.', canvas_open:'Openen', canvas_delete:'Verwijderen', canvas_delete_confirm:'Dit canvas verwijderen? Dit kan niet ongedaan worden gemaakt.', canvas_unnamed:'Naamloze kaart', tutorial_title:'Handleiding', tutorial_intro:'Elk gereedschap in de linker werkbalk opent zijn eigen instellingen in het rechterpaneel. Hieronder een korte samenvatting van wat elk gereedschap doet.', community_title:'Community', community_desc:'Wayborne Map Editor is een open source project dat voortdurend evolueert.', community_github_desc:'Broncode, bugmeldingen en bijdragen', community_soon:'Binnenkort', lib_full:'De browseropslag is vol — verwijder een oud canvas of exporteer het als .json.', tut_h_select:'Selecteer, verplaats en draai objecten; Shift-klik voor meervoudige selectie.', tut_h_erase:'Wist geschilderd land en de terreintextuur erop in één stap.', tut_h_fill:'Vult het binnenste van een gesloten kustlijn met één klik.', tut_h_river:'Klik om punten toe te voegen en een rivier te tekenen; Enter om te voltooien.', tut_h_road:'Klik om punten toe te voegen en een weg te tekenen; Enter om te voltooien.',
       sym_upload:'+ PNG-symbool uploaden', sym_upload_done:'symbo(o)l(en) geladen', sym_del:'Verwijderen', sym_search:'Symbolen zoeken...',
       st_pos:'Positie', st_zoom:'Zoom', st_size:'Canvas', st_tool:'Gereedschap',
       cancel:'Annuleren', ok:'OK',
@@ -506,7 +506,7 @@
       o_view:'Widok', o_fit:'Dopasuj do ekranu', o_100:'100%',
       h_pan:'Prawy przycisk + przeciągnij, środkowy przycisk, Spacja + przeciągnij lub strzałki, aby przesuwać.',
       tab_layers:'Warstwy', tab_library:'Biblioteka', tab_history:'Historia',
-      ref_title:'Obraz referencyjny', ref_export:'Uwzględnij w eksporcie', ref_clear:'Usuń obraz referencyjny', ref_trace:'Tryb kalkowania (pokaż na wierzchu + przyciąganie do linii brzegowej)', blend_sourceover:'Normalny', blend_multiply:'Mnożenie', blend_overlay:'Nakładka', blend_softlight:'Łagodne światło', blend_screen:'Ekran',
+      ref_title:'Obraz referencyjny', ref_export:'Uwzględnij w eksporcie', ref_clear:'Usuń obraz referencyjny', ref_trace:'Tryb kalkowania (pokaż na wierzchu + przyciąganie do linii brzegowej)', blend_sourceover:'Normalny', blend_multiply:'Mnożenie', blend_overlay:'Nakładka', blend_softlight:'Łagodne światło', blend_screen:'Ekran', nav_home:'Strona główna', nav_canvas:'Płótno', nav_tutorial:'Poradnik', nav_community:'Społeczność', home_tagline:'Edytor map dla fantastycznych światów w przeglądarce', home_desc:'Rysuj granice lądu i morza, maluj lasy i góry, umieszczaj zamki i wioski, prowadź rzeki i drogi — wszystko na jednym płótnie, w przeglądarce, bez instalacji.', home_cta:'Zacznij swoją mapę', home_video_caption:'Wkrótce film wprowadzający', canvas_new_title:'Utwórz nowe płótno', canvas_custom:'Niestandardowy rozmiar…', canvas_name_ph:'Nazwa mapy', canvas_create:'Utwórz', canvas_import:'Importuj z pliku .json', canvas_saved_title:'Zapisane płótna', canvas_empty:'W tej przeglądarce nie zapisano jeszcze żadnych płócien. Pojawiają się tu automatycznie po kliknięciu "Zapisz" w edytorze.', canvas_open:'Otwórz', canvas_delete:'Usuń', canvas_delete_confirm:'Usunąć to płótno? Tej operacji nie można cofnąć.', canvas_unnamed:'Mapa bez nazwy', tutorial_title:'Poradnik', tutorial_intro:'Każde narzędzie na lewym pasku otwiera własne ustawienia w prawym panelu. Poniżej krótkie podsumowanie działania każdego narzędzia.', community_title:'Społeczność', community_desc:'Wayborne Map Editor to projekt open source, wciąż rozwijany.', community_github_desc:'Kod źródłowy, zgłoszenia błędów i wkład', community_soon:'Wkrótce', lib_full:'Pamięć przeglądarki jest pełna — usuń stare płótno lub wyeksportuj je jako .json.', tut_h_select:'Zaznaczaj, przesuwaj i obracaj obiekty; Shift+klik dla zaznaczenia wielokrotnego.', tut_h_erase:'Usuwa pomalowany ląd i teksturę terenu nad nim w jednym kroku.', tut_h_fill:'Wypełnia wnętrze zamkniętego zarysu wybrzeża jednym kliknięciem.', tut_h_river:'Kliknij, aby dodać punkty i narysować rzekę; Enter, aby zakończyć.', tut_h_road:'Kliknij, aby dodać punkty i narysować drogę; Enter, aby zakończyć.',
       sym_upload:'+ Wgraj symbol PNG', sym_upload_done:'wczytano symboli', sym_del:'Usuń', sym_search:'Szukaj symboli...',
       st_pos:'Pozycja', st_zoom:'Powiększenie', st_size:'Płótno', st_tool:'Narzędzie',
       cancel:'Anuluj', ok:'OK',
@@ -564,7 +564,7 @@
       o_view:'Вид', o_fit:'По размеру экрана', o_100:'100%',
       h_pan:'ПКМ + перетаскивание, СКМ, Пробел + перетаскивание или стрелки для перемещения.',
       tab_layers:'Слои', tab_library:'Библиотека', tab_history:'История',
-      ref_title:'Референс-изображение', ref_export:'Включить в экспорт', ref_clear:'Убрать референс', ref_trace:'Режим трассировки (показать сверху + привязка к береговой линии)', blend_sourceover:'Обычный', blend_multiply:'Умножение', blend_overlay:'Перекрытие', blend_softlight:'Мягкий свет', blend_screen:'Экран',
+      ref_title:'Референс-изображение', ref_export:'Включить в экспорт', ref_clear:'Убрать референс', ref_trace:'Режим трассировки (показать сверху + привязка к береговой линии)', blend_sourceover:'Обычный', blend_multiply:'Умножение', blend_overlay:'Перекрытие', blend_softlight:'Мягкий свет', blend_screen:'Экран', nav_home:'Главная', nav_canvas:'Холст', nav_tutorial:'Обучение', nav_community:'Сообщество', home_tagline:'Редактор карт фэнтезийных миров прямо в браузере', home_desc:'Рисуйте границы суши и моря, закрашивайте леса и горы, размещайте замки и деревни, прокладывайте реки и дороги — всё на одном холсте, в браузере, без установки.', home_cta:'Начать карту', home_video_caption:'Видео скоро появится', canvas_new_title:'Создать новый холст', canvas_custom:'Свой размер…', canvas_name_ph:'Название карты', canvas_create:'Создать', canvas_import:'Импорт из файла .json', canvas_saved_title:'Сохранённые холсты', canvas_empty:'В этом браузере пока нет сохранённых холстов. Они появятся здесь автоматически после нажатия «Сохранить» в редакторе.', canvas_open:'Открыть', canvas_delete:'Удалить', canvas_delete_confirm:'Удалить этот холст? Это действие необратимо.', canvas_unnamed:'Карта без названия', tutorial_title:'Обучение', tutorial_intro:'Каждый инструмент на левой панели открывает свои настройки в правой панели. Ниже — краткое описание каждого инструмента.', community_title:'Сообщество', community_desc:'Wayborne Map Editor — проект с открытым исходным кодом, который постоянно развивается.', community_github_desc:'Исходный код, отчёты об ошибках и вклад в проект', community_soon:'Скоро', lib_full:'Хранилище браузера заполнено — удалите старый холст или экспортируйте его как .json.', tut_h_select:'Выделяйте, перемещайте и вращайте объекты; Shift+клик для множественного выбора.', tut_h_erase:'Стирает закрашенную сушу и текстуру местности на ней за один шаг.', tut_h_fill:'Заливает внутреннюю часть замкнутого контура побережья одним щелчком.', tut_h_river:'Щёлкайте, чтобы добавить точки и нарисовать реку; Enter — завершить.', tut_h_road:'Щёлкайте, чтобы добавить точки и нарисовать дорогу; Enter — завершить.',
       sym_upload:'+ Загрузить PNG-символ', sym_upload_done:'символ(ов) загружено', sym_del:'Удалить', sym_search:'Поиск символов...',
       st_pos:'Позиция', st_zoom:'Масштаб', st_size:'Холст', st_tool:'Инструмент',
       cancel:'Отмена', ok:'ОК',
@@ -602,6 +602,30 @@
     { code:'ru', flag:'🇷🇺', name:'Русский' }
   ];
 
+  /* Rehber (Tutorial) sayfası için araç listesi — index.html'deki
+     tool-rail sırasıyla birebir aynı; ad/açıklama mevcut t_ ve h_ önekli
+     i18n anahtarlarından okunur, burada yeni çeviri gerekmez. */
+  var TUTORIAL_TOOLS = [
+    { id:'select',     key:'V',     ico:'➤', hint:'tut_h_select' },
+    { id:'landmass',   key:'B',     ico:'◕', hint:'h_landmass' },
+    { id:'erase',      key:'E',     ico:'◌', hint:'tut_h_erase' },
+    { id:'fill',       key:'F',     ico:'◆', hint:'tut_h_fill' },
+    { id:'terrain',    key:'T',     ico:'▨', hint:'h_terrain' },
+    { id:'elevation',  key:'U',     ico:'▲', hint:'h_elevation' },
+    { id:'symbol',     key:'S',     ico:'⛰', hint:'h_symbol' },
+    { id:'river',      key:'R',     ico:'≈', hint:'tut_h_river' },
+    { id:'lake',       key:'K',     ico:'◎', hint:'h_lake' },
+    { id:'territory',  key:'G',     ico:'▧', hint:'h_territory' },
+    { id:'regionlink', key:'M',     ico:'◈', hint:'h_regionlink' },
+    { id:'resource',   key:'Y',     ico:'⛏', hint:'h_resource' },
+    { id:'road',       key:'D',     ico:'⋯', hint:'tut_h_road' },
+    { id:'label',      key:'L',     ico:'A', hint:'h_label' },
+    { id:'eyedrop',    key:'I',     ico:'⊙', hint:'h_eyedrop' },
+    { id:'measure',    key:'Q',     ico:'📏', hint:'h_measure' },
+    { id:'lasso',      key:'X',     ico:'⌁', hint:'h_lasso' },
+    { id:'pan',        key:'Space', ico:'✥', hint:'h_pan' }
+  ];
+
   function $(id){ return document.getElementById(id); }
   function on(id, ev, fn){ var el = $(id); if (el) el.addEventListener(ev, fn); }
 
@@ -622,6 +646,7 @@
       this.bindOptions();
       this.bindPanels();
       this.bindKeys();
+      this.initShell();
       this.applyLang();
       this.refreshAll();
       this.setTool('landmass');
@@ -640,7 +665,10 @@
       this.buildTerrainSwatches();
       this.buildLabelPresets();
       this.buildSymbolLibrary();
-      this.buildLangMenu();
+      this.buildLangMenu('lang-menu');
+      this.buildLangMenu('lang-menu-shell');
+      this.renderTutorial();
+      this.refreshCanvasList();
       this.refreshLayers();
       this.refreshSelection();
       this.refreshHistory();
@@ -702,14 +730,130 @@
         } else e.target.value = String(Cv.W);
       });
 
-      this.buildLangMenu();
-      on('btn-lang', 'click', function (e) { e.stopPropagation(); self.toggleLangMenu(); });
-      document.addEventListener('click', function () { self.closeLangMenu(); });
+      this.buildLangMenu('lang-menu');
+      on('btn-lang', 'click', function (e) { e.stopPropagation(); self.toggleLangMenu('lang-menu'); });
+      this.buildLangMenu('lang-menu-shell');
+      on('btn-lang-shell', 'click', function (e) { e.stopPropagation(); self.toggleLangMenu('lang-menu-shell'); });
+      document.addEventListener('click', function () { self.closeLangMenu('lang-menu'); self.closeLangMenu('lang-menu-shell'); });
     },
 
-    /* ================= dil menüsü ================= */
-    buildLangMenu: function () {
-      var menu = $('lang-menu');
+    /* ================= uygulama kabuğu (Ana Sayfa / Tuval / Rehber / Topluluk) =================
+       Backend yok — sayfa her zaman index.html; sekmeler arası geçiş salt
+       JS ile görünürlük değiştirerek yapılır, sayfa yenilenmez. Editörün
+       kendisi #view-editor içinde önceden tam olarak başlatılmış durumda
+       bekler (App.init() zaten çalıştı), sadece gizli. */
+    initShell: function () {
+      var self = this;
+      document.querySelectorAll('[data-view-link]').forEach(function (el) {
+        el.addEventListener('click', function () { self.showView(el.getAttribute('data-view-link')); });
+      });
+      on('btn-shell-back', 'click', function () { self.showView('canvas'); });
+
+      on('cv-size-preset', 'change', function (e) {
+        $('cv-custom-wh').classList.toggle('hidden', e.target.value !== 'custom');
+      });
+      on('btn-cv-create', 'click', function () {
+        var preset = $('cv-size-preset').value;
+        var w, h;
+        if (preset === 'custom') {
+          w = Math.max(256, Math.min(16384, parseInt($('cv-w').value, 10) || 2048));
+          h = Math.max(256, Math.min(16384, parseInt($('cv-h').value, 10) || 2048));
+        } else { w = h = parseInt(preset, 10); }
+        var name = $('cv-name').value.trim() || self.t('canvas_unnamed');
+        Exporter.newProject(w, h, name);
+        self.showView('editor');
+      });
+      on('file-open-canvas', 'change', function (e) {
+        if (e.target.files && e.target.files[0]) {
+          Exporter.loadProject(e.target.files[0]);
+          self.showView('editor');
+        }
+        e.target.value = '';
+      });
+
+      this.renderTutorial();
+      this.refreshCanvasList();
+      this.showView('home');
+    },
+
+    showView: function (name) {
+      document.querySelectorAll('.shell-view').forEach(function (v) { v.classList.add('hidden'); });
+      var target = $('view-' + name);
+      if (target) target.classList.remove('hidden');
+      document.querySelectorAll('.shell-tab').forEach(function (t) {
+        t.classList.toggle('active', t.getAttribute('data-view-link') === name);
+      });
+      if ($('shell-nav')) $('shell-nav').classList.toggle('hidden', name === 'editor');
+      if (name === 'canvas') this.refreshCanvasList();
+      if (name === 'editor') {
+        /* editör gizliyken canvas 0×0 rapor ediyordu — görünür olduktan
+           sonra viewport ölçülerini yeniden hesapla ve sığdır */
+        requestAnimationFrame(function () { Cv.resize(); Cv.fit(); Cv.requestRender(); });
+      }
+    },
+
+    refreshCanvasList: function () {
+      var grid = $('cv-list'), hint = $('cv-empty-hint');
+      if (!grid) return;
+      var self = this;
+      var list = Exporter.libList().sort(function (a, b) { return b.updatedAt - a.updatedAt; });
+      grid.innerHTML = '';
+      if (hint) hint.style.display = list.length ? 'none' : '';
+      list.forEach(function (entry) {
+        var card = document.createElement('div');
+        card.className = 'cv-card';
+        var nameEl = document.createElement('div'); nameEl.className = 'cv-card-name';
+        var metaEl = document.createElement('div'); metaEl.className = 'cv-card-meta';
+        var thumb = document.createElement('div'); thumb.className = 'cv-card-thumb'; thumb.textContent = '⚔';
+        var actions = document.createElement('div'); actions.className = 'cv-card-actions';
+        var openBtn = document.createElement('button'); openBtn.textContent = self.t('canvas_open');
+        var delBtn = document.createElement('button'); delBtn.textContent = self.t('canvas_delete');
+        nameEl.textContent = entry.name;
+        metaEl.textContent = entry.W + '×' + entry.H + ' · ' + new Date(entry.updatedAt).toLocaleDateString();
+        actions.appendChild(openBtn); actions.appendChild(delBtn);
+        card.appendChild(thumb); card.appendChild(nameEl); card.appendChild(metaEl); card.appendChild(actions);
+
+        function openIt() {
+          Exporter.libOpen(entry.id).then(function () {
+            App.currentLibId = entry.id;
+            App.currentCanvasName = entry.name;
+            self.showView('editor');
+          });
+        }
+        openBtn.addEventListener('click', function (e) { e.stopPropagation(); openIt(); });
+        delBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (confirm(self.t('canvas_delete_confirm'))) { Exporter.libDelete(entry.id); self.refreshCanvasList(); }
+        });
+        card.addEventListener('click', openIt);
+        grid.appendChild(card);
+      });
+    },
+
+    renderTutorial: function () {
+      var box = $('tutorial-list');
+      if (!box) return;
+      var self = this;
+      box.innerHTML = '';
+      TUTORIAL_TOOLS.forEach(function (tl) {
+        var row = document.createElement('div'); row.className = 'tutorial-row';
+        var ico = document.createElement('div'); ico.className = 'tutorial-ico'; ico.textContent = tl.ico;
+        var body = document.createElement('div'); body.className = 'tutorial-body';
+        var nameRow = document.createElement('div'); nameRow.className = 'tutorial-name';
+        nameRow.textContent = self.t('t_' + tl.id);
+        var keyEl = document.createElement('span'); keyEl.className = 'tutorial-key'; keyEl.textContent = tl.key;
+        nameRow.appendChild(keyEl);
+        var desc = document.createElement('div'); desc.className = 'tutorial-desc';
+        desc.textContent = self.t(tl.hint);
+        body.appendChild(nameRow); body.appendChild(desc);
+        row.appendChild(ico); row.appendChild(body);
+        box.appendChild(row);
+      });
+    },
+
+    /* ================= dil menüsü ================= (id: 'lang-menu' veya 'lang-menu-shell') */
+    buildLangMenu: function (id) {
+      var menu = $(id);
       if (!menu) return;
       menu.innerHTML = '';
       var self = this;
@@ -725,22 +869,22 @@
         li.appendChild(flag); li.appendChild(name);
         li.addEventListener('click', function (e) {
           e.stopPropagation();
-          if (self.lang === l.code) { self.closeLangMenu(); return; }
+          if (self.lang === l.code) { self.closeLangMenu(id); return; }
           self.lang = l.code;
           self.applyLang();
-          self.closeLangMenu();
+          self.closeLangMenu(id);
         });
         menu.appendChild(li);
       });
     },
 
-    toggleLangMenu: function () {
-      var menu = $('lang-menu');
+    toggleLangMenu: function (id) {
+      var menu = $(id);
       if (menu) menu.classList.toggle('hidden');
     },
 
-    closeLangMenu: function () {
-      var menu = $('lang-menu');
+    closeLangMenu: function (id) {
+      var menu = $(id);
       if (menu) menu.classList.add('hidden');
     },
 
