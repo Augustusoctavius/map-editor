@@ -343,6 +343,20 @@
     },
     mapToScreen: function (mx, my) { return { x:mx*this.zoom+this.panX, y:my*this.zoom+this.panY }; },
 
+    /* nehir/yol kara-kırpma maskesi için yeniden kullanılabilir scratch
+       canvas'lar. Önceden her render() karesinde (pan/zoom/çizim sırasında
+       saniyede onlarca kez) tam boyutlu YENİ bir canvas oluşturulup atılıyordu
+       — büyük tuvallerde (4096²+) bu, gözle görülür kasılmaya yol açan asıl
+       kaynaktı. Artık boyut değişmediği sürece aynı canvas temizlenip
+       yeniden kullanılıyor. */
+    _scratch: {},
+    _getScratchCanvas: function (key, w, h) {
+      var c = this._scratch[key];
+      if (!c) { c = document.createElement('canvas'); this._scratch[key] = c; }
+      if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+      return c;
+    },
+
     requestRender: function () {
       var self = this;
       if (this._raf) return;
@@ -594,9 +608,9 @@
                ortasında asılı kalmasın; nehir/göl ile aynı kara-kırpma
                tekniği (bkz. aşağıdaki 'rivers' bloğu). */
               var Lm2 = Layers.get('landmass');
-              var rc2 = (Lm2 && Lm2.canvas) ? document.createElement('canvas') : null;
+              var rc2 = (Lm2 && Lm2.canvas) ? this._getScratchCanvas('roads', W, H) : null;
               var rdctx = ctx;
-              if (rc2) { rc2.width = W; rc2.height = H; rdctx = rc2.getContext('2d'); }
+              if (rc2) { rdctx = rc2.getContext('2d'); rdctx.clearRect(0, 0, W, H); }
               else { ctx.save(); ctx.globalAlpha = roadsLayerNow.opacity; }
               for (var ri = 0; ri < roadsLayerNow.objects.length; ri++) {
                 this.drawRoad(rdctx, roadsLayerNow.objects[ri]);
@@ -621,9 +635,9 @@
                ediyoruz; böylece mevcut 4 geçişli çizim mantığına dokunmadan
                tek noktadan kırpma uygulanmış oluyor. */
             var Lm_ = Layers.get('landmass');
-            var rc = (Lm_ && Lm_.canvas) ? document.createElement('canvas') : null;
-            var rctx3 = rc;
-            if (rc) { rc.width = W; rc.height = H; rctx3 = rc.getContext('2d'); }
+            var rc = (Lm_ && Lm_.canvas) ? this._getScratchCanvas('rivers', W, H) : null;
+            var rctx3 = rc ? rc.getContext('2d') : null;
+            if (rctx3) rctx3.clearRect(0, 0, W, H);
             var dctx = rctx3 || ctx;
 
             /* 1. pass: göl kıyı bantları — nehirlerin altında */
