@@ -1270,4 +1270,131 @@
     return s;
   });
 
+  /* ============================================================
+     10) FANTEZİ IRK KÜLTÜRLERİ (cüce, elf, ork/goblin, küçük halk,
+     cin ustası) — jenerik fantazya arketipleri (Tolkien'den beri
+     ortak kültürel malzeme, tek bir esere ait değil); herhangi bir
+     oyun/kitap serisinin özel isim/yer/canavar referansı YOK, sadece
+     benzer DOKU: mimari biçim + malzeme + ölçek. Her ırk kendi
+     içinde birkaç ekonomik/işlevsel varyantla geliyor (mevcut
+     "cultures" kategorisindeki ix_orcfort/ix_mountaintribe ile aynı
+     jenerik yaklaşım).
+     ============================================================ */
+
+  /* ---- Cüce: dağa oyulmuş taş ev — 3 varyant ---- */
+  reg('cultures', 'ix_dwarfhouse_stone', 'Cüce evi · Kayaya oyulmuş', 'Dwarf house · Rock-hewn', function () {
+    var s = S(); s.pad(20, 18, 30, 'stoneD');
+    s.rock(0, 2, 0, 16, 15, 'stoneD');
+    s.box(2, 4, 0, 18, 14, 10, 'granite', { door:true, doorH:0.5, win:1 });
+    s.hip(0, 2, 10, 22, 18, 5, 'stoneD');
+    return s;
+  });
+  reg('cultures', 'ix_dwarfhouse_forge', 'Cüce evi · Demirci ocaklı', 'Dwarf house · Forge-hall', function () {
+    var s = S(); s.pad(22, 19, 34, 'stoneD');
+    s.rock(0, 2, 0, 17, 16, 'basalt');
+    s.box(2, 4, 0, 19, 14, 11, 'basalt', { door:true, doorH:0.5, win:1 });
+    s.hip(0, 2, 11, 23, 18, 5, 'stoneD');
+    chimney(s, 4, 5, 11, 8, 'basalt');
+    s.box(4, 6, 11, 2, 2, 1.4, 'tileR', { plain:true });
+    return s;
+  });
+  reg('cultures', 'ix_dwarfhouse_hall', 'Cüce evi · Büyük salon', 'Dwarf house · Great hall', function () {
+    var s = S(); s.pad(28, 24, 42, 'stoneD');
+    s.rock(0, 2, 0, 22, 20, 'granite');
+    s.box(2, 4, 0, 26, 18, 14, 'stoneW', { door:true, doorH:0.55, win:2 });
+    s.hip(0, 2, 14, 30, 22, 7, 'stoneD');
+    s.flag(28, 6, 14, 10, 'tileB');
+    s.flag(4, 6, 14, 10, 'tileB');
+    return s;
+  });
+
+  /* ---- Elf: ağaçla bütünleşik yüksek konut — 3 varyant ---- */
+  reg('cultures', 'ix_elfhouse_canopy', 'Elf evi · Yeşil tepeli', 'Elf dwelling · Green canopy', function () {
+    var s = S(); s.pad(20, 18, 32, 'grass');
+    s.tree(3, 3, 0, 32, 'round', 'tileG');
+    s.box(7, 6, 15, 7, 7, 5, 'bambooW', { win:1 });
+    s.dome(10, 9, 20, 9, 8, 'tileG');
+    return s;
+  });
+  reg('cultures', 'ix_elfhouse_autumn', 'Elf evi · Sonbahar tepeli', 'Elf dwelling · Autumn canopy', function () {
+    var s = S(); s.pad(20, 18, 32, 'grass');
+    s.tree(3, 3, 0, 30, 'round', 'tileR');
+    s.box(7, 6, 14, 7, 7, 5, 'wood', { win:1 });
+    s.dome(10, 9, 19, 8.5, 7.5, 'tileR');
+    return s;
+  });
+  reg('cultures', 'ix_elfhouse_moonlit', 'Elf evi · Ay ışığı, gümüşi', 'Elf dwelling · Moonlit silver', function () {
+    var s = S(); s.pad(22, 20, 36, 'grass');
+    s.tree(3, 3, 0, 34, 'round', 'ice');
+    s.box(7, 6, 16, 8, 8, 6, 'stoneW', { win:2 });
+    s.dome(11, 10, 22, 10, 9, 'ice');
+    s.flag(4, 4, 20, 8, 'ice');
+    return s;
+  });
+
+  /* ---- Ork/Goblin: derme çatma kulübe — 3 varyant ---- */
+  reg('cultures', 'ix_orcshanty_common', 'Ork kulübesi', 'Orc shanty', function () {
+    var s = S(); s.pad(18, 16, 28, 'dirt');
+    s.box(2, 3, 0, 16, 12, 9, 'woodD', { door:true, win:1 });
+    s.box(1, 2, 9, 18, 14, 1, 'hide', { plain:true });
+    return s;
+  });
+  reg('cultures', 'ix_orcshanty_warband', 'Ork kulübesi · Savaş kampı', 'Orc shanty · Warband camp', function () {
+    var s = S(); s.pad(22, 18, 32, 'dirt');
+    s.box(2, 3, 0, 16, 12, 9, 'woodD', { door:true, win:1 });
+    s.box(1, 2, 9, 18, 14, 1, 'dark', { plain:true });
+    s.box(20, 4, 0, 2, 2, 13, 'bone', { plain:true });
+    s.flag(20.3, 4.3, 11.5, 6, 'dark');
+    return s;
+  });
+  reg('cultures', 'ix_orcshanty_scrap', 'Ork kulübesi · Hurda yığını', 'Orc shanty · Scrap heap', function () {
+    var s = S(); s.pad(20, 17, 30, 'dirt');
+    s.box(2, 3, 0, 15, 11, 8, 'woodD', { door:true });
+    s.box(1, 2, 8, 17, 13, 1, 'hide', { plain:true });
+    s.rock(17, 8, 0, 6, 5, 'stoneD');
+    s.box(19, 9, 5, 1.4, 1.4, 4, 'woodD', { plain:true });
+    return s;
+  });
+
+  /* ---- Küçük halk: toprağa gömülü, yuvarlak kapılı ev — 3 varyant ---- */
+  reg('cultures', 'ix_burrow_meadow', 'Küçük halk evi · Çayır', 'Little-folk burrow · Meadow', function () {
+    var s = S(); s.pad(18, 16, 26, 'grass');
+    s.dome(9, 8, 0, 11, 7, 'grass');
+    s.cyl(6, 6, 0, 2.6, 0.6, 'wood');
+    s.box(8.4, 6, 0, 0.8, 0.8, 4, 'woodD', { plain:true });
+    return s;
+  });
+  reg('cultures', 'ix_burrow_orchard', 'Küçük halk evi · Meyve bahçeli', 'Little-folk burrow · Orchard', function () {
+    var s = S(); s.pad(22, 19, 32, 'grass');
+    s.dome(9, 8, 0, 11, 7, 'grass');
+    s.cyl(6, 6, 0, 2.6, 0.6, 'woodD');
+    s.tree(19, 12, 0, 14, 'round', 'tileG');
+    return s;
+  });
+  reg('cultures', 'ix_burrow_grand', 'Küçük halk evi · Konak', 'Little-folk burrow · Manor', function () {
+    var s = S(); s.pad(26, 22, 38, 'grass');
+    s.dome(12, 10, 0, 14, 9, 'grass');
+    s.cyl(8, 7.5, 0, 3.4, 0.7, 'gold');
+    s.box(7.2, 7.5, 0, 1, 1, 5, 'stoneW', { plain:true });
+    s.box(15.8, 7.5, 0, 1, 1, 5, 'stoneW', { plain:true });
+    return s;
+  });
+
+  /* ---- Cin ustası: küçük atölye kulübesi — 2 varyant ---- */
+  reg('cultures', 'ix_gnomehouse_common', 'Cin ustası kulübesi', 'Gnome workshop cottage', function () {
+    var s = S(); s.pad(16, 14, 24, 'grass');
+    hut(s, 2, 3, 14, 11, 9, 'wood', 'tileB', { win:1 });
+    s.cyl(16, 4, 0, 2, 6, 'basalt');
+    s.cone(16, 4, 6, 2.3, 3, 'tileD');
+    return s;
+  });
+  reg('cultures', 'ix_gnomehouse_workshop', 'Cin ustası kulübesi · Atölye', 'Gnome workshop cottage · Tinker hall', function () {
+    var s = S(); s.pad(20, 17, 30, 'grass');
+    hut(s, 2, 3, 17, 13, 10, 'stoneW', 'tileB', { win:2 });
+    s.cyl(19, 5, 0, 2.4, 8, 'basalt');
+    s.cone(19, 5, 8, 2.7, 3.6, 'gold');
+    s.box(-2, 5, 0, 2, 2, 5, 'wood', { plain:true });
+    return s;
+  });
+
 })(window);
