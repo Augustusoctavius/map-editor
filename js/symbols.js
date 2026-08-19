@@ -686,6 +686,80 @@
         part('M30 68 Q35 63 40 68 Q45 63 50 68',null,'ink',2.2),
         part('M58 30 Q63 25 68 30 Q73 25 78 30',null,'ink',2.2)]},
     ]},
+
+    /* ------------------------------------------------------------------
+       EŞYA — bölge bağlantısıyla girilen İÇ MEKÂN haritaları (oda, avlu,
+       salon) için taşınabilir eşya/nesne sembolleri. Mekanik olarak yeni
+       bir şey gerekmiyor: aynı "Kara" fırçasıyla oda şeklini boyayıp
+       üstüne iç mekân doku(ları)nı (bkz. layers.js — Ahşap/Taş zemin,
+       Halı, Taş duvar vb.) işleyip bu sembolleri yerleştirmek yeterli. */
+    furniture:{ tr:'Eşya', en:'Furniture', items:[
+      {id:'fn_bed',tr:'Yatak',en:'Bed',parts:[
+        part('M18 26 H82 V88 H18 Z','fill','ink',2.6),
+        part('M18 18 H82 V28 H18 Z','shade2','ink',2.4),
+        part('M26 32 H46 V46 H26 Z M54 32 H74 V46 H54 Z','fill2','ink',1.8),
+        part('M18 62 H82',null,'ink3',2)]},
+      {id:'fn_table_round',tr:'Yuvarlak masa',en:'Round table',parts:[
+        part('M50 50 m-30 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0','wood','ink',3),
+        part('M50 50 m-22 0 a22 22 0 1 0 44 0 a22 22 0 1 0 -44 0',null,'ink3',1.6)]},
+      {id:'fn_table_rect',tr:'Masa',en:'Table',parts:[
+        part('M14 34 H86 V66 H14 Z','wood','ink',3),
+        part('M14 34 H86 M14 66 H86',null,'ink3',1.6)]},
+      {id:'fn_chair',tr:'Sandalye',en:'Chair',parts:[
+        part('M28 30 H72 V74 H28 Z','wood','ink',2.6),
+        part('M28 30 H72 V38 H28 Z','shade2','ink',2)]},
+      {id:'fn_chest',tr:'Sandık',en:'Chest',parts:[
+        part('M16 40 H84 V82 H16 Z','wood','ink',3),
+        part('M16 40 H84 V30 Q50 18 16 30 Z','shade2','ink',2.6),
+        part('M46 40 H54 V50 H46 Z','ink',null,0)]},
+      {id:'fn_bookshelf',tr:'Kitaplık',en:'Bookshelf',parts:[
+        part('M16 16 H84 V84 H16 Z','wood','ink',3),
+        part('M16 34 H84 M16 52 H84 M16 68 H84',null,'ink3',2),
+        part('M22 20 H26 V32 H22 Z M30 20 H35 V32 H30 Z M40 20 H44 V32 H40 Z','shade','ink',1.4),
+        part('M22 38 H27 V50 H22 Z M32 38 H36 V50 H32 Z M60 38 H66 V50 H60 Z','red','ink',1.4)]},
+      {id:'fn_fireplace',tr:'Şömine',en:'Fireplace',parts:[
+        part('M14 20 H86 V70 H68 V40 H32 V70 H14 Z','stoned','ink',3),
+        part('M14 20 H86 V28 H14 Z','shade2','ink',2),
+        part('M40 66 L46 46 L50 58 L56 42 L60 66 Z','red','ink',2)]},
+      {id:'fn_cauldron',tr:'Kazan',en:'Cauldron',parts:[
+        part('M38 70 L44 58 L50 68 L56 56 L62 70',null,'red',2.4),
+        part('M50 50 m-18 0 a18 18 0 1 0 36 0 a18 18 0 1 0 -36 0','darkgray','ink',3),
+        part('M28 44 H72',null,'ink',2.4),
+        part('M20 40 L32 44 M80 40 L68 44',null,'ink3',2)]},
+      {id:'fn_cabinet',tr:'Dolap',en:'Cabinet',parts:[
+        part('M22 16 H78 V88 H22 Z','wood','ink',3),
+        part('M48 16 V88',null,'ink3',2),
+        part('M39 46 H43 V50 H39 Z M57 46 H61 V50 H57 Z','ink3',null,0)]},
+      {id:'fn_crate',tr:'Kasa',en:'Crate',parts:[
+        part('M20 20 H80 V80 H20 Z','wood','ink',3),
+        part('M20 20 L80 80 M80 20 L20 80',null,'ink3',2)]},
+      {id:'fn_rug',tr:'Halı',en:'Rug',parts:[
+        part('M14 24 H86 V76 H14 Z','red','ink',2.6),
+        part('M22 32 H78 V68 H22 Z',null,'gold',1.6),
+        part('M50 50 m-10 0 a10 10 0 1 0 20 0 a10 10 0 1 0 -20 0',null,'gold',1.4)]},
+      {id:'fn_window',tr:'Pencere',en:'Window',parts:[
+        part('M20 30 H80 V70 H20 Z','water','ink',3),
+        part('M50 30 V70 M20 50 H80',null,'ink',2.4)]},
+      {id:'fn_door',tr:'İç kapı',en:'Interior door',parts:[
+        part('M30 12 H70 V88 H30 Z',null,'ink',3),
+        part('M30 88 A40 40 0 0 0 70 48',null,'ink3',1.6)]},
+      {id:'fn_sconce',tr:'Duvar meşalesi',en:'Wall sconce',parts:[
+        part('M46 60 H54 V90 H46 Z','wood','ink',2.4),
+        part('M46 50 H54 V62 H46 Z','stoned','ink',2),
+        part('M42 30 Q50 10 58 30 Q54 46 50 50 Q46 46 42 30 Z','red','ink',2)]},
+      {id:'fn_weaponrack',tr:'Silah rafı',en:'Weapon rack',parts:[
+        part('M20 78 H80 V86 H20 Z','wood','ink',2.4),
+        part('M30 78 L26 20 M45 78 L45 16 M60 78 L64 20 M75 78 L79 24',null,'ink3',2.4),
+        part('M26 20 L20 26 L26 14 Z M45 16 L39 22 L51 22 Z M64 20 L70 26 L58 26 Z','shade',null,0)]},
+      {id:'fn_throne',tr:'Taht',en:'Throne',parts:[
+        part('M26 20 H74 V40 H60 V78 H40 V40 H26 Z','gold','ink',3),
+        part('M30 16 L50 6 L70 16 Z','gold','ink',2.4),
+        part('M20 40 H30 V70 H20 Z M70 40 H80 V70 H70 Z','shade2','ink',2.4)]},
+      {id:'fn_anvil',tr:'Örs',en:'Anvil',parts:[
+        part('M20 68 H80 V78 H20 Z','darkgray','ink',2.8),
+        part('M32 50 H68 V68 H32 Z','darkgray','ink',2.6),
+        part('M28 40 H88 L80 50 H28 Z','darkgray','ink',2.6)]},
+    ]},
   };
 
 

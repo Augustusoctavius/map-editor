@@ -166,6 +166,41 @@
       tr:'Mermer meydan', en:'Marble plaza',
       base:'#d8d2c4', dark:'#aca690', mark:'#928c78', mark2:'#c0bcac', kind:'crack', density:0.55,
       shore:['#aea892','#dcd6c8']
+    },
+    /* --- İÇ MEKÂN (bölge bağlantısıyla girilen oda/avlu haritaları için) ---
+       Aynı Kara+Arazi fırçalarıyla çalışır: oda şeklini "Kara" fırçasıyla
+       boyayıp üstüne bu dokulardan biriyle zemin/duvar işlemek yeterli —
+       yeni bir mekanik gerekmiyor. Kıyı parlaması (shore) iç mekanda
+       istenmeyebilir; sol paneldeki "Kıyı" onay kutusundan kapatılabilir. */
+    woodfloor: {
+      tr:'Ahşap zemin', en:'Wood floor',
+      base:'#b08a54', dark:'#8a683c', mark:'#6e4e28', mark2:'#96703e', kind:'plank', density:1.1,
+      shore:['#8a683c','#b6905c']
+    },
+    stonefloor: {
+      tr:'Taş zemin', en:'Stone floor',
+      base:'#a8a292', dark:'#7c7666', mark:'#5c5648', mark2:'#8e8878', kind:'tile', density:1.0,
+      shore:['#7e7868','#aca696']
+    },
+    strawfloor: {
+      tr:'Saman zemin', en:'Straw floor',
+      base:'#c8b468', dark:'#a2903e', mark:'#8a7830', mark2:'#b4a052', kind:'straw', density:1.3,
+      shore:['#a4923e','#cab86c']
+    },
+    carpetfloor: {
+      tr:'Halı', en:'Carpet',
+      base:'#8c2e30', dark:'#601c1e', mark:'#c49a3a', mark2:'#a02426', kind:'rug', density:0.9,
+      shore:['#621e20','#902e30']
+    },
+    cavefloor: {
+      tr:'Mağara zemini', en:'Cave floor',
+      base:'#6a6258', dark:'#443e36', mark:'#2e2a24', mark2:'#544c42', kind:'crack', density:0.65,
+      shore:['#463f36','#6c645a']
+    },
+    stonewall: {
+      tr:'Taş duvar', en:'Stone wall',
+      base:'#5a564c', dark:'#38352e', mark:'#26241e', mark2:'#4a4740', kind:'mortar', density:1.5,
+      shore:['#3a372f','#5c584e']
     }
   };
 
@@ -355,6 +390,58 @@
         ctx.arc(-3.2,3.0,0.8,0,Math.PI*2);
         ctx.arc( 3.0,3.4,0.6,0,Math.PI*2);
         ctx.fill();
+        break;
+
+      case 'plank':
+        /* ahşap zemin: paralel taht sıraları + kaymalı ek yerleri */
+        ctx.beginPath();
+        ctx.moveTo(-6,-3); ctx.lineTo(6,-3);
+        ctx.moveTo(-6, 1); ctx.lineTo(6, 1);
+        ctx.moveTo(-6, 5); ctx.lineTo(6, 5);
+        ctx.moveTo(-2,-3); ctx.lineTo(-2,1);
+        ctx.moveTo( 3, 1); ctx.lineTo( 3,5);
+        ctx.stroke();
+        break;
+
+      case 'tile':
+        /* taş zemin: kare karo ızgarası */
+        ctx.beginPath();
+        ctx.rect(-6,-6,12,12);
+        ctx.moveTo(-6,0); ctx.lineTo(6,0);
+        ctx.moveTo(0,-6); ctx.lineTo(0,6);
+        ctx.stroke();
+        break;
+
+      case 'straw':
+        /* saman: kısa, dağınık saplar */
+        ctx.beginPath();
+        ctx.moveTo(-3,3); ctx.lineTo(-4,-2);
+        ctx.moveTo( 0,4); ctx.lineTo( 1,-3);
+        ctx.moveTo( 3,3); ctx.lineTo( 4,-2);
+        ctx.moveTo(-1,4); ctx.lineTo(-3, 0);
+        ctx.stroke();
+        break;
+
+      case 'rug':
+        /* halı: baklava desenli süsleme + merkez düğüm */
+        ctx.beginPath();
+        ctx.moveTo(0,-5); ctx.lineTo(5,0); ctx.lineTo(0,5); ctx.lineTo(-5,0); ctx.closePath();
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0,0,1.6,0,Math.PI*2);
+        ctx.fill();
+        break;
+
+      case 'mortar':
+        /* taş duvar: harç sıraları + düşey derz atkıları */
+        ctx.beginPath();
+        ctx.moveTo(-6,-3); ctx.lineTo(6,-3);
+        ctx.moveTo(-6, 3); ctx.lineTo(6, 3);
+        ctx.moveTo(-2,-3); ctx.lineTo(-2,3);
+        ctx.moveTo( 3,-3); ctx.lineTo( 3,3);
+        ctx.moveTo(-4, 3); ctx.lineTo(-4,9);
+        ctx.moveTo( 1, 3); ctx.lineTo( 1,9);
+        ctx.stroke();
         break;
     }
   }

@@ -1,6 +1,6 @@
 # Wayborne Map Editor (Cartographer)
 
-Fantastik / ortaçağ tarzı, tarayıcı üzerinde çalışan bir harita editörü. Tamamen vanilla JavaScript ve Canvas 2D ile yazılmıştır — framework, build adımı, bundler, npm bağımlılığı veya CDN varlığı yoktur. Karada, denizde, kıyıda, arazi dokularında, izometrik binalarda kullanılan her şey (850 sembol, 28 arazi tipi, onlarca izometrik yapı) kodun içinde üretilir; dışarıdan görsel dosyası yüklenmez.
+Fantastik / ortaçağ tarzı, tarayıcı üzerinde çalışan bir harita editörü. Tamamen vanilla JavaScript ve Canvas 2D ile yazılmıştır — framework, build adımı, bundler, npm bağımlılığı veya CDN varlığı yoktur. Karada, denizde, kıyıda, arazi dokularında, izometrik binalarda kullanılan her şey (867 sembol, 34 arazi tipi, onlarca izometrik yapı) kodun içinde üretilir; dışarıdan görsel dosyası yüklenmez.
 
 Arayüz 10 dilde kullanılabilir: Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, İtalyanca, Portekizce, Hollandaca, Lehçe, Rusça. Sağ üstteki 🌐 simgesinden değiştirilir.
 
@@ -51,7 +51,7 @@ Her araç, sağ paneldeki ilgili seçenekler bölümünü açar ve tuşlarla da 
 | **Kara** | `B` | Kara kütlesi fırçası — karayı boyar, deniz ile arasına otomatik kıyı efekti (glow) uygulanır. Aynı panelde **prosedürel kara üreteci** de bulunur: Kıta / Ada / Takımada şablonlarından biriyle, tohumlu Perlin gürültüsüne dayalı tek tıkla rastgele kıyı çizgisi üretir (detay/pürüzlülük ayarlanabilir, harici kütüphane kullanılmaz). |
 | **Deniz** | `E` | Silgi — boyanmış karayı (ve üzerindeki arazi dokusunu) tek adımda kaldırır. |
 | **Doldur** | `F` | Kova doldurma — kalemle çizilmiş kapalı bir kıyı çevriminin (ring) içini tek tıkla dolduran flood-fill aracı; tıklanan pikselle aynı kara/deniz durumundaki bitişik alanı doldurur. |
-| **Arazi** | `T` | 28 arazi tipinden biriyle doku boyar (otlak, orman, karanlık orman, tayga, bozkır, savan, çöl, bataklık, kayalık, kar/buz, arnavut kaldırımı, kırık taş yol, çamur yol, pis su akıntısı, süs çiçeği tarhı, çalı bordürü vb.). Her fırça darbesinde desen rastgele serpilir; iki darbe asla birebir aynı görünmez. Fırçanın kara sınırlarını aşmaması otomatik sağlanır. |
+| **Arazi** | `T` | 34 arazi tipinden biriyle doku boyar (otlak, orman, karanlık orman, tayga, bozkır, savan, çöl, bataklık, kayalık, kar/buz, arnavut kaldırımı, kırık taş yol, çamur yol, pis su akıntısı, süs çiçeği tarhı, çalı bordürü vb.). Her fırça darbesinde desen rastgele serpilir; iki darbe asla birebir aynı görünmez. Fırçanın kara sınırlarını aşmaması otomatik sağlanır. |
 | **Yükselti** | `U` | Yükseklik/elevation fırçası — sürükleyerek araziyi yükseltir; "Alçaltma modu" işaretliyken çukurlaştırır. Sonuç, gölgelendirme (hillshade) ve/veya kontur çizgileri olarak otomatik render edilir; ayarlanabilir kontur aralığı vardır. Efekt yalnızca kara üzerinde görünür — denizde asılı kalmaz. |
 | **Sembol** | `S` | ~200+ düz (ink-style) sembol ve onlarca izometrik bina/yapıdan (kale, kulübe, değirmen, köprü vb.) birini yerleştirir. Renk tonu (hue) ve "yıpranma/wear" (eskime lekesi) kaydırıcıları ile özelleştirilebilir; `[` / `]` ile döndürülür. **Fırça modu** açıkken sürükleyerek onlarca sembolü otomatik kümeleyerek dizer (orman/dağ sırası gibi); "Karaya kenetle" işaretliyken denize taşan noktalar otomatik atlanır ve sonradan deniz o bölgeye genişlerse sembol otomatik gizlenir. |
 | **Nehir** | `R` | Tıklayarak yol noktaları eklenen akarsu çizim aracı; kavis/meander ayarı vardır. `Enter` ile bitirilir. Nehir yalnızca kara üzerinde render edilir — denizden karaya çizilirse denizdeki kısmı görünmez, kıyıda doğal biter. |
@@ -77,6 +77,8 @@ Büyük bir dünya haritasından, bir şehrin veya bölgenin kendi ayrıntılı 
 3. Sol üstte beliren gezinme çubuğundaki **"◀ Geri"** ile bir üst haritaya dönülür.
 
 Bağlantı iğneleri yalnızca editör içi gezinme yardımcısıdır; PNG/SVG çıktısına dahil edilmez. `.json` proje dosyası tüm harita ağacını (dünya + tüm alt haritalar) tek seferde saklar.
+
+**İç mekân haritaları:** Aynı mekanizma bir binanın iç mekânına (oda, salon, avlu) geçmek için de kullanılabilir — ayrı bir "iç mekân modu" yok, sadece normal bir alt harita. Oda şeklini **Kara** fırçasıyla boyayıp, **Arazi** panelindeki iç mekân dokularından biriyle (Ahşap/Taş zemin, Saman zemin, Halı, Mağara zemini, Taş duvar) işleyin, ardından **Sembol** kütüphanesinin **Eşya** kategorisinden (yatak, masa, sandalye, sandık, kitaplık, şömine, kazan, dolap, kasa, halı, pencere, iç kapı, duvar meşalesi, silah rafı, taht, örs) mobilya yerleştirin. Kıyı parlaması (shore) iç mekânda istenmiyorsa sağ panelden kapatılabilir.
 
 ## Sağ panel — seçenekler
 
