@@ -32,6 +32,10 @@ iso.js → catalog.js → catalog2.js → symbols.js → i18n-names.js → histo
 
 This order matters: later files reference globals defined by earlier ones (e.g. `catalog2.js` pushes into `IsoCatalog.ITEMS` created by `catalog.js`; `Layers`, `Cv`, `Tools` etc. are read by `ui.js` and `app.js` at init time).
 
+### App shell (Homepage / Canvas / Tutorial / Community)
+
+`index.html` also contains a top-level app shell wrapping the editor: `#shell-nav` (four tabs) plus `#view-home`/`#view-canvas`/`#view-tutorial`/`#view-community`/`#view-editor`, each a `.shell-view` toggled by `UI.showView(name)` in `js/ui.js` (styling in `css/shell.css`). `App.init()` still runs unconditionally on load and fully initializes the editor (Layers/Cv/UI) — it's just hidden behind `#view-editor.hidden` until the user enters it via the Canvas tab (`display:contents` on `#view-editor` when active, so the editor's pre-existing viewport-relative absolute positioning is untouched by the wrapper). Switching into the editor calls `Cv.resize(); Cv.fit();` on the next frame, since the canvas reports 0×0 while hidden. There's no backend: the Canvas tab's "saved canvases" list is `localStorage` (`Exporter.LIB_KEY`, via `Exporter.libList/libSave/libOpen/libDelete`), separate from the `.json` export/import which remains the real backup/transfer path. `Exporter.buildProjectData()`/`applyProjectData(d)` are the shared serialize/deserialize core used by both the file-based flow and the `localStorage` library.
+
 Module responsibilities:
 - **`app.js`** — `App`, the single mutable state object (current tool, brush/terrain/symbol/river/road/label/scale/windrose settings). `App.init()` is the entry point, wired to `DOMContentLoaded`.
 - **`layers.js`** — `Layers` (the 10 raster/vector layers — land, terrain, elevation, territories, rivers, roads, symbols, labels, etc.) and `Terrain` (20 terrain type definitions: base/dark/mark colors, procedural scatter density, terrain-aware shore coloring, selectable shore style — sandy/rocky/reef). Terrain texture is generated per-brush-stroke, not tiled — no two strokes look identical. The `elevation` layer stores raw grayscale height (painted in `tools.js` via lighten/darken brush compositing); `Cv.buildElevationEffect()` derives a cached hillshade + contour-line overlay from it at render time (same lazy-rebuild-on-dirty pattern as the shore effect).
@@ -56,5 +60,5 @@ Coordinate space is 0–100, centered at (50,50).
 ### Key data-flow points
 
 - User input → `Tools` mutates `App.*` settings and/or writes into `Layers` (raster patches or vector object arrays) → `History` snapshots the change → `Cv` re-renders from `Layers` state.
-- Canvas is fixed at 2048×2048, set once in `App.init()`.
+- Canvas defaults to 2048×2048 at `App.init()`, but size is per-project: `Exporter.newProject(w, h, name)` (called from the Canvas tab's new-canvas form) accepts independent width/height.
 - Why Canvas 2D and not WebGL: raster layers are kept full-resolution in offscreen canvases and composited to screen with a single `drawImage` (browser already GPU-accelerates this); WebGL would add per-stroke shader cost and complicate the `getImageData`-based shore thresholding and SVG export.

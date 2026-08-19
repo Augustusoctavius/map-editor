@@ -18,6 +18,17 @@ npx http-server . -p 8000 -c-1 -o
 
 Tarayıcıda `http://localhost:8000/` adresini açın. **`index.html`'i doğrudan `file://` ile açmayın** — PNG/SVG dışa aktarım ve kıyı efekti `toDataURL`/`getImageData` kullanır, bu API'ler `file://` altında CORS tarafından engellenir.
 
+## Karşılama sayfası
+
+Uygulama artık düz editör yerine, üstte dört sekmeli bir karşılama ekranıyla açılır:
+
+- **Ana Sayfa** — proje tanıtımı ve "Haritana başla" butonu.
+- **Tuval** — hazır ölçülerden veya özel genişlik/yükseklikten yeni bir tuval oluşturur, `.json` dosyasından proje içe aktarır, ve bu tarayıcıda daha önce kaydedilmiş tuvalleri listeler (açma/silme). Kayıtlar tarayıcının `localStorage`'ında tutulur — backend yoktur, bu yüzden başka bir cihazdan görünmez; gerçek yedekleme/taşıma için hâlâ `.json` dışa/içe aktarma kullanılır. Editördeki "Kaydet" butonu `.json` indirmeye ek olarak bu listeyi de otomatik günceller.
+- **Rehber** — sol araç çubuğundaki her aracın kısa açıklaması.
+- **Topluluk** — proje hakkında ve GitHub bağlantısı.
+
+Bir tuval oluşturulduğunda veya açıldığında, bildiğiniz editör ekranına geçilir; sol üstteki 🏠 ile karşılama ekranına dönülür.
+
 ## Üst araç çubuğu
 
 | Buton | İşlev |
