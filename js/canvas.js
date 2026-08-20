@@ -410,7 +410,11 @@
     buildElevationEffect: function () {
       var Lv = Layers.get('elevation');
       if (!Lv || !Lv.canvas) return null;
-      var MAX = 1024;
+      /* Bu efekt dirty-flag ile tembel yeniden hesaplanıyor (her karede değil,
+         sadece yükselti değiştiğinde) — bu yüzden sınırı düşük tutmaya gerek
+         yok. Eski 1024 sınırı standart 2048² tuvalde 2x küçültüp geri
+         büyütüyordu, bu da yakınlaştırınca bulanık/pikselli görünüyordu. */
+      var MAX = 2048;
       var W = this.W, H = this.H;
       var sc = Math.min(1, MAX/Math.max(W,H));
       var sw = Math.max(1, Math.round(W*sc)), sh = Math.max(1, Math.round(H*sc));
@@ -914,13 +918,34 @@
        yumuşak radyal leke üst üste bindirilir. Her leke farklı konum,
        boyut ve saydamlıkta; toplamı düzensiz, bulutsu bir dağılım verir.
        Deterministik seed → her render'da aynı görünüm.               */
-    _drawRiverPlume: function (ctx, o, crossing, fullPts, col, wEnd) {
+    _drawRiverPlume: function (realCtx, o, crossing, fullPts, col, wEnd) {
       var mouth = crossing.point;
       var prevIdx = (crossing.prevIndex !== undefined) ? crossing.prevIndex : Math.max(0, crossing.index - 1);
       var prevPt = fullPts[prevIdx];
       var dx = mouth[0]-prevPt[0], dy = mouth[1]-prevPt[1];
       var dlen = Math.hypot(dx,dy) || 1; dx/=dlen; dy/=dlen;
       var nx = -dy, ny = dx;
+
+      /* Onlarca yarı-saydam leke normal source-over ile üst üste
+         bindiğinde, ağız çevresinde kümülatif alfa hızla 1.0'a
+         yaklaşıyor — bulutsu bir sis yerine denizin dokusunu tamamen
+         örten OPAK bir yama gibi görünüyor (kullanıcı geri bildirimi:
+         "nehir haritadaki ana sudan ayrı duruyor"). Bunu önlemek için
+         tüm lekeler önce ayrı bir scratch canvas'a çizilip, gerçek
+         ctx'e TEK bir üst sınır alfasıyla (cap) composite ediliyor —
+         böylece en yoğun noktada bile altındaki okyanus dokusu bir
+         miktar görünür kalıyor, sert/opak bir yama oluşmuyor. */
+      var boxR = Math.ceil(wEnd * 4.2 * 1.35 + wEnd * 9);
+      var bx = Math.max(0, Math.floor(mouth[0] - boxR));
+      var by = Math.max(0, Math.floor(mouth[1] - boxR));
+      var bw = Math.min(this.W - bx, boxR * 2);
+      var bh = Math.min(this.H - by, boxR * 2);
+      if (bw <= 0 || bh <= 0) return;
+      var scratch = this._getScratchCanvas('plume', bw, bh);
+      var ctx = scratch.getContext('2d');
+      ctx.clearRect(0, 0, bw, bh);
+      ctx.save();
+      ctx.translate(-bx, -by);
 
       /* deterministik pseudo-random (nehir id + index seed) */
       var seedBase = 0;
@@ -991,7 +1016,16 @@
       ctx.arc(mouth[0], mouth[1], coreR, 0, Math.PI*2);
       ctx.fill();
 
-      ctx.restore();
+      ctx.restore(); /* globalCompositeOperation save (line ~967) */
+      ctx.restore(); /* translate save (line ~943) */
+
+      /* scratch'i gerçek tuvale TEK seferde, üst sınırlı bir alfa
+         ile composite et — altındaki okyanus dokusu her zaman bir
+         miktar görünür kalsın diye. */
+      realCtx.save();
+      realCtx.globalAlpha = 0.82;
+      realCtx.drawImage(scratch, 0, 0, bw, bh, bx, by, bw, bh);
+      realCtx.restore();
     },
 
     /* ---------- göl yardımcısı: köşe yumuşatma (Chaikin) ----------

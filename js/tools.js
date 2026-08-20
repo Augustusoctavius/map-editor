@@ -574,6 +574,7 @@
       this.activeLayerId = layerId;
       this.last = p;
       this.box = { x0:p.x, y0:p.y, x1:p.x, y1:p.y };
+      this._terrainDensityScale = 1; /* tek tıkla damga: tam yoğunluk */
 
       this.beforeMain = snap(layer.canvas);
       this.beforeAux = null;
@@ -594,6 +595,9 @@
       var step = Math.max(1.5, r * 0.26);
       var dx = p.x-this.last.x, dy = p.y-this.last.y;
       var n = Math.max(1, Math.ceil(Math.hypot(dx,dy)/step));
+      /* arazi fırçasında damgalar arası %74 çakışma var — her damganın
+         mark kotasını bu çakışmaya göre küçült (bkz. Terrain.scatter). */
+      if (this.mode === 'terrain') this._terrainDensityScale = Math.min(1, step / Math.max(1, r));
       for (var i=1; i<=n; i++) this.stamp(this.last.x+dx*i/n, this.last.y+dy*i/n);
       this.last = p;
     },
@@ -613,14 +617,14 @@
         var tmp2 = scratchCanvas('terrain', bw2, bh2);
         var tmpCtx2 = tmp2.getContext('2d');
         tmpCtx2.translate(-bx2, -by2);
-        Terrain.scatter(tmpCtx2, App.terrain.type, x, y, r, App.terrain.opacity);
+        Terrain.scatter(tmpCtx2, App.terrain.type, x, y, r, App.terrain.opacity, this._terrainDensityScale);
         tmpCtx2.setTransform(1,0,0,1,0,0);
         tmpCtx2.globalCompositeOperation = 'destination-in';
         tmpCtx2.drawImage(Lm.canvas, bx2, by2, bw2, bh2, 0, 0, bw2, bh2);
         tmpCtx2.globalCompositeOperation = 'source-over';
         ctx.drawImage(tmp2, 0, 0, bw2, bh2, bx2, by2, bw2, bh2);
       } else {
-        Terrain.scatter(ctx, App.terrain.type, x, y, r, App.terrain.opacity);
+        Terrain.scatter(ctx, App.terrain.type, x, y, r, App.terrain.opacity, this._terrainDensityScale);
       }
       this.expandBox(x, y, r + pad2);
     },

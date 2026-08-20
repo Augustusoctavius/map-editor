@@ -140,6 +140,9 @@ textarea{font-family:var(--f-display);font-size:13px}
 .li-btn{background:none;border:0;cursor:pointer;color:var(--text-dim);font-size:13px;padding:0 2px;line-height:1}
 .li-btn:hover{color:var(--brass)}
 .li-btn.off{color:#5a6259}
+.li-grip{cursor:grab;color:var(--text-dim);font-size:13px;line-height:1;padding:0 1px;flex:none;user-select:none}
+.li-grip:hover{color:var(--brass)}
+.li-grip:active{cursor:grabbing}
 .layer-op{width:100%;margin-top:4px}
 .layer-blend{width:100%;margin-top:4px;font-size:10.5px;background:var(--ink-800);border:1px solid var(--line);border-radius:3px;color:var(--text-dim);padding:2px 4px}
 .layer-extra{border-top:1px solid var(--line);padding-top:10px}
