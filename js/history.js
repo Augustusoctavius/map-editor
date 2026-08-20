@@ -131,6 +131,18 @@
       });
     },
 
+    /* ---- kullanıcı katmanı ekleme/silme ----
+       snap: Layers.snapshotLayer() çıktısı — id, sıradaki konum, tam kanvas
+       içeriği ve meta. add'in undo'su remove'un redo'suyla, remove'un
+       undo'su add'in redo'suyla aynı işlemi yapar; tek entry ikisini kapsar. */
+    pushLayerAdd: function (snap, label) {
+      this.push({ kind:'layerAdd', label:label || 'layer:add', snap: JSON.stringify(snap) });
+    },
+
+    pushLayerRemove: function (snap, label) {
+      this.push({ kind:'layerRemove', label:label || 'layer:remove', snap: JSON.stringify(snap) });
+    },
+
     _applyPatch: function (layerId, dataURL, x, y, w, h) {
       var layer = Layers.get(layerId);
       if (!layer || !layer.canvas) return Promise.resolve();
@@ -194,6 +206,19 @@
 
       if (entry.kind === 'windrose') {
         if (global.App) App.windrose = JSON.parse(entry[pick]);
+        return Promise.resolve();
+      }
+
+      if (entry.kind === 'layerAdd') {
+        var snapA = JSON.parse(entry.snap);
+        if (dir === 'undo') { Layers.removeById(snapA.id); return Promise.resolve(); }
+        return Layers.restoreLayer(snapA);
+      }
+
+      if (entry.kind === 'layerRemove') {
+        var snapR = JSON.parse(entry.snap);
+        if (dir === 'undo') return Layers.restoreLayer(snapR);
+        Layers.removeById(snapR.id);
         return Promise.resolve();
       }
 

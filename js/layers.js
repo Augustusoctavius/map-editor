@@ -798,6 +798,50 @@
       return true;
     },
 
+    /* ---------- katman ekle/sil geri alma ----------
+       Tam katman anlık görüntüsü (id, sıradaki konumu, kanvas içeriği,
+       meta) — History bunu 'layerAdd'/'layerRemove' adımlarında saklar.
+       pushMeta'nın aksine katmanın kendisini yeniden yaratabilir. */
+    snapshotLayer: function(l){
+      return {
+        id:l.id, name:l.name, index:this.indexOf(l.id),
+        visible:l.visible, locked:l.locked, opacity:l.opacity, blend:l.blend,
+        dataURL: l.canvas.toDataURL('image/png')
+      };
+    },
+
+    /* snap'ten katmanı yeniden kurup kaydedilen index'e sokar; Promise
+       kanvas görseli yüklendiğinde katmanla çözülür. */
+    restoreLayer: function(snap){
+      var self = this;
+      return new Promise(function(res){
+        var im = new Image();
+        im.onload = function(){
+          var c = document.createElement('canvas');
+          c.width = im.naturalWidth; c.height = im.naturalHeight;
+          c.getContext('2d').drawImage(im, 0, 0);
+          var l = { id:snap.id, type:'raster', custom:true,
+                    name:snap.name, tr:snap.name, en:snap.name,
+                    visible:snap.visible, locked:snap.locked,
+                    opacity:snap.opacity, blend:snap.blend,
+                    canvas:c, ctx:c.getContext('2d'), objects:[], image:null, imageData:null };
+          var at = Math.max(0, Math.min(snap.index, self.list.length));
+          self.list.splice(at, 0, l);
+          self.active = l.id;
+          res(l);
+        };
+        im.src = snap.dataURL;
+      });
+    },
+
+    removeById: function(id){
+      var idx = this.indexOf(id);
+      if(idx<0) return false;
+      this.list.splice(idx, 1);
+      if(this.active===id) this.active='landmass';
+      return true;
+    },
+
     rename: function(id, name){
       var l=this.get(id);
       if(!l || !l.custom) return false;

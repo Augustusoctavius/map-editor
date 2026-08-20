@@ -79,8 +79,10 @@ layer the incoming document doesn't have — the active document must end up exa
 The `sketch` tool paints into them (`Tools.startRaster(activeId, p, 'sketch')`, a soft round dab honouring
 `App.sketch.{color,size,hardness,opacity,eraser}`), and it refuses to run unless the active layer is a custom
 one — free paint on `landmass` or `elevation` would corrupt what those layers mean (a land mask, a grayscale
-height field). Adding and deleting layers is **not** undoable — `History.pushMeta` round-trips through
-`Layers.meta()`, which carries only id/visible/locked/opacity/blend — so deletion is confirm-gated.
+height field). Adding and deleting layers **is** undoable via dedicated `layerAdd`/`layerRemove` History entries
+(`Layers.snapshotLayer`/`restoreLayer`/`removeById`) — separate from `pushMeta`, which only round-trips
+id/visible/locked/opacity/blend and can't resurrect a deleted layer. Deletion is still confirm-gated since it's
+destructive within the session even though it's now reversible via Ctrl+Z.
 
 ### Multi-map (region links) and interior maps
 
