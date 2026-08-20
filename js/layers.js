@@ -567,34 +567,52 @@
     ];
   }
 
-  function buildShoreCanvas(landCanvas, terrainCanvas, shoreWidth, W, H, style) {
+  /* Kıyı hesabı için yeniden kullanılan çalışma tuvalleri. Eskiden her
+     çağrıda dört tuval tahsis ediliyordu; fırça sürüklenirken bu saniyede
+     onlarca kez tekrarlanıyordu. */
+  var _shoreScratch = {};
+  function shoreScratch(key, w, h) {
+    var c = _shoreScratch[key];
+    if (!c) { c = _shoreScratch[key] = document.createElement('canvas'); }
+    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+    return c;
+  }
+
+  function buildShoreCanvas(landCanvas, terrainCanvas, shoreWidth, W, H, style, preScaled) {
     var cfg = SHORE_STYLES[style] || SHORE_STYLES.sandy;
     var MAX = 1024;
     var sc  = Math.min(1, MAX/Math.max(W,H));
     var sw  = Math.max(1,Math.round(W*sc)), sh = Math.max(1,Math.round(H*sc));
     var bw  = Math.max(2, Math.round(shoreWidth*sc));
 
-    /* --- kara silüetini bulanıklaştır → kıyı maskesi --- */
-    var maskC = document.createElement('canvas'); maskC.width=sw; maskC.height=sh;
+    /* --- kara küçük kopyası: TAM BOYUTTAN YALNIZCA BİR KEZ küçültülür --- */
+    var lC = shoreScratch('land', sw, sh);
+    var lctx = lC.getContext('2d',{willReadFrequently:true});
+    lctx.clearRect(0,0,sw,sh);
+    /* preScaled: kaynak zaten sw×sh küçük ayna — yeniden ölçekleme yok */
+    if (preScaled) lctx.drawImage(landCanvas,0,0);
+    else           lctx.drawImage(landCanvas,0,0,sw,sh);
+    var lData = lctx.getImageData(0,0,sw,sh).data;
+
+    /* --- kıyı maskesi: bulanıklaştırma artık 8192² özgün tuvalden değil,
+       yukarıdaki küçük kopyadan besleniyor (görsel sonuç aynı) --- */
+    var maskC = shoreScratch('mask', sw, sh);
     var mctx  = maskC.getContext('2d',{willReadFrequently:true});
+    mctx.clearRect(0,0,sw,sh);
     mctx.filter='blur('+(bw*cfg.blurMul).toFixed(1)+'px)';
-    mctx.drawImage(landCanvas,0,0,sw,sh);
-    mctx.drawImage(landCanvas,0,0,sw,sh);
+    mctx.drawImage(lC,0,0);
+    mctx.drawImage(lC,0,0);
     mctx.filter='none';
 
     var maskData = mctx.getImageData(0,0,sw,sh).data;
 
     /* --- terrain thumbnail --- */
-    var tC = document.createElement('canvas'); tC.width=sw; tC.height=sh;
+    var tC = shoreScratch('terr', sw, sh);
     var tctx = tC.getContext('2d',{willReadFrequently:true});
-    tctx.drawImage(terrainCanvas,0,0,sw,sh);
+    tctx.clearRect(0,0,sw,sh);
+    if (preScaled) tctx.drawImage(terrainCanvas,0,0);
+    else           tctx.drawImage(terrainCanvas,0,0,sw,sh);
     var tData = tctx.getImageData(0,0,sw,sh).data;
-
-    /* --- land thumbnail --- */
-    var lC = document.createElement('canvas'); lC.width=sw; lC.height=sh;
-    var lctx = lC.getContext('2d',{willReadFrequently:true});
-    lctx.drawImage(landCanvas,0,0,sw,sh);
-    var lData = lctx.getImageData(0,0,sw,sh).data;
 
     /* --- çıktı: her "kıyı" pikseli için renk belirle --- */
     var out  = mctx.createImageData(sw,sh);

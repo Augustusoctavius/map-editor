@@ -297,14 +297,14 @@
       if (this.panning && this.panStart) {
         Cv.panX = this.panStart.px + (e.clientX-this.panStart.x);
         Cv.panY = this.panStart.py + (e.clientY-this.panStart.y);
-        Cv.requestRender();
+        Cv.requestViewRender();
         return;
       }
 
       if (this.lasso && this.lasso.dragging) {
         var lpts = this.lasso.pts, lastP = lpts[lpts.length-1];
         if (Math.hypot(p.x-lastP[0], p.y-lastP[1]) >= 4) lpts.push([p.x, p.y]);
-        Cv.requestRender();
+        Cv.requestViewRender();
         return;
       }
 
@@ -312,7 +312,7 @@
         var frd = this.floatRotateDrag, f0 = this.floating;
         var cx0 = f0.center.x+f0.ox, cy0 = f0.center.y+f0.oy;
         f0.rot = frd.baseRot + (Math.atan2(p.y-cy0, p.x-cx0) - frd.baseAngle);
-        Cv.requestRender();
+        Cv.requestViewRender();
         return;
       }
 
@@ -375,20 +375,23 @@
         App.eyedrop.radius = Math.max(8, ed);
         var el = $('eye-r'); if (el) el.value = Math.min(400, Math.round(ed));
         var vl = $('v-eye-r'); if (vl) vl.textContent = Math.min(400, Math.round(ed));
-        Cv.requestRender();
+        Cv.requestViewRender();
         return;
       }
 
       if (this.measureFrom) {
         this.measureTo = p;
-        Cv.requestRender();
+        Cv.requestViewRender();
         return;
       }
 
       if (this.painting) {
+        var _prev = this.last;
         if (this.mode === 'eyedrop') this.eyedropStrokeTo(p);
         else this.strokeTo(p);
-        Cv.requestRender();
+        /* yalnızca vuruşun dokunduğu dikdörtgeni yeniden beste — tüm
+           haritayı yeniden kurmak yerine (bkz. Cv.ensureComposite) */
+        Cv.requestRender(this._strokeRect(_prev, p));
         return;
       }
 
@@ -627,6 +630,25 @@
         Terrain.scatter(ctx, App.terrain.type, x, y, r, App.terrain.opacity, this._terrainDensityScale);
       }
       this.expandBox(x, y, r + pad2);
+    },
+
+    /* Bir fırça hareketinin görsel olarak etkilediği dikdörtgen.
+       Kara fırçası kıyı efektini, yükselti fırçası gölgelendirmeyi de
+       değiştirir; bu efektler fırçanın biraz dışına taştığı için pay
+       eklenir. Arazi fırçası hiçbir global önbelleği etkilemez. */
+    _strokeRect: function (a, b) {
+      if (!a) a = b;
+      var r = (this.mode === 'terrain'   ? App.terrain.size :
+               this.mode === 'elevation' ? App.elevation.brushSize :
+               this.mode === 'eyedrop'   ? App.eyedrop.radius * 2 :
+                                           App.brush.size) / 2;
+      var pad = r + 8;
+      if (this.mode === 'paint' || this.mode === 'erase') pad += (Cv.shoreWidth || 26) + 24;
+      else if (this.mode === 'elevation') pad += 32;
+      return {
+        x0: Math.min(a.x, b.x) - pad, y0: Math.min(a.y, b.y) - pad,
+        x1: Math.max(a.x, b.x) + pad, y1: Math.max(a.y, b.y) + pad
+      };
     },
 
     expandBox: function (x, y, r) {

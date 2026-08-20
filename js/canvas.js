@@ -298,7 +298,7 @@
       this.view.width = Math.max(1, Math.round(r.width * this.dpr));
       this.view.height = Math.max(1, Math.round(r.height * this.dpr));
       this.vw = r.width; this.vh = r.height;
-      this.requestRender();
+      this.requestViewRender();
     },
 
     setSize: function (w, h, keep) {
@@ -316,7 +316,7 @@
       this.zoom = s;
       this.panX = (this.vw - this.W*s)/2;
       this.panY = (this.vh - this.H*s)/2;
-      this.requestRender();
+      this.requestViewRender();
     },
 
     setZoom: function (z, cx, cy) {
@@ -326,13 +326,13 @@
       this.zoom = z;
       this.panX = cx - mx*z;
       this.panY = cy - my*z;
-      this.requestRender();
+      this.requestViewRender();
       if (global.UI) UI.status();
     },
 
     panBy: function (dx, dy) {
       this.panX += dx; this.panY += dy;
-      this.requestRender();
+      this.requestViewRender();
     },
 
     screenToMap: function (sx, sy) { return { x:(sx-this.panX)/this.zoom, y:(sy-this.panY)/this.zoom }; },
@@ -357,22 +357,248 @@
       return c;
     },
 
-    requestRender: function () {
+    /* ================= KOMPOZİT ÖNBELLEK =================
+       renderMap() tüm katmanları tuval boyutunda besteler; pan/zoom bunu
+       değiştirmez, yalnızca görüntü dönüşümünü değiştirir. Bu yüzden
+       besteyi bir kez mapCanvas'a yazıp her karede sadece GÖRÜNEN
+       dikdörtgeni blit ediyoruz. Kare maliyeti tuvalin değil ekranın
+       alanıyla orantılı hâle geliyor.
+
+       Güvenlik için varsayılan taraf "kirli": requestRender() içeriği
+       geçersiz kılar, yani bir düzenleme yolunu işaretlemeyi unutmak
+       bayat harita üretemez — yalnızca gereksiz yeniden beste yapar.
+       Sıcak görüntü yolları (pan/zoom/imleç) requestViewRender() ile
+       açıkça hızlı tarafı seçer. */
+    mapCanvas: null,
+    mapDirty: true,
+    mapDirtyRect: null,
+
+    /* ÖLÇEK KADEMESİ (LOD): sığdırma zumunda tüm harita görünür olduğu için
+       kırpma işe yaramaz — 8192² bir besteyi her karede ~800px'e küçültmek
+       kare başına 67 milyon kaynak pikseli örneklemek demek. Bunun yerine
+       küçültülmüş bir kopya tutup düşük zumda ondan blit ediyoruz. */
+    mapLod: null,
+    LOD_MAX: 2048,
+
+    /* PAHALI EFEKT KISITLAMASI: kıyı parlaması ve yükselti gölgelendirmesi
+       tüm siluet üzerinden yeniden hesaplanır (2048²'de ~145 ms). Fırça
+       sürüklenirken bunu her karede yapmak kareyi 5 fps'e düşürüyordu.
+       Vuruş sürerken en fazla FX_THROTTLE_MS'de bir yeniden kuruyoruz;
+       dirty bayrağı temizlenmediği için vuruş biter bitmez tam doğru
+       hâline geliyor. */
+    _fxAt: 0,
+    _fxCost: 0,
+    _fxStart: 0,
+    FX_THROTTLE_MS: 130,
+
+    /* Bekleme süresi ölçülen maliyete göre kendini ayarlar: efekt ne kadar
+       pahalıysa o kadar seyrek kurulur. Böylece 1024²'de neredeyse anlık,
+       8192²'de ise kareyi boğmayacak sıklıkta çalışır — sabit bir eşik
+       ayarlamaya gerek kalmaz. */
+    _fxThrottled: function () {
+      if (!global.Tools || !Tools.painting) return false;
+      var now = performance.now();
+      var wait = Math.max(this.FX_THROTTLE_MS, this._fxCost * 5);
+      if (now - this._fxAt < wait) return true;
+      this._fxAt = now;
+      this._fxStart = now;
+      return false;
+    },
+
+    _fxDone: function () {
+      if (this._fxStart) {
+        this._fxCost = performance.now() - this._fxStart;
+        this._fxStart = 0;
+      }
+    },
+
+    /* içerik değişti — tüm besteyi (veya verilen dikdörtgeni) yenile */
+    requestRender: function (rect) {
+      if (rect) this._addDirtyRect(rect);
+      else { this.mapDirty = true; this.mapDirtyRect = null; }
+      this.requestViewRender();
+    },
+
+    /* yalnızca görüntü değişti (pan / zoom / imleç) — besteye dokunma */
+    requestViewRender: function () {
       var self = this;
       if (this._raf) return;
       this._raf = requestAnimationFrame(function () { self._raf = 0; self.render(); });
+    },
+
+    _addDirtyRect: function (r) {
+      if (this.mapDirty) return;            /* zaten tamamı yenilenecek */
+      var d = this.mapDirtyRect;
+      if (!d) { this.mapDirtyRect = { x0:r.x0, y0:r.y0, x1:r.x1, y1:r.y1 }; return; }
+      if (r.x0 < d.x0) d.x0 = r.x0;
+      if (r.y0 < d.y0) d.y0 = r.y0;
+      if (r.x1 > d.x1) d.x1 = r.x1;
+      if (r.y1 > d.y1) d.y1 = r.y1;
+    },
+
+    ensureComposite: function () {
+      var c = this.mapCanvas;
+      if (!c || c.width !== this.W || c.height !== this.H) {
+        c = this.mapCanvas = document.createElement('canvas');
+        c.width = this.W; c.height = this.H;
+        this.mapDirty = true; this.mapDirtyRect = null;
+      }
+      if (!this.mapDirty && !this.mapDirtyRect) return c;
+
+      var mctx = c.getContext('2d');
+      mctx.setTransform(1,0,0,1,0,0);
+
+      if (this.mapDirty) {
+        this._syncMini(null);
+        mctx.clearRect(0, 0, this.W, this.H);
+        this.renderMap(mctx, { includeReference:true, trace:true });
+      } else {
+        /* kısmi yenileme: fırça vuruşu gibi yerel değişikliklerde yalnızca
+           etkilenen dikdörtgen yeniden bestelenir */
+        var d = this.mapDirtyRect;
+        var x0 = Math.max(0, Math.floor(d.x0)), y0 = Math.max(0, Math.floor(d.y0));
+        var x1 = Math.min(this.W, Math.ceil(d.x1)), y1 = Math.min(this.H, Math.ceil(d.y1));
+        if (x1 > x0 && y1 > y0) {
+          this._syncMini({ x0:x0, y0:y0, x1:x1, y1:y1 });
+          mctx.save();
+          mctx.beginPath();
+          mctx.rect(x0, y0, x1-x0, y1-y0);
+          mctx.clip();
+          mctx.clearRect(x0, y0, x1-x0, y1-y0);
+          /* renderMap içindeki yardımcı scratch tuvalleri (nehir/yol kara
+             kırpması) ayrı yüzeylerde çalışır; ctx clip'i onları bağlamaz.
+             Bu yüzden etkin dikdörtgeni ayrıca duyuruyoruz. */
+          this._clipRect = { x:x0, y:y0, w:x1-x0, h:y1-y0 };
+          this.renderMap(mctx, { includeReference:true, trace:true });
+          this._clipRect = null;
+          mctx.restore();
+        }
+      }
+      this._lodSync(this.mapDirty ? null : this.mapDirtyRect);
+      this.mapDirty = false;
+      this.mapDirtyRect = null;
+      return c;
+    },
+
+    /* KÜÇÜK AYNALAR: kıyı hesabı kara ve arazi katmanının küçültülmüş
+       hâlini ister. Eskiden her çağrıda tam boyuttan küçültülüyordu —
+       8192²'de tek bir kıyı yenilemesi 67 milyon kaynak piksel okumak
+       demekti. Bunun yerine 1024²'lik aynaları fırçanın dokunduğu
+       dikdörtgen kadar artımlı güncelliyoruz. */
+    MINI_MAX: 1024,
+    _miniScale: 1,
+
+    /* Birikim: kirli dikdörtgeni sakla, işi kıyı gerçekten kurulana ertele.
+       Arazi fırçası kıyıyı bayatlatmadığı için o vuruşlarda hiç bedel ödenmez. */
+    _miniDirty: null,
+    _miniAll: true,
+
+    _syncMini: function (rect) {
+      if (!rect) { this._miniAll = true; this._miniDirty = null; return; }
+      if (this._miniAll) return;
+      var d = this._miniDirty;
+      if (!d) { this._miniDirty = { x0:rect.x0, y0:rect.y0, x1:rect.x1, y1:rect.y1 }; return; }
+      if (rect.x0 < d.x0) d.x0 = rect.x0;
+      if (rect.y0 < d.y0) d.y0 = rect.y0;
+      if (rect.x1 > d.x1) d.x1 = rect.x1;
+      if (rect.y1 > d.y1) d.y1 = rect.y1;
+    },
+
+    _miniFlush: function () {
+      var rect = this._miniAll ? null : this._miniDirty;
+      if (!this._miniAll && !rect) return;      /* değişiklik yok */
+      this._miniAll = false; this._miniDirty = null;
+      var sc = Math.min(1, this.MINI_MAX / Math.max(this.W, this.H));
+      var sw = Math.max(1, Math.round(this.W*sc)), sh = Math.max(1, Math.round(this.H*sc));
+      this._miniScale = sc;
+      var self = this;
+      ['landmass','terrain'].forEach(function (id) {
+        var L = Layers.get(id);
+        if (!L || !L.canvas) return;
+        var key = '_mini_' + id;
+        var m = self[key], fresh = false;
+        if (!m || m.width !== sw || m.height !== sh) {
+          m = self[key] = document.createElement('canvas');
+          m.width = sw; m.height = sh; fresh = true;
+        }
+        var c = m.getContext('2d');
+        c.setTransform(1,0,0,1,0,0);
+        c.globalCompositeOperation = 'source-over';
+        if (fresh || !rect) {
+          c.clearRect(0,0,sw,sh);
+          c.drawImage(L.canvas, 0, 0, sw, sh);
+          return;
+        }
+        var x0 = Math.max(0, Math.floor(rect.x0)), y0 = Math.max(0, Math.floor(rect.y0));
+        var x1 = Math.min(self.W, Math.ceil(rect.x1)), y1 = Math.min(self.H, Math.ceil(rect.y1));
+        if (x1 <= x0 || y1 <= y0) return;
+        var dx = Math.floor(x0*sc), dy = Math.floor(y0*sc);
+        var dw = Math.ceil((x1-x0)*sc)+1, dh = Math.ceil((y1-y0)*sc)+1;
+        c.clearRect(dx, dy, dw, dh);
+        c.drawImage(L.canvas, x0, y0, x1-x0, y1-y0, dx, dy, dw, dh);
+      });
+    },
+
+    /* LOD'u besteyle eşitle. rect verilirse yalnızca o bölge güncellenir —
+       fırça vuruşu sırasında tüm haritayı yeniden küçültmemek için. */
+    _lodSync: function (rect) {
+      var scale = Math.min(1, this.LOD_MAX / Math.max(this.W, this.H));
+      if (scale >= 1) { this.mapLod = null; return; }   /* küçük tuval: gerek yok */
+      var lw = Math.max(1, Math.round(this.W * scale));
+      var lh = Math.max(1, Math.round(this.H * scale));
+      var l = this.mapLod;
+      var fresh = false;
+      if (!l || l.width !== lw || l.height !== lh) {
+        l = this.mapLod = document.createElement('canvas');
+        l.width = lw; l.height = lh;
+        l._scale = scale;
+        fresh = true;
+      }
+      var lctx = l.getContext('2d');
+      lctx.setTransform(1,0,0,1,0,0);
+      if (fresh || !rect) {
+        lctx.clearRect(0, 0, lw, lh);
+        lctx.drawImage(this.mapCanvas, 0, 0, lw, lh);
+        return;
+      }
+      /* kısmi: dikdörtgeni ölçekleyip yalnızca o parçayı tazele */
+      var x0 = Math.max(0, Math.floor(rect.x0)), y0 = Math.max(0, Math.floor(rect.y0));
+      var x1 = Math.min(this.W, Math.ceil(rect.x1)), y1 = Math.min(this.H, Math.ceil(rect.y1));
+      if (x1 <= x0 || y1 <= y0) return;
+      var dx = Math.floor(x0*scale), dy = Math.floor(y0*scale);
+      var dw = Math.ceil((x1-x0)*scale) + 1, dh = Math.ceil((y1-y0)*scale) + 1;
+      lctx.clearRect(dx, dy, dw, dh);
+      lctx.drawImage(this.mapCanvas, x0, y0, x1-x0, y1-y0, dx, dy, dw, dh);
+    },
+
+    /* ekranda görünen harita dikdörtgeni (harita koordinatlarında) */
+    visibleMapRect: function () {
+      var x0 = -this.panX / this.zoom;
+      var y0 = -this.panY / this.zoom;
+      var x1 = x0 + this.vw / this.zoom;
+      var y1 = y0 + this.vh / this.zoom;
+      x0 = Math.max(0, Math.floor(x0)); y0 = Math.max(0, Math.floor(y0));
+      x1 = Math.min(this.W, Math.ceil(x1)); y1 = Math.min(this.H, Math.ceil(y1));
+      return { x0:x0, y0:y0, x1:x1, y1:y1, w:x1-x0, h:y1-y0 };
     },
 
     /* ---------- KIYI EFEKTİ ----------
        Kara silüetini bulanıklaştırıp açık kum/sığ su tonunda
        birkaç halka olarak karanın altına çizer.                */
     buildShore: function () {
+      /* vuruş sürerken kısıtla — dirty bayrağı korunur, vuruş bitince kurulur */
+      if (this._fxThrottled() && this.shoreCanvas) return this.shoreCanvas;
       var L = Layers.get('landmass');
       var T = Layers.get('terrain');
       if (!L || !L.canvas) return null;
+      this._miniFlush();
+      if (!this._mini_landmass) { this._miniAll = true; this._miniFlush(); }
+      var miniL = this._mini_landmass || L.canvas;
+      var miniT = this._mini_terrain || (T ? T.canvas : L.canvas);
       var result = Terrain.buildShoreCanvas(
-        L.canvas, T ? T.canvas : L.canvas,
-        this.shoreWidth, this.W, this.H, this.shoreStyle
+        miniL, miniT,
+        this.shoreWidth, this.W, this.H, this.shoreStyle,
+        !!this._mini_landmass
       );
       this.shoreCanvas = result.canvas;
       this._shoreScW   = result.sw;
@@ -389,6 +615,7 @@
       sctx.drawImage(L.canvas, 0, 0, LS, LS);
       this.landSample = { data: sctx.getImageData(0,0,LS,LS).data, size: LS, scale: LS / this.W };
 
+      this._fxDone();
       return result.canvas;
     },
 
@@ -408,6 +635,7 @@
        önbelleğe alınmış katman olarak terrain'in üstüne, diğer
        nesnelerin altına bindirilir — kıyı efektiyle aynı mimari. */
     buildElevationEffect: function () {
+      if (this._fxThrottled() && this.elevationCanvas) return this.elevationCanvas;
       var Lv = Layers.get('elevation');
       if (!Lv || !Lv.canvas) return null;
       /* Bu efekt dirty-flag ile tembel yeniden hesaplanıyor (her karede değil,
@@ -419,8 +647,11 @@
       var sc = Math.min(1, MAX/Math.max(W,H));
       var sw = Math.max(1, Math.round(W*sc)), sh = Math.max(1, Math.round(H*sc));
 
-      var tC = document.createElement('canvas'); tC.width = sw; tC.height = sh;
+      var tC = this._getScratchCanvas('elevfx', sw, sh);
       var tctx = tC.getContext('2d', { willReadFrequently:true });
+      tctx.setTransform(1,0,0,1,0,0);
+      tctx.globalCompositeOperation = 'source-over';
+      tctx.clearRect(0, 0, sw, sh);
       tctx.drawImage(Lv.canvas, 0, 0, sw, sh);
       var data = tctx.getImageData(0, 0, sw, sh).data;
 
@@ -474,6 +705,7 @@
 
       this.elevationCanvas = tC;
       this.elevationDirty = false;
+      this._fxDone();
       return tC;
     },
 
@@ -483,6 +715,10 @@
       ctx.setTransform(1,0,0,1,0,0);
       ctx.clearRect(0, 0, this.view.width, this.view.height);
       ctx.setTransform(this.dpr,0,0,this.dpr,0,0);
+
+      /* beste yalnızca içerik değiştiğinde yeniden kurulur */
+      var comp = this.ensureComposite();
+
       ctx.save();
       ctx.translate(this.panX, this.panY);
       ctx.scale(this.zoom, this.zoom);
@@ -494,13 +730,25 @@
       ctx.fillRect(0, 0, this.W, this.H);
       ctx.restore();
 
-      this.renderMap(ctx, { includeReference:true, trace:true });
+      /* GÖRÜNÜR ALAN KIRPMASI: haritanın yalnızca ekrana düşen parçası
+         blit edilir; 8192² bir tuvalde bile maliyet ekran alanı kadardır.
+         Düşük zumda kaynak olarak küçültülmüş LOD kullanılır — aynı ekran
+         sonucunu üretir ama örneklenen kaynak piksel sayısı çok azdır. */
+      var v = this.visibleMapRect();
+      if (v.w > 0 && v.h > 0) {
+        var src = comp, k = 1;
+        var lod = this.mapLod;
+        if (lod && this.zoom <= lod._scale) { src = lod; k = lod._scale; }
+        ctx.drawImage(src,
+          v.x0*k, v.y0*k, v.w*k, v.h*k,
+          v.x0,   v.y0,   v.w,   v.h);
+      }
 
       ctx.strokeStyle = 'rgba(0,0,0,0.6)';
       ctx.lineWidth = 1/this.zoom;
       ctx.strokeRect(0, 0, this.W, this.H);
 
-      if (this.grid) this.drawGrid(ctx);
+      if (this.grid) this.drawGrid(ctx, v);
       if (global.Tools) Tools.drawOverlay(ctx);
 
       ctx.restore();
@@ -612,20 +860,37 @@
                ortasında asılı kalmasın; nehir/göl ile aynı kara-kırpma
                tekniği (bkz. aşağıdaki 'rivers' bloğu). */
               var Lm2 = Layers.get('landmass');
-              var rc2 = (Lm2 && Lm2.canvas) ? this._getScratchCanvas('roads', W, H) : null;
+              /* nesne yoksa tam boyutlu scratch tahsis etme — 8192² bir
+                 tuvalde bu tek başına 268 MB'lık boş bir yüzey demekti */
+              var rc2 = (Lm2 && Lm2.canvas && roadsLayerNow.objects.length)
+                        ? this._getScratchCanvas('roads', W, H) : null;
               var rdctx = ctx;
-              if (rc2) { rdctx = rc2.getContext('2d'); rdctx.clearRect(0, 0, W, H); }
+              var cr2 = this._clipRect;
+              if (rc2) {
+                rdctx = rc2.getContext('2d');
+                rdctx.setTransform(1,0,0,1,0,0);
+                if (cr2) {
+                  rdctx.clearRect(cr2.x, cr2.y, cr2.w, cr2.h);
+                  rdctx.save();
+                  rdctx.beginPath(); rdctx.rect(cr2.x, cr2.y, cr2.w, cr2.h); rdctx.clip();
+                } else {
+                  rdctx.clearRect(0, 0, W, H);
+                }
+              }
               else { ctx.save(); ctx.globalAlpha = roadsLayerNow.opacity; }
               for (var ri = 0; ri < roadsLayerNow.objects.length; ri++) {
                 this.drawRoad(rdctx, roadsLayerNow.objects[ri]);
               }
               if (rc2) {
                 rdctx.globalCompositeOperation = 'destination-in';
-                rdctx.drawImage(Lm2.canvas, 0, 0);
+                if (cr2) rdctx.drawImage(Lm2.canvas, cr2.x, cr2.y, cr2.w, cr2.h, cr2.x, cr2.y, cr2.w, cr2.h);
+                else     rdctx.drawImage(Lm2.canvas, 0, 0);
                 rdctx.globalCompositeOperation = 'source-over';
+                if (cr2) rdctx.restore();
                 ctx.save();
                 ctx.globalAlpha = roadsLayerNow.opacity;
-                ctx.drawImage(rc2, 0, 0);
+                if (cr2) ctx.drawImage(rc2, cr2.x, cr2.y, cr2.w, cr2.h, cr2.x, cr2.y, cr2.w, cr2.h);
+                else     ctx.drawImage(rc2, 0, 0);
                 ctx.restore();
               } else {
                 ctx.restore();
@@ -639,9 +904,20 @@
                ediyoruz; böylece mevcut 4 geçişli çizim mantığına dokunmadan
                tek noktadan kırpma uygulanmış oluyor. */
             var Lm_ = Layers.get('landmass');
-            var rc = (Lm_ && Lm_.canvas) ? this._getScratchCanvas('rivers', W, H) : null;
+            var rc = (Lm_ && Lm_.canvas && l.objects.length)
+                     ? this._getScratchCanvas('rivers', W, H) : null;
             var rctx3 = rc ? rc.getContext('2d') : null;
-            if (rctx3) rctx3.clearRect(0, 0, W, H);
+            var cr = this._clipRect;
+            if (rctx3) {
+              rctx3.setTransform(1,0,0,1,0,0);
+              if (cr) {
+                rctx3.clearRect(cr.x, cr.y, cr.w, cr.h);
+                rctx3.save();
+                rctx3.beginPath(); rctx3.rect(cr.x, cr.y, cr.w, cr.h); rctx3.clip();
+              } else {
+                rctx3.clearRect(0, 0, W, H);
+              }
+            }
             var dctx = rctx3 || ctx;
 
             /* 1. pass: göl kıyı bantları — nehirlerin altında */
@@ -669,9 +945,11 @@
 
             if (rc) {
               rctx3.globalCompositeOperation = 'destination-in';
-              rctx3.drawImage(Lm_.canvas, 0, 0);
+              if (cr) rctx3.drawImage(Lm_.canvas, cr.x, cr.y, cr.w, cr.h, cr.x, cr.y, cr.w, cr.h);
+              else    rctx3.drawImage(Lm_.canvas, 0, 0);
               rctx3.globalCompositeOperation = 'source-over';
-              ctx.drawImage(rc, 0, 0);
+              if (cr) { rctx3.restore(); ctx.drawImage(rc, cr.x, cr.y, cr.w, cr.h, cr.x, cr.y, cr.w, cr.h); }
+              else    ctx.drawImage(rc, 0, 0);
             }
           } else {
             for (var j = 0; j < l.objects.length; j++) {
@@ -1845,15 +2123,21 @@
       ctx.restore();
     },
 
-    /* ---------- ızgara ---------- */
-    drawGrid: function (ctx) {
+    /* ---------- ızgara ----------
+       Görünür dikdörtgene kırpılır: 8192² tuvalde küçük hücre boyunda bile
+       yalnızca ekrandaki çizgiler üretilir. */
+    drawGrid: function (ctx, vis) {
       var g = this.gridSize;
+      if (!(g > 0)) return;
+      var v = vis || this.visibleMapRect();
+      if (v.w <= 0 || v.h <= 0) return;
       ctx.save();
       ctx.strokeStyle = 'rgba(30,40,30,0.28)';
       ctx.lineWidth = 1/this.zoom;
       ctx.beginPath();
-      for (var x = 0; x <= this.W; x += g) { ctx.moveTo(x, 0); ctx.lineTo(x, this.H); }
-      for (var y = 0; y <= this.H; y += g) { ctx.moveTo(0, y); ctx.lineTo(this.W, y); }
+      var sx = Math.floor(v.x0/g)*g, sy = Math.floor(v.y0/g)*g;
+      for (var x = sx; x <= v.x1; x += g) { ctx.moveTo(x, v.y0); ctx.lineTo(x, v.y1); }
+      for (var y = sy; y <= v.y1; y += g) { ctx.moveTo(v.x0, y); ctx.lineTo(v.x1, y); }
       ctx.stroke();
       ctx.restore();
     },
@@ -1885,10 +2169,12 @@
       var s = S/Math.max(this.W, this.H);
       m.setTransform(1,0,0,1,0,0);
       m.clearRect(0, 0, S, S);
-      m.save();
-      m.scale(s, s);
-      this.renderMap(m, { includeReference:false });
-      m.restore();
+      /* Besteyi küçülterek çiz — eskiden burada renderMap() yeniden
+         çalışıyordu; küçük tuvale çizse bile nehir/yol kırpması için
+         tam boyutlu scratch işlemleri yapıyordu (200 ms'de bir). */
+      if (this.mapCanvas) {
+        m.drawImage(this.mapCanvas, 0, 0, this.W*s, this.H*s);
+      }
       var tl = this.screenToMap(0, 0), br = this.screenToMap(this.vw, this.vh);
       m.strokeStyle = '#c08a3e';
       m.lineWidth = 1.5;
@@ -1898,7 +2184,7 @@
     centerOn: function (mx, my) {
       this.panX = this.vw/2 - mx*this.zoom;
       this.panY = this.vh/2 - my*this.zoom;
-      this.requestRender();
+      this.requestViewRender();
     }
   };
 
