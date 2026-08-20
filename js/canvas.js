@@ -824,6 +824,7 @@
         }
 
         if (l.id === 'elevation') {
+          if (this.political && this.politicalMuteTerrain) continue;
           if (App.elevation && (App.elevation.showHillshade || App.elevation.showContours)) {
             if (this.elevationDirty || !this.elevationCanvas) this.buildElevationEffect();
             if (this.elevationCanvas) {
@@ -839,6 +840,11 @@
         if (l.type === 'raster') {
           ctx.save();
           ctx.globalAlpha = l.opacity;
+          /* siyasi görünümde arazi dokusu susturulur: devlet renkleri
+             okunabilsin diye zemin sakinleşir, ama tamamen kaybolmaz */
+          if (this.political && this.politicalMuteTerrain && l.id === 'terrain') {
+            ctx.globalAlpha = l.opacity * 0.22;
+          }
           ctx.globalCompositeOperation = l.blend || 'source-over';
           ctx.drawImage(l.canvas, 0, 0, W, H);
           ctx.restore();
@@ -951,11 +957,49 @@
               if (cr) { rctx3.restore(); ctx.drawImage(rc, cr.x, cr.y, cr.w, cr.h, cr.x, cr.y, cr.w, cr.h); }
               else    ctx.drawImage(rc, 0, 0);
             }
+          } else if (l.id === 'territories') {
+            /* Bölgeler karaya kırpılır: siyasi haritada bir devlet denize
+               taşmaz. Nehir/yol ile aynı destination-in tekniği. */
+            var LmT = Layers.get('landmass');
+            var tc = (LmT && LmT.canvas && l.objects.length)
+                     ? this._getScratchCanvas('terr', W, H) : null;
+            var crT = this._clipRect;
+            var tctx2 = ctx;
+            if (tc) {
+              tctx2 = tc.getContext('2d');
+              tctx2.setTransform(1,0,0,1,0,0);
+              tctx2.globalCompositeOperation = 'source-over';
+              tctx2.globalAlpha = 1;
+              if (crT) {
+                tctx2.clearRect(crT.x, crT.y, crT.w, crT.h);
+                tctx2.save();
+                tctx2.beginPath(); tctx2.rect(crT.x, crT.y, crT.w, crT.h); tctx2.clip();
+              } else {
+                tctx2.clearRect(0, 0, W, H);
+              }
+            }
+            for (var jt = 0; jt < l.objects.length; jt++) {
+              this.drawTerritory(tctx2, l.objects[jt]);
+            }
+            if (tc) {
+              tctx2.globalCompositeOperation = 'destination-in';
+              if (crT) tctx2.drawImage(LmT.canvas, crT.x, crT.y, crT.w, crT.h, crT.x, crT.y, crT.w, crT.h);
+              else     tctx2.drawImage(LmT.canvas, 0, 0);
+              tctx2.globalCompositeOperation = 'source-over';
+              if (crT) { tctx2.restore(); ctx.drawImage(tc, crT.x, crT.y, crT.w, crT.h, crT.x, crT.y, crT.w, crT.h); }
+              else     ctx.drawImage(tc, 0, 0);
+            }
+            /* devlet adları kırpmanın dışında — kıyıya taşan uzun bir ad
+               yarıda kesilmemeli */
+            if (this.political) {
+              for (var jn = 0; jn < l.objects.length; jn++) {
+                this.drawTerritoryName(ctx, l.objects[jn]);
+              }
+            }
           } else {
             for (var j = 0; j < l.objects.length; j++) {
               var o = l.objects[j];
-              if (l.id === 'territories') this.drawTerritory(ctx, o);
-              else if (l.id === 'symbols') {
+              if (l.id === 'symbols') {
                 if (o.clip && !this.isOnLand(o.x, o.y)) { /* kara sınırı dışına taştı — çizme */ }
                 else if (o.kind === 'group') {
                   o.members.forEach(function(m){ Sym.draw(ctx, m.sym, m, function(){ Cv.requestRender(); }); });
@@ -1005,6 +1049,9 @@
           ctx.restore();
         }
       }
+
+      /* --- siyasi harita lejantı --- */
+      if (this.political && this.politicalLegend) this.drawPoliticalLegend(ctx);
 
       /* --- ölçek çubuğu (en üstte) --- */
       if (global.App && App.scale && App.scale.visible) this.drawScaleBar(ctx, App.scale);
@@ -1534,6 +1581,23 @@
       ctx.lineJoin = 'round';
       var path = Geo.polyPath(pts);
       path.closePath();
+
+      if (this.political) {
+        /* SİYASİ GÖRÜNÜM: devlet alanı opak, sınır düz ve belirgin.
+           Fizikî haritada bölge yalnızca bir gölgelendirmedir; siyasi
+           haritada ise asıl konudur. */
+        ctx.globalAlpha *= (this.politicalFill === undefined ? 0.92 : this.politicalFill);
+        ctx.fillStyle = o.color || '#8a5a3a';
+        ctx.fill(path);
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = o.borderColor || '#4a3020';
+        ctx.lineWidth = Math.max(2, o.borderWidth || 2) * 1.6;
+        ctx.setLineDash([]);
+        ctx.stroke(path);
+        ctx.restore();
+        return;
+      }
+
       ctx.globalAlpha *= (o.opacity === undefined ? 0.30 : o.opacity);
       ctx.fillStyle = o.color || '#8a5a3a';
       ctx.fill(path);
@@ -1543,6 +1607,113 @@
         ctx.lineWidth = o.borderWidth;
         ctx.setLineDash([o.borderWidth*3, o.borderWidth*2]);
         ctx.stroke(path);
+      }
+      ctx.restore();
+    },
+
+    /* ---------- siyasi harita ----------
+       Ayrı bir katman değil, mevcut "Bölgeler" katmanının bir GÖRÜNÜM
+       modu: aynı poligonlar devlet alanı olarak okunur. Böylece kullanıcı
+       çizdiği bölgeleri kaybetmeden fizikî ve siyasi sunum arasında
+       geçiş yapabiliyor. */
+    political: false,
+    politicalFill: 0.92,
+    politicalMuteTerrain: true,
+    politicalLegend: true,
+
+    /* Devletlere görsel olarak birbirinden ayrılan renkler atar. Altın
+       açı ile hue dağıtımı, komşu bölgelerin benzer renk almasını
+       istatistiksel olarak engeller. */
+    assignPoliticalColors: function () {
+      var L = Layers.get('territories');
+      if (!L || !L.objects.length) return 0;
+      var n = L.objects.length;
+      for (var i = 0; i < n; i++) {
+        var h = (i * 137.508) % 360;                 /* altın açı */
+        var s = 42 + (i % 3) * 9;
+        var l = 52 + (i % 2) * 8;
+        L.objects[i].color = this._hsl(h, s, l);
+        L.objects[i].borderColor = this._hsl(h, Math.min(70, s + 18), 24);
+      }
+      return n;
+    },
+
+    _hsl: function (h, s, l) {
+      s /= 100; l /= 100;
+      var c = (1 - Math.abs(2*l - 1)) * s;
+      var x = c * (1 - Math.abs(((h/60) % 2) - 1));
+      var m = l - c/2, r=0, g=0, b=0;
+      if (h < 60)       { r=c; g=x; }
+      else if (h < 120) { r=x; g=c; }
+      else if (h < 180) { g=c; b=x; }
+      else if (h < 240) { g=x; b=c; }
+      else if (h < 300) { r=x; b=c; }
+      else              { r=c; b=x; }
+      var f = function (v) {
+        var t = Math.round((v + m) * 255).toString(16);
+        return t.length < 2 ? '0'+t : t;
+      };
+      return '#' + f(r) + f(g) + f(b);
+    },
+
+    /* Devlet adlarını alan merkezine yazar. */
+    drawTerritoryName: function (ctx, o) {
+      if (!o.name) return;
+      var pts = o.pts;
+      var cx = 0, cy = 0;
+      for (var i = 0; i < pts.length; i++) { cx += pts[i][0]; cy += pts[i][1]; }
+      cx /= pts.length; cy /= pts.length;
+      var size = o.nameSize || Math.max(18, Math.min(this.W, this.H) * 0.022);
+      ctx.save();
+      ctx.font = '600 ' + size + 'px ' + FONTS.serif;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = size * 0.22;
+      ctx.strokeStyle = 'rgba(255,252,242,0.85)';
+      ctx.strokeText(o.name, cx, cy);
+      ctx.fillStyle = o.nameColor || '#2e2013';
+      ctx.fillText(o.name, cx, cy);
+      ctx.restore();
+    },
+
+    /* Sağ alt köşeye devletlerin renk anahtarını çizer. */
+    drawPoliticalLegend: function (ctx) {
+      var L = Layers.get('territories');
+      if (!L || !L.visible) return;
+      var items = L.objects.filter(function (o) { return o.name; });
+      if (!items.length) return;
+
+      var pad = Math.max(10, this.W * 0.006);
+      var row = Math.max(16, this.W * 0.014);
+      var fs  = row * 0.62;
+      var boxW = Math.max(this.W * 0.14, 160);
+      var boxH = pad*2 + row*items.length;
+      var x = this.W - boxW - pad*2, y = this.H - boxH - pad*2;
+
+      ctx.save();
+      ctx.globalAlpha = 0.93;
+      ctx.fillStyle = '#f4ead2';
+      ctx.strokeStyle = '#5a4326';
+      ctx.lineWidth = Math.max(1.2, this.W*0.0012);
+      ctx.beginPath();
+      ctx.rect(x, y, boxW, boxH);
+      ctx.fill(); ctx.stroke();
+
+      ctx.globalAlpha = 1;
+      ctx.font = '600 ' + fs + 'px ' + FONTS.serif;
+      ctx.textBaseline = 'middle';
+      for (var i = 0; i < items.length; i++) {
+        var iy = y + pad + row*i + row/2;
+        ctx.fillStyle = items[i].color || '#8a5a3a';
+        ctx.strokeStyle = items[i].borderColor || '#4a3020';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.rect(x + pad, iy - row*0.28, row*0.7, row*0.56);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#2e2013';
+        ctx.textAlign = 'left';
+        ctx.fillText(items[i].name, x + pad + row*0.95, iy);
       }
       ctx.restore();
     },

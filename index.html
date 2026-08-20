@@ -366,6 +366,17 @@
         <label class="row"><span data-i18n="o_width">Kalınlık</span><b id="v-tt-bw">2</b></label>
         <input type="range" id="tt-bw" min="0" max="10" value="2">
         <p class="hint" data-i18n="h_territory">Tıklayarak nokta ekle, 3+ nokta sonra Enter ile kapat.</p>
+
+        <h3 style="margin-top:20px" data-i18n="o_polsec">Siyasi Harita</h3>
+        <label class="chk"><input type="checkbox" id="pol-on"><span data-i18n="o_polmode">Siyasi görünüm</span></label>
+        <label class="chk"><input type="checkbox" id="pol-mute" checked><span data-i18n="o_polmute">Arazi dokusunu sustur</span></label>
+        <label class="chk"><input type="checkbox" id="pol-legend" checked><span data-i18n="o_pollegend">Lejant göster</span></label>
+        <label class="row"><span data-i18n="o_polfill">Dolgu yoğunluğu</span><b id="v-pol-fill">0.92</b></label>
+        <input type="range" id="pol-fill" min="40" max="100" value="92">
+        <button class="btn wide" id="btn-pol-colors" data-i18n="o_polcolors">Devlet renklerini otomatik ata</button>
+        <label class="row" style="margin-top:12px"><span data-i18n="o_polname">Seçili bölgenin adı</span></label>
+        <input type="text" id="tt-name" class="sel" data-i18n-placeholder="o_polname_ph" placeholder="Devlet adı">
+        <p class="hint" data-i18n="h_political">Siyasi görünüm ayrı bir katman değil; çizdiğin bölgeleri devlet alanı olarak sunar. Fizikî ve siyasi görünüm arasında geçiş yapabilirsin.</p>
       </section>
 
       <!-- REGION LINK -->

@@ -145,10 +145,17 @@
               }
             } else if (l.id === 'territories') {
               var tpts = Cv.lakeSmoothPts(o, 24);
-              var tdash = o.borderWidth ? ' stroke-dasharray="'+(o.borderWidth*3)+','+(o.borderWidth*2)+'"' : '';
-              s.push('<path d="' + Geo.svgPolyD(tpts, true) + '" fill="' + (o.color||'#8a5a3a') +
-                     '" opacity="' + (o.opacity===undefined?0.30:o.opacity) + '" stroke="' + (o.borderColor||'#5a3a20') +
-                     '" stroke-width="' + (o.borderWidth||2) + '"' + tdash + ' stroke-linejoin="round"/>');
+              if (Cv.political) {
+                /* siyasi görünüm: opak alan, düz ve belirgin sınır */
+                s.push('<path d="' + Geo.svgPolyD(tpts, true) + '" fill="' + (o.color||'#8a5a3a') +
+                       '" opacity="' + Cv.politicalFill + '" stroke="' + (o.borderColor||'#4a3020') +
+                       '" stroke-width="' + (Math.max(2, o.borderWidth||2)*1.6) + '" stroke-linejoin="round"/>');
+              } else {
+                var tdash = o.borderWidth ? ' stroke-dasharray="'+(o.borderWidth*3)+','+(o.borderWidth*2)+'"' : '';
+                s.push('<path d="' + Geo.svgPolyD(tpts, true) + '" fill="' + (o.color||'#8a5a3a') +
+                       '" opacity="' + (o.opacity===undefined?0.30:o.opacity) + '" stroke="' + (o.borderColor||'#5a3a20') +
+                       '" stroke-width="' + (o.borderWidth||2) + '"' + tdash + ' stroke-linejoin="round"/>');
+              }
             } else if (l.id === 'symbols') {
               s.push(Sym.toSVG(o.sym, o));
             } else if (l.id === 'labels') {
@@ -374,6 +381,8 @@
         app:'cartographer', version:3,
         W:Cv.W, H:Cv.H,
         parchment:Cv.parchment, grid:Cv.grid,
+        political:Cv.political, politicalFill:Cv.politicalFill,
+        politicalMuteTerrain:Cv.politicalMuteTerrain, politicalLegend:Cv.politicalLegend,
         gridType:Cv.gridType, gridSize:Cv.gridSize,
         gridColor:Cv.gridColor, gridOpacity:Cv.gridOpacity,
         shore:Cv.shore, shoreWidth:Cv.shoreWidth, shoreStyle:Cv.shoreStyle, frame:Cv.frame,
@@ -415,6 +424,10 @@
       Cv.setSize(d.W||2048, d.H||2048, false);
       Cv.parchment = !!d.parchment;
       Cv.grid = !!d.grid;
+      Cv.political = !!d.political;
+      if (d.politicalFill !== undefined) Cv.politicalFill = d.politicalFill;
+      if (d.politicalMuteTerrain !== undefined) Cv.politicalMuteTerrain = d.politicalMuteTerrain;
+      if (d.politicalLegend !== undefined) Cv.politicalLegend = d.politicalLegend;
       if (d.gridType)  Cv.gridType  = d.gridType;
       if (d.gridSize)  Cv.gridSize  = d.gridSize;
       if (d.gridColor) Cv.gridColor = d.gridColor;
@@ -431,6 +444,10 @@
 
       document.getElementById('chk-parchment').checked = Cv.parchment;
       document.getElementById('chk-grid').checked = Cv.grid;
+      var _po=document.getElementById('pol-on');     if (_po) _po.checked = Cv.political;
+      var _pm=document.getElementById('pol-mute');   if (_pm) _pm.checked = Cv.politicalMuteTerrain;
+      var _pl=document.getElementById('pol-legend'); if (_pl) _pl.checked = Cv.politicalLegend;
+      var _pf=document.getElementById('pol-fill');   if (_pf) _pf.value = Math.round(Cv.politicalFill*100);
       var _gt=document.getElementById('grid-type');  if (_gt) _gt.value = Cv.gridType;
       var _gs=document.getElementById('grid-size');  if (_gs) _gs.value = Cv.gridSize;
       var _gc=document.getElementById('grid-color'); if (_gc) _gc.value = Cv.gridColor;
