@@ -1312,6 +1312,30 @@
         }
       }
 
+      /* ada/kıta için çoklu blob merkezleri — tekil radyal falloff yerine
+         3-7 örtüşen lob kullanarak organik, oval-olmayan kara formları üretir */
+      var islandBlobs = [], contBlobs = [];
+      if (template === 'island') {
+        var ibCount = 3 + Math.floor(noise.next() * 4);  /* 3..6 */
+        for (var ib = 0; ib < ibCount; ib++) {
+          islandBlobs.push({
+            x: (noise.next() - 0.5) * 0.30,
+            y: (noise.next() - 0.5) * 0.30,
+            r: 0.12 + noise.next() * 0.15
+          });
+        }
+      } else if (template !== 'archipelago') { /* continent */
+        var cbCount = 4 + Math.floor(noise.next() * 4);  /* 4..7 */
+        var cCX = (noise.next() - 0.5) * 0.18, cCY = (noise.next() - 0.5) * 0.12;
+        for (var cbi = 0; cbi < cbCount; cbi++) {
+          contBlobs.push({
+            x: cCX + (noise.next() - 0.5) * 0.42,
+            y: cCY + (noise.next() - 0.5) * 0.32,
+            r: 0.16 + noise.next() * 0.20
+          });
+        }
+      }
+
       function smoothstep(a, b, t) { t = Math.max(0, Math.min(1, (t-a)/(b-a))); return t*t*(3-2*t); }
 
       var small = document.createElement('canvas'); small.width = N; small.height = N;
@@ -1323,8 +1347,12 @@
           var base = noise.fbm(gx/N*freq, gy/N*freq, octaves, 0.5);
           var falloff;
           if (template === 'island') {
-            var d = Math.sqrt(nx*nx+ny*ny)*2.3;
-            falloff = 1 - smoothstep(0.12, 0.5, d);
+            falloff = 0;
+            for (var ib2 = 0; ib2 < islandBlobs.length; ib2++) {
+              var ibl = islandBlobs[ib2];
+              var ibd = Math.sqrt((nx-ibl.x)*(nx-ibl.x)+(ny-ibl.y)*(ny-ibl.y))/ibl.r;
+              falloff = Math.max(falloff, 1 - smoothstep(0.15, 1.0, ibd));
+            }
           } else if (template === 'archipelago') {
             falloff = -1;
             for (var k=0; k<islands.length; k++) {
@@ -1333,8 +1361,12 @@
               falloff = Math.max(falloff, 1 - smoothstep(0.4, 1.0, dd));
             }
           } else { /* continent */
-            var d2 = Math.sqrt(nx*nx+ny*ny)*1.35;
-            falloff = 1 - smoothstep(0.32, 0.78, d2);
+            falloff = 0;
+            for (var cb2 = 0; cb2 < contBlobs.length; cb2++) {
+              var cbl = contBlobs[cb2];
+              var cbd = Math.sqrt((nx-cbl.x)*(nx-cbl.x)+(ny-cbl.y)*(ny-cbl.y))/cbl.r;
+              falloff = Math.max(falloff, 1 - smoothstep(0.18, 1.0, cbd));
+            }
           }
           var value = (falloff - 0.5) + base*(0.22 + roughness*0.5);
           var a = Math.max(0, Math.min(1, value/0.12 + 0.5));
