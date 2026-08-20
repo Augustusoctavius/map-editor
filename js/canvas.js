@@ -667,8 +667,6 @@
         !!this._mini_landmass
       );
       this.shoreCanvas = result.canvas;
-      this._shoreScW   = result.sw;
-      this._shoreScH   = result.sh;
       this.shoreDirty  = false;
       /* kıyı çizgisi değişti — nehir kesim noktaları geçersiz olabilir */
       this._riverCrossingCache = {};
@@ -878,7 +876,7 @@
       for (var i = 0; i < Layers.list.length; i++) {
         var l = Layers.list[i];
         if (!l.visible) continue;
-        if (l.id === 'roads') continue; /* yukarıda erken çizildi */
+        if (l.id === 'roads') continue; /* 'rivers' bloğunda nehirlerle birlikte çizildi */
 
         if (l.id === 'reference') {
           if (!opt.includeReference || !l.image) continue;
@@ -1824,7 +1822,7 @@
         ctx.lineTo(0, 0);
         ctx.lineTo(-side, -base);
         ctx.closePath();
-        ctx.fillStyle = isCard ? col : col;
+        ctx.fillStyle = col;
         ctx.globalAlpha = isCard ? 1.0 : 0.65;
         ctx.fill();
         ctx.strokeStyle = col;

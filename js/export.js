@@ -577,6 +577,7 @@
         elevContourInterval:App.elevation.contourInterval,
         exportReference:App.exportReference,
         scale:App.scale,
+        windrose:App.windrose,
         customSymbols: Sym.serializeCustom(),
         maps: App.maps,
         layers: App.maps.root || Layers.serialize(true)
@@ -627,6 +628,7 @@
       App.elevation.contourInterval = d.elevContourInterval || 32;
       App.exportReference = !!d.exportReference;
       if (d.scale) App.scale = d.scale;
+      if (d.windrose) App.windrose = d.windrose;
 
       document.getElementById('chk-parchment').checked = Cv.parchment;
       document.getElementById('chk-grid').checked = Cv.grid;

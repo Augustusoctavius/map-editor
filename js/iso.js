@@ -489,20 +489,6 @@
     F.push({ p:null, dd:lines.join(''), f:null, s:m.det, lw:0.7 });
   }
 
-  function emitPad(s, F) {
-    var m = M(s.m);
-    var rg = ring(s.x, s.y, 0, s.r, 26);
-    F.push({ p:rg, f:m.top, s:m.line, lw:1.0 });
-    var lines = [];
-    for (var i = 0; i < 7; i++) {
-      var a = Math.random() * Math.PI * 2, d2 = s.r * (0.30 + (i % 4) * 0.16);
-      var p1 = pr(s.x + Math.cos(a) * d2, s.y + Math.sin(a) * d2, 0);
-      var p2 = pr(s.x + Math.cos(a + 0.5) * d2 * 1.1, s.y + Math.sin(a + 0.5) * d2 * 1.1, 0);
-      lines.push(seg(p1, p2));
-    }
-    F.push({ p:null, dd:lines.join(''), f:null, s:m.det, lw:0.7 });
-  }
-
   function emitRock(s, F) {
     var m = M(s.m), r = s.r, h = s.h;
     var N = 9, top = [], bot = [], i;
@@ -583,7 +569,7 @@
      ============================================================ */
   var EMIT = {
     box:emitBox, stake:emitStake, gable:emitGable, hip:emitHip,
-    cyl:emitCyl, cone:emitCone, pad:emitPad, rock:emitRock,
+    cyl:emitCyl, cone:emitCone, rock:emitRock,
     pole:emitPole, flag:emitFlag, tree:emitTree, pagoda:emitPagoda,
     dome:function (s, F) { emitDome(s, F, false); },
     onion:function (s, F) { emitDome(s, F, true); }
@@ -600,14 +586,8 @@
     return [ s.x, s.y ];
   }
 
-  /* Zemin yastığı her zaman en altta; sıralamaya girmez. */
-  function isGround(s) { return s.t === 'pad'; }
-
   Scene.prototype.build = function (partFn) {
-    var ground = [], rest = [], i;
-    for (i = 0; i < this.solids.length; i++) {
-      (isGround(this.solids[i]) ? ground : rest).push(this.solids[i]);
-    }
+    var rest = this.solids.slice(), i;
 
     rest.sort(function (a, b) {
       var ca = centerOf(a), cb = centerOf(b);
@@ -617,35 +597,7 @@
       return (a.z + (a.h || 0)) - (b.z + (b.h || 0));
     });
 
-    /* --- zemin yastığını yapının ayak izine oturt --- */
-    if (ground.length && rest.length) {
-      var nx = Infinity, xx = -Infinity, ny = Infinity, xy = -Infinity;
-      for (i = 0; i < rest.length; i++) {
-        var s2 = rest[i];
-        var ax, bx, ay, by;
-        if (CORNER_BASED[s2.t]) {
-          ax = s2.x; bx = s2.x + (s2.w || 0);
-          ay = s2.y; by = s2.y + (s2.d || 0);
-        } else {
-          var rr = s2.r || (s2.h || 4) * 0.22;
-          ax = s2.x - rr; bx = s2.x + rr;
-          ay = s2.y - rr; by = s2.y + rr;
-        }
-        if (ax < nx) nx = ax;
-        if (bx > xx) xx = bx;
-        if (ay < ny) ny = ay;
-        if (by > xy) xy = by;
-      }
-      if (isFinite(nx)) {
-        var pcx = (nx + xx) / 2, pcy = (ny + xy) / 2;
-        var prr = Math.max(xx - nx, xy - ny) / 2 * 1.14 + 2;
-        for (i = 0; i < ground.length; i++) {
-          ground[i].x = pcx; ground[i].y = pcy; ground[i].r = prr;
-        }
-      }
-    }
-
-    var solids = ground.concat(rest);
+    var solids = rest;
 
     var F = [];
     for (i = 0; i < solids.length; i++) {

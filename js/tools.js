@@ -522,7 +522,7 @@
       }
 
       if (this.measureFrom) {
-        var mf = this.measureFrom, mt = this.measureTo || p;
+        var mf = this.measureFrom, mt = this.measureTo || this.measureFrom;
         this.measureFrom = null; this.measureTo = null;
         if (Math.hypot(mt.x-mf.x, mt.y-mf.y) > 4) {
           var ML = Layers.get('measures');
