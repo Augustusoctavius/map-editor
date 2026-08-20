@@ -54,6 +54,7 @@ summing per-character widths comes out ~26% too wide for connected scripts. `lab
 `direction="rtl"`, `letter-spacing="0"` and no curved `textPath`. Latin/Cyrillic labels take the original
 per-character path untouched.
 
+
 ### Screen support
 
 Shell pages scale fluidly from 360px phones to 4K TVs via `clamp()` typography in `shell.css` (no per-device layouts); under 640px card grids collapse to one column and forms go full-width. The **editor is desktop-only by design** — its three-column `#workspace` grid (`--panel-l` + `1fr` + `--panel-r`) drives the canvas column negative below ~1024px. Rather than render a broken editor, `UI.showView('editor')` redirects to the `#view-narrow` explainer whenever `UI.editorFits()` is false (`EDITOR_MIN_W` 1024 / `EDITOR_MIN_H` 600). `UI._wantedView` remembers that the user actually asked for the editor, so a debounced `resize` handler (`syncNarrowGate`) moves them into the editor the moment a rotation gives enough room, and back out if it shrinks — the existing leave-editor autosave fires on the way out, so no work is lost. Touch is deliberately out of scope for now: pointer events and double-tap path-finish already work, but there is no pinch-zoom (zoom is `wheel`-only and `#view` sets `touch-action:none`).

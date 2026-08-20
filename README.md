@@ -149,6 +149,7 @@ ve yay devre dışı, yola oturan etiket yolun orta noktasındaki teğete yerle�
 şekilde. Latin/Kiril etiketler eski davranışı aynen sürdürür. Bu düzeltme arayüz dili ne olursa olsun geçerlidir —
 Türkçe arayüzde Arapça yer adı yazan biri de doğru sonucu alır.
 
+
 ## Ekran uyumluluğu
 
 **Karşılama sayfaları** (Ana Sayfa / Tuval / Rehber / Topluluk) 360 piksellik telefondan

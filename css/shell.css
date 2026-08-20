@@ -215,6 +215,28 @@ label.btn.wide{display:block; text-align:center; cursor:pointer; margin-top:6px;
 @media (max-width:400px){
   .shell-tab{padding:8px 6px; font-size:11px; letter-spacing:0}
 }
+.narrow-size b{color:var(--brass); font-family:var(--f-mono); font-weight:500}
+
+/* ---------- dar ekranlar ---------- */
+@media (max-width:640px){
+  #shell-nav{gap:6px; padding:0 10px}
+  .shell-brand .brand-name{display:none}
+  .shell-tab{padding:8px 9px; font-size:12px}
+  .shell-tabs{gap:2px}
+  /* tek sütuna in: kart ızgaraları dar ekranda sıkışmasın */
+  .cv-grid,.community-links{grid-template-columns:1fr}
+  .canvas-new-form{flex-direction:column; align-items:stretch}
+  .canvas-new-form select,.canvas-new-form input[type=text]{width:100%}
+  .cv-wh{justify-content:space-between}
+  .cv-wh input{flex:1; width:auto}
+  label.btn.wide{max-width:none}
+  /* rehber satırları: ikon üstte kalsın ama metin daralmasın */
+  .tutorial-row{gap:10px; padding:12px 2px}
+  .tutorial-ico{width:24px; font-size:17px}
+}
+@media (max-width:400px){
+  .shell-tab{padding:8px 6px; font-size:11px; letter-spacing:0}
+}
 
 /* ---------- başlangıç şablonları ---------- */
 .canvas-templates{margin-bottom:44px}
