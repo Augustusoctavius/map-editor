@@ -37,6 +37,9 @@
       x.save();
       x.scale(scale, scale);
       Cv.renderMap(x, { includeReference: App.exportReference, includeLinks: false });
+      /* ızgara açıksa çıktıya da girsin — altıgen ızgaranın asıl değeri
+         basılan/paylaşılan haritada olmasıdır */
+      if (Cv.grid) Cv.drawGrid(x, { x0:0, y0:0, x1:Cv.W, y1:Cv.H, w:Cv.W, h:Cv.H }, true);
       x.restore();
       c.toBlob(function (b) {
         download(b, 'harita-' + stamp() + (scale > 1 ? '-' + scale + 'x' : '') + '.png');
@@ -161,6 +164,8 @@
                '" fill="#d9c79a" opacity="0.28" style="mix-blend-mode:multiply"/>');
       }
 
+      if (Cv.grid) s.push(Exporter.gridSVG(W, H));
+
       if (App.scale && App.scale.visible) s.push(Exporter.scaleSVG(App.scale));
       if (App.windrose && App.windrose.visible) s.push(Exporter.windroseSVG(App.windrose));
 
@@ -173,6 +178,51 @@
       s.push('</svg>');
       download(new Blob([s.join('\n')], { type:'image/svg+xml' }), 'harita-' + stamp() + '.svg');
       UI.msg(UI.t('exported') + ' SVG');
+    },
+
+    /* Izgarayı GERÇEK VEKTÖR olarak yazar. Kare ve nokta bir <pattern>
+       ile tek seferde tanımlanır (kaç hücre olursa olsun birkaç satır);
+       altıgen için de aynı yöntem kullanılır — desen karosu, sivri tepeli
+       ızgaranın (w × 2·vstep) tekrar biriminden üretilir. */
+    gridSVG: function (W, H) {
+      var g = Cv.gridSize;
+      if (!(g > 0)) return '';
+      var col = Cv.gridColor || '#1e281e';
+      var op  = Cv.gridOpacity;
+      var lw  = Math.max(1, g*0.012).toFixed(2);
+      var id  = 'wbGrid';
+      var body, tw, th;
+
+      if (Cv.gridType === 'dot') {
+        var r = Math.max(1.2, g*0.035).toFixed(2);
+        tw = th = g;
+        body = '<circle cx="0" cy="0" r="'+r+'" fill="'+col+'"/>' +
+               '<circle cx="'+g+'" cy="0" r="'+r+'" fill="'+col+'"/>' +
+               '<circle cx="0" cy="'+g+'" r="'+r+'" fill="'+col+'"/>' +
+               '<circle cx="'+g+'" cy="'+g+'" r="'+r+'" fill="'+col+'"/>';
+      } else if (Cv.gridType === 'hex') {
+        var hgt = g * 2 / Math.sqrt(3);
+        var vstep = hgt * 0.75, q = hgt / 4;
+        tw = g; th = vstep * 2;
+        /* karo içinde iki satır: biri hizalı, biri yarım hücre kaydırılmış */
+        function hex(cx, cy) {
+          return 'M'+cx+' '+(cy-hgt/2)+
+                 'L'+(cx+g/2)+' '+(cy-q)+'L'+(cx+g/2)+' '+(cy+q)+
+                 'L'+cx+' '+(cy+hgt/2)+
+                 'L'+(cx-g/2)+' '+(cy+q)+'L'+(cx-g/2)+' '+(cy-q)+'Z';
+        }
+        var d = [hex(0,0), hex(g,0), hex(g/2, vstep), hex(-g/2, vstep),
+                 hex(0, vstep*2), hex(g, vstep*2)].join('');
+        body = '<path d="'+d+'" fill="none" stroke="'+col+'" stroke-width="'+lw+'" stroke-linejoin="round"/>';
+      } else {
+        tw = th = g;
+        body = '<path d="M0 0 H'+g+' M0 0 V'+g+'" fill="none" stroke="'+col+
+               '" stroke-width="'+lw+'"/>';
+      }
+
+      return '<defs><pattern id="'+id+'" patternUnits="userSpaceOnUse" ' +
+             'width="'+tw+'" height="'+th+'">'+body+'</pattern></defs>' +
+             '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="url(#'+id+')" opacity="'+op+'"/>';
     },
 
     windroseSVG: function (wr) {
@@ -324,6 +374,8 @@
         app:'cartographer', version:3,
         W:Cv.W, H:Cv.H,
         parchment:Cv.parchment, grid:Cv.grid,
+        gridType:Cv.gridType, gridSize:Cv.gridSize,
+        gridColor:Cv.gridColor, gridOpacity:Cv.gridOpacity,
         shore:Cv.shore, shoreWidth:Cv.shoreWidth, shoreStyle:Cv.shoreStyle, frame:Cv.frame,
         elevShowHillshade:App.elevation.showHillshade,
         elevShowContours:App.elevation.showContours,
@@ -363,6 +415,10 @@
       Cv.setSize(d.W||2048, d.H||2048, false);
       Cv.parchment = !!d.parchment;
       Cv.grid = !!d.grid;
+      if (d.gridType)  Cv.gridType  = d.gridType;
+      if (d.gridSize)  Cv.gridSize  = d.gridSize;
+      if (d.gridColor) Cv.gridColor = d.gridColor;
+      if (d.gridOpacity !== undefined) Cv.gridOpacity = d.gridOpacity;
       Cv.shore = d.shore !== false;
       Cv.shoreWidth = d.shoreWidth || 26;
       Cv.shoreStyle = d.shoreStyle || 'sandy';
@@ -375,6 +431,10 @@
 
       document.getElementById('chk-parchment').checked = Cv.parchment;
       document.getElementById('chk-grid').checked = Cv.grid;
+      var _gt=document.getElementById('grid-type');  if (_gt) _gt.value = Cv.gridType;
+      var _gs=document.getElementById('grid-size');  if (_gs) _gs.value = Cv.gridSize;
+      var _gc=document.getElementById('grid-color'); if (_gc) _gc.value = Cv.gridColor;
+      var _go=document.getElementById('grid-op');    if (_go) _go.value = Math.round(Cv.gridOpacity*100);
       document.getElementById('chk-shore').checked = Cv.shore;
       document.getElementById('ref-export').checked = App.exportReference;
       document.getElementById('sel-canvas-size').value = String(d.W||2048);

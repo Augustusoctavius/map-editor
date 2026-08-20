@@ -2124,22 +2124,89 @@
     },
 
     /* ---------- ızgara ----------
-       Görünür dikdörtgene kırpılır: 8192² tuvalde küçük hücre boyunda bile
-       yalnızca ekrandaki çizgiler üretilir. */
-    drawGrid: function (ctx, vis) {
+       Üç tür: kare, altıgen (TTRPG standardı) ve nokta. Hepsi görünür
+       dikdörtgene kırpılır — 8192² tuvalde küçük hücre boyunda bile
+       yalnızca ekrandaki hücreler üretilir. */
+    gridType: 'square',
+    gridColor: '#1e281e',
+    gridOpacity: 0.28,
+
+    _gridStroke: function () {
+      var h = (this.gridColor || '#1e281e').replace('#','');
+      if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+      var r = parseInt(h.substr(0,2),16), g = parseInt(h.substr(2,2),16), b = parseInt(h.substr(4,2),16);
+      return 'rgba('+r+','+g+','+b+','+this.gridOpacity+')';
+    },
+
+    drawGrid: function (ctx, vis, forExport) {
       var g = this.gridSize;
       if (!(g > 0)) return;
       var v = vis || this.visibleMapRect();
       if (v.w <= 0 || v.h <= 0) return;
+
+      /* çok uzaklaşıldığında ızgara okunmaz bir gri lekeye dönüşür —
+         ekranda 4 pikselden ince hücrelerde çizmiyoruz (çıktıda geçerli değil) */
+      if (!forExport && g * this.zoom < 4) return;
+
       ctx.save();
-      ctx.strokeStyle = 'rgba(30,40,30,0.28)';
-      ctx.lineWidth = 1/this.zoom;
-      ctx.beginPath();
-      var sx = Math.floor(v.x0/g)*g, sy = Math.floor(v.y0/g)*g;
-      for (var x = sx; x <= v.x1; x += g) { ctx.moveTo(x, v.y0); ctx.lineTo(x, v.y1); }
-      for (var y = sy; y <= v.y1; y += g) { ctx.moveTo(v.x0, y); ctx.lineTo(v.x1, y); }
-      ctx.stroke();
+      ctx.strokeStyle = this._gridStroke();
+      ctx.fillStyle = this._gridStroke();
+      ctx.lineWidth = forExport ? Math.max(1, g*0.012) : 1/this.zoom;
+
+      if (this.gridType === 'hex') {
+        this._drawHexGrid(ctx, v, g);
+      } else if (this.gridType === 'dot') {
+        var dr = forExport ? Math.max(1.2, g*0.035)
+                           : Math.max(0.8/this.zoom, Math.min(2.4/this.zoom, g*0.035));
+        var dsx = Math.floor(v.x0/g)*g, dsy = Math.floor(v.y0/g)*g;
+        ctx.beginPath();
+        for (var dx0 = dsx; dx0 <= v.x1; dx0 += g) {
+          for (var dy0 = dsy; dy0 <= v.y1; dy0 += g) {
+            ctx.moveTo(dx0+dr, dy0);
+            ctx.arc(dx0, dy0, dr, 0, Math.PI*2);
+          }
+        }
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        var sx = Math.floor(v.x0/g)*g, sy = Math.floor(v.y0/g)*g;
+        for (var x = sx; x <= v.x1; x += g) { ctx.moveTo(x, v.y0); ctx.lineTo(x, v.y1); }
+        for (var y = sy; y <= v.y1; y += g) { ctx.moveTo(v.x0, y); ctx.lineTo(v.x1, y); }
+        ctx.stroke();
+      }
       ctx.restore();
+    },
+
+    /* Sivri-tepeli (pointy-top) altıgen ızgara: g hücrenin genişliği.
+       Yatay adım = g, dikey adım = 3/4 · yükseklik; tek satırlar yarım
+       hücre kaydırılır. Yalnızca görünür aralık dolaşılır. */
+    _drawHexGrid: function (ctx, v, g) {
+      var w = g;                    /* hücre genişliği  */
+      var hgt = w * 2 / Math.sqrt(3);   /* sivri tepeli yükseklik */
+      var vstep = hgt * 0.75;
+      var row0 = Math.floor(v.y0 / vstep) - 1;
+      var row1 = Math.ceil(v.y1 / vstep) + 1;
+      var q = hgt / 4;
+      ctx.beginPath();
+      for (var row = row0; row <= row1; row++) {
+        var cy = row * vstep;
+        var offset = (row & 1) ? w/2 : 0;
+        var col0 = Math.floor((v.x0 - offset) / w) - 1;
+        var col1 = Math.ceil((v.x1 - offset) / w) + 1;
+        for (var col = col0; col <= col1; col++) {
+          var cx = col * w + offset;
+          /* altıgenin üst yarısı — alt yarı komşu satırdan gelir,
+             böylece her kenar bir kez çizilir */
+          ctx.moveTo(cx,        cy - hgt/2);
+          ctx.lineTo(cx + w/2,  cy - q);
+          ctx.lineTo(cx + w/2,  cy + q);
+          ctx.lineTo(cx,        cy + hgt/2);
+          ctx.lineTo(cx - w/2,  cy + q);
+          ctx.lineTo(cx - w/2,  cy - q);
+          ctx.closePath();
+        }
+      }
+      ctx.stroke();
     },
 
     /* ---------- fırça imleci ---------- */
