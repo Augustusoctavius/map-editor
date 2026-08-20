@@ -1909,7 +1909,7 @@
           ctx.stroke(Geo.polyPath(sm));
         }
         ctx.globalAlpha = 1;
-        ctx.fillStyle = '#c99a4b';
+        ctx.fillStyle = '#c08a3e';
         for (var i=0; i<this.pathPts.length; i++) {
           ctx.beginPath(); ctx.arc(this.pathPts[i][0], this.pathPts[i][1], 4/z, 0, Math.PI*2); ctx.fill();
         }
@@ -1920,7 +1920,7 @@
       if (this.rubberBand) {
         var rb = this.rubberBand;
         ctx.save();
-        ctx.strokeStyle = '#c99a4b';
+        ctx.strokeStyle = '#c08a3e';
         ctx.fillStyle = 'rgba(201,154,75,0.08)';
         ctx.lineWidth = 1.5/z;
         ctx.setLineDash([5/z, 4/z]);
@@ -1934,7 +1934,7 @@
       /* multi seçim */
       if (App.selection && App.selection.multi) {
         ctx.save();
-        ctx.strokeStyle = '#c99a4b';
+        ctx.strokeStyle = '#c08a3e';
         ctx.lineWidth = 1.5/z;
         ctx.setLineDash([6/z, 4/z]);
         App.selection.objs.forEach(function(obj) {
@@ -1948,7 +1948,7 @@
       var o = this.selected();
       if (!o) return;
       ctx.save();
-      ctx.strokeStyle = '#c99a4b';
+      ctx.strokeStyle = '#c08a3e';
       ctx.lineWidth = 1.5/z;
       ctx.setLineDash([6/z, 4/z]);
       if (App.selection.layerId === 'scale') {
@@ -1963,7 +1963,7 @@
         ctx.stroke(gp);
         ctx.setLineDash([]);
         this.drawPathHandles(ctx, o, isClosed, z);
-        ctx.fillStyle = '#c99a4b';
+        ctx.fillStyle = '#c08a3e';
         for (var k=0; k<o.pts.length; k++) {
           ctx.beginPath(); ctx.arc(o.pts[k][0], o.pts[k][1], 4/z, 0, Math.PI*2); ctx.fill();
         }
@@ -2010,7 +2010,7 @@
       var pts = this.resizeHandlePositions(o);
       ctx.save();
       ctx.setLineDash([]);
-      ctx.fillStyle = '#78bfff'; ctx.strokeStyle = '#1c221e'; ctx.lineWidth = 1/z;
+      ctx.fillStyle = '#78bfff'; ctx.strokeStyle = '#4a3221'; ctx.lineWidth = 1/z;
       pts.forEach(function (pt) {
         ctx.fillRect(pt.x-5/z, pt.y-5/z, 10/z, 10/z);
         ctx.strokeRect(pt.x-5/z, pt.y-5/z, 10/z, 10/z);
