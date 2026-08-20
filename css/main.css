@@ -239,3 +239,26 @@ textarea{font-family:var(--f-display);font-size:13px}
 .terrain-sw canvas{height:30px}
 
 input[type=text].sel{font-family:var(--f-display);font-size:12.5px}
+
+/* ---------- erişilebilirlik ----------
+   Klavyeyle gezen kullanıcı nerede olduğunu görebilmeli. :focus-visible
+   yalnızca klavye/AT gezinmesinde görünür, fare tıklamasında değil. */
+:focus-visible{
+  outline:2px solid var(--brass);
+  outline-offset:2px;
+  border-radius:3px;
+}
+.tool:focus-visible,.tab:focus-visible,.shell-tab:focus-visible{outline-offset:-2px}
+#view:focus-visible{outline-offset:-3px}
+
+/* fare kullanıcısına halka gösterme (destekleyen tarayıcılarda) */
+:focus:not(:focus-visible){outline:none}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+    scroll-behavior:auto !important;
+  }
+}

@@ -869,7 +869,9 @@
       var target = $('view-' + name);
       if (target) target.classList.remove('hidden');
       document.querySelectorAll('.shell-tab').forEach(function (t) {
-        t.classList.toggle('active', t.getAttribute('data-view-link') === name);
+        var on = t.getAttribute('data-view-link') === name;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
       });
       if ($('shell-nav')) $('shell-nav').classList.toggle('hidden', name === 'editor');
       if (name === 'canvas') this.refreshCanvasList();
@@ -997,7 +999,9 @@
       App.tool = name;
       Tools.cancelPath();
       document.querySelectorAll('.tool').forEach(function (b) {
-        b.classList.toggle('active', b.getAttribute('data-tool') === name);
+        var on = b.getAttribute('data-tool') === name;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
       document.querySelectorAll('.opt-group').forEach(function (g) {
         g.classList.toggle('show', g.getAttribute('data-for').split(' ').indexOf(name) >= 0);
@@ -1460,7 +1464,9 @@
 
     showTab: function (name) {
       document.querySelectorAll('.tab').forEach(function (t) {
-        t.classList.toggle('active', t.getAttribute('data-tab') === name);
+        var on = t.getAttribute('data-tab') === name;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
       });
       document.querySelectorAll('.tab-body').forEach(function (b) {
         b.classList.toggle('hidden', b.getAttribute('data-tab') !== name);
