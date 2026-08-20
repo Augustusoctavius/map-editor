@@ -9,6 +9,8 @@
   var DICT = {
     tr: {
       new:'Yeni', open:'Aç', save:'Kaydet', parchment:'Parşömen', grid:'Izgara', shore:'Kıyı',
+      narrow_title:'Editör için daha geniş bir ekran gerekli', narrow_desc:'Harita editörü; araç rayı, tuval ve katman paneliyle yan yana çalışan bir masaüstü yerleşimi kullanır. Bu düzenin sığması için en az 1024 × 600 piksel gerekir.',
+      narrow_hint:'Tablet kullanıyorsan cihazı yatay çevirmeyi dene.', narrow_current:'Bu ekran', narrow_back:'Ana sayfaya dön',
       grp_navigate:'Gezinme', grp_terrain:'Arazi', grp_water:'Su & Yollar', grp_markers:'İşaretler', grp_regions:'Bölge & Ölçüm',
       t_select:'Seç', t_landmass:'Kara', t_erase:'Deniz', t_fill:'Doldur', t_terrain:'Arazi', t_symbol:'Sembol',
       t_river:'Nehir', t_road:'Yol', t_label:'Etiket', t_pan:'Kaydır', t_eyedrop:'Örnekle', t_measure:'Ölç', h_measure:'Haritada sürükleyerek iki nokta arası gerçek mesafeyi ölçek çubuğuna göre hesapla. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez.', t_lasso:'Kement', h_lasso:'Sürükleyerek kapalı bir alan çiz: Kara + Arazi + Yükselti o alanda birlikte kaldırılıp taşınabilir hâle gelir. Sürükleyerek taşı, üstteki tutamaçla döndür. Enter ile onayla, Escape ile iptal et, Delete ile alanı tamamen sil.',
@@ -68,6 +70,8 @@
     },
     en: {
       new:'New', open:'Open', save:'Save', parchment:'Parchment', grid:'Grid', shore:'Shore',
+      narrow_title:'The editor needs a wider screen', narrow_desc:'The map editor uses a desktop layout with the tool rail, canvas and layer panel side by side. It needs at least 1024 × 600 pixels to fit.',
+      narrow_hint:'On a tablet, try rotating your device to landscape.', narrow_current:'This screen', narrow_back:'Back to home',
       grp_navigate:'Navigate', grp_terrain:'Terrain', grp_water:'Water & Routes', grp_markers:'Markers', grp_regions:'Regions & Measure',
       t_select:'Select', t_landmass:'Land', t_erase:'Sea', t_fill:'Fill', t_terrain:'Terrain', t_symbol:'Symbol',
       t_river:'River', t_road:'Road', t_label:'Label', t_pan:'Pan', t_eyedrop:'Sample', t_measure:'Measure', h_measure:'Drag on the map to compute the real distance between two points based on the scale bar. Measurement lines can be selected, moved, or deleted; they are excluded from PNG/SVG export.', t_lasso:'Lasso', h_lasso:'Drag to draw a closed area: Land + Terrain + Elevation are lifted together within it and become movable. Drag to move, use the top handle to rotate. Enter to commit, Escape to cancel, Delete to remove the area entirely.',
@@ -127,6 +131,8 @@
     },
     de: {
       new:'Neu', open:'Öffnen', save:'Speichern', parchment:'Pergament', grid:'Raster', shore:'Küste',
+      narrow_title:'Der Editor benötigt einen breiteren Bildschirm', narrow_desc:'Der Karteneditor nutzt ein Desktop-Layout mit Werkzeugleiste, Leinwand und Ebenenpanel nebeneinander. Dafür sind mindestens 1024 × 600 Pixel nötig.',
+      narrow_hint:'Auf einem Tablet: Gerät ins Querformat drehen.', narrow_current:'Dieser Bildschirm', narrow_back:'Zur Startseite',
       grp_navigate:'Navigation', grp_terrain:'Gelände', grp_water:'Wasser & Wege', grp_markers:'Marker', grp_regions:'Regionen & Maß',
       t_select:'Auswahl', t_landmass:'Land', t_erase:'Meer', t_fill:'Füllen', t_terrain:'Gelände', t_symbol:'Symbol',
       t_river:'Fluss', t_road:'Straße', t_label:'Beschriftung', t_pan:'Verschieben', t_eyedrop:'Pipette', t_measure:'Messen', h_measure:'Auf der Karte ziehen, um die reale Entfernung zwischen zwei Punkten anhand des Maßstabsbalkens zu berechnen. Messlinien können ausgewählt, verschoben oder gelöscht werden; sie sind vom PNG/SVG-Export ausgeschlossen.', t_lasso:'Lasso', h_lasso:'Ziehen, um einen geschlossenen Bereich zu zeichnen: Land + Gelände + Höhenrelief werden darin gemeinsam angehoben und verschiebbar. Ziehen zum Verschieben, oberer Griff zum Drehen. Enter bestätigt, Escape bricht ab, Entf löscht den Bereich vollständig.',
@@ -186,6 +192,8 @@
     },
     fr: {
       new:'Nouveau', open:'Ouvrir', save:'Enregistrer', parchment:'Parchemin', grid:'Grille', shore:'Rivage',
+      narrow_title:'L\'éditeur nécessite un écran plus large', narrow_desc:'L\'éditeur de carte utilise une mise en page bureau avec la barre d\'outils, le canevas et le panneau de calques côte à côte. Il faut au moins 1024 × 600 pixels.',
+      narrow_hint:'Sur tablette, essayez de passer en mode paysage.', narrow_current:'Cet écran', narrow_back:'Retour à l\'accueil',
       grp_navigate:'Navigation', grp_terrain:'Terrain', grp_water:'Eaux & Routes', grp_markers:'Repères', grp_regions:'Régions & Mesure',
       t_select:'Sélection', t_landmass:'Terre', t_erase:'Mer', t_fill:'Remplir', t_terrain:'Terrain', t_symbol:'Symbole',
       t_river:'Rivière', t_road:'Route', t_label:'Étiquette', t_pan:'Déplacer', t_eyedrop:'Pipette', t_measure:'Mesurer', h_measure:'Faites glisser sur la carte pour calculer la distance réelle entre deux points selon l\'échelle. Les lignes de mesure peuvent être sélectionnées, déplacées ou supprimées ; elles sont exclues de l\'export PNG/SVG.', t_lasso:'Lasso', h_lasso:'Faites glisser pour tracer une zone fermée : Terre + Terrain + Relief y sont soulevés ensemble et deviennent déplaçables. Glissez pour déplacer, utilisez la poignée du haut pour pivoter. Entrée pour valider, Échap pour annuler, Suppr pour effacer entièrement la zone.',
@@ -245,6 +253,8 @@
     },
     es: {
       new:'Nuevo', open:'Abrir', save:'Guardar', parchment:'Pergamino', grid:'Cuadrícula', shore:'Costa',
+      narrow_title:'El editor necesita una pantalla más ancha', narrow_desc:'El editor de mapas usa un diseño de escritorio con la barra de herramientas, el lienzo y el panel de capas en paralelo. Necesita al menos 1024 × 600 píxeles.',
+      narrow_hint:'En tablet, prueba a girar el dispositivo en horizontal.', narrow_current:'Esta pantalla', narrow_back:'Volver al inicio',
       grp_navigate:'Navegación', grp_terrain:'Terreno', grp_water:'Agua y Rutas', grp_markers:'Marcadores', grp_regions:'Regiones y Medida',
       t_select:'Seleccionar', t_landmass:'Tierra', t_erase:'Mar', t_fill:'Rellenar', t_terrain:'Terreno', t_symbol:'Símbolo',
       t_river:'Río', t_road:'Camino', t_label:'Etiqueta', t_pan:'Desplazar', t_eyedrop:'Muestra', t_measure:'Medir', h_measure:'Arrastra en el mapa para calcular la distancia real entre dos puntos según la escala. Las líneas de medición se pueden seleccionar, mover o eliminar; se excluyen de la exportación PNG/SVG.', t_lasso:'Lazo', h_lasso:'Arrastra para trazar un área cerrada: Tierra + Terreno + Relieve se levantan juntos dentro de ella y se vuelven movibles. Arrastra para mover, usa el tirador superior para rotar. Intro para confirmar, Esc para cancelar, Supr para eliminar el área por completo.',
@@ -304,6 +314,8 @@
     },
     it: {
       new:'Nuovo', open:'Apri', save:'Salva', parchment:'Pergamena', grid:'Griglia', shore:'Costa',
+      narrow_title:'L\'editor richiede uno schermo più ampio', narrow_desc:'L\'editor di mappe usa un layout desktop con barra strumenti, tela e pannello livelli affiancati. Servono almeno 1024 × 600 pixel.',
+      narrow_hint:'Su tablet, prova a ruotare il dispositivo in orizzontale.', narrow_current:'Questo schermo', narrow_back:'Torna alla home',
       grp_navigate:'Navigazione', grp_terrain:'Terreno', grp_water:'Acque e Vie', grp_markers:'Segnalini', grp_regions:'Regioni e Misura',
       t_select:'Seleziona', t_landmass:'Terra', t_erase:'Mare', t_fill:'Riempi', t_terrain:'Terreno', t_symbol:'Simbolo',
       t_river:'Fiume', t_road:'Strada', t_label:'Etichetta', t_pan:'Sposta', t_eyedrop:'Campiona', t_measure:'Misura', h_measure:'Trascina sulla mappa per calcolare la distanza reale tra due punti in base alla scala. Le linee di misura possono essere selezionate, spostate o eliminate; sono escluse dall\'esportazione PNG/SVG.', t_lasso:'Laccio', h_lasso:'Trascina per disegnare un\'area chiusa: Terra + Terreno + Rilievo vengono sollevati insieme al suo interno e diventano spostabili. Trascina per spostare, usa la maniglia superiore per ruotare. Invio per confermare, Esc per annullare, Canc per eliminare completamente l\'area.',
@@ -363,6 +375,8 @@
     },
     pt: {
       new:'Novo', open:'Abrir', save:'Guardar', parchment:'Pergaminho', grid:'Grelha', shore:'Costa',
+      narrow_title:'O editor precisa de um ecrã mais largo', narrow_desc:'O editor de mapas usa um layout de computador com a barra de ferramentas, a tela e o painel de camadas lado a lado. São necessários pelo menos 1024 × 600 pixéis.',
+      narrow_hint:'Num tablet, tente rodar o dispositivo na horizontal.', narrow_current:'Este ecrã', narrow_back:'Voltar ao início',
       grp_navigate:'Navegação', grp_terrain:'Terreno', grp_water:'Água e Rotas', grp_markers:'Marcadores', grp_regions:'Regiões e Medida',
       t_select:'Selecionar', t_landmass:'Terra', t_erase:'Mar', t_fill:'Preencher', t_terrain:'Terreno', t_symbol:'Símbolo',
       t_river:'Rio', t_road:'Estrada', t_label:'Etiqueta', t_pan:'Deslocar', t_eyedrop:'Amostra', t_measure:'Medir', h_measure:'Arraste no mapa para calcular a distância real entre dois pontos com base na escala. As linhas de medição podem ser selecionadas, movidas ou eliminadas; são excluídas da exportação PNG/SVG.', t_lasso:'Laço', h_lasso:'Arraste para desenhar uma área fechada: Terra + Terreno + Relevo são levantados juntos nessa área e tornam-se móveis. Arraste para mover, use a pega superior para rodar. Enter para confirmar, Esc para cancelar, Delete para eliminar a área por completo.',
@@ -422,6 +436,8 @@
     },
     nl: {
       new:'Nieuw', open:'Openen', save:'Opslaan', parchment:'Perkament', grid:'Raster', shore:'Kust',
+      narrow_title:'De editor heeft een breder scherm nodig', narrow_desc:'De kaarteditor gebruikt een desktopindeling met gereedschapsbalk, canvas en lagenpaneel naast elkaar. Daarvoor is minimaal 1024 × 600 pixels nodig.',
+      narrow_hint:'Op een tablet: draai het apparaat naar liggend.', narrow_current:'Dit scherm', narrow_back:'Terug naar start',
       grp_navigate:'Navigatie', grp_terrain:'Terrein', grp_water:'Water & Routes', grp_markers:'Markeringen', grp_regions:"Regio's & Meten",
       t_select:'Selecteren', t_landmass:'Land', t_erase:'Zee', t_fill:'Vullen', t_terrain:'Terrein', t_symbol:'Symbool',
       t_river:'Rivier', t_road:'Weg', t_label:'Label', t_pan:'Verschuiven', t_eyedrop:'Pipet', t_measure:'Meten', h_measure:'Sleep op de kaart om de werkelijke afstand tussen twee punten te berekenen op basis van de schaal. Meetlijnen kunnen worden geselecteerd, verplaatst of verwijderd; ze worden niet meegenomen in de PNG/SVG-export.', t_lasso:'Lasso', h_lasso:'Sleep om een gesloten gebied te tekenen: Land + Terrein + Reliëf worden daarbinnen samen opgetild en verplaatsbaar. Sleep om te verplaatsen, gebruik de bovenste handgreep om te draaien. Enter om te bevestigen, Escape om te annuleren, Delete om het gebied volledig te verwijderen.',
@@ -481,6 +497,8 @@
     },
     pl: {
       new:'Nowy', open:'Otwórz', save:'Zapisz', parchment:'Pergamin', grid:'Siatka', shore:'Wybrzeże',
+      narrow_title:'Edytor wymaga szerszego ekranu', narrow_desc:'Edytor map korzysta z układu desktopowego: pasek narzędzi, płótno i panel warstw obok siebie. Potrzeba co najmniej 1024 × 600 pikseli.',
+      narrow_hint:'Na tablecie spróbuj obrócić urządzenie poziomo.', narrow_current:'Ten ekran', narrow_back:'Powrót do strony głównej',
       grp_navigate:'Nawigacja', grp_terrain:'Teren', grp_water:'Woda i Drogi', grp_markers:'Znaczniki', grp_regions:'Regiony i Pomiar',
       t_select:'Zaznacz', t_landmass:'Ląd', t_erase:'Morze', t_fill:'Wypełnij', t_terrain:'Teren', t_symbol:'Symbol',
       t_river:'Rzeka', t_road:'Droga', t_label:'Etykieta', t_pan:'Przesuń', t_eyedrop:'Próbnik', t_measure:'Mierz', h_measure:'Przeciągnij po mapie, aby obliczyć rzeczywistą odległość między dwoma punktami na podstawie skali. Linie pomiarowe można zaznaczać, przesuwać lub usuwać; nie są uwzględniane w eksporcie PNG/SVG.', t_lasso:'Lasso', h_lasso:'Przeciągnij, aby narysować zamknięty obszar: Ląd + Teren + Rzeźba terenu są w nim razem podnoszone i stają się przesuwalne. Przeciągnij, aby przesunąć, użyj górnego uchwytu, aby obrócić. Enter zatwierdza, Escape anuluje, Delete całkowicie usuwa obszar.',
@@ -540,6 +558,8 @@
     },
     ru: {
       new:'Новый', open:'Открыть', save:'Сохранить', parchment:'Пергамент', grid:'Сетка', shore:'Берег',
+      narrow_title:'Редактору нужен экран пошире', narrow_desc:'Редактор карт использует настольную раскладку: панель инструментов, холст и панель слоёв рядом. Требуется минимум 1024 × 600 пикселей.',
+      narrow_hint:'На планшете попробуйте повернуть устройство горизонтально.', narrow_current:'Этот экран', narrow_back:'На главную',
       grp_navigate:'Навигация', grp_terrain:'Рельеф', grp_water:'Вода и пути', grp_markers:'Метки', grp_regions:'Регионы и мера',
       t_select:'Выделение', t_landmass:'Суша', t_erase:'Море', t_fill:'Заливка', t_terrain:'Местность', t_symbol:'Символ',
       t_river:'Река', t_road:'Дорога', t_label:'Надпись', t_pan:'Перемещение', t_eyedrop:'Пипетка', t_measure:'Измерить', h_measure:'Перетаскивайте по карте, чтобы вычислить реальное расстояние между двумя точками по масштабной линейке. Линии измерения можно выделять, перемещать или удалять; они не входят в экспорт PNG/SVG.', t_lasso:'Лассо', h_lasso:'Перетаскивайте, чтобы нарисовать замкнутую область: Суша + Местность + Рельеф поднимаются в ней вместе и становятся перемещаемыми. Перетаскивайте для перемещения, используйте верхний маркер для поворота. Enter — подтвердить, Escape — отменить, Delete — полностью удалить область.',
@@ -797,15 +817,53 @@
         e.target.value = '';
       });
 
+      /* cihaz çevrildiğinde / pencere boyutlandığında kapıyı senkronla —
+         yer açılırsa editöre kendiliğinden dön, daralırsa kapıya geç */
+      var rt = 0;
+      window.addEventListener('resize', function () {
+        clearTimeout(rt);
+        rt = setTimeout(function () { self.syncNarrowGate(); }, 150);
+      });
+
       this.renderTutorial();
       this.refreshCanvasList();
       this.showView('home');
+    },
+
+    /* Editörün üç sütunlu yerleşimi için gereken en küçük viewport.
+       Bu ölçünün altında tuval sütunu (1fr) negatife düşüyor. */
+    EDITOR_MIN_W: 1024,
+    EDITOR_MIN_H: 600,
+
+    editorFits: function () {
+      return window.innerWidth >= this.EDITOR_MIN_W &&
+             window.innerHeight >= this.EDITOR_MIN_H;
+    },
+
+    /* Ekran editöre yetmiyorsa bozuk arayüz yerine açıklayıcı kapıyı göster.
+       Kullanıcı hangi görünümü istediğini _wantedView'da saklıyoruz ki
+       cihaz yatay çevrilip yer açıldığında oraya kendiliğinden dönebilelim. */
+    syncNarrowGate: function () {
+      var el = $('narrow-current-size');
+      if (el) el.textContent = window.innerWidth + ' × ' + window.innerHeight;
+      if (this._wantedView !== 'editor') return;
+      if (this._currentView === 'narrow' && this.editorFits()) this.showView('editor');
+      else if (this._currentView === 'editor' && !this.editorFits()) this.showView('narrow');
     },
 
     showView: function (name) {
       /* editörden ayrılırken (ör. ana sayfaya dönüş) sessizce oto-kaydet —
          böylece "Tuval" sekmesindeki kayıtlı tuvaller listesinde görünür */
       if (this._currentView === 'editor' && name !== 'editor') Exporter.autoSave();
+
+      /* 'narrow' kapının kendisi; kullanıcının asıl niyetini ezmemeli */
+      if (name !== 'narrow') this._wantedView = name;
+      if (name === 'editor' && !this.editorFits()) name = 'narrow';
+      if (name === 'narrow') {
+        var szEl = $('narrow-current-size');
+        if (szEl) szEl.textContent = window.innerWidth + ' × ' + window.innerHeight;
+      }
+
       this._currentView = name;
       document.querySelectorAll('.shell-view').forEach(function (v) { v.classList.add('hidden'); });
       var target = $('view-' + name);

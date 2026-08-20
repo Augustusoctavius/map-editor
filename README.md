@@ -131,6 +131,25 @@ Bir nesne seçildiğinde ek işlemler görünür: **Çoğalt**, **Sil**, öne/ar
 - **Minimap** — Sağ altta, tüm haritanın küçük genel görünümü ve hızlı gezinme.
 - **Klavye kısayolları** — Araç seçimi için tek harf tuşları (yukarıdaki tabloda), yön tuşlarıyla kaydırma, `+`/`-`/`0` ile yakınlaştır/uzaklaştır/sığdır, `Delete` ile seçili nesneyi (veya son yol noktasını) sil, `Escape` ile çizimi iptal et.
 
+## Ekran uyumluluğu
+
+**Karşılama sayfaları** (Ana Sayfa / Tuval / Rehber / Topluluk) 360 piksellik telefondan
+4K televizyona kadar tek akışkan ölçekle çalışır: tipografi ve boşluklar `clamp()` ile
+viewport'a bağlı büyür, üst sınır çok büyük ekranda satır uzunluğunu okunur tutar.
+640 piksel altında kart ızgaraları tek sütuna iner ve formlar tam genişliğe yayılır.
+
+**Editör masaüstü yerleşimi gerektirir.** Araç rayı + tuval + katman paneli yan yana
+çalışan üç sütunlu sabit bir düzendir; **1024 × 600 pikselin** altında tuval sütunu
+sıfıra düşer. Bu ölçünün altında bozuk bir arayüz göstermek yerine ne gerektiğini
+açıklayan bir bilgi ekranı çıkar (`#view-narrow`) ve mevcut ekran ölçüsünü gösterir.
+Eşik `UI.EDITOR_MIN_W` / `UI.EDITOR_MIN_H` ile tanımlıdır; cihaz yatay çevrilip yer
+açıldığında editöre kendiliğinden dönülür, daraldığında bilgi ekranına geçilir
+(geçmeden önce sessiz oto-kayıt çalışır, çizim kaybolmaz).
+
+Dokunmatik cihazlarda editör henüz hedeflenmiyor: çizim `pointer` olaylarıyla çalışır
+ve yol araçları çift dokunmayla bitirilebilir, ancak yakınlaştırma yalnızca fare
+tekerleğine bağlıdır (pinch-zoom yoktur) ve bazı kontroller parmak için küçüktür.
+
 ## Mimari (geliştiriciler için)
 
 Kod tabanının modül yapısı, yükleme sırası ve her dosyanın sorumluluğu için bkz. [`CLAUDE.md`](./CLAUDE.md).

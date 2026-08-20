@@ -56,3 +56,8 @@
 .lang-flag{font-size:15px;line-height:1}
 .lang-name{flex:1}
 .lang-item.active::after{content:'✓';font-size:11px;color:var(--brass)}
+
+/* Arayüz ikonları tek renk: emoji yerine currentColor alan satır içi SVG,
+   böylece pirinç palet her platformda bozulmadan kalır. */
+.ico-svg{width:16px;height:16px;display:block}
+.tb-btn.lang{padding:0 8px}
