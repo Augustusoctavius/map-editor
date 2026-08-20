@@ -24,6 +24,7 @@ Uygulama artık düz editör yerine, üstte dört sekmeli bir karşılama ekran�
 
 - **Ana Sayfa** — proje tanıtımı ve "Haritana başla" butonu.
 - **Tuval** — hazır ölçülerden veya özel genişlik/yükseklikten yeni bir tuval oluşturur, `.json` dosyasından proje içe aktarır, ve bu tarayıcıda daha önce kaydedilmiş tuvalleri listeler (açma/silme). Kayıtlar tarayıcının `localStorage`'ında tutulur — backend yoktur, bu yüzden başka bir cihazdan görünmez; gerçek yedekleme/taşıma için hâlâ `.json` dışa/içe aktarma kullanılır. Editördeki "Kaydet" butonu `.json` indirmeye ek olarak bu listeyi de otomatik günceller. Ayrıca sessiz oto-kayıt vardır: editörden Ana Sayfa/Tuval gibi başka bir sekmeye geçildiğinde ve editördeyken her 10 dakikada bir, üzerinde çizim yapılmış tuval otomatik olarak bu listeye kaydedilir.
+- **Tuval → Şablonla başla** — Boş tuval yerine hazır bir kıyı çizgisiyle başlamak için altı şablon: Kıta, Ada, Takımada, Krallık, Savaş alanı (altıgen ızgaralı) ve Boş tuval. Şablonlar yeni bir mekanik değildir; mevcut prosedürel kara üretecini hazır şablon/pürüzlülük değerleriyle çağırır, arazi türünü seçer ve gerekiyorsa ızgarayı açar. Boyut ve harita adı yeni-tuval formundan okunur.
 - **Rehber** — sol araç çubuğundaki her aracın kısa açıklaması.
 - **Topluluk** — proje hakkında ve GitHub bağlantısı.
 
@@ -39,6 +40,8 @@ Bir tuval oluşturulduğunda veya açıldığında, bildiğiniz editör ekranın
 | **↶ / ↷ (Geri al / Yinele)** | 50 adıma kadar geri al/yinele geçmişi. `Ctrl+Z` / `Ctrl+Shift+Z` / `Ctrl+Y`. |
 | **PNG / PNG 2× / PNG 4×** | Haritayı normal, 2× veya 4× çözünürlükte PNG olarak dışa aktarır. |
 | **SVG** | Haritayı gerçek vektör SVG olarak dışa aktarır — sembol yolları (`Path2D` verisi) doğrudan `<path>` olarak yazılır, bitmap gömme değildir. Kıyı parlaması ve yükselti gölgelendirmesi gibi raster efektler base64 `<image>` olarak gömülür. |
+| **HTML** | Haritayı **tek bir `.html` dosyası** olarak dışa aktarır: görüntü ve küçük bir görüntüleyici (sürükle-kaydır, tekerlekle yakınlaş, çift tıkla sığdır) dosyanın içine gömülüdür. Dış istek, sunucu veya betik kütüphanesi yok — dosyayı yollayıp çift tıklamak yeterli. En uzun kenar (1280–4096 px) ve biçim (PNG kayıpsız / JPEG küçük dosya) seçilebilir. |
+| **🖨 Baskı / PDF** | Haritayı sayfa boyu (A5–Tabloid), yön, kenar boşluğu ve DPI (96 / 150 / 300) seçerek tarayıcının baskı iletişimine gönderir. Oradan yazıcıya basılabilir ya da "PDF olarak kaydet" ile gerçek PDF üretilebilir; ayrı bir PDF kütüphanesi kullanılmaz. Harita, seçilen sayfanın basılabilir alanına en-boy oranı korunarak sığdırılır. |
 | **🌐 Dil** | 10 dilli arayüz dili seçici (bayraklı, açılır menü). |
 
 ## Araç çubuğu (sol taraf, dikey)
@@ -80,7 +83,7 @@ bölümünü açar ve tuşuyla da seçilebilir. Rehber sayfası da aynı gruplam
 |---|---|---|
 | **Sembol** | `S` | ~200+ düz (ink-style) sembol ve onlarca izometrik bina/yapıdan (kale, kulübe, değirmen, köprü vb.) birini yerleştirir. Renk tonu (hue) ve "yıpranma/wear" (eskime lekesi) kaydırıcıları ile özelleştirilebilir; `[` / `]` ile döndürülür. **Fırça modu** açıkken sürükleyerek onlarca sembolü otomatik kümeleyerek dizer (orman/dağ sırası gibi); "Karaya kenetle" işaretliyken denize taşan noktalar otomatik atlanır ve sonradan deniz o bölgeye genişlerse sembol otomatik gizlenir. |
 | **Kaynak** | `Y` | Maden, tarım, avlanma, balıkçılık, ticaret ve taş ocağı olmak üzere 6 türden birini seçip haritaya oyun-tasarımı amaçlı kaynak işareti yerleştirir (kervan/ticaret temalı haritalar için). |
-| **Etiket** | `L` | Metin etiketi yerleştirir; hazır stil (başlık, şehir adı, bölge adı vb.) ön ayarları mevcuttur. **"Yola oturt"** işaretliyse ve tıklama bir nehre/yola yakınsa, etiket o çizginin gerçek şekline harf harf oturur (dairesel yay değil, çizilmiş eğrinin kendisi). |
+| **Etiket** | `L` | Metin etiketi yerleştirir; hazır stil (başlık, şehir adı, bölge adı vb.) ön ayarları mevcuttur. **"Yola oturt"** işaretliyse ve tıklama bir nehre/yola yakınsa, etiket o çizginin gerçek şekline harf harf oturur (dairesel yay değil, çizilmiş eğrinin kendisi). | **Tipografi** bölümünden yazı ailesi (on tarihsel aile: eski kitap, anıtsal, Roma kitabesi, ünsiyal, gotik yazı, divani el yazısı, kalın serif, fantastik, sade, daktilo), kapıt (kurdele/levha/tomar/taş), büyük harf, dış hat + rengi ve gölge ayrı ayrı denetlenir; stil şablonu yalnızca bir başlangıç noktasıdır. Proje harici font yüklemez — her aile bir yığındır (macOS/Windows/Linux karşılıkları sırayla denenir), kurulu olanlar listede `·` ile işaretlenir. Ayrıca **ad üreteci**: yedi kültür (Batı, Akdeniz, Kuzey, Doğu, Taş, Orman halkı, Yaban) × sekiz coğrafi tür için hece tabanlı, sözlüksüz yer adı önerileri — öneriye tıklayınca metin alanına yazılır.
 
 ### Bölge & Ölçüm
 

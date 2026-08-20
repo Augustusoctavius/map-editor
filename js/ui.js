@@ -6,6 +6,13 @@
 (function (global) {
   'use strict';
 
+  /* innerHTML ile kurulan modal gövdelerinde kullanıcı metni (harita adı)
+     ve çeviri dizeleri geçtiği için kaçış şart. */
+  function esc(v) {
+    return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
   var DICT = {
     tr: {
       new:'Yeni', open:'Aç', save:'Kaydet', parchment:'Parşömen', grid:'Izgara', shore:'Kıyı',
@@ -17,6 +24,7 @@
       tpl_title:'Şablonla başla', tpl_desc:'Hazır bir kıyı çizgisiyle başla, sonra üzerine kendi dünyanı kur.', tpl_ready:'tuval hazır',
       tpl_continent:'Kıta', tpl_continent_d:'Geniş ana kara, girintili kıyılar', tpl_island:'Ada', tpl_island_d:'Tek büyük ada, çevresi açık deniz', tpl_archipelago:'Takımada', tpl_archipelago_d:'Dağınık adalar ve sığ boğazlar', tpl_kingdom:'Krallık', tpl_kingdom_d:'Yumuşak kıyılı, tarıma elverişli topraklar', tpl_battle:'Savaş alanı', tpl_battle_d:'Altıgen ızgaralı küçük arazi', tpl_blank:'Boş tuval', tpl_blank_d:'Her şeye sıfırdan başla',
       o_outlinecolor:'Dış hat rengi',
+      exp_html_t:'Tek dosya HTML', exp_print_t:'Baskı / PDF', exp_png2_t:'2× çözünürlük', exp_png4_t:'4× çözünürlük', exp_maxdim:'En uzun kenar', exp_format:'Biçim', exp_fmt_png:'PNG · keskin, büyük dosya', exp_fmt_jpeg:'JPEG · küçük dosya', exp_title:'Başlık', exp_html_help:'Tek bir .html dosyası indirilir: harita ve küçük bir görüntüleyici içine gömülüdür. Sunucu gerekmez — dosyayı yollayıp çift tıklamak yeterli.', exp_page:'Sayfa boyu', exp_orient:'Yön', exp_portrait:'Dikey', exp_landscape:'Yatay', exp_margin:'Kenar boşluğu', exp_dpi:'Çözünürlük', exp_dpi_screen:'ekran', exp_dpi_normal:'normal baskı', exp_dpi_high:'yüksek kalite', exp_print_help:'Tarayıcının baskı penceresi açılır. Oradan yazıcıya gönderebilir ya da "PDF olarak kaydet" ile PDF üretebilirsin.', printing:'Baskı hazırlanıyor', print_failed:'Baskı penceresi açılamadı', viewer_hint:'sürükle · tekerlek · çift tık', viewer_in:'Yakınlaş', viewer_out:'Uzaklaş', viewer_fit:'Sığdır',
       o_typography:'Tipografi', o_font:'Yazı ailesi', o_banner:'Kapıt', o_banner_none:'Yok', o_banner_ribbon:'Kurdele', o_banner_plate:'Levha', o_banner_scroll:'Tomar', o_banner_stone:'Taş', o_caps:'Büyük harf', o_outline:'Dış hat', o_shadow:'Gölge', h_font_missing:'Bu yazı ailesi bu cihazda kurulu değil; en yakın karşılığı kullanılıyor. Listede • ile işaretli olanlar kurulu.',
       grp_navigate:'Gezinme', grp_terrain:'Arazi', grp_water:'Su & Yollar', grp_markers:'İşaretler', grp_regions:'Bölge & Ölçüm',
       t_select:'Seç', t_landmass:'Kara', t_erase:'Deniz', t_fill:'Doldur', t_terrain:'Arazi', t_symbol:'Sembol',
@@ -85,6 +93,7 @@
       tpl_title:'Start from a template', tpl_desc:'Begin with a ready-made coastline, then build your world on top of it.', tpl_ready:'canvas ready',
       tpl_continent:'Continent', tpl_continent_d:'Broad landmass with indented coasts', tpl_island:'Island', tpl_island_d:'A single large island in open sea', tpl_archipelago:'Archipelago', tpl_archipelago_d:'Scattered isles and shallow straits', tpl_kingdom:'Kingdom', tpl_kingdom_d:'Gentle coasts, farmable inland', tpl_battle:'Battle map', tpl_battle_d:'Small terrain with a hex grid', tpl_blank:'Blank canvas', tpl_blank_d:'Start from nothing',
       o_outlinecolor:'Outline colour',
+      exp_html_t:'Single-file HTML', exp_print_t:'Print / PDF', exp_png2_t:'2× resolution', exp_png4_t:'4× resolution', exp_maxdim:'Longest edge', exp_format:'Format', exp_fmt_png:'PNG · sharp, large file', exp_fmt_jpeg:'JPEG · small file', exp_title:'Title', exp_html_help:'Downloads one .html file with the map and a small viewer embedded inside it. No server needed — send the file and double-click it.', exp_page:'Page size', exp_orient:'Orientation', exp_portrait:'Portrait', exp_landscape:'Landscape', exp_margin:'Margin', exp_dpi:'Resolution', exp_dpi_screen:'screen', exp_dpi_normal:'normal print', exp_dpi_high:'high quality', exp_print_help:'Opens your browser’s print dialog. From there you can send it to a printer or choose “Save as PDF”.', printing:'Preparing print', print_failed:'Could not open the print dialog', viewer_hint:'drag · wheel · double-click', viewer_in:'Zoom in', viewer_out:'Zoom out', viewer_fit:'Fit',
       o_typography:'Typography', o_font:'Typeface', o_banner:'Banner', o_banner_none:'None', o_banner_ribbon:'Ribbon', o_banner_plate:'Plate', o_banner_scroll:'Scroll', o_banner_stone:'Stone', o_caps:'Uppercase', o_outline:'Outline', o_shadow:'Shadow', h_font_missing:'This typeface is not installed on this device; the closest match is used instead. Entries marked · are installed.',
       grp_navigate:'Navigate', grp_terrain:'Terrain', grp_water:'Water & Routes', grp_markers:'Markers', grp_regions:'Regions & Measure',
       t_select:'Select', t_landmass:'Land', t_erase:'Sea', t_fill:'Fill', t_terrain:'Terrain', t_symbol:'Symbol',
@@ -153,6 +162,7 @@
       tpl_title:'Mit einer Vorlage beginnen', tpl_desc:'Starte mit einer fertigen Küstenlinie und baue deine Welt darauf auf.', tpl_ready:'Leinwand bereit',
       tpl_continent:'Kontinent', tpl_continent_d:'Weite Landmasse mit zerklüfteten Küsten', tpl_island:'Insel', tpl_island_d:'Eine große Insel im offenen Meer', tpl_archipelago:'Archipel', tpl_archipelago_d:'Verstreute Inseln und flache Meerengen', tpl_kingdom:'Königreich', tpl_kingdom_d:'Sanfte Küsten, fruchtbares Hinterland', tpl_battle:'Schlachtkarte', tpl_battle_d:'Kleines Gelände mit Hexfeld-Raster', tpl_blank:'Leere Leinwand', tpl_blank_d:'Ganz von vorn anfangen',
       o_outlinecolor:'Konturfarbe',
+      exp_html_t:'Einzeldatei-HTML', exp_print_t:'Drucken / PDF', exp_png2_t:'2× Auflösung', exp_png4_t:'4× Auflösung', exp_maxdim:'Längste Kante', exp_format:'Format', exp_fmt_png:'PNG · scharf, große Datei', exp_fmt_jpeg:'JPEG · kleine Datei', exp_title:'Titel', exp_html_help:'Lädt eine einzelne .html-Datei mit der Karte und einem kleinen Betrachter darin herunter. Kein Server nötig — Datei verschicken und doppelklicken.', exp_page:'Seitenformat', exp_orient:'Ausrichtung', exp_portrait:'Hochformat', exp_landscape:'Querformat', exp_margin:'Rand', exp_dpi:'Auflösung', exp_dpi_screen:'Bildschirm', exp_dpi_normal:'normaler Druck', exp_dpi_high:'hohe Qualität', exp_print_help:'Öffnet den Druckdialog des Browsers. Dort kannst du drucken oder „Als PDF speichern“ wählen.', printing:'Druck wird vorbereitet', print_failed:'Druckdialog konnte nicht geöffnet werden', viewer_hint:'ziehen · Rad · Doppelklick', viewer_in:'Vergrößern', viewer_out:'Verkleinern', viewer_fit:'Einpassen',
       o_typography:'Typografie', o_font:'Schriftart', o_banner:'Banner', o_banner_none:'Keins', o_banner_ribbon:'Band', o_banner_plate:'Tafel', o_banner_scroll:'Schriftrolle', o_banner_stone:'Stein', o_caps:'Großbuchstaben', o_outline:'Kontur', o_shadow:'Schatten', h_font_missing:'Diese Schriftart ist auf diesem Gerät nicht installiert; die nächstbeste wird verwendet. Mit · markierte Einträge sind installiert.',
       grp_navigate:'Navigation', grp_terrain:'Gelände', grp_water:'Wasser & Wege', grp_markers:'Marker', grp_regions:'Regionen & Maß',
       t_select:'Auswahl', t_landmass:'Land', t_erase:'Meer', t_fill:'Füllen', t_terrain:'Gelände', t_symbol:'Symbol',
@@ -221,6 +231,7 @@
       tpl_title:'Partir d’un modèle', tpl_desc:'Commence avec un littoral tout prêt, puis bâtis ton monde par-dessus.', tpl_ready:'toile prête',
       tpl_continent:'Continent', tpl_continent_d:'Vaste masse terrestre aux côtes découpées', tpl_island:'Île', tpl_island_d:'Une grande île en pleine mer', tpl_archipelago:'Archipel', tpl_archipelago_d:'Îles éparses et détroits peu profonds', tpl_kingdom:'Royaume', tpl_kingdom_d:'Côtes douces, terres cultivables', tpl_battle:'Carte de bataille', tpl_battle_d:'Petit terrain avec grille hexagonale', tpl_blank:'Toile vierge', tpl_blank_d:'Tout créer depuis zéro',
       o_outlinecolor:'Couleur du contour',
+      exp_html_t:'HTML en un seul fichier', exp_print_t:'Imprimer / PDF', exp_png2_t:'Résolution 2×', exp_png4_t:'Résolution 4×', exp_maxdim:'Plus grand côté', exp_format:'Format', exp_fmt_png:'PNG · net, fichier lourd', exp_fmt_jpeg:'JPEG · fichier léger', exp_title:'Titre', exp_html_help:'Télécharge un seul fichier .html contenant la carte et une petite visionneuse. Aucun serveur requis — envoyez le fichier et double-cliquez.', exp_page:'Format de page', exp_orient:'Orientation', exp_portrait:'Portrait', exp_landscape:'Paysage', exp_margin:'Marge', exp_dpi:'Résolution', exp_dpi_screen:'écran', exp_dpi_normal:'impression normale', exp_dpi_high:'haute qualité', exp_print_help:'Ouvre la fenêtre d’impression du navigateur. Vous pouvez y imprimer ou choisir « Enregistrer au format PDF ».', printing:'Préparation de l’impression', print_failed:'Impossible d’ouvrir la fenêtre d’impression', viewer_hint:'glisser · molette · double-clic', viewer_in:'Zoom avant', viewer_out:'Zoom arrière', viewer_fit:'Ajuster',
       o_typography:'Typographie', o_font:'Police', o_banner:'Bannière', o_banner_none:'Aucune', o_banner_ribbon:'Ruban', o_banner_plate:'Plaque', o_banner_scroll:'Parchemin', o_banner_stone:'Pierre', o_caps:'Majuscules', o_outline:'Contour', o_shadow:'Ombre', h_font_missing:'Cette police n’est pas installée sur cet appareil ; la plus proche est utilisée. Les entrées marquées · sont installées.',
       grp_navigate:'Navigation', grp_terrain:'Terrain', grp_water:'Eaux & Routes', grp_markers:'Repères', grp_regions:'Régions & Mesure',
       t_select:'Sélection', t_landmass:'Terre', t_erase:'Mer', t_fill:'Remplir', t_terrain:'Terrain', t_symbol:'Symbole',
@@ -289,6 +300,7 @@
       tpl_title:'Empezar con una plantilla', tpl_desc:'Comienza con una costa ya hecha y construye tu mundo sobre ella.', tpl_ready:'lienzo listo',
       tpl_continent:'Continente', tpl_continent_d:'Gran masa de tierra con costas recortadas', tpl_island:'Isla', tpl_island_d:'Una gran isla en mar abierto', tpl_archipelago:'Archipiélago', tpl_archipelago_d:'Islas dispersas y estrechos poco profundos', tpl_kingdom:'Reino', tpl_kingdom_d:'Costas suaves, interior cultivable', tpl_battle:'Mapa de batalla', tpl_battle_d:'Terreno pequeño con rejilla hexagonal', tpl_blank:'Lienzo en blanco', tpl_blank_d:'Empezar desde cero',
       o_outlinecolor:'Color del contorno',
+      exp_html_t:'HTML de un solo archivo', exp_print_t:'Imprimir / PDF', exp_png2_t:'Resolución 2×', exp_png4_t:'Resolución 4×', exp_maxdim:'Lado más largo', exp_format:'Formato', exp_fmt_png:'PNG · nítido, archivo grande', exp_fmt_jpeg:'JPEG · archivo pequeño', exp_title:'Título', exp_html_help:'Descarga un único archivo .html con el mapa y un pequeño visor incrustado. No hace falta servidor — envía el archivo y haz doble clic.', exp_page:'Tamaño de página', exp_orient:'Orientación', exp_portrait:'Vertical', exp_landscape:'Horizontal', exp_margin:'Margen', exp_dpi:'Resolución', exp_dpi_screen:'pantalla', exp_dpi_normal:'impresión normal', exp_dpi_high:'alta calidad', exp_print_help:'Abre el diálogo de impresión del navegador. Desde allí puedes imprimir o elegir «Guardar como PDF».', printing:'Preparando la impresión', print_failed:'No se pudo abrir el diálogo de impresión', viewer_hint:'arrastrar · rueda · doble clic', viewer_in:'Acercar', viewer_out:'Alejar', viewer_fit:'Ajustar',
       o_typography:'Tipografía', o_font:'Tipo de letra', o_banner:'Banderola', o_banner_none:'Ninguna', o_banner_ribbon:'Cinta', o_banner_plate:'Placa', o_banner_scroll:'Pergamino', o_banner_stone:'Piedra', o_caps:'Mayúsculas', o_outline:'Contorno', o_shadow:'Sombra', h_font_missing:'Esta tipografía no está instalada en este dispositivo; se usa la más parecida. Las entradas marcadas con · están instaladas.',
       grp_navigate:'Navegación', grp_terrain:'Terreno', grp_water:'Agua y Rutas', grp_markers:'Marcadores', grp_regions:'Regiones y Medida',
       t_select:'Seleccionar', t_landmass:'Tierra', t_erase:'Mar', t_fill:'Rellenar', t_terrain:'Terreno', t_symbol:'Símbolo',
@@ -357,6 +369,7 @@
       tpl_title:'Parti da un modello', tpl_desc:'Inizia con una costa già pronta, poi costruiscici sopra il tuo mondo.', tpl_ready:'tela pronta',
       tpl_continent:'Continente', tpl_continent_d:'Ampia massa continentale dalle coste frastagliate', tpl_island:'Isola', tpl_island_d:'Una grande isola in mare aperto', tpl_archipelago:'Arcipelago', tpl_archipelago_d:'Isole sparse e stretti poco profondi', tpl_kingdom:'Regno', tpl_kingdom_d:'Coste dolci, entroterra coltivabile', tpl_battle:'Mappa di battaglia', tpl_battle_d:'Piccolo terreno con griglia esagonale', tpl_blank:'Tela vuota', tpl_blank_d:'Partire da zero',
       o_outlinecolor:'Colore del contorno',
+      exp_html_t:'HTML in un solo file', exp_print_t:'Stampa / PDF', exp_png2_t:'Risoluzione 2×', exp_png4_t:'Risoluzione 4×', exp_maxdim:'Lato più lungo', exp_format:'Formato', exp_fmt_png:'PNG · nitido, file grande', exp_fmt_jpeg:'JPEG · file piccolo', exp_title:'Titolo', exp_html_help:'Scarica un unico file .html con la mappa e un piccolo visualizzatore incorporato. Nessun server richiesto — invia il file e fai doppio clic.', exp_page:'Formato pagina', exp_orient:'Orientamento', exp_portrait:'Verticale', exp_landscape:'Orizzontale', exp_margin:'Margine', exp_dpi:'Risoluzione', exp_dpi_screen:'schermo', exp_dpi_normal:'stampa normale', exp_dpi_high:'alta qualità', exp_print_help:'Apre la finestra di stampa del browser. Da lì puoi stampare o scegliere «Salva come PDF».', printing:'Preparazione della stampa', print_failed:'Impossibile aprire la finestra di stampa', viewer_hint:'trascina · rotella · doppio clic', viewer_in:'Ingrandisci', viewer_out:'Riduci', viewer_fit:'Adatta',
       o_typography:'Tipografia', o_font:'Carattere', o_banner:'Cartiglio', o_banner_none:'Nessuno', o_banner_ribbon:'Nastro', o_banner_plate:'Targa', o_banner_scroll:'Pergamena', o_banner_stone:'Pietra', o_caps:'Maiuscolo', o_outline:'Contorno', o_shadow:'Ombra', h_font_missing:'Questo carattere non è installato su questo dispositivo; viene usato il più simile. Le voci con · sono installate.',
       grp_navigate:'Navigazione', grp_terrain:'Terreno', grp_water:'Acque e Vie', grp_markers:'Segnalini', grp_regions:'Regioni e Misura',
       t_select:'Seleziona', t_landmass:'Terra', t_erase:'Mare', t_fill:'Riempi', t_terrain:'Terreno', t_symbol:'Simbolo',
@@ -425,6 +438,7 @@
       tpl_title:'Começar por um modelo', tpl_desc:'Comece com uma linha costeira pronta e construa o seu mundo por cima.', tpl_ready:'tela pronta',
       tpl_continent:'Continente', tpl_continent_d:'Vasta massa de terra com costas recortadas', tpl_island:'Ilha', tpl_island_d:'Uma grande ilha em mar aberto', tpl_archipelago:'Arquipélago', tpl_archipelago_d:'Ilhas dispersas e estreitos rasos', tpl_kingdom:'Reino', tpl_kingdom_d:'Costas suaves, interior cultivável', tpl_battle:'Mapa de batalha', tpl_battle_d:'Terreno pequeno com grelha hexagonal', tpl_blank:'Tela vazia', tpl_blank_d:'Começar do zero',
       o_outlinecolor:'Cor do contorno',
+      exp_html_t:'HTML em ficheiro único', exp_print_t:'Imprimir / PDF', exp_png2_t:'Resolução 2×', exp_png4_t:'Resolução 4×', exp_maxdim:'Lado mais longo', exp_format:'Formato', exp_fmt_png:'PNG · nítido, ficheiro grande', exp_fmt_jpeg:'JPEG · ficheiro pequeno', exp_title:'Título', exp_html_help:'Transfere um único ficheiro .html com o mapa e um pequeno visualizador embutido. Não precisa de servidor — envie o ficheiro e faça duplo clique.', exp_page:'Tamanho da página', exp_orient:'Orientação', exp_portrait:'Retrato', exp_landscape:'Paisagem', exp_margin:'Margem', exp_dpi:'Resolução', exp_dpi_screen:'ecrã', exp_dpi_normal:'impressão normal', exp_dpi_high:'alta qualidade', exp_print_help:'Abre a janela de impressão do navegador. A partir daí pode imprimir ou escolher «Guardar como PDF».', printing:'A preparar a impressão', print_failed:'Não foi possível abrir a janela de impressão', viewer_hint:'arrastar · roda · duplo clique', viewer_in:'Aproximar', viewer_out:'Afastar', viewer_fit:'Ajustar',
       o_typography:'Tipografia', o_font:'Tipo de letra', o_banner:'Faixa', o_banner_none:'Nenhuma', o_banner_ribbon:'Fita', o_banner_plate:'Placa', o_banner_scroll:'Pergaminho', o_banner_stone:'Pedra', o_caps:'Maiúsculas', o_outline:'Contorno', o_shadow:'Sombra', h_font_missing:'Este tipo de letra não está instalado neste dispositivo; é usado o mais próximo. As entradas marcadas com · estão instaladas.',
       grp_navigate:'Navegação', grp_terrain:'Terreno', grp_water:'Água e Rotas', grp_markers:'Marcadores', grp_regions:'Regiões e Medida',
       t_select:'Selecionar', t_landmass:'Terra', t_erase:'Mar', t_fill:'Preencher', t_terrain:'Terreno', t_symbol:'Símbolo',
@@ -493,6 +507,7 @@
       tpl_title:'Begin met een sjabloon', tpl_desc:'Start met een kant-en-klare kustlijn en bouw daarop je wereld.', tpl_ready:'canvas klaar',
       tpl_continent:'Continent', tpl_continent_d:'Brede landmassa met grillige kusten', tpl_island:'Eiland', tpl_island_d:'Eén groot eiland in open zee', tpl_archipelago:'Archipel', tpl_archipelago_d:'Verspreide eilanden en ondiepe zeestraten', tpl_kingdom:'Koninkrijk', tpl_kingdom_d:'Zachte kusten, vruchtbaar achterland', tpl_battle:'Slagveldkaart', tpl_battle_d:'Klein terrein met hexraster', tpl_blank:'Leeg canvas', tpl_blank_d:'Helemaal opnieuw beginnen',
       o_outlinecolor:'Omlijningskleur',
+      exp_html_t:'HTML in één bestand', exp_print_t:'Afdrukken / PDF', exp_png2_t:'2× resolutie', exp_png4_t:'4× resolutie', exp_maxdim:'Langste zijde', exp_format:'Formaat', exp_fmt_png:'PNG · scherp, groot bestand', exp_fmt_jpeg:'JPEG · klein bestand', exp_title:'Titel', exp_html_help:'Downloadt één .html-bestand met de kaart en een kleine viewer erin. Geen server nodig — stuur het bestand en dubbelklik erop.', exp_page:'Paginaformaat', exp_orient:'Richting', exp_portrait:'Staand', exp_landscape:'Liggend', exp_margin:'Marge', exp_dpi:'Resolutie', exp_dpi_screen:'scherm', exp_dpi_normal:'normale afdruk', exp_dpi_high:'hoge kwaliteit', exp_print_help:'Opent het afdrukvenster van de browser. Daar kun je afdrukken of “Opslaan als pdf” kiezen.', printing:'Afdruk wordt voorbereid', print_failed:'Kon het afdrukvenster niet openen', viewer_hint:'slepen · wiel · dubbelklik', viewer_in:'Inzoomen', viewer_out:'Uitzoomen', viewer_fit:'Passend',
       o_typography:'Typografie', o_font:'Lettertype', o_banner:'Banier', o_banner_none:'Geen', o_banner_ribbon:'Lint', o_banner_plate:'Plaat', o_banner_scroll:'Perkament', o_banner_stone:'Steen', o_caps:'Hoofdletters', o_outline:'Omlijning', o_shadow:'Schaduw', h_font_missing:'Dit lettertype is niet op dit apparaat geïnstalleerd; het dichtstbijzijnde wordt gebruikt. Items met · zijn geïnstalleerd.',
       grp_navigate:'Navigatie', grp_terrain:'Terrein', grp_water:'Water & Routes', grp_markers:'Markeringen', grp_regions:"Regio's & Meten",
       t_select:'Selecteren', t_landmass:'Land', t_erase:'Zee', t_fill:'Vullen', t_terrain:'Terrein', t_symbol:'Symbool',
@@ -561,6 +576,7 @@
       tpl_title:'Zacznij od szablonu', tpl_desc:'Zacznij od gotowej linii brzegowej, a potem zbuduj na niej swój świat.', tpl_ready:'płótno gotowe',
       tpl_continent:'Kontynent', tpl_continent_d:'Rozległy ląd o poszarpanych wybrzeżach', tpl_island:'Wyspa', tpl_island_d:'Jedna duża wyspa na otwartym morzu', tpl_archipelago:'Archipelag', tpl_archipelago_d:'Rozproszone wyspy i płytkie cieśniny', tpl_kingdom:'Królestwo', tpl_kingdom_d:'Łagodne brzegi, żyzne wnętrze', tpl_battle:'Mapa bitwy', tpl_battle_d:'Mały teren z siatką heksagonalną', tpl_blank:'Puste płótno', tpl_blank_d:'Zacznij od zera',
       o_outlinecolor:'Kolor obrysu',
+      exp_html_t:'HTML w jednym pliku', exp_print_t:'Drukuj / PDF', exp_png2_t:'Rozdzielczość 2×', exp_png4_t:'Rozdzielczość 4×', exp_maxdim:'Dłuższy bok', exp_format:'Format', exp_fmt_png:'PNG · ostry, duży plik', exp_fmt_jpeg:'JPEG · mały plik', exp_title:'Tytuł', exp_html_help:'Pobiera jeden plik .html z mapą i małą przeglądarką w środku. Serwer niepotrzebny — wyślij plik i kliknij dwukrotnie.', exp_page:'Rozmiar strony', exp_orient:'Orientacja', exp_portrait:'Pionowa', exp_landscape:'Pozioma', exp_margin:'Margines', exp_dpi:'Rozdzielczość', exp_dpi_screen:'ekran', exp_dpi_normal:'zwykły druk', exp_dpi_high:'wysoka jakość', exp_print_help:'Otwiera okno drukowania przeglądarki. Stamtąd możesz wydrukować albo wybrać „Zapisz jako PDF”.', printing:'Przygotowywanie wydruku', print_failed:'Nie udało się otworzyć okna drukowania', viewer_hint:'przeciągnij · kółko · dwuklik', viewer_in:'Powiększ', viewer_out:'Pomniejsz', viewer_fit:'Dopasuj',
       o_typography:'Typografia', o_font:'Krój pisma', o_banner:'Banderola', o_banner_none:'Brak', o_banner_ribbon:'Wstęga', o_banner_plate:'Tablica', o_banner_scroll:'Zwój', o_banner_stone:'Kamień', o_caps:'Wersaliki', o_outline:'Obrys', o_shadow:'Cień', h_font_missing:'Ten krój pisma nie jest zainstalowany na tym urządzeniu; użyto najbliższego zamiennika. Pozycje oznaczone · są zainstalowane.',
       grp_navigate:'Nawigacja', grp_terrain:'Teren', grp_water:'Woda i Drogi', grp_markers:'Znaczniki', grp_regions:'Regiony i Pomiar',
       t_select:'Zaznacz', t_landmass:'Ląd', t_erase:'Morze', t_fill:'Wypełnij', t_terrain:'Teren', t_symbol:'Symbol',
@@ -629,6 +645,7 @@
       tpl_title:'Начать с шаблона', tpl_desc:'Начните с готовой береговой линии, а затем стройте на ней свой мир.', tpl_ready:'холст готов',
       tpl_continent:'Континент', tpl_continent_d:'Обширная суша с изрезанными берегами', tpl_island:'Остров', tpl_island_d:'Один большой остров в открытом море', tpl_archipelago:'Архипелаг', tpl_archipelago_d:'Разбросанные острова и мелкие проливы', tpl_kingdom:'Королевство', tpl_kingdom_d:'Мягкие берега, плодородные земли', tpl_battle:'Карта сражения', tpl_battle_d:'Небольшая местность с гексагональной сеткой', tpl_blank:'Пустой холст', tpl_blank_d:'Начать с нуля',
       o_outlinecolor:'Цвет обводки',
+      exp_html_t:'HTML одним файлом', exp_print_t:'Печать / PDF', exp_png2_t:'Разрешение 2×', exp_png4_t:'Разрешение 4×', exp_maxdim:'Длинная сторона', exp_format:'Формат', exp_fmt_png:'PNG · чётко, большой файл', exp_fmt_jpeg:'JPEG · маленький файл', exp_title:'Заголовок', exp_html_help:'Скачивается один файл .html с картой и небольшим просмотрщиком внутри. Сервер не нужен — отправьте файл и откройте двойным щелчком.', exp_page:'Размер страницы', exp_orient:'Ориентация', exp_portrait:'Книжная', exp_landscape:'Альбомная', exp_margin:'Поля', exp_dpi:'Разрешение', exp_dpi_screen:'экран', exp_dpi_normal:'обычная печать', exp_dpi_high:'высокое качество', exp_print_help:'Откроется окно печати браузера. Оттуда можно напечатать или выбрать «Сохранить как PDF».', printing:'Подготовка к печати', print_failed:'Не удалось открыть окно печати', viewer_hint:'тяните · колесо · двойной щелчок', viewer_in:'Приблизить', viewer_out:'Отдалить', viewer_fit:'Вписать',
       o_typography:'Типографика', o_font:'Гарнитура', o_banner:'Лента', o_banner_none:'Нет', o_banner_ribbon:'Лента', o_banner_plate:'Табличка', o_banner_scroll:'Свиток', o_banner_stone:'Камень', o_caps:'Прописные', o_outline:'Обводка', o_shadow:'Тень', h_font_missing:'Эта гарнитура не установлена на устройстве; используется ближайшая замена. Пункты с · установлены.',
       grp_navigate:'Навигация', grp_terrain:'Рельеф', grp_water:'Вода и пути', grp_markers:'Метки', grp_regions:'Регионы и мера',
       t_select:'Выделение', t_landmass:'Суша', t_erase:'Море', t_fill:'Заливка', t_terrain:'Местность', t_symbol:'Символ',
@@ -772,6 +789,13 @@
       });
       document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
         el.placeholder = self.t(el.getAttribute('data-i18n-placeholder'));
+      });
+      /* Yalnız ikon taşıyan düğmelerde başlık aynı zamanda erişilebilir ad
+         olsun — ekran okuyucu için başka metin yok. */
+      document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+        var v = self.t(el.getAttribute('data-i18n-title'));
+        el.title = v;
+        if (!el.textContent.trim()) el.setAttribute('aria-label', v);
       });
       document.documentElement.lang = this.lang;
       this.buildTerrainSwatches();
@@ -1595,6 +1619,8 @@
       /* --- PNG export ölçeği --- */
       on('btn-export-png2', 'click', function () { Exporter.png(2); });
       on('btn-export-png4', 'click', function () { Exporter.png(4); });
+      on('btn-export-html', 'click', function () { self.htmlExportDialog(); });
+      on('btn-print', 'click', function () { self.printDialog(); });
 
       /* --- görünüm --- */
       on('btn-fit', 'click', function () { Cv.fit(); });
@@ -2211,6 +2237,79 @@
       el.textContent = text;
       clearTimeout(this.msgTimer);
       this.msgTimer = setTimeout(function () { el.textContent = ''; }, 3600);
+    },
+
+    /* ================= paylaş / baskı ================= */
+
+    /* Tek dosya HTML: boyut ve biçim seçimi. Kayıpsız PNG keskin ama
+       büyük; JPEG paylaşılabilir boyutta kalır. */
+    htmlExportDialog: function () {
+      var self = this;
+      var name = App.currentCanvasName || this.t('canvas_unnamed');
+      var body =
+        '<label class="row"><span>' + esc(this.t('exp_maxdim')) + '</span></label>' +
+        '<select id="hx-dim" class="sel">' +
+          '<option value="1280">1280 px</option>' +
+          '<option value="2048" selected>2048 px</option>' +
+          '<option value="3072">3072 px</option>' +
+          '<option value="4096">4096 px</option>' +
+        '</select>' +
+        '<label class="row"><span>' + esc(this.t('exp_format')) + '</span></label>' +
+        '<select id="hx-fmt" class="sel">' +
+          '<option value="png">' + esc(this.t('exp_fmt_png')) + '</option>' +
+          '<option value="jpeg">' + esc(this.t('exp_fmt_jpeg')) + '</option>' +
+        '</select>' +
+        '<label class="row"><span>' + esc(this.t('exp_title')) + '</span></label>' +
+        '<input type="text" id="hx-title" class="sel" value="' + esc(name) + '">' +
+        '<p class="hint">' + esc(this.t('exp_html_help')) + '</p>';
+
+      this.modal(this.t('exp_html_t'), body, function () {
+        Exporter.html({
+          maxDim: parseInt($('hx-dim').value, 10) || 2048,
+          format: $('hx-fmt').value,
+          title: $('hx-title').value
+        });
+      });
+    },
+
+    /* Baskı: sayfa boyu, yön, kenar boşluğu, DPI. Çıktıyı tarayıcının
+       baskı iletişimine veriyoruz — "PDF olarak kaydet" gerçek PDF üretir. */
+    printDialog: function () {
+      var self = this;
+      var pages = [['a4','A4'], ['a3','A3'], ['a5','A5'], ['letter','Letter'], ['tabloid','Tabloid']];
+      var landscape = Cv.W >= Cv.H;
+      var body =
+        '<label class="row"><span>' + esc(this.t('exp_page')) + '</span></label>' +
+        '<select id="pr-page" class="sel">' +
+          pages.map(function (p) { return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('') +
+        '</select>' +
+        '<label class="row"><span>' + esc(this.t('exp_orient')) + '</span></label>' +
+        '<select id="pr-orient" class="sel">' +
+          '<option value="portrait"' + (landscape ? '' : ' selected') + '>' + esc(this.t('exp_portrait')) + '</option>' +
+          '<option value="landscape"' + (landscape ? ' selected' : '') + '>' + esc(this.t('exp_landscape')) + '</option>' +
+        '</select>' +
+        '<label class="row"><span>' + esc(this.t('exp_margin')) + '</span></label>' +
+        '<select id="pr-margin" class="sel">' +
+          '<option value="0">0 mm</option><option value="5">5 mm</option>' +
+          '<option value="10" selected>10 mm</option><option value="20">20 mm</option>' +
+        '</select>' +
+        '<label class="row"><span>' + esc(this.t('exp_dpi')) + '</span></label>' +
+        '<select id="pr-dpi" class="sel">' +
+          '<option value="96">96 · ' + esc(this.t('exp_dpi_screen')) + '</option>' +
+          '<option value="150" selected>150 · ' + esc(this.t('exp_dpi_normal')) + '</option>' +
+          '<option value="300">300 · ' + esc(this.t('exp_dpi_high')) + '</option>' +
+        '</select>' +
+        '<p class="hint">' + esc(this.t('exp_print_help')) + '</p>';
+
+      this.modal(this.t('exp_print_t'), body, function () {
+        Exporter.print({
+          page: $('pr-page').value,
+          orient: $('pr-orient').value,
+          margin: parseFloat($('pr-margin').value),
+          dpi: parseInt($('pr-dpi').value, 10),
+          title: App.currentCanvasName
+        });
+      });
     },
 
     /* ================= modal ================= */

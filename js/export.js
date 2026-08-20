@@ -30,21 +30,200 @@
 
     png: function (scale) {
       scale = scale || 1;
-      var w = Math.round(Cv.W*scale), h = Math.round(Cv.H*scale);
-      var c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      var x = c.getContext('2d');
-      x.save();
-      x.scale(scale, scale);
-      Cv.renderMap(x, { includeReference: App.exportReference, includeLinks: false });
-      /* ızgara açıksa çıktıya da girsin — altıgen ızgaranın asıl değeri
-         basılan/paylaşılan haritada olmasıdır */
-      if (Cv.grid) Cv.drawGrid(x, { x0:0, y0:0, x1:Cv.W, y1:Cv.H, w:Cv.W, h:Cv.H }, true);
-      x.restore();
+      /* ızgara açıksa çıktıya da girer — altıgen ızgaranın asıl değeri
+         basılan/paylaşılan haritada olmasıdır (bkz. renderToCanvas) */
+      var c = this.renderToCanvas(Cv.W*scale, Cv.H*scale);
+      var w = c.width, h = c.height;
       c.toBlob(function (b) {
         download(b, 'harita-' + stamp() + (scale > 1 ? '-' + scale + 'x' : '') + '.png');
         UI.msg(UI.t('exported') + ' PNG ' + w + '×' + h);
       }, 'image/png');
+    },
+
+    /* Haritayı istenen ölçekte tek bir <canvas>'a çizer. PNG/HTML/baskı
+       çıktılarının ortak adımı — hepsi aynı renderMap yolundan geçsin
+       diye ayrı bir yardımcıya alındı. */
+    renderToCanvas: function (targetW, targetH) {
+      var c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(targetW));
+      c.height = Math.max(1, Math.round(targetH));
+      var x = c.getContext('2d');
+      x.save();
+      x.scale(c.width / Cv.W, c.height / Cv.H);
+      Cv.renderMap(x, { includeReference: App.exportReference, includeLinks: false });
+      if (Cv.grid) Cv.drawGrid(x, { x0:0, y0:0, x1:Cv.W, y1:Cv.H, w:Cv.W, h:Cv.H }, true);
+      x.restore();
+      return c;
+    },
+
+    /* Uzun kenarı maxDim'i aşmayacak ölçek — en-boy oranı korunur, hiçbir
+       zaman büyütülmez (küçük bir tuvali 4096'ya şişirmek dosyayı büyütür,
+       görüntüyü iyileştirmez). */
+    _fitScale: function (maxDim) {
+      return Math.min(1, maxDim / Math.max(Cv.W, Cv.H));
+    },
+
+    /* ================= TEK DOSYA HTML =================
+       Haritayı gömülü bir görüntü + minik bir görüntüleyiciyle tek bir
+       .html dosyasına yazar. Sunucu, betik kütüphanesi, dış istek yok —
+       dosyayı e-postayla yollayıp çift tıklamak yeterli. */
+    html: function (opts) {
+      opts = opts || {};
+      var maxDim = opts.maxDim || 2048;
+      var fmt = opts.format === 'jpeg' ? 'jpeg' : 'png';
+      var title = (opts.title || App.currentCanvasName || 'Wayborne').trim() || 'Wayborne';
+
+      var k = this._fitScale(maxDim);
+      var c = this.renderToCanvas(Cv.W * k, Cv.H * k);
+      var data = (fmt === 'jpeg')
+        ? c.toDataURL('image/jpeg', 0.88)
+        : c.toDataURL('image/png');
+
+      var doc = this._viewerHTML(title, data, c.width, c.height);
+      download(new Blob([doc], { type:'text/html;charset=utf-8' }),
+               this._slug(title) + '-' + stamp() + '.html');
+      UI.msg(UI.t('exported') + ' HTML · ' + c.width + '×' + c.height +
+             ' · ' + this._humanSize(doc.length));
+    },
+
+    _slug: function (s) {
+      return String(s).toLowerCase()
+        .replace(/[ğ]/g,'g').replace(/[ü]/g,'u').replace(/[ş]/g,'s')
+        .replace(/[ı]/g,'i').replace(/[ö]/g,'o').replace(/[ç]/g,'c')
+        .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0, 48) || 'harita';
+    },
+
+    _humanSize: function (n) {
+      if (n < 1024) return n + ' B';
+      if (n < 1024*1024) return (n/1024).toFixed(0) + ' KB';
+      return (n/(1024*1024)).toFixed(1) + ' MB';
+    },
+
+    /* Gömülü görüntüleyici: sürükle-kaydır, tekerlekle yakınlaş, çift
+       tıkla sığdır. Tek dosyada kalması için her şey satır içi. */
+    _viewerHTML: function (title, dataURI, w, h) {
+      var t = esc(title);
+      var lang = (UI && UI.lang) || 'tr';
+      var hint = esc(UI.t('viewer_hint'));
+      var tIn = esc(UI.t('viewer_in')), tOut = esc(UI.t('viewer_out')), tFit = esc(UI.t('viewer_fit'));
+      return '<!doctype html>\n<html lang="' + lang + '"><head><meta charset="utf-8">\n' +
+'<meta name="viewport" content="width=device-width,initial-scale=1">\n' +
+'<title>' + t + '</title>\n<style>\n' +
+'*{margin:0;padding:0;box-sizing:border-box}\n' +
+'html,body{height:100%;background:#160f07;color:#e8dcc4;overflow:hidden;\n' +
+'  font:14px/1.5 Georgia,"Times New Roman",serif}\n' +
+'#stage{position:absolute;inset:0;cursor:grab;touch-action:none}\n' +
+'#stage.drag{cursor:grabbing}\n' +
+'#map{position:absolute;top:0;left:0;transform-origin:0 0;\n' +
+'  image-rendering:auto;box-shadow:0 30px 90px -20px #000c;user-select:none;-webkit-user-drag:none}\n' +
+'#bar{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:14px;\n' +
+'  padding:10px 16px;background:linear-gradient(#160f07ee,#160f0700);pointer-events:none}\n' +
+'#bar h1{font-size:16px;font-weight:600;letter-spacing:.04em;color:#e8dcc4;\n' +
+'  text-shadow:0 2px 8px #000}\n' +
+'#hint{margin-left:auto;font-size:11px;color:#c08a3e;opacity:.85}\n' +
+'#zoom{position:absolute;right:14px;bottom:14px;display:flex;gap:6px}\n' +
+'#zoom button{width:32px;height:32px;border:1px solid #4a3a24;background:#241708cc;\n' +
+'  color:#c08a3e;border-radius:5px;cursor:pointer;font:15px/1 Georgia,serif}\n' +
+'#zoom button:hover{border-color:#c08a3e}\n' +
+'</style></head><body>\n' +
+'<div id="stage"><img id="map" alt="' + t + '" src="' + dataURI + '"></div>\n' +
+'<div id="bar"><h1>' + t + '</h1><span id="hint">' + hint + '</span></div>\n' +
+'<div id="zoom"><button id="zo" title="' + tOut + '">&minus;</button>' +
+'<button id="zf" title="' + tFit + '">&#9633;</button>' +
+'<button id="zi" title="' + tIn + '">&plus;</button></div>\n' +
+'<script>\n' +
+'(function(){\n' +
+'var W=' + w + ',H=' + h + ';\n' +
+'var st=document.getElementById("stage"),im=document.getElementById("map");\n' +
+'var z=1,ox=0,oy=0;\n' +
+'function apply(){im.style.transform="translate("+ox+"px,"+oy+"px) scale("+z+")";}\n' +
+'function fit(){var p=24;z=Math.min((st.clientWidth-p*2)/W,(st.clientHeight-p*2)/H);\n' +
+'  ox=(st.clientWidth-W*z)/2;oy=(st.clientHeight-H*z)/2;apply();}\n' +
+'function zoomAt(cx,cy,f){var nz=Math.max(0.02,Math.min(12,z*f));\n' +
+'  ox=cx-(cx-ox)*(nz/z);oy=cy-(cy-oy)*(nz/z);z=nz;apply();}\n' +
+'st.addEventListener("wheel",function(e){e.preventDefault();\n' +
+'  var r=st.getBoundingClientRect();\n' +
+'  zoomAt(e.clientX-r.left,e.clientY-r.top,e.deltaY<0?1.12:1/1.12);},{passive:false});\n' +
+'var down=false,px=0,py=0;\n' +
+'st.addEventListener("pointerdown",function(e){down=true;px=e.clientX;py=e.clientY;\n' +
+'  st.classList.add("drag");st.setPointerCapture(e.pointerId);});\n' +
+'st.addEventListener("pointermove",function(e){if(!down)return;\n' +
+'  ox+=e.clientX-px;oy+=e.clientY-py;px=e.clientX;py=e.clientY;apply();});\n' +
+'st.addEventListener("pointerup",function(){down=false;st.classList.remove("drag");});\n' +
+'st.addEventListener("dblclick",fit);\n' +
+'document.getElementById("zi").onclick=function(){zoomAt(st.clientWidth/2,st.clientHeight/2,1.3);};\n' +
+'document.getElementById("zo").onclick=function(){zoomAt(st.clientWidth/2,st.clientHeight/2,1/1.3);};\n' +
+'document.getElementById("zf").onclick=fit;\n' +
+'addEventListener("resize",fit);\n' +
+'if(im.complete)fit();else im.onload=fit;\n' +
+'})();\n' +
+'<\/script>\n</body></html>\n';
+    },
+
+    /* ================= BASKI / PDF =================
+       Ayrı bir kütüphane yok: haritayı hedef sayfa ve DPI'ya göre
+       ölçekleyip gizli bir iframe'e @page kuralıyla basıyoruz.
+       Tarayıcının "PDF olarak kaydet" seçeneği gerçek PDF üretir. */
+    PAGES: {
+      a4:     { w:210, h:297 },
+      a3:     { w:297, h:420 },
+      a5:     { w:148, h:210 },
+      letter: { w:215.9, h:279.4 },
+      tabloid:{ w:279.4, h:431.8 }
+    },
+
+    print: function (opts) {
+      opts = opts || {};
+      var page = this.PAGES[opts.page] || this.PAGES.a4;
+      var landscape = opts.orient === 'landscape';
+      var pw = landscape ? page.h : page.w;
+      var ph = landscape ? page.w : page.h;
+      var margin = Math.max(0, Math.min(40, opts.margin === undefined ? 10 : opts.margin));
+      var dpi = opts.dpi || 150;
+
+      /* basılabilir alan (mm) -> hedef piksel */
+      var availW = pw - margin*2, availH = ph - margin*2;
+      var mm2px = dpi / 25.4;
+      var fit = Math.min(availW / Cv.W, availH / Cv.H);   /* mm / harita pikseli */
+      var outW = Math.round(Cv.W * fit * mm2px);
+      var outH = Math.round(Cv.H * fit * mm2px);
+
+      /* Aşırı büyük çıktıyı sınırla: 300 DPI A3 tam sayfa ~ 4900px, bunun
+         üstü tarayıcıyı kilitler ve baskıda fark etmez. */
+      var CAP = 6000;
+      if (Math.max(outW, outH) > CAP) {
+        var s = CAP / Math.max(outW, outH);
+        outW = Math.round(outW*s); outH = Math.round(outH*s);
+      }
+
+      var c = this.renderToCanvas(outW, outH);
+      var data = c.toDataURL('image/png');
+      var title = esc((opts.title || App.currentCanvasName || 'Wayborne').trim());
+      var pageCss = (landscape ? (page.h + 'mm ' + page.w + 'mm') : (page.w + 'mm ' + page.h + 'mm'));
+
+      var doc = '<!doctype html><html><head><meta charset="utf-8"><title>' + title + '</title><style>' +
+        '@page{size:' + pageCss + ';margin:' + margin + 'mm}' +
+        'html,body{margin:0;padding:0;background:#fff}' +
+        'img{display:block;width:' + (Cv.W*fit).toFixed(2) + 'mm;height:' + (Cv.H*fit).toFixed(2) + 'mm;margin:0 auto}' +
+        '</style></head><body><img src="' + data + '"></body></html>';
+
+      /* Yeni sekme yerine gizli iframe: açılır pencere engelleyicilerine
+         takılmaz ve editörden çıkmaz. */
+      var old = document.getElementById('wb-print-frame');
+      if (old) old.parentNode.removeChild(old);
+      var f = document.createElement('iframe');
+      f.id = 'wb-print-frame';
+      f.setAttribute('aria-hidden', 'true');
+      f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+      document.body.appendChild(f);
+      f.onload = function () {
+        try {
+          f.contentWindow.focus();
+          f.contentWindow.print();
+        } catch (e) { UI.msg(UI.t('print_failed')); }
+      };
+      f.srcdoc = doc;
+      UI.msg(UI.t('printing') + ' · ' + outW + '×' + outH + ' · ' + dpi + ' DPI');
     },
 
     svg: function () {
