@@ -510,9 +510,16 @@
         out.push('</g>');
       }
 
+      /* Bitişik yazılarda (Arapça, Farsça, İbranice, Hint yazıları) harf
+         aralığı bağlanma biçimlerini bozar; ayrıca sağdan sola yazıda
+         yönün açıkça belirtilmesi gerekir — canvas tarafındaki tek parça
+         çizimin SVG karşılığı. */
+      var complex = Cv.isComplexText(text);
+      var track = complex ? 0 : (o.track||0);
+      var dirAttr = complex && Cv.isRTLText(text) ? ' direction="rtl"' : '';
       var common = 'font-family="'+esc(fam)+'" font-size="'+(o.size||32)+
-                   '" font-weight="600" letter-spacing="'+(o.track||0)+
-                   '" fill="'+(o.color||'#3a2b18')+'"' +
+                   '" font-weight="600" letter-spacing="'+track+
+                   '" fill="'+(o.color||'#3a2b18')+'"' + dirAttr +
                    (o.outline ? ' stroke="'+(o.outlineColor||'#f5ecd8')+'" stroke-width="'+
                      Math.max(1.5,(o.size||32)*0.16)+'" paint-order="stroke"' : '');
 
@@ -528,7 +535,7 @@
         return out.join('');
       }
 
-      if (!o.curve) {
+      if (!o.curve || complex) {
         out.push('<text x="'+o.x+'" y="'+o.y+'" text-anchor="middle" dominant-baseline="middle" '+
                  common+rot+'>'+esc(text)+'</text>');
         return out.join('');

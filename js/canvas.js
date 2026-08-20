@@ -1959,10 +1959,31 @@
       return o.caps ? t.toUpperCase() : t;
     },
 
+    /* Harf harf çizim (harf aralığı, yay, yola oturma) yalnızca her
+       harfin bağımsız çizildiği yazılarda doğrudur. Arapça/Farsça gibi
+       bitişik yazılarda harfleri tek tek çizmek bağlanma biçimlerini
+       yok eder ve iki yönlü (bidi) sırayı bozar; Hint yazılarında da
+       birleşik harfler (ligatür) dağılır. Bu yazılarda etiket tek
+       parça çizilir — tarayıcının kendi şekillendirmesi devreye girer. */
+    RTL_RE: /[\u0590-\u05FF\u0600-\u06FF\u0700-\u074F\u0750-\u077F\u0780-\u07BF\u07C0-\u07FF\u08A0-\u08FF\uFB1D-\uFB4F\uFB50-\uFDFF\uFE70-\uFEFF]/,
+    COMPLEX_RE: /[\u0590-\u05FF\u0600-\u06FF\u0700-\u074F\u0750-\u077F\u0780-\u07BF\u07C0-\u07FF\u0900-\u0DFF\u0E80-\u0EFF\u0F00-\u0FFF\u1780-\u17FF\u08A0-\u08FF\uFB1D-\uFB4F\uFB50-\uFDFF\uFE70-\uFEFF]/,
+
+    isComplexText: function (t) { return this.COMPLEX_RE.test(t || ''); },
+    isRTLText:     function (t) { return this.RTL_RE.test(t || ''); },
+
     measureLabel: function (ctx, o) {
       ctx.save();
       ctx.font = this.labelFont(o);
-      var tr = o.track || 0, w = 0, t = this.labelText(o);
+      var t = this.labelText(o), w;
+      if (this.isComplexText(t)) {
+        /* şekillendirilmiş genişlik: harflerin tek tek toplamı bitişik
+           yazıda gerçek genişlikten belirgin biçimde geniş çıkar */
+        w = ctx.measureText(t).width;
+        ctx.restore();
+        return Math.max(1, w);
+      }
+      var tr = o.track || 0;
+      w = 0;
       for (var i = 0; i < t.length; i++) w += ctx.measureText(t[i]).width + tr;
       ctx.restore();
       return Math.max(1, w - tr);
@@ -2200,6 +2221,8 @@
       ctx.miterLimit = 2;
 
       var total = this.measureLabel(ctx, o);
+      var complex = this.isComplexText(text);
+      if (complex) ctx.direction = this.isRTLText(text) ? 'rtl' : 'ltr';
 
       /* --- nehir/yol üzerine oturan etiket: gerçek çizilmiş eğriyi izler,
          daire yayı değil, sabit poligon (o.pathPts, oluşturulduğu anda alınmış) --- */
@@ -2213,6 +2236,24 @@
         var center = (o.pathCenter != null) ? o.pathCenter : pathLen/2;
         var startLen = center - total/2;
         var tr3 = o.track||0;
+        /* bitişik yazı: yay boyunca harf harf dağıtmak yerine, yolun orta
+           noktasındaki teğete oturan tek bir parça */
+        if (complex) {
+          var cp = Geo.pointAtLength(o.pathPts, center);
+          ctx.save();
+          ctx.translate(cp.x, cp.y);
+          ctx.rotate(cp.ang);
+          if (o.outline) {
+            ctx.strokeStyle = o.outlineColor || '#f5ecd8';
+            ctx.lineWidth = Math.max(1.5, (o.size||32)*0.16);
+            ctx.strokeText(text, 0, 0);
+          }
+          ctx.fillStyle = o.color || '#3a2b18';
+          ctx.fillText(text, 0, 0);
+          ctx.restore();
+          ctx.restore();
+          return;
+        }
         var cursor = startLen;
         for (var pi = 0; pi < text.length; pi++) {
           var cw3 = ctx.measureText(text[pi]).width;
@@ -2272,6 +2313,14 @@
         }
         ctx.fillStyle = o.color || '#3a2b18';
         ctx.fillText(ch, cx, 0);
+      }
+
+      /* bitişik yazıda harf aralığı ve yay devre dışı: ikisi de harfleri
+         tek tek konumlandırmayı gerektirir. */
+      if (complex) {
+        paint(text, 0);
+        ctx.restore();
+        return;
       }
 
       if (!arc || Math.abs(arc) < 0.01) {

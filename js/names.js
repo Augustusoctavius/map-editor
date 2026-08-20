@@ -111,7 +111,10 @@
 
     cultureList: function (lang) {
       return Object.keys(CULTURES).map(function (k) {
-        return { key:k, name: (lang === 'tr' ? CULTURES[k].tr : CULTURES[k].en) };
+        var c = CULTURES[k];
+        var n = global.i18nName ? global.i18nName('nameculture_' + k, c.tr, c.en, lang)
+                                : (lang === 'tr' ? c.tr : c.en);
+        return { key:k, name:n };
       });
     },
 

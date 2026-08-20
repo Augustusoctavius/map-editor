@@ -42,7 +42,7 @@ Bir tuval oluşturulduğunda veya açıldığında, bildiğiniz editör ekranın
 | **SVG** | Haritayı gerçek vektör SVG olarak dışa aktarır — sembol yolları (`Path2D` verisi) doğrudan `<path>` olarak yazılır, bitmap gömme değildir. Kıyı parlaması ve yükselti gölgelendirmesi gibi raster efektler base64 `<image>` olarak gömülür. |
 | **HTML** | Haritayı **tek bir `.html` dosyası** olarak dışa aktarır: görüntü ve küçük bir görüntüleyici (sürükle-kaydır, tekerlekle yakınlaş, çift tıkla sığdır) dosyanın içine gömülüdür. Dış istek, sunucu veya betik kütüphanesi yok — dosyayı yollayıp çift tıklamak yeterli. En uzun kenar (1280–4096 px) ve biçim (PNG kayıpsız / JPEG küçük dosya) seçilebilir. |
 | **🖨 Baskı / PDF** | Haritayı sayfa boyu (A5–Tabloid), yön, kenar boşluğu ve DPI (96 / 150 / 300) seçerek tarayıcının baskı iletişimine gönderir. Oradan yazıcıya basılabilir ya da "PDF olarak kaydet" ile gerçek PDF üretilebilir; ayrı bir PDF kütüphanesi kullanılmaz. Harita, seçilen sayfanın basılabilir alanına en-boy oranı korunarak sığdırılır. |
-| **🌐 Dil** | 10 dilli arayüz dili seçici (bayraklı, açılır menü). |
+| **🌐 Dil** | 11 dilli arayüz dili seçici (bayraklı, açılır menü). Arapça seçildiğinde arayüz sağdan sola döner (araç rayı sağa, seçenek paneli sola geçer); tuval her zaman aynı kalır. |
 
 ## Araç çubuğu (sol taraf, dikey)
 
@@ -134,6 +134,20 @@ Bir nesne seçildiğinde ek işlemler görünür: **Çoğalt**, **Sil**, öne/ar
 - **Izgaraya yapış** — Sembol/nokta yerleştirmeyi belirli bir aralığa hizalar.
 - **Minimap** — Sağ altta, tüm haritanın küçük genel görünümü ve hızlı gezinme.
 - **Klavye kısayolları** — Araç seçimi için tek harf tuşları (yukarıdaki tabloda), yön tuşlarıyla kaydırma, `+`/`-`/`0` ile yakınlaştır/uzaklaştır/sığdır, `Delete` ile seçili nesneyi (veya son yol noktasını) sil, `Escape` ile çizimi iptal et.
+
+## Sağdan sola diller (RTL)
+
+Arayüz Arapça'yı destekler; `fa`/`he`/`ur` eklemek artık yalnızca veri işi. Yön `<html dir>`'e yazılır ve düzen
+kendiliğinden aynalanır, çünkü yöne duyarlı CSS mantıksal özellikler kullanır (`border-inline-start`,
+`padding-inline-end`, `inset-inline-end`, `text-align:start`). Tuvalin kendisi bir metin akışı olmadığı için
+aynalanmaz.
+
+Bundan bağımsız olarak **harita etiketleri** de düzeltildi: etiket motoru harf aralığı, yay ve yola oturma için
+harfleri tek tek konumlandırıyordu; bu, Arapça/Farsça'da harflerin bitişme biçimlerini ve iki yönlü (bidi) sırayı
+bozuyor, Hint yazılarında birleşik harfleri dağıtıyordu. Artık bu yazılarda etiket tek parça çiziliyor (harf aralığı
+ve yay devre dışı, yola oturan etiket yolun orta noktasındaki teğete yerleşiyor); PNG ve SVG çıktısında da aynı
+şekilde. Latin/Kiril etiketler eski davranışı aynen sürdürür. Bu düzeltme arayüz dili ne olursa olsun geçerlidir —
+Türkçe arayüzde Arapça yer adı yazan biri de doğru sonucu alır.
 
 ## Ekran uyumluluğu
 

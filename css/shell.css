@@ -75,7 +75,7 @@
 .video-play{
   width:56px; height:56px; border-radius:50%; border:2px solid var(--brass-dim);
   display:flex; align-items:center; justify-content:center;
-  font-size:18px; color:var(--brass); padding-left:3px;
+  font-size:18px; color:var(--brass); padding-inline-start:3px;
 }
 
 /* ---------- canvas sayfası ---------- */
@@ -127,7 +127,7 @@ label.btn.wide{display:block; text-align:center; cursor:pointer; margin-top:6px;
   display:flex; align-items:center; gap:10px;
   font-family:var(--f-display); font-size:10px; letter-spacing:.15em;
   text-transform:uppercase; color:var(--brass); opacity:.85;
-  margin:22px 0 4px; padding-left:2px;
+  margin:22px 0 4px; padding-inline-start:2px;
 }
 .tutorial-group-label:first-child{margin-top:0}
 .tutorial-group-label::after{
@@ -224,7 +224,7 @@ label.btn.wide{display:block; text-align:center; cursor:pointer; margin-top:6px;
 }
 .tpl-card{
   background:var(--ink-800); border:1px solid var(--line); border-radius:8px;
-  padding:0; cursor:pointer; overflow:hidden; text-align:left;
+  padding:0; cursor:pointer; overflow:hidden; text-align:start;
   transition:border-color .12s; color:inherit; font:inherit;
 }
 .tpl-card:hover{border-color:var(--brass-dim)}

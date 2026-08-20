@@ -50,8 +50,8 @@ h4{font-size:11px;color:var(--text-dim)}
   background:var(--ink-800);
   display:flex;flex-direction:column;min-height:0;
 }
-#left-panel{border-right:1px solid var(--line)}
-#right-panel{border-left:1px solid var(--line)}
+#left-panel{border-inline-end:1px solid var(--line)}
+#right-panel{border-inline-start:1px solid var(--line)}
 
 /* ---------- left: tool rail ----------
    Araçlar 5 işlevsel gruba ayrılır. Tile'lar varsayılan olarak şeffaftır —
@@ -67,7 +67,7 @@ h4{font-size:11px;color:var(--text-dim)}
   display:flex;align-items:center;gap:8px;
   font-family:var(--f-display);font-size:9.5px;letter-spacing:.15em;
   text-transform:uppercase;color:var(--text-dim);opacity:.7;
-  padding-left:2px;user-select:none;
+  padding-inline-start:2px;user-select:none;
 }
 .tool-group-label::after{
   content:"";flex:1;height:1px;
@@ -116,7 +116,7 @@ h4{font-size:11px;color:var(--text-dim)}
 .sub-sec .hint{margin:4px 0 8px}
 .sub-sec .hint.hidden{display:none}
 .hint{font-size:11px;line-height:1.5;color:var(--text-dim);
-  border-left:2px solid var(--brass-dim);padding-left:8px;margin:12px 0 0}
+  border-inline-start:2px solid var(--brass-dim);padding-inline-start:8px;margin:12px 0 0}
 .sel-info{font-family:var(--f-mono);font-size:11px;background:var(--ink-700);
   border:1px solid var(--line);border-radius:var(--radius);padding:7px 8px;color:var(--text-dim)}
 
@@ -206,7 +206,7 @@ textarea{font-family:var(--f-display);font-size:13px}
 
 /* history */
 .history-list{list-style:none;margin:0;padding:0}
-.history-list li{padding:5px 8px;border-left:2px solid var(--line);font-size:11px;
+.history-list li{padding:5px 8px;border-inline-start:2px solid var(--line);font-size:11px;
   color:var(--text-dim);cursor:pointer;font-family:var(--f-mono)}
 .history-list li:hover{color:var(--text)}
 .history-list li.cur{border-left-color:var(--brass);color:var(--brass);background:var(--ink-700)}
@@ -221,7 +221,7 @@ textarea{font-family:var(--f-display);font-size:13px}
 }
 #statusbar b{color:var(--text);font-weight:500}
 #statusbar i{font-style:normal;opacity:.7}
-#statusbar .right{margin-left:auto;color:var(--brass)}
+#statusbar .right{margin-inline-start:auto;color:var(--brass)}
 
 /* ---------- modal ---------- */
 .modal{position:fixed;inset:0;background:#000a;display:flex;align-items:center;
@@ -246,7 +246,7 @@ textarea{font-family:var(--f-display);font-size:13px}
 /* ---------- v3 eklemeleri ---------- */
 .custom-sym-bar{border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px}
 .sym-del{
-  position:absolute;top:2px;right:2px;font-size:10px;line-height:1;
+  position:absolute;top:2px;inset-inline-end:2px;font-size:10px;line-height:1;
   padding:1px 4px;background:var(--danger);border:none;color:#fff;
   border-radius:3px;cursor:pointer;opacity:0;transition:opacity .12s
 }

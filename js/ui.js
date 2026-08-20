@@ -644,6 +644,120 @@
       o_snap:'Przyciągaj do siatki', o_snapsize:'Rozmiar siatki', o_frame:'Ramka mapy', o_frame_none:'Brak', o_frame_simple:'Prosta linia', o_frame_rope:'Lina', o_frame_ornate:'Zdobiona', o_frame_color:'Kolor',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     },
+    ar: {
+      new:'جديد', open:'فتح', save:'حفظ', parchment:'رَق', grid:'شبكة', shore:'ساحل', narrow_title:'يحتاج المحرِّر إلى شاشة أعرض',
+      narrow_desc:'يستخدم محرِّر الخرائط تخطيطًا مكتبيًا يضع شريط الأدوات واللوحة ولوحة الطبقات جنبًا إلى جنب. ويحتاج إلى 1024 × 600 بكسل على الأقل.',
+      narrow_hint:'إن كنت على جهاز لوحي، جرِّب تدويره أفقيًا.', narrow_current:'هذه الشاشة',
+      narrow_back:'العودة إلى الصفحة الرئيسية', o_gridsec:'الشبكة', o_gridtype:'النوع', o_grid_square:'مربّعة',
+      o_grid_hex:'سداسية', o_grid_dot:'نقطية', o_gridcell:'حجم الخلية', o_gridcolor:'اللون', o_gridop:'الوضوح',
+      h_grid:'فعِّل الشبكة من مربّع «شبكة» في الشريط العلوي. الشبكة السداسية هي المعيار في ألعاب الأدوار الورقية.',
+      o_polsec:'الخريطة السياسية', o_polmode:'العرض السياسي', o_polmute:'إخفات نسيج التضاريس', o_pollegend:'إظهار المفتاح',
+      o_polfill:'شدّة التعبئة', o_polcolors:'إسناد ألوان الدول تلقائيًا', o_polname:'اسم المنطقة المحدَّدة',
+      o_polname_ph:'اسم الدولة', h_political:'العرض السياسي ليس طبقة منفصلة؛ إنما يعرض المناطق التي رسمتها بوصفها دولًا.',
+      m_polon:'العرض السياسي مُفعَّل', m_poloff:'العرض الطبيعي', m_polcolored:'منطقة مُلوَّنة', m_polempty:'ارسم منطقة أولًا',
+      o_nameculture:'الثقافة', o_namefeature:'النوع', o_namegen:'🎲 اقترح اسمًا', o_nf_settlement:'مستوطنة', o_nf_city:'مدينة',
+      o_nf_river:'نهر', o_nf_mountain:'جبل', o_nf_forest:'غابة', o_nf_region:'إقليم', o_nf_lake:'بحيرة', o_nf_sea:'بحر',
+      tpl_title:'ابدأ من قالب', tpl_desc:'ابدأ بخطّ ساحلي جاهز، ثم ابنِ عالمك فوقه.', tpl_ready:'اللوحة جاهزة',
+      tpl_continent:'قارّة', tpl_continent_d:'كتلة يابسة واسعة بسواحل متعرّجة', tpl_island:'جزيرة',
+      tpl_island_d:'جزيرة كبيرة واحدة في عرض البحر', tpl_archipelago:'أرخبيل', tpl_archipelago_d:'جزر متناثرة ومضائق ضحلة',
+      tpl_kingdom:'مملكة', tpl_kingdom_d:'سواحل هادئة وداخل صالح للزراعة', tpl_battle:'خريطة معركة',
+      tpl_battle_d:'أرض صغيرة بشبكة سداسية', tpl_blank:'لوحة فارغة', tpl_blank_d:'ابدأ من الصفر',
+      o_outlinecolor:'لون الحدّ الخارجي', exp_html_t:'HTML بملف واحد', exp_print_t:'طباعة / PDF', exp_png2_t:'دقّة 2×',
+      exp_png4_t:'دقّة 4×', exp_maxdim:'الضلع الأطول', exp_format:'الصيغة', exp_fmt_png:'‏PNG · حادّ، ملف كبير',
+      exp_fmt_jpeg:'‏JPEG · ملف صغير', exp_title:'العنوان',
+      exp_html_help:'يُنزَّل ملف ‎.html واحد يتضمّن الخريطة وعارضًا صغيرًا مدمجًا بداخله. لا حاجة إلى خادم — أرسل الملف وانقر عليه نقرًا مزدوجًا.',
+      exp_page:'حجم الصفحة', exp_orient:'الاتجاه', exp_portrait:'طولي', exp_landscape:'عرضي', exp_margin:'الهامش',
+      exp_dpi:'الدقّة', exp_dpi_screen:'شاشة', exp_dpi_normal:'طباعة عادية', exp_dpi_high:'جودة عالية',
+      exp_print_help:'يفتح نافذة الطباعة في متصفّحك. ومنها يمكنك الإرسال إلى الطابعة أو اختيار «حفظ بصيغة PDF».',
+      printing:'جارٍ تجهيز الطباعة', print_failed:'تعذّر فتح نافذة الطباعة', viewer_hint:'اسحب · بالعجلة · نقر مزدوج',
+      viewer_in:'تكبير', viewer_out:'تصغير', viewer_fit:'ملاءمة', t_sketch:'رسم حرّ', o_sketch:'رسم حرّ',
+      h_sketch:'فرشاة حرّة ترسم على الطبقات التي تضيفها أنت فقط. أضِف طبقة بزرّ «+ أضف طبقة» في لوحة الطبقات، ثم اخترها من القائمة، ثم ارسم على الخريطة.',
+      o_hardness:'الصلابة', o_sketch_eraser:'وضع المِمحاة', sketch_target:'الطبقة الهدف',
+      sketch_need_layer:'أضِف طبقتك أولًا ثم اخترها من القائمة', layer_add:'+ أضف طبقة',
+      h_add_layer:'الطبقات التي تضيفها أنت مخصّصة للرسم الحرّ؛ ارسم عليها بأداة «رسم حرّ». إضافة الطبقات وحذفها لا يمكن التراجع عنه.',
+      layer_added:'أُضيفت طبقة', layer_untitled:'طبقة', layer_max:'يمكن إضافة 12 طبقة مستخدم كحدّ أقصى', layer_rename:'اسم الطبقة',
+      layer_rename_hint:'انقر نقرًا مزدوجًا لإعادة التسمية', layer_delete:'حذف الطبقة',
+      layer_delete_confirm:'أتريد حذف هذه الطبقة وكلّ ما رُسم عليها؟ لا يمكن التراجع عن ذلك.',
+      tut_h_sketch:'يرسم بحرّية على الطبقات التي تضيفها أنت؛ اللون والحجم والصلابة والشفافية ووضع المِمحاة قابلة للضبط.',
+      o_typography:'الطباعة والخطوط', o_font:'عائلة الخط', o_banner:'لافتة', o_banner_none:'بلا', o_banner_ribbon:'شريط',
+      o_banner_plate:'لوحة', o_banner_scroll:'مخطوطة', o_banner_stone:'حجر', o_caps:'حروف كبيرة', o_outline:'حدّ خارجي',
+      o_shadow:'ظلّ',
+      h_font_missing:'هذه العائلة الخطّية غير مثبَّتة على هذا الجهاز؛ يُستخدَم أقرب بديل لها. العناصر المعلَّمة بـ · مثبَّتة.',
+      grp_navigate:'التنقّل', grp_terrain:'التضاريس', grp_water:'المياه والطرق', grp_markers:'العلامات',
+      grp_regions:'المناطق والقياس', t_select:'تحديد', t_landmass:'يابسة', t_erase:'بحر', t_fill:'تعبئة', t_terrain:'تضاريس',
+      t_symbol:'رمز', t_river:'نهر', t_road:'طريق', t_label:'تسمية', t_pan:'تحريك', t_eyedrop:'أخذ عيّنة', t_measure:'قياس',
+      h_measure:'اسحب على الخريطة لحساب المسافة الحقيقية بين نقطتين استنادًا إلى شريط المقياس. يمكن تحديد خطوط القياس ونقلها وحذفها؛ وهي مستثناة من تصدير PNG/SVG.',
+      t_lasso:'أُنشوطة',
+      h_lasso:'اسحب لرسم منطقة مغلقة: تُرفَع اليابسة والتضاريس والارتفاع داخلها معًا وتصبح قابلة للنقل. اسحب للنقل، واستخدم المقبض العلوي للتدوير. Enter للتثبيت، Escape للإلغاء، Delete لحذف المنطقة كليًا.',
+      o_landmass:'اليابسة / الساحل', o_brushsize:'حجم الفرشاة', o_rough:'خشونة الساحل', o_landcolor:'لون اليابسة',
+      o_shorew:'عرض الساحل', o_shorestyle:'نمط الساحل', o_shore_sandy:'رملي', o_shore_rocky:'صخري', o_shore_reef:'شعاب',
+      o_smooth:'تنعيم خطّ الساحل', o_clearland:'مسح اليابسة',
+      h_landmass:'اسحب لرسم اليابسة. أداة «بحر» تمحو اليابسة والتضاريس معًا.', o_landgen:'توليد يابسة عشوائية',
+      o_landgentpl:'القالب', o_landgen_continent:'قارّة', o_landgen_island:'جزيرة', o_landgen_archipelago:'أرخبيل',
+      o_landgenrough:'التفاصيل / الخشونة', o_landgen_go:'🎲 توليد',
+      h_landgen:'يستبدل طبقة اليابسة الحالية. انقر مرّة أخرى بالإعدادات نفسها للحصول على نتيجة عشوائية جديدة.',
+      o_terrain:'رسم التضاريس', o_opacity:'الشفافية', o_clip:'ارسم على اليابسة فقط', o_clearterrain:'مسح طبقة التضاريس',
+      h_terrain:'تتوزّع العلامات عشوائيًا في كلّ ضربة فرشاة — بلا نمط متكرّر.', t_elevation:'الارتفاع', o_elevation:'الارتفاع',
+      o_elevstrength:'الشدّة', o_elevlower:'وضع الخفض', o_clearelevation:'مسح الارتفاع', o_elevdisplay:'العرض',
+      o_elevhillshade:'تظليل التلال', o_elevcontours:'خطوط الكنتور', o_contourinterval:'فاصل الكنتور',
+      h_elevation:'اسحب لرفع الأرض؛ فعِّل «وضع الخفض» لحفرها. يتحدّث تظليل التلال تلقائيًا.', o_symbol:'رمز', o_size:'الحجم',
+      o_rot:'الدوران', o_hue:'إزاحة اللون', o_wear:'البلى', o_jitter:'عشوائية الموضع',
+      h_symbol:'اختر رمزًا ثم انقر على الخريطة. استخدم «تحديد» للنقل، وDelete للحذف.', o_river:'نهر', o_width:'العرض',
+      o_meander:'التعرّج', o_taper:'تضييق عند المنبع', o_color:'اللون',
+      h_path:'انقر لإضافة نقاط. Enter أو نقر مزدوج للإنهاء، Esc للإلغاء.', o_road:'طريق / درب قوافل', o_label:'تسمية',
+      o_preset:'نمط جاهز', o_curve:'الانحناء', o_track:'تباعد الحروف', o_snappath:'محاذاة إلى مسار (نهر/طريق)',
+      h_label:'اختر نمطًا، اكتب النصّ، ثم انقر على الخريطة. تُطبَّق الإعدادات فورًا على التسمية المحدَّدة.',
+      o_eyedrop:'آخذ عيّنات النسيج', o_eye_nosample:'لا عيّنة بعد', o_eye_radius:'نصف قطر العيّنة', o_eye_brush:'حجم الفرشاة',
+      o_eye_pick:'① اختر منطقة', o_eye_paint:'② ابدأ الرسم', o_eye_clear:'مسح العيّنة',
+      h_eyedrop:'① اختر منطقة: اسحب دائرة. ② ارسم: طبِّق النسيج المأخوذ.', eyeOk:'✓ أُخذت عيّنة النسيج',
+      eyeFail:'فشل أخذ العيّنة — جرِّب فوق يابسة أو تضاريس.', eyePick:'انقر واسحب على الخريطة ← اضبط حجم الدائرة ← أفلِت.',
+      eyePaint:'انقر واسحب على الخريطة ← يُطبَّق النسيج.', eyeNeed:'خُذ عيّنة نسيج أولًا عبر ① اختر منطقة.', o_selection:'التحديد',
+      o_nosel:'لا شيء محدَّد', o_dup:'تكرار', o_del:'حذف', o_scalebar:'شريط المقياس', o_scvis:'إظهار على الخريطة', o_sclen:'الطول',
+      o_scsize:'حجم النصّ', o_scsegs:'الأقسام', h_scale:'اسحب شريط المقياس على الخريطة لتغيير موضعه.', o_view:'العرض',
+      o_fit:'ملاءمة الشاشة', o_100:'100%',
+      h_pan:'اسحب بالزرّ الأيمن، أو الزرّ الأوسط، أو Space مع السحب، أو استخدم مفاتيح الأسهم للتحريك.', tab_layers:'الطبقات',
+      tab_library:'المكتبة', tab_history:'السجلّ', ref_title:'صورة مرجعية', ref_export:'تضمينها في التصدير',
+      ref_clear:'إزالة المرجع', ref_trace:'وضع التتبّع (إظهارها فوق الكلّ + محاذاة خطّ الساحل)',
+      layer_drag_hint:'امسك من هنا لسحب الطبقة وإعادة ترتيبها', blend_sourceover:'عادي', blend_multiply:'ضرب',
+      blend_overlay:'تراكب', blend_softlight:'ضوء ناعم', blend_screen:'شاشة', nav_home:'الرئيسية', nav_canvas:'اللوحة',
+      nav_tutorial:'الدليل', nav_community:'المجتمع', home_tagline:'محرِّر خرائط يعمل في المتصفّح لعوالم الخيال',
+      home_desc:'ارسم حدود اليابسة والبحر، ولوِّن الغابات والجبال، وضَع القلاع والقرى، ومدَّ الأنهار والطرق — كلّ ذلك على لوحة واحدة، داخل متصفّحك، دون أيّ تثبيت.',
+      home_cta:'ابدأ خريطتك', home_video_caption:'فيديو تعريفي قريبًا', canvas_new_title:'إنشاء لوحة جديدة',
+      canvas_custom:'مقاس مخصّص…', canvas_name_ph:'اسم الخريطة', canvas_create:'إنشاء', canvas_import:'استيراد من ملف ‎.json',
+      canvas_saved_title:'اللوحات المحفوظة',
+      canvas_empty:'لا توجد لوحات محفوظة في هذا المتصفّح بعد. تظهر هنا تلقائيًا عند الضغط على «حفظ» داخل المحرِّر.',
+      canvas_open:'فتح', canvas_delete:'حذف', canvas_delete_confirm:'أتريد حذف هذه اللوحة؟ لا يمكن التراجع عن ذلك.',
+      canvas_unnamed:'خريطة بلا عنوان', tutorial_title:'الدليل',
+      tutorial_intro:'كلّ أداة في شريط الأدوات الجانبي تفتح إعداداتها الخاصّة في اللوحة المقابلة. في ما يلي ملخّص سريع لعمل كلّ أداة.',
+      community_title:'المجتمع', community_desc:'Wayborne Map Editor مشروع مفتوح المصدر ويتطوّر باستمرار.',
+      community_github_desc:'الشيفرة المصدرية وبلاغات الأخطاء والمساهمات', community_soon:'قريبًا',
+      lib_full:'مساحة تخزين المتصفّح ممتلئة — احذف لوحة قديمة أو صدِّرها بصيغة ‎.json.',
+      tut_h_select:'حدِّد الكائنات وانقلها ودوِّرها؛ Shift مع النقر للتحديد المتعدّد.',
+      tut_h_erase:'يمحو اليابسة المرسومة ونسيج التضاريس فوقها في خطوة واحدة.', tut_h_fill:'يملأ داخل خطّ ساحلي مغلق بنقرة واحدة.',
+      tut_h_river:'انقر لإضافة نقاط ورسم نهر؛ Enter للإنهاء.', tut_h_road:'انقر لإضافة نقاط ورسم طريق؛ Enter للإنهاء.',
+      sym_upload:'+ ارفع رمز PNG', sym_upload_done:'رمز/رموز حُمِّلت', sym_del:'حذف', sym_search:'ابحث في الرموز…',
+      st_pos:'الموضع', st_zoom:'التقريب', st_size:'اللوحة', st_tool:'الأداة', cancel:'إلغاء', ok:'موافق',
+      locked:'الطبقة مقفلة أو مخفية.', needtext:'اكتب نصّ التسمية أولًا.', nopathnear:'لا يوجد نهر أو طريق قريب.',
+      fill_toolarge:'المنطقة كبيرة جدًا — جرِّب داخل حدّ مغلق.', exported:'صُدِّر:', saved:'حُفظ المشروع.',
+      loaded:'حُمِّل المشروع.', badfile:'ملف مشروع غير صالح.', newmap:'أُنشئت خريطة جديدة.',
+      confirmNew:'ستُلغى الخريطة الحالية. اختر حجم اللوحة:',
+      confirmSize:'تغيير حجم اللوحة يعيد تحجيم الطبقات الموجودة. أتريد المتابعة؟', histStart:'البداية', selNone:'لا شيء محدَّد',
+      symbols:'رمز', selScale:'شريط المقياس محدَّد', o_zorder:'ترتيب الطبقات', o_front:'إلى الأمام تمامًا',
+      o_back:'إلى الخلف تمامًا', o_fwd:'خطوة إلى الأمام', o_bwd:'خطوة إلى الخلف', o_group:'تجميع', o_ungroup:'فكّ التجميع',
+      selMulti:'كائن محدَّد', t_lake:'بحيرة', o_lake:'بحيرة', h_lake:'انقر لإضافة نقاط، ومع 3 نقاط أو أكثر اضغط Enter للإغلاق.',
+      t_territory:'منطقة', o_territory:'منطقة', o_territorycolor:'لون التعبئة', o_territorybcolor:'لون الحدّ',
+      h_territory:'انقر لإضافة نقاط، ومع 3 نقاط أو أكثر اضغط Enter للإغلاق.', t_regionlink:'رابط منطقة',
+      h_regionlink:'انقر على الخريطة وسمِّها: تُنشَأ خريطة منطقة جديدة فارغة. انقر نقرًا مزدوجًا على الدبّوس بأداة «تحديد» للدخول إليها، واستخدم «رجوع» في الأعلى للعودة إلى خريطة العالم.',
+      rl_newtitle:'خريطة منطقة جديدة', rl_placeholder:'اسم المنطقة', rl_default:'منطقة بلا اسم', rl_open:'ادخل المنطقة ←',
+      bc_back:'رجوع', bc_world:'خريطة العالم', t_resource:'مورد', o_resourcetype:'النوع', rs_mine:'منجم', rs_farm:'أرض زراعية',
+      rs_hunting:'أرض صيد', rs_fishing:'موضع صيد سمك', rs_trade:'مركز تجاري', rs_quarry:'محجر',
+      h_resource:'انقر على الخريطة لوضع علامة مورد من النوع المحدَّد.', o_lakecolor:'لون البحيرة', o_symbbrush:'وضع الفرشاة',
+      o_symbdensity:'الكثافة', o_clipland:'القصّ على اليابسة (فرشاة)', o_windrose:'وردة الرياح', o_wrvis:'إظهار على الخريطة',
+      o_wrsize:'الحجم', o_wrstyle_classic:'كلاسيكي', o_wrstyle_minimal:'مبسَّط', o_wrstyle:'النمط', o_wrcolor:'اللون',
+      h_windrose:'اسحب على الخريطة لتغيير الموضع.', o_snap:'محاذاة إلى الشبكة', o_snapsize:'حجم الشبكة', o_frame:'إطار الخريطة',
+      o_frame_none:'بلا', o_frame_simple:'خطّ بسيط', o_frame_rope:'حبل', o_frame_ornate:'مزخرف', o_frame_color:'اللون',
+      o_png2x:'PNG 2×', o_png4x:'PNG 4×'
+    },
     ru: {
       new:'Новый', open:'Открыть', save:'Сохранить', parchment:'Пергамент', grid:'Сетка', shore:'Берег',
       narrow_title:'Редактору нужен экран пошире', narrow_desc:'Редактор карт использует настольную раскладку: панель инструментов, холст и панель слоёв рядом. Требуется минимум 1024 × 600 пикселей.',
@@ -726,7 +840,8 @@
     { code:'pt', flag:'🇵🇹', name:'Português' },
     { code:'nl', flag:'🇳🇱', name:'Nederlands' },
     { code:'pl', flag:'🇵🇱', name:'Polski' },
-    { code:'ru', flag:'🇷🇺', name:'Русский' }
+    { code:'ru', flag:'🇷🇺', name:'Русский' },
+    { code:'ar', flag:'🇸🇦', name:'العربية' }
   ];
 
   /* Rehber (Tutorial) sayfası — index.html'deki tool-rail ile AYNI gruplama
@@ -774,7 +889,18 @@
     scaleSnapshot:null,
     msgTimer:0,
 
-    t: function (k) { return (DICT[this.lang] && DICT[this.lang][k]) || DICT.tr[k] || k; },
+    /* Sağdan sola yazılan arayüz dilleri. */
+    RTL_LANGS: { ar:1, fa:1, he:1, ur:1 },
+    isRTL: function (lang) { return !!this.RTL_LANGS[lang || this.lang]; },
+
+    /* Çeviri yoksa: RTL/yeni diller İngilizce'ye düşer (Türkçe'ye değil),
+       çünkü İngilizce bu diller için ortak ikinci dil. */
+    t: function (k) {
+      var d = DICT[this.lang];
+      if (d && d[k] !== undefined) return d[k];
+      if (this.lang !== 'tr' && DICT.en[k] !== undefined) return DICT.en[k];
+      return DICT.tr[k] || k;
+    },
 
     init: function () {
       this.buildTerrainSwatches();
@@ -809,6 +935,11 @@
         if (!el.textContent.trim()) el.setAttribute('aria-label', v);
       });
       document.documentElement.lang = this.lang;
+      /* Sağdan sola diller: yön <html>'e yazılır, düzen mantıksal
+         özelliklerle (padding-inline-start vb.) kendiliğinden aynalanır.
+         Editörün tuvali ve minimap'i her zaman soldan sağ kalır — harita
+         içeriği bir metin akışı değil. */
+      document.documentElement.dir = this.isRTL() ? 'rtl' : 'ltr';
       this.buildTerrainSwatches();
       this.buildLabelPresets();
       this.buildFontList();
