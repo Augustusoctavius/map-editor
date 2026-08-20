@@ -100,6 +100,18 @@ h4{font-size:11px;color:var(--text-dim)}
 .opt-group .row b{color:var(--text);font-weight:600;font-family:var(--f-mono)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
 .mini{display:block;font-size:10px;color:var(--text-dim);margin-bottom:2px}
+/* Panel içi alt bölüm: ayarları ana akıştan bir çizgiyle ayırır
+   (etiket panelindeki tipografi bloğu gibi). */
+.sub-sec{
+  margin:12px 0 4px; padding-top:10px;
+  border-top:1px solid var(--line);
+}
+.sub-sec > .mini:first-child{
+  font-family:var(--f-display); letter-spacing:.13em; text-transform:uppercase;
+  color:var(--brass); opacity:.85; margin-bottom:8px;
+}
+.sub-sec .hint{margin:4px 0 8px}
+.sub-sec .hint.hidden{display:none}
 .hint{font-size:11px;line-height:1.5;color:var(--text-dim);
   border-left:2px solid var(--brass-dim);padding-left:8px;margin:12px 0 0}
 .sel-info{font-family:var(--f-mono);font-size:11px;background:var(--ink-700);

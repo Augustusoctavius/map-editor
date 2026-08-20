@@ -180,13 +180,79 @@
   };
 
   /* ================= yazı tipleri ================= */
+  /* ================= ETİKET YAZI AİLELERİ =================
+     Proje harici font yüklemez (ne CDN ne gömülü dosya), bu yüzden her
+     aile bir *yığın*: önce o karakteri en iyi veren sistem fontu, sonra
+     macOS / Windows / Linux karşılıkları, en sonda jenerik bir sınıf.
+     Böylece hiçbir sistemde "yazı kayboldu" durumu olmaz; yalnızca
+     karakter zayıflar. fontAvailable(key) ile arayüz hangi ailenin
+     gerçekten kurulu olduğunu işaretler.
+
+     Anahtarlar geriye dönük: fantasy/serif/sans/mono/black eski
+     kayıtlarda ve presetlerde geçtiği için korunuyor. */
   var FONTS = {
-    fantasy:'"Papyrus","Luminari","Trattatello","Copperplate",fantasy',
-    serif:'Georgia,"Iowan Old Style","Times New Roman",serif',
-    sans:'"Segoe UI",Helvetica,Arial,sans-serif',
-    mono:'"SFMono-Regular",Consolas,monospace',
-    black:'"Cinzel","Trajan Pro",Georgia,serif'
+    serif:      'Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"URW Palladio L","Liberation Serif","Times New Roman",serif',
+    black:      '"Cinzel","Trajan Pro","Optima","Copperplate","Copperplate Gothic Light","Bookman Old Style","URW Bookman L",Georgia,serif',
+    fantasy:    '"Luminari","Papyrus","Trattatello","Herculanum","Copperplate",fantasy,serif',
+    sans:       '"Optima","Gill Sans","Gill Sans MT","Segoe UI","DejaVu Sans",Helvetica,Arial,sans-serif',
+    mono:       '"SFMono-Regular","Menlo",Consolas,"DejaVu Sans Mono","Liberation Mono",monospace',
+    /* --- yeni tarihsel aileler --- */
+    uncial:     '"Luminari","Herculanum","Papyrus","Bradley Hand","Segoe Print",fantasy,serif',
+    blackletter:'"UnifrakturMaguntia","Old English Text MT","Blackadder ITC","Lucida Blackletter","Cloister Black",Georgia,serif',
+    roman:      '"Trajan Pro","Cinzel","Copperplate","Copperplate Gothic Bold","Perpetua Titling MT","Nimbus Roman No9 L","Times New Roman",serif',
+    chancery:   '"Zapfino","Edwardian Script ITC","Apple Chancery","URW Chancery L","Segoe Script","Brush Script MT",cursive,serif',
+    slab:       '"Rockwell","Bookman Old Style","URW Bookman L","Roboto Slab","Courier New",Georgia,serif'
   };
+
+  /* Tek bir font adının kurulu olup olmadığını ölçer: aday font ile
+     jenerik bir taban aynı metni aynı genişlikte çiziyorsa font yoktur
+     (tarayıcı tabana düşmüştür). Üç farklı tabana bakılır, çünkü aday
+     tesadüfen tabanlardan biriyle aynı metriklere sahip olabilir. */
+  var _fontProbe = null, _fontSeen = {};
+  function faceInstalled(name) {
+    if (name in _fontSeen) return _fontSeen[name];
+    if (!_fontProbe) _fontProbe = document.createElement('canvas').getContext('2d');
+    var probe = 'MWQ@ilg 0123 mmmwww';
+    var base = ['monospace', 'serif', 'sans-serif'];
+    var found = false;
+    for (var i = 0; i < base.length && !found; i++) {
+      _fontProbe.font = '72px ' + base[i];
+      var ref = _fontProbe.measureText(probe).width;
+      _fontProbe.font = '72px "' + name + '",' + base[i];
+      if (Math.abs(_fontProbe.measureText(probe).width - ref) > 0.5) found = true;
+    }
+    return (_fontSeen[name] = found);
+  }
+
+  /* Bir ailenin *karakterini* veren fontlardan en az biri kurulu mu?
+     Yığının sonundaki jenerik yedekler (Georgia, serif …) sayılmaz —
+     gotik bir yığın Georgia'ya düştüğünde ailenin karakteri kaybolur,
+     dolayısıyla o aile "yok" sayılmalıdır. faces === null olan aileler
+     zaten jenerik tasarlandığı için her yerde var kabul edilir. */
+  function fontAvailable(key) {
+    var f = FONT_BY_KEY[key];
+    if (!f) return true;
+    if (!f.faces) return true;
+    for (var i = 0; i < f.faces.length; i++) if (faceInstalled(f.faces[i])) return true;
+    return false;
+  }
+
+  /* Arayüzde gösterilen sıra + ad. i18n-names.js 'font_<key>' ile
+     diğer dilleri tamamlar. */
+  var FONT_LIST = [
+    { key:'serif',       tr:'Eski kitap',      en:'Old book',        faces:null },
+    { key:'black',       tr:'Anıtsal',         en:'Monumental',      faces:['Cinzel','Trajan Pro','Optima','Copperplate','Copperplate Gothic Light'] },
+    { key:'roman',       tr:'Roma kitabesi',   en:'Roman capitals',  faces:['Trajan Pro','Cinzel','Copperplate','Copperplate Gothic Bold','Perpetua Titling MT'] },
+    { key:'uncial',      tr:'Ünsiyal',         en:'Uncial',          faces:['Luminari','Herculanum','Papyrus'] },
+    { key:'blackletter', tr:'Gotik yazı',      en:'Blackletter',     faces:['UnifrakturMaguntia','Old English Text MT','Blackadder ITC','Lucida Blackletter','Cloister Black'] },
+    { key:'chancery',    tr:'Divani el yazısı',en:'Chancery script', faces:['Zapfino','Edwardian Script ITC','Apple Chancery','URW Chancery L','Segoe Script','Brush Script MT'] },
+    { key:'slab',        tr:'Kalın serif',     en:'Slab serif',      faces:['Rockwell','Bookman Old Style','URW Bookman L','Roboto Slab'] },
+    { key:'fantasy',     tr:'Fantastik',       en:'Fantasy',         faces:['Luminari','Papyrus','Trattatello','Herculanum','Copperplate'] },
+    { key:'sans',        tr:'Sade',            en:'Plain',           faces:null },
+    { key:'mono',        tr:'Daktilo',         en:'Typewriter',      faces:null }
+  ];
+  var FONT_BY_KEY = {};
+  FONT_LIST.forEach(function (f) { FONT_BY_KEY[f.key] = f; });
 
   /* ================= ETİKET PRESETLERİ =================
      banner: null | 'ribbon' | 'plate' | 'scroll' | 'stone'   */
@@ -2436,6 +2502,8 @@
 
   global.Geo = Geo;
   global.FONTS = FONTS;
+  global.FONT_LIST = FONT_LIST;
+  global.fontAvailable = fontAvailable;
   global.LABEL_PRESETS = LABEL_PRESETS;
   global.Cv = Cv;
 })(window);

@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wayborne Map Editor</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23241708%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23c08a3e%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M8%2024%20L24%208%22%2F%3E%3Cpath%20d%3D%22M24%2024%20L8%208%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%223.1%22%20fill%3D%22%23241708%22%20stroke%3D%22%23c08a3e%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/toolbar.css">
 <link rel="stylesheet" href="css/canvas.css">
@@ -477,6 +478,25 @@
         <input type="range" id="lb-rot" min="-180" max="180" value="0">
         <label class="row"><span data-i18n="o_color">Metin rengi</span></label>
         <input type="color" id="lb-color" value="#3a2b18">
+        <div class="sub-sec">
+          <span class="mini" data-i18n="o_typography">Tipografi</span>
+          <label class="row"><span data-i18n="o_font">Yazı ailesi</span></label>
+          <select id="lb-font" class="sel"></select>
+          <p class="hint" id="lb-font-note" data-i18n="h_font_missing">Bu yazı ailesi bu cihazda kurulu değil; en yakın karşılığı kullanılıyor.</p>
+          <label class="row"><span data-i18n="o_banner">Kapıt</span></label>
+          <select id="lb-banner" class="sel">
+            <option value="" data-i18n="o_banner_none">Yok</option>
+            <option value="ribbon" data-i18n="o_banner_ribbon">Kurdele</option>
+            <option value="plate" data-i18n="o_banner_plate">Levha</option>
+            <option value="scroll" data-i18n="o_banner_scroll">Tomar</option>
+            <option value="stone" data-i18n="o_banner_stone">Taş</option>
+          </select>
+          <label class="chk"><input type="checkbox" id="lb-caps"><span data-i18n="o_caps">Büyük harf</span></label>
+          <label class="chk"><input type="checkbox" id="lb-outline"><span data-i18n="o_outline">Dış hat</span></label>
+          <span class="mini" data-i18n="o_outlinecolor">Dış hat rengi</span>
+          <input type="color" id="lb-outline-color" value="#f5ecd8">
+          <label class="chk"><input type="checkbox" id="lb-shadow"><span data-i18n="o_shadow">Gölge</span></label>
+        </div>
         <label class="chk"><input type="checkbox" id="lb-snap-path"><span data-i18n="o_snappath">Yola oturt (nehir/yol)</span></label>
         <p class="hint" data-i18n="h_label">Şablon seç, metni yaz, haritaya tıkla. Seçili etikette ayarlar anında uygulanır.</p>
       </section>

@@ -15,6 +15,17 @@
   'use strict';
 
   var NameI18N = {
+    /* --- etiket yazi aileleri --- */
+    'font_serif': { de:'Altes Buch', fr:'Livre ancien', es:'Libro antiguo', it:'Libro antico', pt:'Livro antigo', nl:'Oud boek', pl:'Stara księga', ru:'Старая книга' },
+    'font_black': { de:'Monumental', fr:'Monumentale', es:'Monumental', it:'Monumentale', pt:'Monumental', nl:'Monumentaal', pl:'Monumentalny', ru:'Монументальный' },
+    'font_roman': { de:'Römische Kapitalis', fr:'Capitales romaines', es:'Capitales romanas', it:'Capitali romane', pt:'Capitais romanas', nl:'Romeinse kapitalen', pl:'Kapitała rzymska', ru:'Римский капитал' },
+    'font_uncial': { de:'Unziale', fr:'Onciale', es:'Uncial', it:'Onciale', pt:'Uncial', nl:'Unciaal', pl:'Uncjała', ru:'Унциал' },
+    'font_blackletter': { de:'Fraktur', fr:'Gothique', es:'Letra gótica', it:'Gotico', pt:'Letra gótica', nl:'Gotisch schrift', pl:'Gotyk', ru:'Готическое письмо' },
+    'font_chancery': { de:'Kanzleischrift', fr:'Écriture de chancellerie', es:'Escritura cancilleresca', it:'Cancelleresca', pt:'Escrita chancelaresca', nl:'Kanselarijschrift', pl:'Pismo kancelaryjne', ru:'Канцелярский курсив' },
+    'font_slab': { de:'Egyptienne', fr:'Égyptienne', es:'Serif egipcia', it:'Egiziano', pt:'Serifa egípcia', nl:'Schreefletter', pl:'Szeryfowa płytowa', ru:'Брусковая антиква' },
+    'font_fantasy': { de:'Fantasy', fr:'Fantastique', es:'Fantástica', it:'Fantasy', pt:'Fantasia', nl:'Fantasy', pl:'Fantasy', ru:'Фэнтези' },
+    'font_sans': { de:'Schlicht', fr:'Sobre', es:'Sencilla', it:'Semplice', pt:'Simples', nl:'Eenvoudig', pl:'Prosta', ru:'Простой' },
+    'font_mono': { de:'Schreibmaschine', fr:'Machine à écrire', es:'Máquina de escribir', it:'Macchina da scrivere', pt:'Máquina de escrever', nl:'Schrijfmachine', pl:'Maszynowa', ru:'Печатная машинка' },
     'grassland': { de:'Grasland', fr:'Plaine herbeuse', es:'Pradera', it:'Prateria', pt:'Pradaria', nl:'Grasland', pl:'Step trawiasty', ru:'Луга' },
     'meadow': { de:'Wiese', fr:'Prairie fleurie', es:'Prado', it:'Prato fiorito', pt:'Campina florida', nl:'Bloemenweide', pl:'Łąka kwietna', ru:'Цветущий луг' },
     'shrubland': { de:'Buschland', fr:'Maquis', es:'Matorral', it:'Macchia', pt:'Mato', nl:'Struikland', pl:'Zarośla', ru:'Кустарники' },

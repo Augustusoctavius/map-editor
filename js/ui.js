@@ -16,6 +16,8 @@
       o_nameculture:'Kültür', o_namefeature:'Tür', o_namegen:'🎲 Ad öner', o_nf_settlement:'Yerleşim', o_nf_city:'Şehir', o_nf_river:'Nehir', o_nf_mountain:'Dağ', o_nf_forest:'Orman', o_nf_region:'Bölge', o_nf_lake:'Göl', o_nf_sea:'Deniz',
       tpl_title:'Şablonla başla', tpl_desc:'Hazır bir kıyı çizgisiyle başla, sonra üzerine kendi dünyanı kur.', tpl_ready:'tuval hazır',
       tpl_continent:'Kıta', tpl_continent_d:'Geniş ana kara, girintili kıyılar', tpl_island:'Ada', tpl_island_d:'Tek büyük ada, çevresi açık deniz', tpl_archipelago:'Takımada', tpl_archipelago_d:'Dağınık adalar ve sığ boğazlar', tpl_kingdom:'Krallık', tpl_kingdom_d:'Yumuşak kıyılı, tarıma elverişli topraklar', tpl_battle:'Savaş alanı', tpl_battle_d:'Altıgen ızgaralı küçük arazi', tpl_blank:'Boş tuval', tpl_blank_d:'Her şeye sıfırdan başla',
+      o_outlinecolor:'Dış hat rengi',
+      o_typography:'Tipografi', o_font:'Yazı ailesi', o_banner:'Kapıt', o_banner_none:'Yok', o_banner_ribbon:'Kurdele', o_banner_plate:'Levha', o_banner_scroll:'Tomar', o_banner_stone:'Taş', o_caps:'Büyük harf', o_outline:'Dış hat', o_shadow:'Gölge', h_font_missing:'Bu yazı ailesi bu cihazda kurulu değil; en yakın karşılığı kullanılıyor. Listede • ile işaretli olanlar kurulu.',
       grp_navigate:'Gezinme', grp_terrain:'Arazi', grp_water:'Su & Yollar', grp_markers:'İşaretler', grp_regions:'Bölge & Ölçüm',
       t_select:'Seç', t_landmass:'Kara', t_erase:'Deniz', t_fill:'Doldur', t_terrain:'Arazi', t_symbol:'Sembol',
       t_river:'Nehir', t_road:'Yol', t_label:'Etiket', t_pan:'Kaydır', t_eyedrop:'Örnekle', t_measure:'Ölç', h_measure:'Haritada sürükleyerek iki nokta arası gerçek mesafeyi ölçek çubuğuna göre hesapla. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez.', t_lasso:'Kement', h_lasso:'Sürükleyerek kapalı bir alan çiz: Kara + Arazi + Yükselti o alanda birlikte kaldırılıp taşınabilir hâle gelir. Sürükleyerek taşı, üstteki tutamaçla döndür. Enter ile onayla, Escape ile iptal et, Delete ile alanı tamamen sil.',
@@ -82,6 +84,8 @@
       o_nameculture:'Culture', o_namefeature:'Type', o_namegen:'🎲 Suggest name', o_nf_settlement:'Settlement', o_nf_city:'City', o_nf_river:'River', o_nf_mountain:'Mountain', o_nf_forest:'Forest', o_nf_region:'Region', o_nf_lake:'Lake', o_nf_sea:'Sea',
       tpl_title:'Start from a template', tpl_desc:'Begin with a ready-made coastline, then build your world on top of it.', tpl_ready:'canvas ready',
       tpl_continent:'Continent', tpl_continent_d:'Broad landmass with indented coasts', tpl_island:'Island', tpl_island_d:'A single large island in open sea', tpl_archipelago:'Archipelago', tpl_archipelago_d:'Scattered isles and shallow straits', tpl_kingdom:'Kingdom', tpl_kingdom_d:'Gentle coasts, farmable inland', tpl_battle:'Battle map', tpl_battle_d:'Small terrain with a hex grid', tpl_blank:'Blank canvas', tpl_blank_d:'Start from nothing',
+      o_outlinecolor:'Outline colour',
+      o_typography:'Typography', o_font:'Typeface', o_banner:'Banner', o_banner_none:'None', o_banner_ribbon:'Ribbon', o_banner_plate:'Plate', o_banner_scroll:'Scroll', o_banner_stone:'Stone', o_caps:'Uppercase', o_outline:'Outline', o_shadow:'Shadow', h_font_missing:'This typeface is not installed on this device; the closest match is used instead. Entries marked · are installed.',
       grp_navigate:'Navigate', grp_terrain:'Terrain', grp_water:'Water & Routes', grp_markers:'Markers', grp_regions:'Regions & Measure',
       t_select:'Select', t_landmass:'Land', t_erase:'Sea', t_fill:'Fill', t_terrain:'Terrain', t_symbol:'Symbol',
       t_river:'River', t_road:'Road', t_label:'Label', t_pan:'Pan', t_eyedrop:'Sample', t_measure:'Measure', h_measure:'Drag on the map to compute the real distance between two points based on the scale bar. Measurement lines can be selected, moved, or deleted; they are excluded from PNG/SVG export.', t_lasso:'Lasso', h_lasso:'Drag to draw a closed area: Land + Terrain + Elevation are lifted together within it and become movable. Drag to move, use the top handle to rotate. Enter to commit, Escape to cancel, Delete to remove the area entirely.',
@@ -148,6 +152,8 @@
       o_nameculture:'Kultur', o_namefeature:'Typ', o_namegen:'🎲 Namen vorschlagen', o_nf_settlement:'Siedlung', o_nf_city:'Stadt', o_nf_river:'Fluss', o_nf_mountain:'Berg', o_nf_forest:'Wald', o_nf_region:'Region', o_nf_lake:'See', o_nf_sea:'Meer',
       tpl_title:'Mit einer Vorlage beginnen', tpl_desc:'Starte mit einer fertigen Küstenlinie und baue deine Welt darauf auf.', tpl_ready:'Leinwand bereit',
       tpl_continent:'Kontinent', tpl_continent_d:'Weite Landmasse mit zerklüfteten Küsten', tpl_island:'Insel', tpl_island_d:'Eine große Insel im offenen Meer', tpl_archipelago:'Archipel', tpl_archipelago_d:'Verstreute Inseln und flache Meerengen', tpl_kingdom:'Königreich', tpl_kingdom_d:'Sanfte Küsten, fruchtbares Hinterland', tpl_battle:'Schlachtkarte', tpl_battle_d:'Kleines Gelände mit Hexfeld-Raster', tpl_blank:'Leere Leinwand', tpl_blank_d:'Ganz von vorn anfangen',
+      o_outlinecolor:'Konturfarbe',
+      o_typography:'Typografie', o_font:'Schriftart', o_banner:'Banner', o_banner_none:'Keins', o_banner_ribbon:'Band', o_banner_plate:'Tafel', o_banner_scroll:'Schriftrolle', o_banner_stone:'Stein', o_caps:'Großbuchstaben', o_outline:'Kontur', o_shadow:'Schatten', h_font_missing:'Diese Schriftart ist auf diesem Gerät nicht installiert; die nächstbeste wird verwendet. Mit · markierte Einträge sind installiert.',
       grp_navigate:'Navigation', grp_terrain:'Gelände', grp_water:'Wasser & Wege', grp_markers:'Marker', grp_regions:'Regionen & Maß',
       t_select:'Auswahl', t_landmass:'Land', t_erase:'Meer', t_fill:'Füllen', t_terrain:'Gelände', t_symbol:'Symbol',
       t_river:'Fluss', t_road:'Straße', t_label:'Beschriftung', t_pan:'Verschieben', t_eyedrop:'Pipette', t_measure:'Messen', h_measure:'Auf der Karte ziehen, um die reale Entfernung zwischen zwei Punkten anhand des Maßstabsbalkens zu berechnen. Messlinien können ausgewählt, verschoben oder gelöscht werden; sie sind vom PNG/SVG-Export ausgeschlossen.', t_lasso:'Lasso', h_lasso:'Ziehen, um einen geschlossenen Bereich zu zeichnen: Land + Gelände + Höhenrelief werden darin gemeinsam angehoben und verschiebbar. Ziehen zum Verschieben, oberer Griff zum Drehen. Enter bestätigt, Escape bricht ab, Entf löscht den Bereich vollständig.',
@@ -214,6 +220,8 @@
       o_nameculture:'Culture', o_namefeature:'Type', o_namegen:'🎲 Proposer un nom', o_nf_settlement:'Village', o_nf_city:'Ville', o_nf_river:'Rivière', o_nf_mountain:'Montagne', o_nf_forest:'Forêt', o_nf_region:'Région', o_nf_lake:'Lac', o_nf_sea:'Mer',
       tpl_title:'Partir d’un modèle', tpl_desc:'Commence avec un littoral tout prêt, puis bâtis ton monde par-dessus.', tpl_ready:'toile prête',
       tpl_continent:'Continent', tpl_continent_d:'Vaste masse terrestre aux côtes découpées', tpl_island:'Île', tpl_island_d:'Une grande île en pleine mer', tpl_archipelago:'Archipel', tpl_archipelago_d:'Îles éparses et détroits peu profonds', tpl_kingdom:'Royaume', tpl_kingdom_d:'Côtes douces, terres cultivables', tpl_battle:'Carte de bataille', tpl_battle_d:'Petit terrain avec grille hexagonale', tpl_blank:'Toile vierge', tpl_blank_d:'Tout créer depuis zéro',
+      o_outlinecolor:'Couleur du contour',
+      o_typography:'Typographie', o_font:'Police', o_banner:'Bannière', o_banner_none:'Aucune', o_banner_ribbon:'Ruban', o_banner_plate:'Plaque', o_banner_scroll:'Parchemin', o_banner_stone:'Pierre', o_caps:'Majuscules', o_outline:'Contour', o_shadow:'Ombre', h_font_missing:'Cette police n’est pas installée sur cet appareil ; la plus proche est utilisée. Les entrées marquées · sont installées.',
       grp_navigate:'Navigation', grp_terrain:'Terrain', grp_water:'Eaux & Routes', grp_markers:'Repères', grp_regions:'Régions & Mesure',
       t_select:'Sélection', t_landmass:'Terre', t_erase:'Mer', t_fill:'Remplir', t_terrain:'Terrain', t_symbol:'Symbole',
       t_river:'Rivière', t_road:'Route', t_label:'Étiquette', t_pan:'Déplacer', t_eyedrop:'Pipette', t_measure:'Mesurer', h_measure:'Faites glisser sur la carte pour calculer la distance réelle entre deux points selon l\'échelle. Les lignes de mesure peuvent être sélectionnées, déplacées ou supprimées ; elles sont exclues de l\'export PNG/SVG.', t_lasso:'Lasso', h_lasso:'Faites glisser pour tracer une zone fermée : Terre + Terrain + Relief y sont soulevés ensemble et deviennent déplaçables. Glissez pour déplacer, utilisez la poignée du haut pour pivoter. Entrée pour valider, Échap pour annuler, Suppr pour effacer entièrement la zone.',
@@ -280,6 +288,8 @@
       o_nameculture:'Cultura', o_namefeature:'Tipo', o_namegen:'🎲 Sugerir nombre', o_nf_settlement:'Asentamiento', o_nf_city:'Ciudad', o_nf_river:'Río', o_nf_mountain:'Montaña', o_nf_forest:'Bosque', o_nf_region:'Región', o_nf_lake:'Lago', o_nf_sea:'Mar',
       tpl_title:'Empezar con una plantilla', tpl_desc:'Comienza con una costa ya hecha y construye tu mundo sobre ella.', tpl_ready:'lienzo listo',
       tpl_continent:'Continente', tpl_continent_d:'Gran masa de tierra con costas recortadas', tpl_island:'Isla', tpl_island_d:'Una gran isla en mar abierto', tpl_archipelago:'Archipiélago', tpl_archipelago_d:'Islas dispersas y estrechos poco profundos', tpl_kingdom:'Reino', tpl_kingdom_d:'Costas suaves, interior cultivable', tpl_battle:'Mapa de batalla', tpl_battle_d:'Terreno pequeño con rejilla hexagonal', tpl_blank:'Lienzo en blanco', tpl_blank_d:'Empezar desde cero',
+      o_outlinecolor:'Color del contorno',
+      o_typography:'Tipografía', o_font:'Tipo de letra', o_banner:'Banderola', o_banner_none:'Ninguna', o_banner_ribbon:'Cinta', o_banner_plate:'Placa', o_banner_scroll:'Pergamino', o_banner_stone:'Piedra', o_caps:'Mayúsculas', o_outline:'Contorno', o_shadow:'Sombra', h_font_missing:'Esta tipografía no está instalada en este dispositivo; se usa la más parecida. Las entradas marcadas con · están instaladas.',
       grp_navigate:'Navegación', grp_terrain:'Terreno', grp_water:'Agua y Rutas', grp_markers:'Marcadores', grp_regions:'Regiones y Medida',
       t_select:'Seleccionar', t_landmass:'Tierra', t_erase:'Mar', t_fill:'Rellenar', t_terrain:'Terreno', t_symbol:'Símbolo',
       t_river:'Río', t_road:'Camino', t_label:'Etiqueta', t_pan:'Desplazar', t_eyedrop:'Muestra', t_measure:'Medir', h_measure:'Arrastra en el mapa para calcular la distancia real entre dos puntos según la escala. Las líneas de medición se pueden seleccionar, mover o eliminar; se excluyen de la exportación PNG/SVG.', t_lasso:'Lazo', h_lasso:'Arrastra para trazar un área cerrada: Tierra + Terreno + Relieve se levantan juntos dentro de ella y se vuelven movibles. Arrastra para mover, usa el tirador superior para rotar. Intro para confirmar, Esc para cancelar, Supr para eliminar el área por completo.',
@@ -346,6 +356,8 @@
       o_nameculture:'Cultura', o_namefeature:'Tipo', o_namegen:'🎲 Suggerisci nome', o_nf_settlement:'Insediamento', o_nf_city:'Città', o_nf_river:'Fiume', o_nf_mountain:'Montagna', o_nf_forest:'Foresta', o_nf_region:'Regione', o_nf_lake:'Lago', o_nf_sea:'Mare',
       tpl_title:'Parti da un modello', tpl_desc:'Inizia con una costa già pronta, poi costruiscici sopra il tuo mondo.', tpl_ready:'tela pronta',
       tpl_continent:'Continente', tpl_continent_d:'Ampia massa continentale dalle coste frastagliate', tpl_island:'Isola', tpl_island_d:'Una grande isola in mare aperto', tpl_archipelago:'Arcipelago', tpl_archipelago_d:'Isole sparse e stretti poco profondi', tpl_kingdom:'Regno', tpl_kingdom_d:'Coste dolci, entroterra coltivabile', tpl_battle:'Mappa di battaglia', tpl_battle_d:'Piccolo terreno con griglia esagonale', tpl_blank:'Tela vuota', tpl_blank_d:'Partire da zero',
+      o_outlinecolor:'Colore del contorno',
+      o_typography:'Tipografia', o_font:'Carattere', o_banner:'Cartiglio', o_banner_none:'Nessuno', o_banner_ribbon:'Nastro', o_banner_plate:'Targa', o_banner_scroll:'Pergamena', o_banner_stone:'Pietra', o_caps:'Maiuscolo', o_outline:'Contorno', o_shadow:'Ombra', h_font_missing:'Questo carattere non è installato su questo dispositivo; viene usato il più simile. Le voci con · sono installate.',
       grp_navigate:'Navigazione', grp_terrain:'Terreno', grp_water:'Acque e Vie', grp_markers:'Segnalini', grp_regions:'Regioni e Misura',
       t_select:'Seleziona', t_landmass:'Terra', t_erase:'Mare', t_fill:'Riempi', t_terrain:'Terreno', t_symbol:'Simbolo',
       t_river:'Fiume', t_road:'Strada', t_label:'Etichetta', t_pan:'Sposta', t_eyedrop:'Campiona', t_measure:'Misura', h_measure:'Trascina sulla mappa per calcolare la distanza reale tra due punti in base alla scala. Le linee di misura possono essere selezionate, spostate o eliminate; sono escluse dall\'esportazione PNG/SVG.', t_lasso:'Laccio', h_lasso:'Trascina per disegnare un\'area chiusa: Terra + Terreno + Rilievo vengono sollevati insieme al suo interno e diventano spostabili. Trascina per spostare, usa la maniglia superiore per ruotare. Invio per confermare, Esc per annullare, Canc per eliminare completamente l\'area.',
@@ -412,6 +424,8 @@
       o_nameculture:'Cultura', o_namefeature:'Tipo', o_namegen:'🎲 Sugerir nome', o_nf_settlement:'Povoação', o_nf_city:'Cidade', o_nf_river:'Rio', o_nf_mountain:'Montanha', o_nf_forest:'Floresta', o_nf_region:'Região', o_nf_lake:'Lago', o_nf_sea:'Mar',
       tpl_title:'Começar por um modelo', tpl_desc:'Comece com uma linha costeira pronta e construa o seu mundo por cima.', tpl_ready:'tela pronta',
       tpl_continent:'Continente', tpl_continent_d:'Vasta massa de terra com costas recortadas', tpl_island:'Ilha', tpl_island_d:'Uma grande ilha em mar aberto', tpl_archipelago:'Arquipélago', tpl_archipelago_d:'Ilhas dispersas e estreitos rasos', tpl_kingdom:'Reino', tpl_kingdom_d:'Costas suaves, interior cultivável', tpl_battle:'Mapa de batalha', tpl_battle_d:'Terreno pequeno com grelha hexagonal', tpl_blank:'Tela vazia', tpl_blank_d:'Começar do zero',
+      o_outlinecolor:'Cor do contorno',
+      o_typography:'Tipografia', o_font:'Tipo de letra', o_banner:'Faixa', o_banner_none:'Nenhuma', o_banner_ribbon:'Fita', o_banner_plate:'Placa', o_banner_scroll:'Pergaminho', o_banner_stone:'Pedra', o_caps:'Maiúsculas', o_outline:'Contorno', o_shadow:'Sombra', h_font_missing:'Este tipo de letra não está instalado neste dispositivo; é usado o mais próximo. As entradas marcadas com · estão instaladas.',
       grp_navigate:'Navegação', grp_terrain:'Terreno', grp_water:'Água e Rotas', grp_markers:'Marcadores', grp_regions:'Regiões e Medida',
       t_select:'Selecionar', t_landmass:'Terra', t_erase:'Mar', t_fill:'Preencher', t_terrain:'Terreno', t_symbol:'Símbolo',
       t_river:'Rio', t_road:'Estrada', t_label:'Etiqueta', t_pan:'Deslocar', t_eyedrop:'Amostra', t_measure:'Medir', h_measure:'Arraste no mapa para calcular a distância real entre dois pontos com base na escala. As linhas de medição podem ser selecionadas, movidas ou eliminadas; são excluídas da exportação PNG/SVG.', t_lasso:'Laço', h_lasso:'Arraste para desenhar uma área fechada: Terra + Terreno + Relevo são levantados juntos nessa área e tornam-se móveis. Arraste para mover, use a pega superior para rodar. Enter para confirmar, Esc para cancelar, Delete para eliminar a área por completo.',
@@ -478,6 +492,8 @@
       o_nameculture:'Cultuur', o_namefeature:'Type', o_namegen:'🎲 Naam voorstellen', o_nf_settlement:'Nederzetting', o_nf_city:'Stad', o_nf_river:'Rivier', o_nf_mountain:'Berg', o_nf_forest:'Bos', o_nf_region:'Regio', o_nf_lake:'Meer', o_nf_sea:'Zee',
       tpl_title:'Begin met een sjabloon', tpl_desc:'Start met een kant-en-klare kustlijn en bouw daarop je wereld.', tpl_ready:'canvas klaar',
       tpl_continent:'Continent', tpl_continent_d:'Brede landmassa met grillige kusten', tpl_island:'Eiland', tpl_island_d:'Eén groot eiland in open zee', tpl_archipelago:'Archipel', tpl_archipelago_d:'Verspreide eilanden en ondiepe zeestraten', tpl_kingdom:'Koninkrijk', tpl_kingdom_d:'Zachte kusten, vruchtbaar achterland', tpl_battle:'Slagveldkaart', tpl_battle_d:'Klein terrein met hexraster', tpl_blank:'Leeg canvas', tpl_blank_d:'Helemaal opnieuw beginnen',
+      o_outlinecolor:'Omlijningskleur',
+      o_typography:'Typografie', o_font:'Lettertype', o_banner:'Banier', o_banner_none:'Geen', o_banner_ribbon:'Lint', o_banner_plate:'Plaat', o_banner_scroll:'Perkament', o_banner_stone:'Steen', o_caps:'Hoofdletters', o_outline:'Omlijning', o_shadow:'Schaduw', h_font_missing:'Dit lettertype is niet op dit apparaat geïnstalleerd; het dichtstbijzijnde wordt gebruikt. Items met · zijn geïnstalleerd.',
       grp_navigate:'Navigatie', grp_terrain:'Terrein', grp_water:'Water & Routes', grp_markers:'Markeringen', grp_regions:"Regio's & Meten",
       t_select:'Selecteren', t_landmass:'Land', t_erase:'Zee', t_fill:'Vullen', t_terrain:'Terrein', t_symbol:'Symbool',
       t_river:'Rivier', t_road:'Weg', t_label:'Label', t_pan:'Verschuiven', t_eyedrop:'Pipet', t_measure:'Meten', h_measure:'Sleep op de kaart om de werkelijke afstand tussen twee punten te berekenen op basis van de schaal. Meetlijnen kunnen worden geselecteerd, verplaatst of verwijderd; ze worden niet meegenomen in de PNG/SVG-export.', t_lasso:'Lasso', h_lasso:'Sleep om een gesloten gebied te tekenen: Land + Terrein + Reliëf worden daarbinnen samen opgetild en verplaatsbaar. Sleep om te verplaatsen, gebruik de bovenste handgreep om te draaien. Enter om te bevestigen, Escape om te annuleren, Delete om het gebied volledig te verwijderen.',
@@ -544,6 +560,8 @@
       o_nameculture:'Kultura', o_namefeature:'Typ', o_namegen:'🎲 Zaproponuj nazwę', o_nf_settlement:'Osada', o_nf_city:'Miasto', o_nf_river:'Rzeka', o_nf_mountain:'Góra', o_nf_forest:'Las', o_nf_region:'Region', o_nf_lake:'Jezioro', o_nf_sea:'Morze',
       tpl_title:'Zacznij od szablonu', tpl_desc:'Zacznij od gotowej linii brzegowej, a potem zbuduj na niej swój świat.', tpl_ready:'płótno gotowe',
       tpl_continent:'Kontynent', tpl_continent_d:'Rozległy ląd o poszarpanych wybrzeżach', tpl_island:'Wyspa', tpl_island_d:'Jedna duża wyspa na otwartym morzu', tpl_archipelago:'Archipelag', tpl_archipelago_d:'Rozproszone wyspy i płytkie cieśniny', tpl_kingdom:'Królestwo', tpl_kingdom_d:'Łagodne brzegi, żyzne wnętrze', tpl_battle:'Mapa bitwy', tpl_battle_d:'Mały teren z siatką heksagonalną', tpl_blank:'Puste płótno', tpl_blank_d:'Zacznij od zera',
+      o_outlinecolor:'Kolor obrysu',
+      o_typography:'Typografia', o_font:'Krój pisma', o_banner:'Banderola', o_banner_none:'Brak', o_banner_ribbon:'Wstęga', o_banner_plate:'Tablica', o_banner_scroll:'Zwój', o_banner_stone:'Kamień', o_caps:'Wersaliki', o_outline:'Obrys', o_shadow:'Cień', h_font_missing:'Ten krój pisma nie jest zainstalowany na tym urządzeniu; użyto najbliższego zamiennika. Pozycje oznaczone · są zainstalowane.',
       grp_navigate:'Nawigacja', grp_terrain:'Teren', grp_water:'Woda i Drogi', grp_markers:'Znaczniki', grp_regions:'Regiony i Pomiar',
       t_select:'Zaznacz', t_landmass:'Ląd', t_erase:'Morze', t_fill:'Wypełnij', t_terrain:'Teren', t_symbol:'Symbol',
       t_river:'Rzeka', t_road:'Droga', t_label:'Etykieta', t_pan:'Przesuń', t_eyedrop:'Próbnik', t_measure:'Mierz', h_measure:'Przeciągnij po mapie, aby obliczyć rzeczywistą odległość między dwoma punktami na podstawie skali. Linie pomiarowe można zaznaczać, przesuwać lub usuwać; nie są uwzględniane w eksporcie PNG/SVG.', t_lasso:'Lasso', h_lasso:'Przeciągnij, aby narysować zamknięty obszar: Ląd + Teren + Rzeźba terenu są w nim razem podnoszone i stają się przesuwalne. Przeciągnij, aby przesunąć, użyj górnego uchwytu, aby obrócić. Enter zatwierdza, Escape anuluje, Delete całkowicie usuwa obszar.',
@@ -610,6 +628,8 @@
       o_nameculture:'Культура', o_namefeature:'Тип', o_namegen:'🎲 Предложить имя', o_nf_settlement:'Поселение', o_nf_city:'Город', o_nf_river:'Река', o_nf_mountain:'Гора', o_nf_forest:'Лес', o_nf_region:'Регион', o_nf_lake:'Озеро', o_nf_sea:'Море',
       tpl_title:'Начать с шаблона', tpl_desc:'Начните с готовой береговой линии, а затем стройте на ней свой мир.', tpl_ready:'холст готов',
       tpl_continent:'Континент', tpl_continent_d:'Обширная суша с изрезанными берегами', tpl_island:'Остров', tpl_island_d:'Один большой остров в открытом море', tpl_archipelago:'Архипелаг', tpl_archipelago_d:'Разбросанные острова и мелкие проливы', tpl_kingdom:'Королевство', tpl_kingdom_d:'Мягкие берега, плодородные земли', tpl_battle:'Карта сражения', tpl_battle_d:'Небольшая местность с гексагональной сеткой', tpl_blank:'Пустой холст', tpl_blank_d:'Начать с нуля',
+      o_outlinecolor:'Цвет обводки',
+      o_typography:'Типографика', o_font:'Гарнитура', o_banner:'Лента', o_banner_none:'Нет', o_banner_ribbon:'Лента', o_banner_plate:'Табличка', o_banner_scroll:'Свиток', o_banner_stone:'Камень', o_caps:'Прописные', o_outline:'Обводка', o_shadow:'Тень', h_font_missing:'Эта гарнитура не установлена на устройстве; используется ближайшая замена. Пункты с · установлены.',
       grp_navigate:'Навигация', grp_terrain:'Рельеф', grp_water:'Вода и пути', grp_markers:'Метки', grp_regions:'Регионы и мера',
       t_select:'Выделение', t_landmass:'Суша', t_erase:'Море', t_fill:'Заливка', t_terrain:'Местность', t_symbol:'Символ',
       t_river:'Река', t_road:'Дорога', t_label:'Надпись', t_pan:'Перемещение', t_eyedrop:'Пипетка', t_measure:'Измерить', h_measure:'Перетаскивайте по карте, чтобы вычислить реальное расстояние между двумя точками по масштабной линейке. Линии измерения можно выделять, перемещать или удалять; они не входят в экспорт PNG/SVG.', t_lasso:'Лассо', h_lasso:'Перетаскивайте, чтобы нарисовать замкнутую область: Суша + Местность + Рельеф поднимаются в ней вместе и становятся перемещаемыми. Перетаскивайте для перемещения, используйте верхний маркер для поворота. Enter — подтвердить, Escape — отменить, Delete — полностью удалить область.',
@@ -731,6 +751,7 @@
     init: function () {
       this.buildTerrainSwatches();
       this.buildLabelPresets();
+      this.buildFontList();
       this.buildSymbolLibrary();
       this.bindTopbar();
       this.bindTools();
@@ -755,6 +776,7 @@
       document.documentElement.lang = this.lang;
       this.buildTerrainSwatches();
       this.buildLabelPresets();
+      this.buildFontList();
       this.buildSymbolLibrary();
       this.buildCultureList();
       this.buildTemplateGrid();
@@ -1387,6 +1409,36 @@
         self.drawLabelPreview();
         Cv.requestRender();
       });
+      on('lb-font', 'change', function (e) {
+        App.label.font = e.target.value;
+        labelEdit({ font:e.target.value });
+        self.syncFontNote();
+        self.drawLabelPreview();
+        Cv.requestRender();
+      });
+      on('lb-banner', 'change', function (e) {
+        var v = e.target.value || null;
+        App.label.banner = v;
+        labelEdit({ banner:v });
+        self.drawLabelPreview();
+        Cv.requestRender();
+      });
+      ['caps', 'outline', 'shadow'].forEach(function (k) {
+        on('lb-' + k, 'change', function (e) {
+          var props = {}; props[k] = e.target.checked;
+          App.label[k] = e.target.checked;
+          if (k === 'outline' && $('lb-outline-color')) $('lb-outline-color').disabled = !e.target.checked;
+          labelEdit(props);
+          self.drawLabelPreview();
+          Cv.requestRender();
+        });
+      });
+      on('lb-outline-color', 'input', function (e) {
+        App.label.outlineColor = e.target.value;
+        labelEdit({ outlineColor:e.target.value });
+        self.drawLabelPreview();
+        Cv.requestRender();
+      });
       on('lb-snap-path', 'change', function (e) { App.label.snapPath = e.target.checked; });
 
       /* --- örnekleyici --- */
@@ -1605,6 +1657,32 @@
       });
     },
 
+    /* Yazı ailesi listesi. Sistemde kurulu olmayan aileler işaretlenir —
+       proje harici font yüklemediği için kullanıcı ne göreceğini bilmeli. */
+    buildFontList: function () {
+      var sel = $('lb-font');
+      if (!sel) return;
+      var self = this, cur = App.label.font;
+      sel.innerHTML = '';
+      FONT_LIST.forEach(function (f) {
+        var o = document.createElement('option');
+        o.value = f.key;
+        var nm = i18nName('font_' + f.key, f.tr, f.en, self.lang);
+        o.textContent = nm + (fontAvailable(f.key) ? ' ·' : '');
+        sel.appendChild(o);
+      });
+      sel.value = FONTS[cur] ? cur : 'serif';
+      this.syncLabelType(App.label);
+    },
+
+    /* Seçili aile bu cihazda yoksa küçük bir not göster. */
+    syncFontNote: function () {
+      var note = $('lb-font-note');
+      if (!note) return;
+      var ok = fontAvailable(App.label.font);
+      note.classList.toggle('hidden', ok);
+    },
+
     /* ================= etiket şablonları ================= */
     buildLabelPresets: function () {
       var sel = $('lb-preset');
@@ -1638,6 +1716,19 @@
       $('lb-size').value = p.size;   $('v-lb-size').textContent = p.size;
       $('lb-track').value = p.track; $('v-lb-track').textContent = p.track;
       $('lb-color').value = p.color;
+      this.syncLabelType(p);
+    },
+
+    /* Tipografi kutucuklarını bir etiket/preset nesnesinden tazele */
+    syncLabelType: function (o) {
+      var f = $('lb-font');           if (f) f.value = FONTS[o.font] ? o.font : 'serif';
+      var b = $('lb-banner');         if (b) b.value = o.banner || '';
+      var c = $('lb-caps');           if (c) c.checked = !!o.caps;
+      var ol = $('lb-outline');       if (ol) ol.checked = !!o.outline;
+      var oc = $('lb-outline-color');
+      if (oc) { oc.value = o.outlineColor || '#f5ecd8'; oc.disabled = !o.outline; }
+      var sh = $('lb-shadow');        if (sh) sh.checked = !!o.shadow;
+      this.syncFontNote();
     },
 
     drawLabelPreview: function () {
@@ -2041,6 +2132,7 @@
         $('lb-track').value = o.track;  $('v-lb-track').textContent = o.track;
         $('lb-rot').value = o.rot;      $('v-lb-rot').textContent = o.rot+'°';
         $('lb-color').value = o.color;
+        this.syncLabelType(o);
       } else if (kind === 'rivers' && o.kind === 'lake') {
         $('lk-color').value = o.color;
       } else if (kind === 'rivers') {
