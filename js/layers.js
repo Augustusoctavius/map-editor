@@ -456,9 +456,10 @@
     return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';
   }
 
-  function scatter(ctx, key, cx, cy, radius, opacity) {
+  function scatter(ctx, key, cx, cy, radius, opacity, densityScale) {
     var t = TERRAIN[key]; if (!t) return;
     var R = radius;
+    var ds = (densityScale === undefined) ? 1 : densityScale;
 
     ctx.save();
 
@@ -478,9 +479,14 @@
 
     /* işaretler — clip sayesinde dışarı çıkamaz */
     /* mark yoğunluğu: birim alana göre sabit — büyük fırçada daha çok mark ama aynı yoğunluk */
+    /* densityScale: sık üst üste binen fırça damgalarında (strokeTo, ~%74
+       çakışma) her damga kendi tam mark kotasını bağımsız rastgele
+       dağıtırsa çakışma bölgelerinde mark yoğunluğu katlanarak artar —
+       opaklık 1.0 olsa bile "yığılmış" görünür. Çakışma oranına göre
+       kotayı küçültüp toplam çizgisel yoğunluğu tek damgayla eşitliyoruz. */
     var area = Math.PI * R * R;
-    var n = Math.round(area / 1800 * (t.density||1));
-    n = Math.max(3, Math.min(80, n));
+    var n = Math.round(area / 1800 * (t.density||1) * ds);
+    n = Math.max(ds < 1 ? 1 : 3, Math.min(80, n));
     var unit = 14; /* mark boyutu sabit — fırça büyüse de desen ölçeği değişmez */
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
@@ -489,7 +495,7 @@
       var rr = Math.sqrt(Math.random()) * R * 0.85;
       var mx = cx + Math.cos(a)*rr;
       var my = cy + Math.sin(a)*rr;
-      var alpha = opacity * (0.30 + Math.random()*0.40) * (1 - rr/R * 0.5);
+      var alpha = opacity * (0.42 + Math.random()*0.46) * (1 - rr/R * 0.4);
       if (alpha < 0.04) continue;
       var sc  = unit/6 * (0.62 + Math.random()*0.82);
       var rot = (Math.random()-0.5) * (t.kind==='field'?0.4 : t.kind==='dune'||t.kind==='chevron'?0.28 : 0.90);

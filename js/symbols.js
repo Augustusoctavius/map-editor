@@ -282,17 +282,17 @@
     cities:{ tr:'Şehirler', en:'Cities', items:[
       {id:'city_small',tr:'Küçük şehir',en:'Small city',parts:[
         part(F.wallB,'fill','ink',3),part(F.wallC,'stone','ink',2.2),part(F.gate,'ink2',null,0),
-        part(F.towerB,'fill','ink',3,[-32,-18,0.44]),part(F.towerCren,'stone','ink',2,[-32,-18,0.44]),
-        part(F.towerB,'fill','ink',3,[58,-18,0.44]),part(F.towerCren,'stone','ink',2,[58,-18,0.44])]},
+        part(F.towerB,'fill','ink',3,[-8,18.4,0.44]),part(F.towerCren,'stone','ink',2,[-8,18.4,0.44]),
+        part(F.towerB,'fill','ink',3,[64,18.4,0.44]),part(F.towerCren,'stone','ink',2,[64,18.4,0.44])]},
       {id:'city_capital',tr:'Başkent',en:'Capital',parts:c([
         [part(F.wallB,'fill','ink',3),part(F.wallC,'stone','ink',2.2),part(F.gate,'ink2',null,0)],
-        [part(F.towerB,'fill','ink',3,[-34,-24,0.5]),part(F.towerR,'red','ink',3,[-34,-24,0.5]),
-         part(F.flagP,null,'ink',2.5,[-34,-24,0.5]),part(F.flag,'red','ink',2,[-34,-24,0.5])],
-        [part(F.towerB,'fill','ink',3,[60,-24,0.5]),part(F.towerR,'red','ink',3,[60,-24,0.5])],
+        [part(F.towerB,'fill','ink',3,[-11,13,0.5]),part(F.towerR,'red','ink',3,[-11,13,0.5]),
+         part(F.flagP,null,'ink',2.5,[-11,13,0.5]),part(F.flag,'red','ink',2,[-11,13,0.5])],
+        [part(F.towerB,'fill','ink',3,[61,13,0.5]),part(F.towerR,'red','ink',3,[61,13,0.5])],
         [part(F.spire,'shade','ink',2.4,[10,8,0.6])]])},
       {id:'city_port',tr:'Liman şehri',en:'Port city',parts:c([
         [part(F.wallB,'fill','ink',3),part(F.wallC,'stone','ink',2.2),part(F.gate,'ink2',null,0)],
-        [part(F.towerB,'fill','ink',3,[-32,-18,0.44]),part(F.towerCren,'stone','ink',2,[-32,-18,0.44])],
+        [part(F.towerB,'fill','ink',3,[-8,18.4,0.44]),part(F.towerCren,'stone','ink',2,[-8,18.4,0.44])],
         [part(F.hull,'wood','ink',3,[38,18,0.4]),part(F.mast,'fill','ink',2.5,[38,18,0.4])]])},
       {id:'city_ruin',tr:'Yıkık şehir',en:'Ruined city',parts:[
         part('M14 90 V60 H86 V90 Z','stone','ink',3),
@@ -302,10 +302,10 @@
         part('M22 82 H38 M58 78 H74',null,'ink3',2)]},
       {id:'city_castle_city',tr:'Kale-şehir',en:'Castle city',parts:c([
         [part(F.wallB,'fill','ink',3),part(F.wallC,'stone','ink',2),part(F.gate,'ink2',null,0)],
-        [part(F.towerB,'fill','ink',3.5,[-34,-24,0.52]),part(F.towerCren,'stone','ink',2.5,[-34,-24,0.52]),
-         part(F.towerR,'red','ink',3,[-34,-24,0.52])],
-        [part(F.towerB,'fill','ink',3.5,[60,-24,0.52]),part(F.towerCren,'stone','ink',2.5,[60,-24,0.52]),
-         part(F.towerR,'red','ink',3,[60,-24,0.52])],
+        [part(F.towerB,'fill','ink',3.5,[-12,11.2,0.52]),part(F.towerCren,'stone','ink',2.5,[-12,11.2,0.52]),
+         part(F.towerR,'red','ink',3,[-12,11.2,0.52])],
+        [part(F.towerB,'fill','ink',3.5,[60,11.2,0.52]),part(F.towerCren,'stone','ink',2.5,[60,11.2,0.52]),
+         part(F.towerR,'red','ink',3,[60,11.2,0.52])],
         [part(F.dome,'shade','ink',2.5,[10,6,0.5]),part(F.domeB,'fill','ink',2.5,[10,6,0.5]),
          part(F.spire,'red','ink',2,[10,-8,0.4])]])},
       {id:'city_trade',tr:'Ticaret kenti',en:'Trade city',parts:c([
@@ -374,15 +374,15 @@
       {id:'cas_castle',tr:'Kale',en:'Castle',parts:c([
         [part('M22 90 V56 H78 V90 Z','fill','ink',3),
          part('M22 56 H32 V48 H22 Z M45 56 H55 V48 H45 Z M68 56 H78 V48 H68 Z','stone','ink',2)],
-        [part(F.towerB,'fill','ink',3,[-32,-12,0.46]),part(F.towerCren,'stone','ink',2,[-32,-12,0.46])],
-        [part(F.towerB,'fill','ink',3,[58,-12,0.46]),part(F.towerCren,'stone','ink',2,[58,-12,0.46])]])},
+        [part(F.towerB,'fill','ink',3,[3,14.6,0.46]),part(F.towerCren,'stone','ink',2,[3,14.6,0.46])],
+        [part(F.towerB,'fill','ink',3,[51,14.6,0.46]),part(F.towerCren,'stone','ink',2,[51,14.6,0.46])]])},
       {id:'cas_fortress',tr:'Kale-hisar',en:'Fortress',parts:c([
         [part('M14 90 V60 H86 V90 Z','fill','ink',3),
          part('M14 60 H26 V52 H14 Z M44 60 H56 V52 H44 Z M74 60 H86 V52 H74 Z','stone','ink',2)],
-        [part(F.towerB,'fill','ink',3.5,[-38,6,0.38]),part(F.towerCren,'stone','ink',2.5,[-38,6,0.38]),
-         part(F.towerR,'red','ink',3,[-38,6,0.38])],
-        [part(F.towerB,'fill','ink',3.5,[64,6,0.38]),part(F.towerCren,'stone','ink',2.5,[64,6,0.38]),
-         part(F.towerR,'red','ink',3,[64,6,0.38])],
+        [part(F.towerB,'fill','ink',3.5,[1,25.8,0.38]),part(F.towerCren,'stone','ink',2.5,[1,25.8,0.38]),
+         part(F.towerR,'red','ink',3,[1,25.8,0.38])],
+        [part(F.towerB,'fill','ink',3.5,[61,25.8,0.38]),part(F.towerCren,'stone','ink',2.5,[61,25.8,0.38]),
+         part(F.towerR,'red','ink',3,[61,25.8,0.38])],
         [part(F.gate,'ink2',null,0)]])},
       {id:'cas_watchtower',tr:'Gözetleme',en:'Watchtower',parts:c([
         [part(F.towerB,'fill','ink',3),part(F.towerCren,'stone','ink',2.2),
@@ -531,8 +531,8 @@
         part('M6 70 q12-10 24 0 t24 0 t24 0 t16 0',null,'water',4),
         part('M30 34 L44 88 M56 34 L70 88',null,'ink2',3.5)]},
       {id:'pss_border',tr:'Sınır kapısı',en:'Border gate',parts:c([
-        [part(F.towerB,'fill','ink',3,[-30,10,0.6]),part(F.towerCren,'stone','ink',2,[-30,10,0.6])],
-        [part(F.towerB,'fill','ink',3,[34,10,0.6]),part(F.towerCren,'stone','ink',2,[34,10,0.6])],
+        [part(F.towerB,'fill','ink',3,[-10,36,0.6]),part(F.towerCren,'stone','ink',2,[-10,36,0.6])],
+        [part(F.towerB,'fill','ink',3,[50,36,0.6]),part(F.towerCren,'stone','ink',2,[50,36,0.6])],
         [part('M34 52 H66 V62 H34 Z','wood','ink',2.8)]])},
     ]},
 
