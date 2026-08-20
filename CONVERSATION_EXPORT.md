@@ -139,7 +139,13 @@ Tüm değişiklikler `origin/claude/init-x06we9` push edildi. ✅
 - ✅ FPS benchmark framework
 
 ### Gelecek Geliştirmeler:
-- ⏳ **Harita üretim şekli:** Şu anda sadece oval formlar üretiyor → daha karmaşık kıyı hatları gerekli
+- ⏳ **Harita üretim şekli:** `Tools.generateLandmass()` kıta/ada/takımada şablonlarında radyal falloff
+  kullanıyor (`Math.sqrt(nx*nx+ny*ny)`) — bu her zaman oval/dairesel temel form üretiyor.
+  Hedef: Perlin noise'u radyal değil dikdörtgen/poligonal falloff maskesi ile birleştirmek,
+  ya da fault-line / diamond-square / Voronoi tabanlı alternatif üretici eklemek.
+  → `js/tools.js` satır 1292–1360 `generateLandmass()` fonksiyonu
+- ⏳ **Task #9 FPS tamamlama:** `fps.js` altyapısı yazıldı ama headless browser testi
+  henüz çalıştırılmadı. Manuel test için: `http://localhost:8000#fps-bench` aç, console'u izle.
 - ⏳ **Layer undo:** Add/delete işlemleri geri alınamıyor
 - ⏳ **Tam Arapça katalog:** 910 sembol adı sadece İngilizce (fallback)
 - ⏳ **Ek diller:** fa/he/ur (çeviriler zaten i18n-names.js'de)
