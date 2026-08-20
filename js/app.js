@@ -39,6 +39,13 @@
        (breadcrumb) tutar. Undo geçmişi haritaya özeldir, geçişte sıfırlanır. */
     maps: {}, mapStack: [], currentMapId: 'root', currentMapLabel: '',
 
+    /* Harita geçişi Layers.deserialize() üzerinden ASENKRON ilerler. Geçiş
+       tamamlanmadan ikinci bir geçiş başlarsa currentMapId hâlâ eski haritayı
+       gösterdiği için _snapshotLayers() o kimliğin altına YANLIŞ dokümanı
+       yazar ve üst haritanın içeriği kaybolur. Bu bayrak, uçuştaki geçiş
+       bitene kadar yeni geçişleri yok sayar. */
+    _switching: false,
+
     /* Layers.serialize() vektör katmanlarda .objects dizisini referans olarak
        döndürür (JSON.stringify'a hazırlık amaçlı) — bellekte doküman olarak
        saklanacaksa mutlaka derin kopyalanmalı, yoksa iki "harita" aynı diziyi
@@ -46,28 +53,34 @@
     _snapshotLayers: function () { return JSON.parse(JSON.stringify(Layers.serialize(true))); },
 
     enterMap: function (targetId, label) {
+      if (this._switching) return;
       if (targetId === this.currentMapId) return;
       this.maps[this.currentMapId] = this._snapshotLayers();
       this.mapStack.push({ id: this.currentMapId, label: this.currentMapLabel });
       var self = this;
       var snap = this.maps[targetId] || this._blankSnapshot;
+      this._switching = true;
       Layers.deserialize(snap).then(function () {
         self.currentMapId = targetId;
         self.currentMapLabel = label || '';
         self._afterMapSwitch();
-      });
+      })['catch'](function () {})
+        .then(function () { self._switching = false; });
     },
 
     exitMap: function () {
+      if (this._switching) return;
       if (!this.mapStack.length) return;
       this.maps[this.currentMapId] = this._snapshotLayers();
       var parent = this.mapStack.pop();
       var self = this;
+      this._switching = true;
       Layers.deserialize(this.maps[parent.id] || this._blankSnapshot).then(function () {
         self.currentMapId = parent.id;
         self.currentMapLabel = parent.label;
         self._afterMapSwitch();
-      });
+      })['catch'](function () {})
+        .then(function () { self._switching = false; });
     },
 
     _afterMapSwitch: function () {

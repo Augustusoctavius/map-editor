@@ -481,14 +481,6 @@
     libDelete: function (id) {
       var list = this.libList().filter(function (e) { return e.id !== id; });
       try { localStorage.setItem(this.LIB_KEY, JSON.stringify(list)); } catch (e) {}
-    },
-
-    libRename: function (id, name) {
-      var list = this.libList();
-      var entry = list.filter(function (e) { return e.id === id; })[0];
-      if (!entry) return;
-      entry.name = name;
-      try { localStorage.setItem(this.LIB_KEY, JSON.stringify(list)); } catch (e) {}
     }
   };
 

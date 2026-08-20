@@ -175,25 +175,59 @@
 
   <!-- ============ SOL PANEL ============ -->
   <aside id="left-panel">
+    <!-- Araçlar işleve göre 5 gruba ayrılmıştır; her grup 3 veya 6 araç
+         içerdiğinden 3 sütunlu ızgarada satırlar tam dolar. Butonların
+         .tool sınıfı ve data-tool niteliği JS bağlaması için korunmalıdır. -->
     <div class="tool-rail" id="tool-rail">
-      <button class="tool" data-tool="select"   title="V"><span class="ico">➤</span><em data-i18n="t_select">Seç</em></button>
-      <button class="tool" data-tool="landmass" title="B"><span class="ico">◕</span><em data-i18n="t_landmass">Kara</em></button>
-      <button class="tool" data-tool="erase"    title="E"><span class="ico">◌</span><em data-i18n="t_erase">Deniz</em></button>
-      <button class="tool" data-tool="fill"     title="F"><span class="ico">◆</span><em data-i18n="t_fill">Doldur</em></button>
-      <button class="tool" data-tool="terrain"  title="T"><span class="ico">▨</span><em data-i18n="t_terrain">Arazi</em></button>
-      <button class="tool" data-tool="elevation" title="U"><span class="ico">▲</span><em data-i18n="t_elevation">Yükselti</em></button>
-      <button class="tool" data-tool="symbol"   title="S"><span class="ico">⛰</span><em data-i18n="t_symbol">Sembol</em></button>
-      <button class="tool" data-tool="river"    title="R"><span class="ico">≈</span><em data-i18n="t_river">Nehir</em></button>
-      <button class="tool" data-tool="lake"     title="K"><span class="ico">◎</span><em data-i18n="t_lake">Göl</em></button>
-      <button class="tool" data-tool="territory" title="G"><span class="ico">▧</span><em data-i18n="t_territory">Bölge</em></button>
-      <button class="tool" data-tool="regionlink" title="M"><span class="ico">◈</span><em data-i18n="t_regionlink">Bölge bağlantısı</em></button>
-      <button class="tool" data-tool="resource" title="Y"><span class="ico">⛏</span><em data-i18n="t_resource">Kaynak</em></button>
-      <button class="tool" data-tool="road"     title="D"><span class="ico">⋯</span><em data-i18n="t_road">Yol</em></button>
-      <button class="tool" data-tool="label"    title="L"><span class="ico">A</span><em data-i18n="t_label">Etiket</em></button>
-      <button class="tool" data-tool="eyedrop"  title="I"><span class="ico">⊙</span><em data-i18n="t_eyedrop">Örnekle</em></button>
-      <button class="tool" data-tool="measure"  title="Q"><span class="ico">📏</span><em data-i18n="t_measure">Ölç</em></button>
-      <button class="tool" data-tool="lasso"    title="X"><span class="ico">⌁</span><em data-i18n="t_lasso">Kement</em></button>
-      <button class="tool" data-tool="pan"      title="Space"><span class="ico">✥</span><em data-i18n="t_pan">Kaydır</em></button>
+
+      <div class="tool-group">
+        <div class="tool-group-label" data-i18n="grp_navigate">Gezinme</div>
+        <div class="tool-grid">
+          <button class="tool" data-tool="select" title="V"><span class="ico">➤</span><em data-i18n="t_select">Seç</em></button>
+          <button class="tool" data-tool="lasso"  title="X"><span class="ico">⌁</span><em data-i18n="t_lasso">Kement</em></button>
+          <button class="tool" data-tool="pan"    title="Space"><span class="ico">✥</span><em data-i18n="t_pan">Kaydır</em></button>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <div class="tool-group-label" data-i18n="grp_terrain">Arazi</div>
+        <div class="tool-grid">
+          <button class="tool" data-tool="landmass"  title="B"><span class="ico">◕</span><em data-i18n="t_landmass">Kara</em></button>
+          <button class="tool" data-tool="erase"     title="E"><span class="ico">◌</span><em data-i18n="t_erase">Deniz</em></button>
+          <button class="tool" data-tool="fill"      title="F"><span class="ico">◆</span><em data-i18n="t_fill">Doldur</em></button>
+          <button class="tool" data-tool="terrain"   title="T"><span class="ico">▨</span><em data-i18n="t_terrain">Arazi</em></button>
+          <button class="tool" data-tool="elevation" title="U"><span class="ico">▲</span><em data-i18n="t_elevation">Yükselti</em></button>
+          <button class="tool" data-tool="eyedrop"   title="I"><span class="ico">⊙</span><em data-i18n="t_eyedrop">Örnekle</em></button>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <div class="tool-group-label" data-i18n="grp_water">Su &amp; Yollar</div>
+        <div class="tool-grid">
+          <button class="tool" data-tool="river" title="R"><span class="ico">≈</span><em data-i18n="t_river">Nehir</em></button>
+          <button class="tool" data-tool="lake"  title="K"><span class="ico">◎</span><em data-i18n="t_lake">Göl</em></button>
+          <button class="tool" data-tool="road"  title="D"><span class="ico">⋯</span><em data-i18n="t_road">Yol</em></button>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <div class="tool-group-label" data-i18n="grp_markers">İşaretler</div>
+        <div class="tool-grid">
+          <button class="tool" data-tool="symbol"   title="S"><span class="ico">⛰︎</span><em data-i18n="t_symbol">Sembol</em></button>
+          <button class="tool" data-tool="resource" title="Y"><span class="ico">⛏︎</span><em data-i18n="t_resource">Kaynak</em></button>
+          <button class="tool" data-tool="label"    title="L"><span class="ico">A</span><em data-i18n="t_label">Etiket</em></button>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <div class="tool-group-label" data-i18n="grp_regions">Bölge &amp; Ölçüm</div>
+        <div class="tool-grid">
+          <button class="tool" data-tool="territory"  title="G"><span class="ico">▧</span><em data-i18n="t_territory">Bölge</em></button>
+          <button class="tool" data-tool="regionlink" title="M"><span class="ico">◈</span><em data-i18n="t_regionlink">Bölge bağlantısı</em></button>
+          <button class="tool" data-tool="measure"    title="Q"><span class="ico">↔︎</span><em data-i18n="t_measure">Ölç</em></button>
+        </div>
+      </div>
+
     </div>
 
     <div class="opt-scroll">
@@ -543,7 +577,7 @@
   <span class="st"><i data-i18n="st_size">Tuval</i> <b id="st-size">2048 × 2048</b></span>
   <span class="st"><i data-i18n="st_tool">Araç</i> <b id="st-tool">Kara</b></span>
   <span class="st right" id="st-msg"></span>
-  <span class="st right" style="opacity:0.45;font-size:11px;letter-spacing:0.04em">v0.61</span>
+  <span class="st right" style="opacity:0.45;font-size:11px;letter-spacing:0.04em">v0.62</span>
 </footer>
 
 </div><!-- /view-editor -->

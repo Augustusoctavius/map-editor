@@ -1269,14 +1269,6 @@
       ctx.restore();
     },
 
-    /* eski drawLake — geriye uyumluluk için yönlendir */
-    drawLake: function (ctx, o) {
-      this.drawLakeShore(ctx, o);
-      this.drawLakeFill(ctx, o);
-    },
-
-    lakeGeometry: function (o) { return Geo.sample(o.pts, 16); },
-
     /* ---------- windrose ---------- */
     windroseSize: function (wr) { return wr.size || 120; },
 
