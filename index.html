@@ -23,7 +23,7 @@
     <button class="shell-tab" data-view-link="community" data-i18n="nav_community">Topluluk</button>
   </div>
   <div class="lang-switch" id="lang-switch-shell">
-    <button class="tb-btn lang" id="btn-lang-shell" title="Language / Dil" aria-label="Language">🌐</button>
+    <button class="tb-btn lang" id="btn-lang-shell" title="Language / Dil" aria-label="Language"><svg class="ico-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><ellipse cx="10" cy="10" rx="3.2" ry="7.5"/><path d="M2.7 7.5h14.6M2.7 12.5h14.6"/></svg></button>
     <ul class="lang-menu hidden" id="lang-menu-shell"></ul>
   </div>
 </nav>
@@ -117,11 +117,38 @@
   </div>
 </div>
 
+<!-- ============ DAR EKRAN KAPISI ============
+     Editör üç sütunlu sabit yerleşime dayanır (araç rayı + tuval + katman
+     paneli); ~1024px altında tuval alanı negatife düşer. Bozuk bir arayüz
+     göstermek yerine burada ne gerektiğini açıkça söylüyoruz. -->
+<div id="view-narrow" class="shell-view hidden">
+  <div class="narrow-gate">
+    <div class="narrow-card">
+      <svg class="narrow-ico" viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="2" width="60" height="38" rx="3"/>
+        <path d="M2 33h60"/>
+        <path d="M24 44h16M32 40v4"/>
+      </svg>
+      <h2 data-i18n="narrow_title">Editör için daha geniş bir ekran gerekli</h2>
+      <p data-i18n="narrow_desc">Harita editörü; araç rayı, tuval ve katman paneliyle yan yana
+        çalışan bir masaüstü yerleşimi kullanır. Bu düzenin sığması için en az
+        1024 × 600 piksel gerekir.</p>
+      <p class="narrow-hint" data-i18n="narrow_hint">Tablet kullanıyorsan cihazı yatay çevirmeyi dene.</p>
+      <div class="narrow-size">
+        <span data-i18n="narrow_current">Bu ekran</span>
+        <b id="narrow-current-size">—</b>
+      </div>
+      <button class="btn primary big" data-view-link="home" data-i18n="narrow_back">Ana sayfaya dön</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ EDITOR ============ -->
 <div id="view-editor" class="shell-view hidden">
 
 <header id="topbar">
-  <button class="tb-btn" id="btn-shell-back" title="Homepage">🏠</button>
+  <button class="tb-btn" id="btn-shell-back" title="Homepage"><svg class="ico-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.6 10 3.6l7 6"/><path d="M4.9 8.7V16.2h10.2V8.7"/></svg></button>
   <div class="brand">
     <span class="brand-mark">⚔</span>
     <span class="brand-name">Wayborne Map Editor</span>
@@ -166,7 +193,7 @@
   </select>
 
   <div class="lang-switch" id="lang-switch">
-    <button class="tb-btn lang" id="btn-lang" title="Language / Dil" aria-label="Language">🌐</button>
+    <button class="tb-btn lang" id="btn-lang" title="Language / Dil" aria-label="Language"><svg class="ico-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><ellipse cx="10" cy="10" rx="3.2" ry="7.5"/><path d="M2.7 7.5h14.6M2.7 12.5h14.6"/></svg></button>
     <ul class="lang-menu hidden" id="lang-menu"></ul>
   </div>
 </header>
@@ -577,7 +604,7 @@
   <span class="st"><i data-i18n="st_size">Tuval</i> <b id="st-size">2048 × 2048</b></span>
   <span class="st"><i data-i18n="st_tool">Araç</i> <b id="st-tool">Kara</b></span>
   <span class="st right" id="st-msg"></span>
-  <span class="st right" style="opacity:0.45;font-size:11px;letter-spacing:0.04em">v0.62</span>
+  <span class="st right" style="opacity:0.45;font-size:11px;letter-spacing:0.04em">v0.63</span>
 </footer>
 
 </div><!-- /view-editor -->
