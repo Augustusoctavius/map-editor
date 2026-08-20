@@ -262,3 +262,12 @@ input[type=text].sel{font-family:var(--f-display);font-size:12.5px}
     scroll-behavior:auto !important;
   }
 }
+
+/* ---------- isim önerileri ---------- */
+.nm-suggest{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.nm-suggest button{
+  background:var(--ink-700);border:1px solid var(--line);color:var(--text-dim);
+  border-radius:12px;padding:3px 10px;font-size:11px;cursor:pointer;
+  font-family:var(--f-display);transition:.12s;
+}
+.nm-suggest button:hover{background:var(--ink-600);border-color:var(--brass-dim);color:var(--parch)}

@@ -76,6 +76,14 @@
       <label class="btn wide" for="file-open-canvas" data-i18n="canvas_import">.json dosyasından içe aktar</label>
       <input type="file" id="file-open-canvas" accept="application/json,.json" hidden>
     </section>
+
+    <!-- Boş tuval yaratıcı araçlarda en büyük terk sebebidir; şablonlar
+         kullanıcıyı doğrudan çizilebilir bir dünyanın içine bırakır. -->
+    <section class="canvas-templates">
+      <h2 data-i18n="tpl_title">Şablonla başla</h2>
+      <p class="hint" data-i18n="tpl_desc">Hazır bir kıyı çizgisiyle başla, sonra üzerine kendi dünyanı kur.</p>
+      <div id="tpl-grid" class="tpl-grid"></div>
+    </section>
     <section class="canvas-saved">
       <h2 data-i18n="canvas_saved_title">Kayıtlı tuvaller</h2>
       <div id="cv-list" class="cv-grid"></div>
@@ -435,6 +443,27 @@
       <section class="opt-group" data-for="label">
         <h3 data-i18n="o_label">Etiket</h3>
         <textarea id="lb-text" rows="2" placeholder="Sideria"></textarea>
+        <div class="row2" style="margin-top:0">
+          <div>
+            <span class="mini" data-i18n="o_nameculture">Kültür</span>
+            <select id="nm-culture" class="sel"></select>
+          </div>
+          <div>
+            <span class="mini" data-i18n="o_namefeature">Tür</span>
+            <select id="nm-feature" class="sel">
+              <option value="settlement" data-i18n="o_nf_settlement">Yerleşim</option>
+              <option value="city" data-i18n="o_nf_city">Şehir</option>
+              <option value="river" data-i18n="o_nf_river">Nehir</option>
+              <option value="mountain" data-i18n="o_nf_mountain">Dağ</option>
+              <option value="forest" data-i18n="o_nf_forest">Orman</option>
+              <option value="region" data-i18n="o_nf_region">Bölge</option>
+              <option value="lake" data-i18n="o_nf_lake">Göl</option>
+              <option value="sea" data-i18n="o_nf_sea">Deniz</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn wide" id="btn-nm-gen" data-i18n="o_namegen">🎲 Ad öner</button>
+        <div id="nm-suggest" class="nm-suggest"></div>
         <label class="row"><span data-i18n="o_preset">Stil şablonu</span></label>
         <select id="lb-preset" class="sel"></select>
         <div id="lb-preview-wrap"><canvas id="lb-preview" width="220" height="64"></canvas></div>
@@ -653,6 +682,7 @@
 <script src="js/catalog2.js"></script>
 <script src="js/symbols.js"></script>
 <script src="js/i18n-names.js"></script>
+<script src="js/names.js"></script>
 <script src="js/history.js"></script>
 <script src="js/layers.js"></script>
 <script src="js/canvas.js"></script>
