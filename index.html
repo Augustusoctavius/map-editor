@@ -260,6 +260,7 @@
           <button class="tool" data-tool="symbol"   title="S" aria-pressed="false"><span class="ico">⛰︎</span><em data-i18n="t_symbol">Sembol</em></button>
           <button class="tool" data-tool="resource" title="Y" aria-pressed="false"><span class="ico">⛏︎</span><em data-i18n="t_resource">Kaynak</em></button>
           <button class="tool" data-tool="label"    title="L" aria-pressed="false"><span class="ico">A</span><em data-i18n="t_label">Etiket</em></button>
+          <button class="tool" data-tool="sketch"   title="N" aria-pressed="false"><span class="ico">✎︎</span><em data-i18n="t_sketch">Çizim</em></button>
         </div>
       </div>
 
@@ -509,6 +510,22 @@
         <p class="hint" data-i18n="h_label">Şablon seç, metni yaz, haritaya tıkla. Seçili etikette ayarlar anında uygulanır.</p>
       </section>
 
+      <!-- SKETCH -->
+      <section class="opt-group" data-for="sketch">
+        <h3 data-i18n="o_sketch">Çizim</h3>
+        <p class="hint" data-i18n="h_sketch">Serbest fırça, yalnızca kendi eklediğin katmanlara çizer. Katman panelinden "+ Katman" ile bir katman ekle, listeden onu seç, sonra haritaya çiz.</p>
+        <div id="sk-target" class="sk-target"></div>
+        <label class="row"><span data-i18n="o_color">Renk</span></label>
+        <input type="color" id="sk-color" value="#3a2b18">
+        <label class="row"><span data-i18n="o_brushsize">Fırça boyutu</span><b id="v-sk-size">26</b></label>
+        <input type="range" id="sk-size" min="2" max="300" value="26">
+        <label class="row"><span data-i18n="o_hardness">Sertlik</span><b id="v-sk-hard">0.70</b></label>
+        <input type="range" id="sk-hard" min="0" max="100" value="70">
+        <label class="row"><span data-i18n="o_opacity">Opaklık</span><b id="v-sk-op">0.90</b></label>
+        <input type="range" id="sk-op" min="5" max="100" value="90">
+        <label class="chk"><input type="checkbox" id="sk-eraser"><span data-i18n="o_sketch_eraser">Silgi modu</span></label>
+      </section>
+
       <!-- EYEDROPPER -->
       <!-- MEASURE -->
       <section class="opt-group" data-for="measure">
@@ -655,6 +672,8 @@
 
     <div class="tab-body" data-tab="layers">
       <ul id="layer-list" class="layer-list"></ul>
+      <button class="btn wide" id="btn-add-layer" data-i18n="layer_add">+ Katman ekle</button>
+      <p class="hint" data-i18n="h_add_layer">Kendi eklediğin katmanlar serbest çizim içindir; "Çizim" aracıyla üzerlerine boyayabilirsin. Katman ekleme/silme geri alınamaz.</p>
       <div class="layer-extra">
         <h4 data-i18n="ref_title">Referans görsel</h4>
         <input type="file" id="ref-file" accept="image/*">

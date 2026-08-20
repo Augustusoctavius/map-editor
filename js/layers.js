@@ -63,7 +63,7 @@
     },
     desert: {
       tr:'Çöl', en:'Desert',
-      base:'#e4cе7a', dark:'#c0a050', mark:'#a07e38', mark2:'#b89248', kind:'dune',   density:0.55,
+      base:'#e4ce7a', dark:'#c0a050', mark:'#a07e38', mark2:'#b89248', kind:'dune',   density:0.55,
       shore:['#c8a84a','#e0c070']
     },
     badlands: {
@@ -203,9 +203,6 @@
       shore:['#3a372f','#5c584e']
     }
   };
-
-  /* ---------- desert base rengi düzelt (typo) ---------- */
-  TERRAIN.desert.base = '#e4ce7a';
 
   /* =========================================================
      IŞARET ÜRETICILERI  (birim uzay ~-8..8)
@@ -759,7 +756,54 @@
       this.list.splice(to,0,item);
     },
 
-    name: function(l,lang){ return global.i18nName ? global.i18nName(l.id, l.tr, l.en, lang) : (lang==='tr'?l.tr:l.en); },
+    /* Kullanıcı katmanının adı çeviri tablosundan gelmez — kullanıcı ne
+       yazdıysa odur, dil değişince değişmemeli. */
+    name: function(l,lang){
+      if(l.custom) return l.name || '';
+      return global.i18nName ? global.i18nName(l.id, l.tr, l.en, lang) : (lang==='tr'?l.tr:l.en);
+    },
+
+    /* ---------- kullanıcı katmanları ----------
+       Serbest çizim/not katmanı: sabit 13 katmanın üstüne kullanıcının
+       kendi ekleyebildiği raster katman. renderMap'in genel 'raster'
+       dalından geçtiği için ayrıca çizim kodu gerekmez; kilit, görünürlük,
+       opaklık, karışım modu ve sıralama hazır mekanizmalardan gelir. */
+    CUSTOM_MAX: 12,
+
+    customCount: function(){
+      return this.list.filter(function(l){ return l.custom; }).length;
+    },
+
+    /* Yeni katman aktif katmanın hemen üstüne girer — kullanıcı listede
+       nereye düşeceğini tahmin edebilsin diye. */
+    addCustom: function(name, w, h){
+      if(this.customCount() >= this.CUSTOM_MAX) return null;
+      var c=document.createElement('canvas');
+      c.width = w || (this.get('landmass') && this.get('landmass').canvas.width) || 2048;
+      c.height= h || (this.get('landmass') && this.get('landmass').canvas.height) || 2048;
+      var l={ id:'usr_'+Math.random().toString(36).slice(2,10), type:'raster', custom:true,
+              name:name||'', tr:name||'', en:name||'',
+              visible:true, locked:false, opacity:1, blend:'source-over',
+              canvas:c, ctx:c.getContext('2d'), objects:[], image:null, imageData:null };
+      var at=this.indexOf(this.active);
+      this.list.splice(at<0 ? this.list.length : at+1, 0, l);
+      return l;
+    },
+
+    removeCustom: function(id){
+      var l=this.get(id);
+      if(!l || !l.custom) return false;
+      this.list.splice(this.indexOf(id), 1);
+      if(this.active===id) this.active='landmass';
+      return true;
+    },
+
+    rename: function(id, name){
+      var l=this.get(id);
+      if(!l || !l.custom) return false;
+      l.name = l.tr = l.en = String(name||'').slice(0, 40);
+      return true;
+    },
 
     meta: function(){
       return this.list.map(function(l){
@@ -780,6 +824,7 @@
     serialize: function(includeRef){
       return this.list.map(function(l){
         var o={id:l.id,type:l.type,visible:l.visible,locked:l.locked,opacity:l.opacity,blend:l.blend};
+        if(l.custom){ o.custom=true; o.name=l.name; }
         if(l.type==='raster') o.data=l.canvas.toDataURL('image/png');
         if(l.type==='vector') o.objects=l.objects;
         if(l.type==='image'&&l.imageData&&includeRef!==false) o.data=l.imageData;
@@ -789,8 +834,25 @@
 
     deserialize: function(arr){
       var self=this, jobs=[], ordered=[];
+      /* Kayıtta olmayan kullanıcı katmanlarını at: aktif belge tamamen
+         gelen kaydın katman kümesine dönmeli, öncekinden artık kalmamalı. */
+      this.list = this.list.filter(function(l){
+        return !l.custom || arr.some(function(e){ return e.id===l.id; });
+      });
       arr.forEach(function(e){
-        var l=self.get(e.id); if(!l)return;
+        var l=self.get(e.id);
+        /* kullanıcı katmanı kayıttan geliyorsa yoktan var et */
+        if(!l && e.custom && e.type==='raster'){
+          var W=(self.get('landmass')&&self.get('landmass').canvas.width)||2048;
+          var H=(self.get('landmass')&&self.get('landmass').canvas.height)||2048;
+          var c=document.createElement('canvas'); c.width=W; c.height=H;
+          l={ id:e.id, type:'raster', custom:true, name:e.name||'', tr:e.name||'', en:e.name||'',
+              visible:true, locked:false, opacity:1, blend:'source-over',
+              canvas:c, ctx:c.getContext('2d'), objects:[], image:null, imageData:null };
+          self.list.push(l);
+        }
+        if(!l)return;
+        if(l.custom && e.name!==undefined) l.name=l.tr=l.en=e.name;
         l.visible=e.visible; l.locked=e.locked; l.opacity=e.opacity; l.blend=e.blend||'source-over';
         if(l.type==='vector') l.objects=e.objects||[];
         if(l.type==='raster'){

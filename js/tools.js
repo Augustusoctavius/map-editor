@@ -16,6 +16,13 @@
     return m ? { r:parseInt(m[1],16), g:parseInt(m[2],16), b:parseInt(m[3],16) } : { r:0, g:0, b:0 };
   }
 
+  /* Yumuşak fırça kenarı için: aynı rengin saydam hâli. Doğrudan
+     'transparent' kullanmak bazı tarayıcılarda gradyanı siyaha kaydırır. */
+  function rgbaOf(hex, a) {
+    var c = hexToRgb(hex);
+    return 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + a + ')';
+  }
+
   /* Fırça vuruşu sırasında (stampTerrain/eyedropStamp) tekrar tekrar canvas
      oluşturmamak için tek seferlik, sadece büyüyen bir scratch canvas havuzu. */
   var _scratchPool = {};
@@ -271,6 +278,16 @@
         case 'fill':     this.floodFill(p.x, p.y); break;
         case 'terrain':  this.startRaster('terrain',  p, 'terrain'); break;
         case 'elevation': this.startRaster('elevation', p, 'elevation'); break;
+        case 'sketch': {
+          /* Çizim her zaman *aktif* katmana yazar ve yalnız kullanıcı
+             katmanına izin verilir — yerleşik katmanlara serbest boya
+             sızdırmak, o katmanların anlamını (kara maskesi, yükselti
+             gri tonu) bozardı. */
+          var sl = Layers.get(Layers.active);
+          if (!sl || !sl.custom) { UI.msg(UI.t('sketch_need_layer')); break; }
+          this.startRaster(sl.id, p, 'sketch');
+          break;
+        }
         case 'symbol':
           if (App.symbol.brushMode) this.startSymbolBrush(p);
           else this.placeSymbol(p);
@@ -594,7 +611,8 @@
     strokeTo: function (p) {
       if (!this.last) { this.last = p; return; }
       var r = (this.mode === 'terrain' ? App.terrain.size :
-                this.mode === 'elevation' ? App.elevation.brushSize : App.brush.size)/2;
+                this.mode === 'elevation' ? App.elevation.brushSize :
+                this.mode === 'sketch' ? App.sketch.size : App.brush.size)/2;
       var step = Math.max(1.5, r * 0.26);
       var dx = p.x-this.last.x, dy = p.y-this.last.y;
       var n = Math.max(1, Math.ceil(Math.hypot(dx,dy)/step));
@@ -641,6 +659,7 @@
       var r = (this.mode === 'terrain'   ? App.terrain.size :
                this.mode === 'elevation' ? App.elevation.brushSize :
                this.mode === 'eyedrop'   ? App.eyedrop.radius * 2 :
+               this.mode === 'sketch'    ? App.sketch.size :
                                            App.brush.size) / 2;
       var pad = r + 8;
       if (this.mode === 'paint' || this.mode === 'erase') pad += (Cv.shoreWidth || 26) + 24;
@@ -694,6 +713,32 @@
         ctx.restore();
         Cv.elevationDirty = true;
         this.expandBox(x, y, er + 4);
+        return;
+      }
+
+      /* ---- ÇİZİM: kullanıcı katmanına serbest fırça ----
+         Yumuşak kenarlı yuvarlak damga; sertlik damganın ne kadarının
+         tam opak kaldığını belirler. Silgi modunda aynı damga
+         'destination-out' ile uygulanır, böylece aynı fırça hem çizer
+         hem siler. Hiçbir global önbelleği (kıyı/gölgelendirme)
+         etkilemez — kullanıcı katmanı yalnız kendi başına çizilir. */
+      if (this.mode === 'sketch') {
+        var sr = App.sketch.size/2;
+        var hard = Math.max(0, Math.min(1, App.sketch.hardness));
+        ctx.save();
+        ctx.globalAlpha = App.sketch.opacity;
+        if (App.sketch.eraser) ctx.globalCompositeOperation = 'destination-out';
+        if (hard > 0.985) {
+          ctx.fillStyle = App.sketch.color;
+        } else {
+          var sg = ctx.createRadialGradient(x, y, sr*hard, x, y, sr);
+          sg.addColorStop(0, App.sketch.color);
+          sg.addColorStop(1, rgbaOf(App.sketch.color, 0));
+          ctx.fillStyle = sg;
+        }
+        ctx.beginPath(); ctx.arc(x, y, sr, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+        this.expandBox(x, y, sr + 2);
         return;
       }
 
@@ -778,7 +823,12 @@
 
       this.box = null; this.last = null;
       this.beforeMain = null; this.beforeAux = null;
-      Cv.shoreDirty = true;
+      /* Kıyıyı yalnızca kara sınırını gerçekten değiştiren darbeler
+         geçersizleştirir; arazi/yükselti/çizim darbeleri kıyıyı
+         etkilemez ve boşuna yeniden inşa ettirmemeli. */
+      if (this.mode !== 'terrain' && this.mode !== 'elevation' && this.mode !== 'sketch') {
+        Cv.shoreDirty = true;
+      }
       UI.refreshHistory();
       Cv.requestRender();
     },

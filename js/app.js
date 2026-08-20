@@ -23,6 +23,7 @@
     label:   { preset:'region', font:'serif', size:46, color:'#5a4326', outline:true,
                outlineColor:'#f5ecd8', shadow:true, curve:0, track:8, rot:0,
                caps:true, banner:null, snapPath:false },
+    sketch:  { color:'#3a2b18', size:26, opacity:0.9, hardness:0.7, eraser:false },
     eyedrop: { radius:60, brushRadius:80, targetLayer:'terrain', hasSample:false, painting:false },
     resource:{ type:'mine', size:36 },
     reference:{ traceMode:false },
