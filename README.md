@@ -43,28 +43,52 @@ Bir tuval oluşturulduğunda veya açıldığında, bildiğiniz editör ekranın
 
 ## Araç çubuğu (sol taraf, dikey)
 
-Her araç, sağ paneldeki ilgili seçenekler bölümünü açar ve tuşlarla da seçilebilir:
+18 araç işleve göre **beş gruba** ayrılmıştır; her grup 3 veya 6 araç içerir, böylece
+3 sütunlu ızgarada satırlar tam dolar. Her araç sağ paneldeki ilgili seçenekler
+bölümünü açar ve tuşuyla da seçilebilir. Rehber sayfası da aynı gruplamayı kullanır.
+
+### Gezinme
 
 | Araç | Tuş | İşlev |
 |---|---|---|
 | **Seç** | `V` | Vektör nesneleri (nehir, yol, göl, bölge, sembol, etiket) seçmek, taşımak, düzenlemek için. Seçili bir yol/göl/bölgenin bezier tutamaçları (handle) buradan sürüklenir. |
+| **Kement** | `X` | Raster lasso seçim — sürükleyerek kapalı bir alan çiz; Kara + Arazi + Yükselti katmanlarındaki o bölge, üzerinde duran semboller/kaynaklar/etiketler/harita bağlantılarıyla BİRLİKTE kaldırılıp taşınabilir/döndürülebilir hâle gelir (tutamaçla döndür). `Enter` ile onayla (tek adımlık geri alınabilir işlem), `Escape` ile iptal et, `Delete` ile alanı tamamen sil. |
+| **Kaydır** | `Space` (basılı tutarak) | Tuvali sürükleyerek kaydırma; sağ tık ile de her araçtan bağımsız pan yapılabilir. |
+
+### Arazi
+
+| Araç | Tuş | İşlev |
+|---|---|---|
 | **Kara** | `B` | Kara kütlesi fırçası — karayı boyar, deniz ile arasına otomatik kıyı efekti (glow) uygulanır. Aynı panelde **prosedürel kara üreteci** de bulunur: Kıta / Ada / Takımada şablonlarından biriyle, tohumlu Perlin gürültüsüne dayalı tek tıkla rastgele kıyı çizgisi üretir (detay/pürüzlülük ayarlanabilir, harici kütüphane kullanılmaz). |
 | **Deniz** | `E` | Silgi — boyanmış karayı (ve üzerindeki arazi dokusunu) tek adımda kaldırır. |
 | **Doldur** | `F` | Kova doldurma — kalemle çizilmiş kapalı bir kıyı çevriminin (ring) içini tek tıkla dolduran flood-fill aracı; tıklanan pikselle aynı kara/deniz durumundaki bitişik alanı doldurur. |
 | **Arazi** | `T` | 34 arazi tipinden biriyle doku boyar (otlak, orman, karanlık orman, tayga, bozkır, savan, çöl, bataklık, kayalık, kar/buz, arnavut kaldırımı, kırık taş yol, çamur yol, pis su akıntısı, süs çiçeği tarhı, çalı bordürü vb.). Her fırça darbesinde desen rastgele serpilir; iki darbe asla birebir aynı görünmez. Fırçanın kara sınırlarını aşmaması otomatik sağlanır. |
 | **Yükselti** | `U` | Yükseklik/elevation fırçası — sürükleyerek araziyi yükseltir; "Alçaltma modu" işaretliyken çukurlaştırır. Sonuç, gölgelendirme (hillshade) ve/veya kontur çizgileri olarak otomatik render edilir; ayarlanabilir kontur aralığı vardır. Efekt yalnızca kara üzerinde görünür — denizde asılı kalmaz. |
-| **Sembol** | `S` | ~200+ düz (ink-style) sembol ve onlarca izometrik bina/yapıdan (kale, kulübe, değirmen, köprü vb.) birini yerleştirir. Renk tonu (hue) ve "yıpranma/wear" (eskime lekesi) kaydırıcıları ile özelleştirilebilir; `[` / `]` ile döndürülür. **Fırça modu** açıkken sürükleyerek onlarca sembolü otomatik kümeleyerek dizer (orman/dağ sırası gibi); "Karaya kenetle" işaretliyken denize taşan noktalar otomatik atlanır ve sonradan deniz o bölgeye genişlerse sembol otomatik gizlenir. |
+| **Örnekle** | `I` | Doku eyedropper — haritanın bir bölgesinden dokuyu örnekleyip başka bir yere aynı stille "boyayabilme" aracı; ① alan seç → ② boyamaya başla akışıyla çalışır. |
+
+### Su & Yollar
+
+| Araç | Tuş | İşlev |
+|---|---|---|
 | **Nehir** | `R` | Tıklayarak yol noktaları eklenen akarsu çizim aracı; kavis/meander ayarı vardır. `Enter` ile bitirilir. Nehir yalnızca kara üzerinde render edilir — denizden karaya çizilirse denizdeki kısmı görünmez, kıyıda doğal biter. |
 | **Göl** | `K` | Kapalı bir gölet/deniz gölü şekli çizer; kıyı rengi altındaki arazi dokusuna göre otomatik uyarlanır. Yalnızca kara üzerinde görünür — denize taşan veya tamamen denizde kalan kısım render edilmez. |
+| **Yol** | `D` | Kervan güzergâhı / kara yolu çizim aracı, nehirle aynı mantıkta. |
+
+### İşaretler
+
+| Araç | Tuş | İşlev |
+|---|---|---|
+| **Sembol** | `S` | ~200+ düz (ink-style) sembol ve onlarca izometrik bina/yapıdan (kale, kulübe, değirmen, köprü vb.) birini yerleştirir. Renk tonu (hue) ve "yıpranma/wear" (eskime lekesi) kaydırıcıları ile özelleştirilebilir; `[` / `]` ile döndürülür. **Fırça modu** açıkken sürükleyerek onlarca sembolü otomatik kümeleyerek dizer (orman/dağ sırası gibi); "Karaya kenetle" işaretliyken denize taşan noktalar otomatik atlanır ve sonradan deniz o bölgeye genişlerse sembol otomatik gizlenir. |
+| **Kaynak** | `Y` | Maden, tarım, avlanma, balıkçılık, ticaret ve taş ocağı olmak üzere 6 türden birini seçip haritaya oyun-tasarımı amaçlı kaynak işareti yerleştirir (kervan/ticaret temalı haritalar için). |
+| **Etiket** | `L` | Metin etiketi yerleştirir; hazır stil (başlık, şehir adı, bölge adı vb.) ön ayarları mevcuttur. **"Yola oturt"** işaretliyse ve tıklama bir nehre/yola yakınsa, etiket o çizginin gerçek şekline harf harf oturur (dairesel yay değil, çizilmiş eğrinin kendisi). |
+
+### Bölge & Ölçüm
+
+| Araç | Tuş | İşlev |
+|---|---|---|
 | **Bölge** | `G` | Toprak/bölge (territory) doldurma aracı — kesikli kenarlıklı, yarı saydam dolgulu kapalı bir alan çizer; sınır/siyasi harita amaçlı. |
 | **Bölge bağlantısı** | `M` | Haritaya tıklayıp isim vererek yeni, boş bir **alt harita** (bölge/şehir haritası) oluşturur ve üzerine bir bağlantı iğnesi yerleştirir. Bkz. aşağıdaki "Çoklu harita" bölümü. |
-| **Kaynak** | `Y` | Maden, tarım, avlanma, balıkçılık, ticaret ve taş ocağı olmak üzere 6 türden birini seçip haritaya oyun-tasarımı amaçlı kaynak işareti yerleştirir (kervan/ticaret temalı haritalar için). |
-| **Yol** | `D` | Kervan güzergâhı / kara yolu çizim aracı, nehirle aynı mantıkta. |
-| **Etiket** | `L` | Metin etiketi yerleştirir; hazır stil (başlık, şehir adı, bölge adı vb.) ön ayarları mevcuttur. **"Yola oturt"** işaretliyse ve tıklama bir nehre/yola yakınsa, etiket o çizginin gerçek şekline harf harf oturur (dairesel yay değil, çizilmiş eğrinin kendisi). |
-| **Örnekle** | `I` | Doku eyedropper — haritanın bir bölgesinden dokuyu örnekleyip başka bir yere aynı stille "boyayabilme" aracı; ① alan seç → ② boyamaya başla akışıyla çalışır. |
 | **Ölç** | `Q` | Sürüklenebilir mesafe cetveli — iki nokta arası gerçek mesafeyi ölçek çubuğuna göre hesaplayıp gösterir. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez. |
-| **Kement** | `X` | Raster lasso seçim — sürükleyerek kapalı bir alan çiz; Kara + Arazi + Yükselti katmanlarındaki o bölge, üzerinde duran semboller/kaynaklar/etiketler/harita bağlantılarıyla BİRLİKTE kaldırılıp taşınabilir/döndürülebilir hâle gelir (tutamaçla döndür). `Enter` ile onayla (tek adımlık geri alınabilir işlem), `Escape` ile iptal et, `Delete` ile alanı tamamen sil. |
-| **Kaydır** | `Space` (basılı tutarak) | Tuvali sürükleyerek kaydırma; sağ tık ile de her araçtan bağımsız pan yapılabilir. |
 
 Tüm çizim yolları (nehir/yol/göl/bölge) isteğe bağlı **bezier tutamaç** düzenlemeyi destekler: bir noktayı seçip tutamaçlarını sürükleyerek eğriyi elle şekillendirebilirsiniz; tutamaç eklenmemiş eski projeler otomatik (Catmull-Rom eşdeğeri) eğriyle bire bir aynı görünmeye devam eder.
 

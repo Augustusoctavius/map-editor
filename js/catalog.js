@@ -78,13 +78,6 @@
     return s;
   }
 
-  /* rastgelesiz sabit dağılım için yardımcı */
-  function grid(n, cols, sx, sy) {
-    var out = [], i;
-    for (i = 0; i < n; i++) out.push([(i % cols) * sx, Math.floor(i / cols) * sy]);
-    return out;
-  }
-
   /* ============ KATALOG ============ */
   var ITEMS = {};   /* kategori -> [{id,tr,en,make}] */
 

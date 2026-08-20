@@ -116,6 +116,17 @@ label.btn.wide{display:block; text-align:center; cursor:pointer; margin-top:6px;
 .tutorial-intro{margin-bottom:24px}
 .tutorial-intro p{color:var(--text-dim); font-size:13px; line-height:1.6}
 .tutorial-list{display:flex; flex-direction:column; gap:2px}
+.tutorial-group-label{
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--f-display); font-size:10px; letter-spacing:.15em;
+  text-transform:uppercase; color:var(--brass); opacity:.85;
+  margin:22px 0 4px; padding-left:2px;
+}
+.tutorial-group-label:first-child{margin-top:0}
+.tutorial-group-label::after{
+  content:""; flex:1; height:1px;
+  background:linear-gradient(90deg,var(--line),transparent);
+}
 .tutorial-row{
   display:flex; gap:14px; align-items:flex-start; padding:14px 4px;
   border-bottom:1px solid var(--line);
