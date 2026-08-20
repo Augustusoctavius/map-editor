@@ -4,7 +4,7 @@
 #canvas-area{
   position:relative;overflow:hidden;
   background:
-    radial-gradient(120% 90% at 50% 0%,#1a201d 0%,#0c0f0d 100%);
+    radial-gradient(120% 90% at 50% 0%,#201a12 0%,#0f0b07 100%);
 }
 #canvas-area::after{
   content:"";position:absolute;inset:0;pointer-events:none;
@@ -35,4 +35,4 @@
   border:1px solid var(--line);border-radius:var(--radius);
   background:var(--ink-800);padding:4px;box-shadow:0 6px 22px #000a;z-index:5;
 }
-#minimap{display:block;border-radius:3px;cursor:pointer;background:#0d1110}
+#minimap{display:block;border-radius:3px;cursor:pointer;background:#100b06}

@@ -1,21 +1,21 @@
 /* ============================================================
    Cartographer — main.css
-   Palette: cartographer's night desk — ink, brass, parchment
+   Palette: wandering cartographer's satchel — leather, brass, parchment
    ============================================================ */
 :root{
-  --ink-900:#101311;
-  --ink-800:#161b18;
-  --ink-700:#1c221e;
-  --ink-600:#242c27;
-  --ink-500:#2f3931;
-  --line:#3a4740;
-  --text:#dfe3da;
-  --text-dim:#96a096;
-  --brass:#c99a4b;
-  --brass-dim:#8a6a33;
+  --ink-900:#241708;
+  --ink-800:#3a2716;
+  --ink-700:#4a3221;
+  --ink-600:#5a3f29;
+  --ink-500:#6b4c31;
+  --line:#7a5738;
+  --text:#eddcbd;
+  --text-dim:#b89a72;
+  --brass:#c08a3e;
+  --brass-dim:#96692b;
   --parch:#e8d9b5;
-  --danger:#b5563f;
-  --ok:#6f9a63;
+  --danger:#8c2a1c;
+  --ok:#6f8a52;
   --radius:5px;
   --panel-l:236px;
   --panel-r:272px;
@@ -139,7 +139,7 @@ textarea{font-family:var(--f-display);font-size:13px}
 .layer-item.active .layer-name{color:var(--brass)}
 .li-btn{background:none;border:0;cursor:pointer;color:var(--text-dim);font-size:13px;padding:0 2px;line-height:1}
 .li-btn:hover{color:var(--brass)}
-.li-btn.off{color:#5a6259}
+.li-btn.off{color:#6b5c46}
 .li-grip{cursor:grab;color:var(--text-dim);font-size:13px;line-height:1;padding:0 1px;flex:none;user-select:none}
 .li-grip:hover{color:var(--brass)}
 .li-grip:active{cursor:grabbing}

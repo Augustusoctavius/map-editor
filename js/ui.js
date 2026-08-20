@@ -1775,7 +1775,7 @@
       }
       el.textContent = (App.eyedrop.painting ? '🖌 ' : '✓ ') +
                        'r=' + Math.round(s.radius) + ' · ' + s.edges.length + ' · ' + s.baseColor;
-      el.style.color = App.eyedrop.painting ? '#6f9a63' : '#c99a4b';
+      el.style.color = App.eyedrop.painting ? '#6f8a52' : '#c08a3e';
       if ($('btn-eye-paint')) $('btn-eye-paint').disabled = false;
     },
 
