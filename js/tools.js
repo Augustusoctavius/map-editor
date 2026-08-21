@@ -1300,74 +1300,98 @@
       var octaves = 3 + Math.round(roughness*3);      /* 3..6 */
       var freq = 2.2 + roughness*4;                    /* pürüzlülük arttıkça daha sık desen */
 
-      /* takımada için birkaç rastgele ada merkezi */
-      var islands = [];
-      if (template === 'archipelago') {
-        var count = 5 + Math.floor(noise.next()*5);
-        for (var ii = 0; ii < count; ii++) {
-          islands.push({
-            x: 0.15 + noise.next()*0.7, y: 0.15 + noise.next()*0.7,
-            r: 0.10 + noise.next()*0.14
-          });
-        }
-      }
-
-      /* ada/kıta için çoklu blob merkezleri — tekil radyal falloff yerine
-         3-7 örtüşen lob kullanarak organik, oval-olmayan kara formları üretir */
-      var islandBlobs = [], contBlobs = [];
+      /* ---- kaynak noktaları (tohum) — şablona göre 1..9 arası ----
+         Bunlar artık analitik bir daireye "falloff" ile değil, aşağıdaki
+         blobFill() ile ızgara üzerinde rastgele bir su baskını (flood-fill)
+         gibi yayılıyor; bu, Azgaar's Fantasy Map Generator'ın "en basit ve
+         en iyi sonuç veren" yükselti algoritmasıyla aynı fikir: komşu
+         hücrelere geçişte küçük rastgele bir çürüme (decay) uygulamak,
+         analitik dairelerin asla üretemeyeceği koy/yarımada/parmak gibi
+         gerçekçi, düzensiz kıyı biçimleri doğurur. */
+      var seeds = [];
       if (template === 'island') {
         var ibCount = 3 + Math.floor(noise.next() * 4);  /* 3..6 */
         for (var ib = 0; ib < ibCount; ib++) {
-          islandBlobs.push({
-            x: (noise.next() - 0.5) * 0.30,
-            y: (noise.next() - 0.5) * 0.30,
-            r: 0.12 + noise.next() * 0.15
+          seeds.push({
+            x: 0.5 + (noise.next() - 0.5) * 0.30,
+            y: 0.5 + (noise.next() - 0.5) * 0.30,
+            r: 0.12 + noise.next() * 0.15,
+            h: ib === 0 ? 1.0 : 0.55 + noise.next() * 0.3
           });
         }
-      } else if (template !== 'archipelago') { /* continent */
+      } else if (template === 'archipelago') {
+        var count = 5 + Math.floor(noise.next()*5);
+        for (var ii = 0; ii < count; ii++) {
+          seeds.push({
+            x: 0.15 + noise.next()*0.7, y: 0.15 + noise.next()*0.7,
+            r: 0.10 + noise.next()*0.14,
+            h: 0.75 + noise.next() * 0.25
+          });
+        }
+      } else { /* continent */
         var cbCount = 4 + Math.floor(noise.next() * 4);  /* 4..7 */
-        var cCX = (noise.next() - 0.5) * 0.18, cCY = (noise.next() - 0.5) * 0.12;
+        var cCX = 0.5 + (noise.next() - 0.5) * 0.18, cCY = 0.5 + (noise.next() - 0.5) * 0.12;
         for (var cbi = 0; cbi < cbCount; cbi++) {
-          contBlobs.push({
+          seeds.push({
             x: cCX + (noise.next() - 0.5) * 0.42,
             y: cCY + (noise.next() - 0.5) * 0.32,
-            r: 0.16 + noise.next() * 0.20
+            r: 0.16 + noise.next() * 0.20,
+            h: cbi === 0 ? 1.0 : 0.6 + noise.next() * 0.3
           });
         }
       }
 
-      function smoothstep(a, b, t) { t = Math.max(0, Math.min(1, (t-a)/(b-a))); return t*t*(3-2*t); }
+      /* Çok kaynaklı, rastgele-çürümeli taşkın doldurma: her tohumdan
+         8-komşulukla yayılır, her adımda hedef yarıçapına göre hesaplanan
+         çürüme oranına küçük bir jitter eklenir. Bir hücrenin yüksekliği
+         yalnızca daha önce ulaşılandan yüksekse güncellenir (gevşetme),
+         böylece örtüşen tohumlar doğal biçimde birleşir. */
+      function blobFill(N, seedList, roughness, rng) {
+        var hgt = new Float32Array(N * N);
+        var dec = new Float32Array(N * N);
+        var queue = [];
+        var jitter = 0.05 + roughness * 0.09;
+        seedList.forEach(function (s) {
+          var gx = Math.max(0, Math.min(N-1, Math.round(s.x * N)));
+          var gy = Math.max(0, Math.min(N-1, Math.round(s.y * N)));
+          var rCells = Math.max(2, s.r * N);
+          var seedDecay = Math.pow(0.02 / s.h, 1 / rCells); /* h * decay^rCells ≈ 0.02 */
+          var idx = gy * N + gx;
+          if (s.h > hgt[idx]) { hgt[idx] = s.h; dec[idx] = seedDecay; queue.push(idx); }
+        });
+        var qi = 0;
+        while (qi < queue.length) {
+          var cur = queue[qi++];
+          var cx = cur % N, cy = (cur / N) | 0;
+          var curH = hgt[cur], curD = dec[cur];
+          if (curH <= 0.02) continue;
+          for (var dy = -1; dy <= 1; dy++) {
+            for (var dx = -1; dx <= 1; dx++) {
+              if (dx === 0 && dy === 0) continue;
+              var nx2 = cx + dx, ny2 = cy + dy;
+              if (nx2 < 0 || nx2 >= N || ny2 < 0 || ny2 >= N) continue;
+              var nidx = ny2 * N + nx2;
+              var effDecay = Math.max(0.5, Math.min(0.995, curD * (1 + (rng.next()-0.5) * jitter)));
+              var nh = curH * effDecay;
+              if (nh > hgt[nidx] + 0.001) {
+                hgt[nidx] = nh; dec[nidx] = curD;
+                queue.push(nidx);
+              }
+            }
+          }
+        }
+        return hgt;
+      }
+
+      var heightGrid = blobFill(N, seeds, roughness, noise);
 
       var small = document.createElement('canvas'); small.width = N; small.height = N;
       var sctx = small.getContext('2d');
       var img = sctx.createImageData(N, N);
       for (var gy = 0; gy < N; gy++) {
         for (var gx = 0; gx < N; gx++) {
-          var nx = gx/N - 0.5, ny = gy/N - 0.5;
           var base = noise.fbm(gx/N*freq, gy/N*freq, octaves, 0.5);
-          var falloff;
-          if (template === 'island') {
-            falloff = 0;
-            for (var ib2 = 0; ib2 < islandBlobs.length; ib2++) {
-              var ibl = islandBlobs[ib2];
-              var ibd = Math.sqrt((nx-ibl.x)*(nx-ibl.x)+(ny-ibl.y)*(ny-ibl.y))/ibl.r;
-              falloff = Math.max(falloff, 1 - smoothstep(0.15, 1.0, ibd));
-            }
-          } else if (template === 'archipelago') {
-            falloff = -1;
-            for (var k=0; k<islands.length; k++) {
-              var isl = islands[k];
-              var dd = Math.hypot(nx+0.5-isl.x, ny+0.5-isl.y)/isl.r;
-              falloff = Math.max(falloff, 1 - smoothstep(0.4, 1.0, dd));
-            }
-          } else { /* continent */
-            falloff = 0;
-            for (var cb2 = 0; cb2 < contBlobs.length; cb2++) {
-              var cbl = contBlobs[cb2];
-              var cbd = Math.sqrt((nx-cbl.x)*(nx-cbl.x)+(ny-cbl.y)*(ny-cbl.y))/cbl.r;
-              falloff = Math.max(falloff, 1 - smoothstep(0.18, 1.0, cbd));
-            }
-          }
+          var falloff = heightGrid[gy*N+gx];
           var value = (falloff - 0.5) + base*(0.22 + roughness*0.5);
           var a = Math.max(0, Math.min(1, value/0.12 + 0.5));
           var idx = (gy*N+gx)*4;
