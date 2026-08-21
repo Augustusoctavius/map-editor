@@ -72,6 +72,10 @@
       o_view:'Görünüm', o_fit:'Ekrana sığdır', o_100:'%100',
       h_pan:'Sağ tık + sürükle, orta tık, Space + sürükle veya yön tuşları ile kaydır.',
       tab_layers:'Katmanlar', tab_library:'Kütüphane', tab_history:'Geçmiş',
+      tab_regions:'Bölgeler', tab_todo:'Görevler',
+      regions_political:'Siyasi bölgeler', regions_political_empty:'Henüz adlandırılmış bölge yok. "Bölge" aracıyla çiz, sonra ad ver.',
+      regions_maptree:'Harita ağacı',
+      todo_placeholder:'Yeni görev...', todo_add:'Ekle', todo_empty:'Henüz görev yok.',
       ref_title:'Referans görsel', ref_export:"Export'a dahil et", ref_clear:'Referansı kaldır', ref_trace:'İz sürme modu (üstte göster + kıyı kenetleme)', layer_drag_hint:'Katmanı sürükleyip yeniden sıralamak için buradan tutun', blend_sourceover:'Normal', blend_multiply:'Çarpma', blend_overlay:'Bindirme', blend_softlight:'Yumuşak ışık', blend_screen:'Ekranlama', nav_home:'Ana Sayfa', nav_canvas:'Tuval', nav_tutorial:'Rehber', nav_community:'Topluluk', home_tagline:'Fantastik dünyalar için tarayıcı tabanlı harita editörü', home_desc:'Kara ve deniz sınırlarını çiz, ormanları ve dağları boya, kaleler ve köyler yerleştir, nehirler ve yollar döşe — hepsi tek bir tuvalde, kurulum gerektirmeden tarayıcında.', home_cta:'Haritana başla', home_video_caption:'Tanıtım videosu yakında', canvas_new_title:'Yeni tuval oluştur', canvas_custom:'Özel ölçü…', canvas_name_ph:'Harita adı', canvas_create:'Oluştur', canvas_import:'.json dosyasından içe aktar', canvas_saved_title:'Kayıtlı tuvaller', canvas_empty:'Bu tarayıcıda henüz kayıtlı bir tuval yok. Editördeyken "Kaydet" ile otomatik burada listelenir.', canvas_open:'Aç', canvas_delete:'Sil', canvas_delete_confirm:'Bu tuvali silmek istediğine emin misin? Bu işlem geri alınamaz.', canvas_unnamed:'Adsız harita', tutorial_title:'Rehber', tutorial_intro:'Sol araç çubuğundaki her araç, sağ panelde kendi ayarlarını açar. Aşağıda her aracın ne işe yaradığının kısa özeti var.', community_title:'Topluluk', community_desc:'Wayborne Map Editor açık kaynaklı, sürekli gelişen bir projedir.', community_github_desc:'Kaynak kod, hata bildirimi ve katkı', community_soon:'Yakında', lib_full:'Tarayıcı depolama alanı dolu — eski bir tuvali sil ya da .json olarak dışa aktar.', tut_h_select:'Nesneleri seç, taşı, döndür; Shift ile çoklu seçim yap.', tut_h_erase:'Boyanmış karayı ve üzerindeki arazi dokusunu tek adımda siler.', tut_h_fill:'Kapalı bir kıyı çevriminin içini tek tıkla doldurur.', tut_h_river:'Tıklayarak nokta ekle, akarsu çiz; Enter ile bitir.', tut_h_road:'Tıklayarak nokta ekle, yol çiz; Enter ile bitir.',
       sym_upload:'+ PNG Sembol yükle', sym_upload_done:'sembol yüklendi', sym_del:'Sil', sym_search:'Sembol ara...', sym_recent:'Son kullanılanlar',
       st_pos:'Konum', st_zoom:'Yakınlık', st_size:'Tuval', st_tool:'Araç',
@@ -153,6 +157,10 @@
       o_view:'View', o_fit:'Fit to screen', o_100:'100%',
       h_pan:'Right-click drag, middle-click, Space + drag, or arrow keys to pan.',
       tab_layers:'Layers', tab_library:'Library', tab_history:'History',
+      tab_regions:'Regions', tab_todo:'To-do',
+      regions_political:'Political regions', regions_political_empty:'No named regions yet. Draw with the "Territory" tool, then give it a name.',
+      regions_maptree:'Map tree',
+      todo_placeholder:'New task...', todo_add:'Add', todo_empty:'No tasks yet.',
       ref_title:'Reference image', ref_export:'Include in export', ref_clear:'Remove reference', ref_trace:'Trace mode (show on top + coastline snap)', layer_drag_hint:'Grab here to drag and reorder the layer', blend_sourceover:'Normal', blend_multiply:'Multiply', blend_overlay:'Overlay', blend_softlight:'Soft light', blend_screen:'Screen', nav_home:'Home', nav_canvas:'Canvas', nav_tutorial:'Tutorial', nav_community:'Community', home_tagline:'A browser-based map editor for fantasy worlds', home_desc:'Draw land and sea boundaries, paint forests and mountains, place castles and villages, lay down rivers and roads — all on one canvas, in your browser, no install required.', home_cta:'Start your map', home_video_caption:'Intro video coming soon', canvas_new_title:'Create a new canvas', canvas_custom:'Custom size…', canvas_name_ph:'Map name', canvas_create:'Create', canvas_import:'Import from .json file', canvas_saved_title:'Saved canvases', canvas_empty:'No canvases saved in this browser yet. They\'re listed here automatically when you hit "Save" in the editor.', canvas_open:'Open', canvas_delete:'Delete', canvas_delete_confirm:'Delete this canvas? This cannot be undone.', canvas_unnamed:'Untitled map', tutorial_title:'Tutorial', tutorial_intro:'Each tool in the left toolbar opens its own settings in the right panel. Below is a quick summary of what each tool does.', community_title:'Community', community_desc:'Wayborne Map Editor is an open-source, actively evolving project.', community_github_desc:'Source code, bug reports and contributions', community_soon:'Coming soon', lib_full:'Browser storage is full — delete an old canvas or export it as .json.', tut_h_select:'Select, move and rotate objects; Shift-click for multi-select.', tut_h_erase:'Erases painted land and the terrain texture on top of it in one step.', tut_h_fill:'Fills the inside of a closed coastline outline with one click.', tut_h_river:'Click to add points and draw a river; Enter to finish.', tut_h_road:'Click to add points and draw a road; Enter to finish.',
       sym_upload:'+ Upload PNG Symbol', sym_upload_done:'symbol(s) loaded', sym_del:'Delete', sym_search:'Search symbols...', sym_recent:'Recently used',
       st_pos:'Pos', st_zoom:'Zoom', st_size:'Canvas', st_tool:'Tool',
@@ -1912,9 +1920,10 @@
         History.pushVector('territories', before, JSON.parse(JSON.stringify(L.objects)), 'political-colors');
         UI.refreshHistory();
         Cv.requestRender();
+        self.refreshTerritoryList();
         UI.msg(n + ' ' + UI.t('m_polcolored'));
       });
-      on('tt-name', 'input', function (e) { terrEdit({ name: e.target.value }); });
+      on('tt-name', 'input', function (e) { terrEdit({ name: e.target.value }); self.refreshTerritoryList(); });
 
       /* --- fantastik ad üreteci --- */
       self.buildCultureList();
@@ -2140,6 +2149,9 @@
       });
       on('sym-cat', 'change', function () { $('sym-search').value = ''; self.renderSymbolGrid(); });
       on('sym-search', 'input', function () { self.renderSymbolGrid(); });
+
+      on('btn-todo-add', 'click', function () { self.addTodo(); });
+      on('todo-input', 'keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); self.addTodo(); } });
     },
 
     showTab: function (name) {
@@ -2478,6 +2490,147 @@
     },
 
     /* ================= geçmiş ================= */
+    /* ================= bölgeler paneli (siyasi bölgeler + harita ağacı) ================= */
+    refreshRegionsPanel: function () {
+      this.refreshTerritoryList();
+      this.refreshMapTree();
+    },
+
+    refreshTerritoryList: function () {
+      var ul = $('territory-list'), hint = $('territory-empty-hint');
+      if (!ul) return;
+      var self = this;
+      var L = Layers.get('territories');
+      var items = (L ? L.objects : []).filter(function (o) { return o.name; });
+      ul.innerHTML = '';
+      if (hint) hint.style.display = items.length ? 'none' : '';
+      items.forEach(function (o) {
+        var li = document.createElement('li');
+        li.className = 'territory-item';
+        var sw = document.createElement('span');
+        sw.className = 'territory-swatch';
+        sw.style.background = o.color || '#8a5a3a';
+        var name = document.createElement('span');
+        name.className = 'territory-name';
+        name.textContent = o.name;
+        li.appendChild(sw); li.appendChild(name);
+        li.addEventListener('click', function () {
+          self.setTool('territory');
+          App.selection = { layerId:'territories', id:o.id };
+          self.refreshSelection();
+          if (o.pts && o.pts.length) {
+            var cx = 0, cy = 0;
+            o.pts.forEach(function (p) { cx += p[0]; cy += p[1]; });
+            Cv.centerOn(cx/o.pts.length, cy/o.pts.length);
+          }
+          Cv.requestRender();
+        });
+        ul.appendChild(li);
+      });
+    },
+
+    /* Harita ağacını (App.buildMapTree) girintili, tıklanabilir bir listeye
+       çizer. Aktif haritayı vurgular; tıklanan düğüme App.jumpToMap ile
+       doğrudan atlar (ara adımlardan geçmeye gerek yok). */
+    refreshMapTree: function () {
+      var ul = $('maptree-list');
+      if (!ul) return;
+      var self = this;
+      var tree = App.buildMapTree();
+      ul.innerHTML = '';
+
+      function render(node, depth) {
+        var li = document.createElement('li');
+        li.className = 'maptree-item' + (node.id === App.currentMapId ? ' cur' : '');
+        li.style.paddingInlineStart = (7 + depth*16) + 'px';
+        var ico = document.createElement('span');
+        ico.className = 'maptree-ico';
+        ico.textContent = depth === 0 ? '⌂' : '◈';
+        var name = document.createElement('span');
+        name.className = 'maptree-name';
+        name.textContent = depth === 0 ? App.currentCanvasName : (node.label || self.t('rl_default'));
+        li.appendChild(ico); li.appendChild(name);
+        if (node.children.length) {
+          var count = document.createElement('span');
+          count.className = 'maptree-count';
+          count.textContent = node.children.length;
+          li.appendChild(count);
+        }
+        li.addEventListener('click', function () { App.jumpToMap(node.id); });
+        ul.appendChild(li);
+        node.children.forEach(function (c) { render(c, depth+1); });
+      }
+      render(tree, 0);
+    },
+
+    /* ================= yapılacaklar listesi ================= */
+    /* Tarayıcı localStorage'ında tek bir JSON dizi olarak tutulur — kütüphane
+       (Exporter.libList) ile aynı upsert/tam-yeniden-yaz deseni. Proje/harita
+       başına değil, tüm oturum için tek liste (kasıtlı olarak global). */
+    TODO_KEY: 'wayborne_todos',
+
+    _loadTodos: function () {
+      try { return JSON.parse(localStorage.getItem(this.TODO_KEY) || '[]'); }
+      catch (e) { return []; }
+    },
+    _saveTodos: function (arr) {
+      try { localStorage.setItem(this.TODO_KEY, JSON.stringify(arr)); } catch (e) {}
+    },
+
+    addTodo: function () {
+      var input = $('todo-input');
+      if (!input) return;
+      var text = input.value.trim();
+      if (!text) return;
+      var todos = this._loadTodos();
+      var id = 't' + Date.now().toString(36) + Math.floor(Math.random()*1e6).toString(36);
+      todos.push({ id: id, text: text, done: false, createdAt: Date.now() });
+      this._saveTodos(todos);
+      input.value = '';
+      this.refreshTodoList();
+    },
+    toggleTodo: function (id) {
+      var todos = this._loadTodos();
+      var t = todos.filter(function (o) { return o.id === id; })[0];
+      if (!t) return;
+      t.done = !t.done;
+      this._saveTodos(todos);
+      this.refreshTodoList();
+    },
+    deleteTodo: function (id) {
+      var todos = this._loadTodos().filter(function (o) { return o.id !== id; });
+      this._saveTodos(todos);
+      this.refreshTodoList();
+    },
+
+    refreshTodoList: function () {
+      var ul = $('todo-list'), hint = $('todo-empty-hint');
+      if (!ul) return;
+      var self = this;
+      var todos = this._loadTodos();
+      ul.innerHTML = '';
+      if (hint) hint.style.display = todos.length ? 'none' : '';
+      todos.forEach(function (o) {
+        var li = document.createElement('li');
+        li.className = 'todo-item' + (o.done ? ' done' : '');
+        var chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.className = 'todo-check';
+        chk.checked = !!o.done;
+        chk.addEventListener('change', function () { self.toggleTodo(o.id); });
+        var txt = document.createElement('span');
+        txt.className = 'todo-text';
+        txt.textContent = o.text;
+        var del = document.createElement('button');
+        del.className = 'todo-del';
+        del.type = 'button';
+        del.textContent = '×';
+        del.addEventListener('click', function () { self.deleteTodo(o.id); });
+        li.appendChild(chk); li.appendChild(txt); li.appendChild(del);
+        ul.appendChild(li);
+      });
+    },
+
     refreshHistory: function () {
       var ul = $('history-list');
       if (!ul) return;
@@ -2625,6 +2778,8 @@
       this.refreshEyedropPanel();
       this.renderCustomSymGrid();
       this.syncSketchTarget();
+      this.refreshRegionsPanel();
+      this.refreshTodoList();
       this.status();
     },
 

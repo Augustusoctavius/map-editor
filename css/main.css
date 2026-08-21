@@ -156,9 +156,9 @@ textarea{font-family:var(--f-display);font-size:13px}
 .terrain-sw.active span{color:var(--brass)}
 
 /* ---------- right panel ---------- */
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--line);gap:1px;flex:none}
-.tab{background:var(--ink-700);border:0;padding:9px 4px;cursor:pointer;color:var(--text-dim);
-  font-size:11px;letter-spacing:.04em}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);background:var(--line);gap:1px;flex:none}
+.tab{background:var(--ink-700);border:0;padding:8px 2px;cursor:pointer;color:var(--text-dim);
+  font-size:9.5px;letter-spacing:.02em;line-height:1.25}
 .tab:hover{background:var(--ink-600);color:var(--text)}
 .tab.active{background:var(--ink-500);color:var(--brass);box-shadow:inset 0 -2px 0 var(--brass)}
 .tab-body{padding:10px;overflow-y:auto;flex:1;min-height:0}
@@ -211,6 +211,48 @@ textarea{font-family:var(--f-display);font-size:13px}
 .history-list li:hover{color:var(--text)}
 .history-list li.cur{border-left-color:var(--brass);color:var(--brass);background:var(--ink-700)}
 .history-list li.future{opacity:.4}
+
+/* ---------- bölgeler: siyasi bölgeler + harita ağacı ---------- */
+.regions-section{margin-bottom:18px}
+.regions-section:last-child{margin-bottom:0}
+.territory-list,.maptree-list{list-style:none;margin:0 0 6px;padding:0}
+.territory-item{
+  display:flex;align-items:center;gap:8px;padding:6px 7px;border-radius:var(--radius);
+  cursor:pointer;font-size:11.5px;color:var(--text-dim);
+}
+.territory-item:hover{background:var(--ink-700);color:var(--text)}
+.territory-swatch{width:12px;height:12px;border-radius:3px;flex:none;border:1px solid rgba(0,0,0,.35)}
+.territory-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.maptree-item{
+  display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:var(--radius);
+  cursor:pointer;font-size:11.5px;color:var(--text-dim);
+}
+.maptree-item:hover{background:var(--ink-700);color:var(--text)}
+.maptree-item.cur{background:var(--ink-600);color:var(--brass)}
+.maptree-ico{flex:none;opacity:.7;font-size:11px}
+.maptree-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.maptree-count{flex:none;font-family:var(--f-mono);font-size:9.5px;color:var(--text-dim);opacity:.75}
+
+/* ---------- görevler ---------- */
+.todo-add-row{display:flex;gap:6px;margin-bottom:10px}
+.todo-add-row input{flex:1;min-width:0}
+.todo-list{list-style:none;margin:0;padding:0}
+.todo-item{
+  display:flex;align-items:flex-start;gap:8px;padding:6px 7px;border-radius:var(--radius);
+  font-size:11.5px;color:var(--text-dim);
+}
+.todo-item:hover{background:var(--ink-700)}
+.todo-check{
+  flex:none;width:15px;height:15px;margin-top:1px;border-radius:3px;border:1px solid var(--line);
+  background:var(--ink-900);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--brass);font-size:11px;line-height:1;
+}
+.todo-check:hover{border-color:var(--brass-dim)}
+.todo-text{flex:1;cursor:pointer;word-break:break-word;line-height:1.4}
+.todo-item.done .todo-text{text-decoration:line-through;opacity:.5}
+.todo-del{flex:none;background:none;border:0;cursor:pointer;color:var(--text-dim);font-size:14px;
+  line-height:1;padding:0 2px;opacity:.6}
+.todo-del:hover{color:var(--danger);opacity:1}
 
 /* ---------- status bar ---------- */
 #statusbar{

@@ -2344,7 +2344,7 @@
          verisi de temizlenir — yoksa proje dosyasında sonsuza dek öksüz kalır */
       if (s.layerId === 'links') {
         var delObj = L.objects.filter(function (o) { return o.id === s.id; })[0];
-        if (delObj && App.maps[delObj.targetMapId]) delete App.maps[delObj.targetMapId];
+        if (delObj) App.deleteMapRecursive(delObj.targetMapId);
       }
       L.objects = L.objects.filter(function (o) { return o.id !== s.id; });
       App.selection = null;

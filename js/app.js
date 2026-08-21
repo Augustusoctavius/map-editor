@@ -54,13 +54,23 @@
        paylaşıp birbirini kirletir. */
     _snapshotLayers: function () { return JSON.parse(JSON.stringify(Layers.serialize(true))); },
 
+    /* _blankSnapshot bir kez oluşturulup tekrar tekrar kullanılan tek bir
+       nesnedir. Layers.deserialize vektör katmanlarda .objects dizisini
+       KOPYALAMADAN doğrudan referans olarak atar (bkz. layers.js) — bu yüzden
+       her yeni (daha önce hiç ziyaret edilmemiş) alt haritada _blankSnapshot'ı
+       olduğu gibi geçirmek, o haritaların hepsinin AYNI diziyi paylaşmasına
+       yol açar: birine eklenen bağlantı/nesne sessizce diğerlerinde de belirir
+       (hatta döngüsel bağlantı gibi görünebilir). Her kullanımda derin kopya
+       almak bu takılmayı önler. */
+    _cloneBlank: function () { return JSON.parse(JSON.stringify(this._blankSnapshot)); },
+
     enterMap: function (targetId, label) {
       if (this._switching) return;
       if (targetId === this.currentMapId) return;
       this.maps[this.currentMapId] = this._snapshotLayers();
       this.mapStack.push({ id: this.currentMapId, label: this.currentMapLabel });
       var self = this;
-      var snap = this.maps[targetId] || this._blankSnapshot;
+      var snap = this.maps[targetId] || this._cloneBlank();
       this._switching = true;
       Layers.deserialize(snap).then(function () {
         self.currentMapId = targetId;
@@ -70,6 +80,79 @@
         .then(function () { self._switching = false; });
     },
 
+    /* Tüm harita ağacını (kök + iç içe bölge bağlantıları) tek bir düğüm
+       nesnesi olarak kurar: { id, label, children:[...] }. Aktif haritayı
+       önce App.maps'e senkronlar (enterMap'in yaptığı gibi) ki ağaç en
+       güncel bağlantı kümesini yansıtsın. Bir hedef hiç ziyaret edilmediyse
+       (App.maps'te kaydı yoksa) içinde başka bağlantı olamaz — dal orada
+       yaprak olarak biter. visited koruması, bir bağlantının kendi atasına
+       işaret ettiği (bozuk/döngüsel) uç durumda sonsuz özyinelemeyi önler. */
+    buildMapTree: function () {
+      this.maps[this.currentMapId] = this._snapshotLayers();
+      var self = this, visited = {};
+      function node(id, label) {
+        if (visited[id]) return { id:id, label:label, children:[], cycle:true };
+        visited[id] = true;
+        var snap = self.maps[id];
+        var linksLayer = snap && snap.filter(function (l) { return l.id === 'links'; })[0];
+        var children = [];
+        if (linksLayer && linksLayer.objects) {
+          linksLayer.objects.forEach(function (o) {
+            children.push(node(o.targetMapId, o.name || ''));
+          });
+        }
+        return { id:id, label:label, children:children };
+      }
+      return node('root', '');
+    },
+
+    /* Harita ağacında herhangi bir düğüme doğrudan atlar (enterMap sadece
+       bir adım ileri gidebiliyor). Kökten hedefe giden yolu bulup mapStack'i
+       o yola göre yeniden kurar — enterMap'in adım adım yaptığı şeyin
+       tek seferde eşdeğeri. */
+    jumpToMap: function (targetId) {
+      if (this._switching) return;
+      if (targetId === this.currentMapId) return;
+      var tree = this.buildMapTree();
+      var path = null;
+      (function walk(n, trail) {
+        if (path) return;
+        var t = trail.concat([n]);
+        if (n.id === targetId) { path = t; return; }
+        for (var i = 0; i < n.children.length && !path; i++) walk(n.children[i], t);
+      })(tree, []);
+      if (!path) return;
+
+      var self = this;
+      this.mapStack = path.slice(0, path.length - 1).map(function (n) { return { id:n.id, label:n.label }; });
+      var target = path[path.length - 1];
+      var snap = this.maps[targetId] || this._cloneBlank();
+      this._switching = true;
+      Layers.deserialize(snap).then(function () {
+        self.currentMapId = targetId;
+        self.currentMapLabel = target.label;
+        self._afterMapSwitch();
+      })['catch'](function () {})
+        .then(function () { self._switching = false; });
+    },
+
+    /* Bir bölge bağlantısı silindiğinde yalnızca doğrudan hedefi değil,
+       onun içindeki (ve onların içindeki...) tüm alt haritaları da siler —
+       aksi hâlde bu veri hiçbir yerden erişilemez hâlde bellekte kalır. */
+    deleteMapRecursive: function (id, visited) {
+      visited = visited || {};
+      if (visited[id]) return;
+      visited[id] = true;
+      var snap = this.maps[id];
+      if (!snap) return;
+      var self = this;
+      var linksLayer = snap.filter(function (l) { return l.id === 'links'; })[0];
+      if (linksLayer && linksLayer.objects) {
+        linksLayer.objects.forEach(function (o) { self.deleteMapRecursive(o.targetMapId, visited); });
+      }
+      delete this.maps[id];
+    },
+
     exitMap: function () {
       if (this._switching) return;
       if (!this.mapStack.length) return;
@@ -77,7 +160,7 @@
       var parent = this.mapStack.pop();
       var self = this;
       this._switching = true;
-      Layers.deserialize(this.maps[parent.id] || this._blankSnapshot).then(function () {
+      Layers.deserialize(this.maps[parent.id] || this._cloneBlank()).then(function () {
         self.currentMapId = parent.id;
         self.currentMapLabel = parent.label;
         self._afterMapSwitch();

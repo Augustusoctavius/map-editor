@@ -710,6 +710,8 @@
       <button class="tab active" data-tab="layers" role="tab" aria-selected="true" data-i18n="tab_layers">Katmanlar</button>
       <button class="tab" data-tab="library" role="tab" aria-selected="false" data-i18n="tab_library">Kütüphane</button>
       <button class="tab" data-tab="history" role="tab" aria-selected="false" data-i18n="tab_history">Geçmiş</button>
+      <button class="tab" data-tab="regions" role="tab" aria-selected="false" data-i18n="tab_regions">Bölgeler</button>
+      <button class="tab" data-tab="todo" role="tab" aria-selected="false" data-i18n="tab_todo">Görevler</button>
     </nav>
 
     <div class="tab-body" data-tab="layers">
@@ -742,6 +744,27 @@
 
     <div class="tab-body hidden" data-tab="history">
       <ul id="history-list" class="history-list"></ul>
+    </div>
+
+    <div class="tab-body hidden" data-tab="regions">
+      <div class="regions-section">
+        <h4 data-i18n="regions_political">Siyasi bölgeler</h4>
+        <ul id="territory-list" class="territory-list"></ul>
+        <p class="hint" id="territory-empty-hint" data-i18n="regions_political_empty">Henüz adlandırılmış bölge yok. "Bölge" aracıyla çiz, sonra ada ver.</p>
+      </div>
+      <div class="regions-section">
+        <h4 data-i18n="regions_maptree">Harita ağacı</h4>
+        <ul id="maptree-list" class="maptree-list"></ul>
+      </div>
+    </div>
+
+    <div class="tab-body hidden" data-tab="todo">
+      <div class="todo-add-row">
+        <input type="text" id="todo-input" class="sel" data-i18n-placeholder="todo_placeholder" placeholder="Yeni görev...">
+        <button class="btn" id="btn-todo-add" data-i18n="todo_add">Ekle</button>
+      </div>
+      <ul id="todo-list" class="todo-list"></ul>
+      <p class="hint" id="todo-empty-hint" data-i18n="todo_empty">Henüz görev yok.</p>
     </div>
   </aside>
 </main>
