@@ -295,11 +295,11 @@
         case 'lake':
         case 'river':
         case 'road':
-        case 'territory': this.addPathPoint(p); break;
+        case 'territory':
+        case 'measure':  this.addPathPoint(p); break;
         case 'label':    this.placeLabel(p); break;
         case 'resource': this.placeResource(p); break;
         case 'regionlink': this.placeRegionLink(p); break;
-        case 'measure':  this.measureFrom = p; break;
         case 'lasso':    this.onLassoDown(p); break;
         case 'select':   this.startSelect(p, e.shiftKey); break;
       }
@@ -392,12 +392,6 @@
         App.eyedrop.radius = Math.max(8, ed);
         var el = $('eye-r'); if (el) el.value = Math.min(400, Math.round(ed));
         var vl = $('v-eye-r'); if (vl) vl.textContent = Math.min(400, Math.round(ed));
-        Cv.requestViewRender();
-        return;
-      }
-
-      if (this.measureFrom) {
-        this.measureTo = p;
         Cv.requestViewRender();
         return;
       }
@@ -518,22 +512,6 @@
 
       if (this.mode === 'symbolBrush') {
         this.endSymbolBrush();
-        return;
-      }
-
-      if (this.measureFrom) {
-        var mf = this.measureFrom, mt = this.measureTo || this.measureFrom;
-        this.measureFrom = null; this.measureTo = null;
-        if (Math.hypot(mt.x-mf.x, mt.y-mf.y) > 4) {
-          var ML = Layers.get('measures');
-          var mbefore = JSON.parse(JSON.stringify(ML.objects));
-          var mo = { id:uid(), pts:[[mf.x,mf.y],[mt.x,mt.y]] };
-          ML.objects.push(mo);
-          App.selection = { layerId:'measures', id:mo.id };
-          History.pushVector('measures', mbefore, JSON.parse(JSON.stringify(ML.objects)), 'measure');
-          UI.refreshHistory(); UI.refreshSelection();
-        }
-        Cv.requestRender();
         return;
       }
 
@@ -1659,6 +1637,309 @@
       Cv.requestRender();
     },
 
+    /* ================= YOL OTOMATİK ÜRETİMİ =================
+       Yerleşim sembolleri (şehir/kasaba/köy/kale/liman) varsa onları,
+       yoksa iyi ayrılmış birkaç rastgele kara noktasını bir asgari yayılan
+       ağaç (MST, düz-çizgi mesafesiyle) ile eşleştirir; her kenar için
+       yükselti-maliyetli A* ile en az dik yamaçtan geçen, denize hiç
+       girmeyen bir yol bulur. Nehir akışının aksine (tek yönlü, en dik
+       iniş) burada gerçek graf araması gerekiyor çünkü yol iki sabit uç
+       arasında olmalı. */
+    ROAD_SETTLE_CATS: { cities:1, towns:1, villages:1, castles:1, ports:1 },
+
+    generateRoads: function (seed) {
+      var Lm = Layers.get('landmass'), Ev = Layers.get('elevation'), Rd = Layers.get('roads'), Sy = Layers.get('symbols');
+      if (!Lm || !Rd) return;
+      if (Rd.locked) { UI.msg(UI.t('locked')); return; }
+      var w = Lm.canvas.width, h = Lm.canvas.height;
+      var rnd = this._noiseGrid((seed >>> 0) || Math.floor(Math.random()*4294967296));
+
+      var N = Math.max(50, Math.min(120, Math.round(Math.min(w,h)/32)));
+      var sw = N, sh = Math.max(1, Math.round(N * h/w));
+
+      var lc = document.createElement('canvas'); lc.width = sw; lc.height = sh;
+      var lctx = lc.getContext('2d', { willReadFrequently:true });
+      lctx.drawImage(Lm.canvas, 0, 0, sw, sh);
+      var land = lctx.getImageData(0, 0, sw, sh).data;
+
+      var ec = document.createElement('canvas'); ec.width = sw; ec.height = sh;
+      var ectx = ec.getContext('2d', { willReadFrequently:true });
+      ectx.drawImage(Ev.canvas, 0, 0, sw, sh);
+      var elev = ectx.getImageData(0, 0, sw, sh).data;
+
+      function isLand(gx, gy) {
+        if (gx < 0 || gy < 0 || gx >= sw || gy >= sh) return false;
+        return land[(gy*sw+gx)*4+3]/255 > 0.4;
+      }
+      function heightAt(gx, gy) {
+        var i = (gy*sw+gx)*4;
+        var a = elev[i+3]/255;
+        return a > 0.02 ? (elev[i]*a + 128*(1-a)) : 128;
+      }
+
+      var self = this;
+      var pts = [];
+      if (Sy) {
+        Sy.objects.forEach(function (o) {
+          if (!o.sym) return;
+          var cat = Sym.catOf(o.sym);
+          if (!self.ROAD_SETTLE_CATS[cat]) return;
+          var gx = Math.round(o.x/w*sw), gy = Math.round(o.y/h*sh);
+          if (isLand(gx, gy)) pts.push({ x:o.x, y:o.y, gx:gx, gy:gy });
+        });
+      }
+      if (pts.length < 2) {
+        var landCells = [];
+        for (var gy0 = 0; gy0 < sh; gy0++) {
+          for (var gx0 = 0; gx0 < sw; gx0++) if (isLand(gx0, gy0)) landCells.push([gx0, gy0]);
+        }
+        if (landCells.length < 2) { UI.msg(UI.t('roadgen_noland')); return; }
+        var wanted = Math.max(3, Math.min(6, Math.round(landCells.length/900)));
+        var picked = [], tries = 0;
+        while (picked.length < wanted && tries < 500) {
+          tries++;
+          var cand = landCells[Math.floor(rnd.next()*landCells.length)];
+          var ok = true;
+          for (var pi0 = 0; pi0 < picked.length; pi0++) {
+            var dx0 = picked[pi0][0]-cand[0], dy0 = picked[pi0][1]-cand[1];
+            if (Math.hypot(dx0, dy0) < sw*0.18) { ok = false; break; }
+          }
+          if (ok) picked.push(cand);
+        }
+        pts = picked.map(function (c) { return { x:(c[0]+0.5)/sw*w, y:(c[1]+0.5)/sh*h, gx:c[0], gy:c[1] }; });
+        if (pts.length < 2) { UI.msg(UI.t('roadgen_noland')); return; }
+      }
+
+      /* düz-çizgi mesafesiyle asgari yayılan ağaç (Prim) — hangi noktaların
+         yolla bağlanacağını belirler, gerçek yol şeklini değil */
+      var n = pts.length;
+      var inMST = [], distMST = [], parent = [];
+      for (var i = 0; i < n; i++) { inMST.push(false); distMST.push(Infinity); parent.push(-1); }
+      distMST[0] = 0;
+      var edges = [];
+      for (var it = 0; it < n; it++) {
+        var u = -1, best = Infinity;
+        for (var j = 0; j < n; j++) if (!inMST[j] && distMST[j] < best) { best = distMST[j]; u = j; }
+        if (u === -1) break;
+        inMST[u] = true;
+        if (parent[u] !== -1) edges.push([parent[u], u]);
+        for (var k = 0; k < n; k++) {
+          if (inMST[k]) continue;
+          var dd = Math.hypot(pts[u].x-pts[k].x, pts[u].y-pts[k].y);
+          if (dd < distMST[k]) { distMST[k] = dd; parent[k] = u; }
+        }
+      }
+
+      /* A* — 8 komşuluk, adım maliyeti yükselti farkına göre artar (yol
+         dik yamaçtan kaçınır), deniz hücreleri tamamen kapalı */
+      function astar(sx, sy, tx, ty) {
+        var heap = [];
+        function pushHeap(item) {
+          heap.push(item);
+          var idx = heap.length-1;
+          while (idx > 0) {
+            var p = (idx-1) >> 1;
+            if (heap[p][0] <= heap[idx][0]) break;
+            var t = heap[p]; heap[p] = heap[idx]; heap[idx] = t;
+            idx = p;
+          }
+        }
+        function popHeap() {
+          var top = heap[0], last = heap.pop();
+          if (heap.length) {
+            heap[0] = last;
+            var idx = 0;
+            while (true) {
+              var l = idx*2+1, r = idx*2+2, s = idx;
+              if (l < heap.length && heap[l][0] < heap[s][0]) s = l;
+              if (r < heap.length && heap[r][0] < heap[s][0]) s = r;
+              if (s === idx) break;
+              var t = heap[idx]; heap[idx] = heap[s]; heap[s] = t;
+              idx = s;
+            }
+          }
+          return top;
+        }
+
+        var startIdx = sy*sw+sx, targetIdx = ty*sw+tx;
+        var total = sw*sh;
+        var gScore = new Array(total), cameFrom = new Array(total);
+        var visited = new Uint8Array(total);
+        for (var gi = 0; gi < total; gi++) { gScore[gi] = Infinity; cameFrom[gi] = -1; }
+        gScore[startIdx] = 0;
+        pushHeap([Math.hypot(tx-sx, ty-sy), startIdx]);
+
+        while (heap.length) {
+          var cur = popHeap(), ci = cur[1];
+          if (visited[ci]) continue;
+          visited[ci] = 1;
+          if (ci === targetIdx) break;
+          var cx = ci % sw, cy = (ci/sw)|0;
+          for (var dy = -1; dy <= 1; dy++) {
+            for (var dx = -1; dx <= 1; dx++) {
+              if (!dx && !dy) continue;
+              var nx = cx+dx, ny = cy+dy;
+              if (!isLand(nx, ny)) continue;
+              var ni = ny*sw+nx;
+              if (visited[ni]) continue;
+              var slope = Math.abs(heightAt(nx, ny) - heightAt(cx, cy));
+              var cost = Math.hypot(dx, dy) * (1 + slope*0.05);
+              var ng = gScore[ci] + cost;
+              if (ng < gScore[ni]) {
+                gScore[ni] = ng;
+                cameFrom[ni] = ci;
+                pushHeap([ng + Math.hypot(tx-nx, ty-ny), ni]);
+              }
+            }
+          }
+        }
+
+        if (cameFrom[targetIdx] === -1 && targetIdx !== startIdx) return null;
+        var path = [], cur2 = targetIdx, guard = 0;
+        while (cur2 !== -1 && guard++ < total) {
+          path.push([cur2 % sw, (cur2/sw)|0]);
+          if (cur2 === startIdx) break;
+          cur2 = cameFrom[cur2];
+        }
+        path.reverse();
+        return path;
+      }
+
+      var before = JSON.parse(JSON.stringify(Rd.objects));
+      var made = 0;
+      edges.forEach(function (e) {
+        var a = pts[e[0]], b = pts[e[1]];
+        var path = astar(a.gx, a.gy, b.gx, b.gy);
+        if (!path || path.length < 2) return;
+
+        var step = Math.max(1, Math.floor(path.length/40));
+        var rpts = [];
+        for (var pi = 0; pi < path.length; pi += step) {
+          var px = (path[pi][0]+0.5)/sw*w, py = (path[pi][1]+0.5)/sh*h;
+          if (rpts.length) {
+            var lp = rpts[rpts.length-1];
+            if (Math.hypot(px-lp[0], py-lp[1]) < Math.min(w,h)*0.008) continue;
+          }
+          rpts.push([px, py]);
+        }
+        var lastc = path[path.length-1];
+        var lpx = (lastc[0]+0.5)/sw*w, lpy = (lastc[1]+0.5)/sh*h;
+        if (!rpts.length || Math.hypot(lpx-rpts[rpts.length-1][0], lpy-rpts[rpts.length-1][1]) > 1) rpts.push([lpx, lpy]);
+        if (rpts.length < 2) return;
+
+        Rd.objects.push({ id:uid(), pts:rpts, width:App.road.width, style:App.road.style, color:App.road.color, opacity:1 });
+        made++;
+      });
+
+      if (!made) { UI.msg(UI.t('roadgen_none')); return; }
+      History.pushVector('roads', before, JSON.parse(JSON.stringify(Rd.objects)), 'roadgen');
+      UI.refreshHistory();
+      Cv.requestRender();
+    },
+
+    /* ================= YERLEŞİM OTOMATİK YERLEŞTİRME =================
+       Düz (düşük yükselti) ve kıyıya yakın kara hücrelerini puanlayıp en
+       iyilerini seçer — en yüksek puanlı kale/liman, sonraki birkaçı
+       kasaba, geri kalanı köy sembolü olur. generateRoads ile aynı
+       ROAD_SETTLE_CATS kategori kümesini kullanır, böylece "Yol üret"
+       burada yerleştirilen sembolleri otomatik bulup birbirine bağlar. */
+    autoSettle: function (count, seed) {
+      var Lm = Layers.get('landmass'), Ev = Layers.get('elevation'), Sy = Layers.get('symbols');
+      if (!Lm || !Sy) return;
+      if (Sy.locked || !Sy.visible) { UI.msg(UI.t('locked')); return; }
+      var w = Lm.canvas.width, h = Lm.canvas.height;
+      var rnd = this._noiseGrid((seed >>> 0) || Math.floor(Math.random()*4294967296));
+
+      var N = Math.max(50, Math.min(120, Math.round(Math.min(w,h)/32)));
+      var sw = N, sh = Math.max(1, Math.round(N * h/w));
+
+      var lc = document.createElement('canvas'); lc.width = sw; lc.height = sh;
+      var lctx = lc.getContext('2d', { willReadFrequently:true });
+      lctx.drawImage(Lm.canvas, 0, 0, sw, sh);
+      var land = lctx.getImageData(0, 0, sw, sh).data;
+
+      var ec = document.createElement('canvas'); ec.width = sw; ec.height = sh;
+      var ectx = ec.getContext('2d', { willReadFrequently:true });
+      ectx.drawImage(Ev.canvas, 0, 0, sw, sh);
+      var elev = ectx.getImageData(0, 0, sw, sh).data;
+
+      function isLand(gx, gy) {
+        if (gx < 0 || gy < 0 || gx >= sw || gy >= sh) return false;
+        return land[(gy*sw+gx)*4+3]/255 > 0.4;
+      }
+      function heightAt(gx, gy) {
+        var i = (gy*sw+gx)*4;
+        var a = elev[i+3]/255;
+        return a > 0.02 ? (elev[i]*a + 128*(1-a)) : 128;
+      }
+      function isCoastal(gx, gy) {
+        for (var dy = -2; dy <= 2; dy++) {
+          for (var dx = -2; dx <= 2; dx++) {
+            if (!dx && !dy) continue;
+            if (!isLand(gx+dx, gy+dy)) return true;
+          }
+        }
+        return false;
+      }
+
+      var cells = [];
+      for (var gy = 0; gy < sh; gy++) {
+        for (var gx = 0; gx < sw; gx++) {
+          if (!isLand(gx, gy)) continue;
+          var e = Math.max(0, (heightAt(gx, gy)-128)/127);
+          if (e > 0.55) continue; /* çok dik/dağlık arazi — yerleşim uygun değil */
+          var coastal = isCoastal(gx, gy);
+          var score = (1-e) + (coastal ? 0.6 : 0) + rnd.next()*0.25;
+          cells.push({ gx:gx, gy:gy, score:score, coastal:coastal });
+        }
+      }
+      if (!cells.length) { UI.msg(UI.t('settlegen_noland')); return; }
+      cells.sort(function (a, b) { return b.score - a.score; });
+
+      var wanted = count || Math.max(3, Math.min(9, Math.round(cells.length/700)));
+      var minSepCells = Math.max(3, Math.round(sw*0.10));
+
+      var existing = [];
+      Sy.objects.forEach(function (o) { existing.push([o.x/w*sw, o.y/h*sh]); });
+
+      var picked = [];
+      for (var ci = 0; ci < cells.length && picked.length < wanted; ci++) {
+        var c = cells[ci];
+        var ok = true;
+        for (var pi = 0; pi < picked.length; pi++) {
+          if (Math.hypot(picked[pi].gx-c.gx, picked[pi].gy-c.gy) < minSepCells) { ok = false; break; }
+        }
+        if (ok) {
+          for (var ei = 0; ei < existing.length; ei++) {
+            if (Math.hypot(existing[ei][0]-c.gx, existing[ei][1]-c.gy) < minSepCells*0.6) { ok = false; break; }
+          }
+        }
+        if (ok) picked.push(c);
+      }
+      if (!picked.length) { UI.msg(UI.t('settlegen_none')); return; }
+
+      var before = JSON.parse(JSON.stringify(Sy.objects));
+      picked.forEach(function (c, idx) {
+        var cat, sizeBase;
+        if (idx === 0)    { cat = (c.coastal && Sym.SYMBOLS.ports) ? 'ports' : 'castles'; sizeBase = 84; }
+        else if (idx < 3) { cat = 'towns'; sizeBase = 68; }
+        else              { cat = 'villages'; sizeBase = 52; }
+        var catDef = Sym.SYMBOLS[cat] || Sym.SYMBOLS.villages;
+        var items = catDef.items;
+        var def = items[Math.floor(rnd.next()*items.length)];
+        var x = (c.gx+0.5)/sw*w, y = (c.gy+0.5)/sh*h;
+        Sy.objects.push({
+          id:uid(), sym:def.id, x:x, y:y,
+          size: sizeBase * (0.9 + rnd.next()*0.2), rot:0,
+          hue:0, opacity:1, wear:0
+        });
+      });
+
+      History.pushVector('symbols', before, JSON.parse(JSON.stringify(Sy.objects)), 'settlegen');
+      UI.refreshHistory();
+      Cv.requestRender();
+    },
+
     clearRasterLayer: function (id) {
       var L = Layers.get(id);
       if (L.locked) { UI.msg(UI.t('locked')); return; }
@@ -1857,6 +2138,7 @@
     pathLayerId: function (tool) {
       if (tool === 'river' || tool === 'lake') return 'rivers';
       if (tool === 'territory') return 'territories';
+      if (tool === 'measure') return 'measures';
       return 'roads';
     },
 
@@ -1873,6 +2155,7 @@
       var isLake      = App.tool === 'lake';
       var isTerritory = App.tool === 'territory';
       var isRiver     = App.tool === 'river';
+      var isMeasure   = App.tool === 'measure';
       var minPts = (isLake || isTerritory) ? 3 : 2;
       if (this.pathPts.length < minPts) { this.pathPts = []; Cv.requestRender(); return; }
       var lid = this.pathLayerId(App.tool);
@@ -1889,6 +2172,8 @@
       } else if (isRiver) {
         o = { id:uid(), pts:this.pathPts.slice(), width:App.river.width, meander:App.river.meander,
               taper:App.river.taper, color:App.river.color, opacity:1 };
+      } else if (isMeasure) {
+        o = { id:uid(), pts:this.pathPts.slice(), closed: App.measure.area && this.pathPts.length >= 3 };
       } else {
         o = { id:uid(), pts:this.pathPts.slice(), width:App.road.width, style:App.road.style,
               color:App.road.color, opacity:1 };
@@ -2171,10 +2456,6 @@
     drawOverlay: function (ctx) {
       var z = Cv.zoom;
 
-      if (this.measureFrom && this.measureTo) {
-        Cv.drawMeasure(ctx, { pts:[[this.measureFrom.x,this.measureFrom.y],[this.measureTo.x,this.measureTo.y]] });
-      }
-
       if (this.lasso && this.lasso.pts.length) {
         var lp = this.lasso.pts;
         ctx.save();
@@ -2241,7 +2522,13 @@
         ctx.restore();
       }
 
-      if (this.pathPts.length) {
+      if (this.pathPts.length && App.tool === 'measure') {
+        var mpts = this.pathPts.slice();
+        if (this.pathHover) mpts.push([this.pathHover.x, this.pathHover.y]);
+        if (mpts.length >= 2) {
+          Cv.drawMeasure(ctx, { pts:mpts, closed: App.measure.area && mpts.length >= 3 });
+        }
+      } else if (this.pathPts.length) {
         var pts = this.pathPts.slice();
         if (this.pathHover) pts.push([this.pathHover.x, this.pathHover.y]);
         var sm = Geo.sample(pts, 14);

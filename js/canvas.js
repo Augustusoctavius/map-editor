@@ -142,6 +142,19 @@
       return len;
     },
 
+    /* Kapalı bir çokgenin alanı (shoelace formülü, piksel²). pts kapanışı
+       (son nokta = ilk nokta) içermese de olur — kapatan kenar zımnen
+       eklenir. */
+    polygonArea: function (pts) {
+      if (!pts || pts.length < 3) return 0;
+      var a = 0;
+      for (var i = 0; i < pts.length; i++) {
+        var p1 = pts[i], p2 = pts[(i+1) % pts.length];
+        a += p1[0]*p2[1] - p2[0]*p1[1];
+      }
+      return Math.abs(a) / 2;
+    },
+
     /* verilen kümülatif uzunlukta {x,y,ang} döner (ang: teğet açısı, radyan) */
     pointAtLength: function (pts, len) {
       if (!pts || pts.length < 2) return { x:0, y:0, ang:0 };
@@ -2121,11 +2134,23 @@
       return { px: s.len/num, unit: unit };
     },
 
+    /* Nehir/yol'un aksine ölçüm çizgisi kasıtlı olarak Catmull-Rom ile
+       yumuşatılmıyor: eğri, keskin köşeli bir çokgende (ör. dört köşeli
+       bir alan) köşelerden taşarak gerçek alanı ~%15-20 büyük gösterir.
+       Bir cetvel doğru olmalı — düz kenar, tıklanan noktaların tam
+       kendisini ölçer. */
     measureLength: function (o) {
-      var pts = o.handles ? Geo.sampleBezier(o.pts, o.handles, 18, false) : Geo.sample(o.pts, 18);
+      var pts = o.pts.slice();
       var len = Geo.polylineLength(pts);
+      if (o.closed) len += Math.hypot(pts[0][0]-pts[pts.length-1][0], pts[0][1]-pts[pts.length-1][1]);
       var conv = this.pxPerScaleUnit();
-      return { px:len, real: len/conv.px, unit: conv.unit, pts:pts };
+      var real = len/conv.px;
+      var area = null;
+      if (o.closed) {
+        var pxArea = Geo.polygonArea(pts);
+        area = { px: pxArea, real: pxArea/(conv.px*conv.px), unit: conv.unit };
+      }
+      return { px:len, real:real, unit:conv.unit, pts:pts, area:area };
     },
 
     formatDistance: function (real, unit) {
@@ -2133,41 +2158,71 @@
       return r + (unit ? ' ' + unit : '');
     },
 
+    formatArea: function (real, unit) {
+      var r = real >= 100 ? Math.round(real) : Math.round(real*10)/10;
+      return r + (unit ? ' ' + unit + '²' : '');
+    },
+
     drawMeasure: function (ctx, o) {
       var info = this.measureLength(o);
       var pts = info.pts;
       if (pts.length < 2) return;
       ctx.save();
+
+      if (o.closed && pts.length >= 3) {
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for (var ci = 1; ci < pts.length; ci++) ctx.lineTo(pts[ci][0], pts[ci][1]);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(201,75,75,0.12)';
+        ctx.fill();
+      }
+
       ctx.strokeStyle = '#c94b4b';
       ctx.lineWidth = 2.5;
       ctx.setLineDash([9, 6]);
       ctx.beginPath();
       ctx.moveTo(pts[0][0], pts[0][1]);
       for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+      if (o.closed) ctx.closePath();
       ctx.stroke();
       ctx.setLineDash([]);
 
-      /* uç işaretleri */
-      [pts[0], pts[pts.length-1]].forEach(function (pt) {
+      /* köşe işaretleri — kapalıysa hepsi, açıksa yalnız uçlar */
+      var markPts = o.closed ? pts : [pts[0], pts[pts.length-1]];
+      markPts.forEach(function (pt) {
         ctx.beginPath(); ctx.arc(pt[0], pt[1], 5, 0, Math.PI*2);
         ctx.fillStyle = '#c94b4b'; ctx.fill();
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
       });
 
-      /* orta noktada mesafe etiketi */
-      var midIdx = Math.floor(pts.length/2);
-      var mx = pts[midIdx][0], my = pts[midIdx][1];
-      var text = this.formatDistance(info.real, info.unit);
+      /* etiket: kapalıysa merkezde alan+çevre, açıksa orta noktada mesafe */
+      var lx, ly, lines;
+      if (o.closed) {
+        var cx = 0, cy = 0;
+        for (var pj = 0; pj < pts.length; pj++) { cx += pts[pj][0]; cy += pts[pj][1]; }
+        lx = cx/pts.length; ly = cy/pts.length;
+        lines = [this.formatArea(info.area.real, info.area.unit), this.formatDistance(info.real, info.unit)];
+      } else {
+        var midIdx = Math.floor(pts.length/2);
+        lx = pts[midIdx][0]; ly = pts[midIdx][1];
+        lines = [this.formatDistance(info.real, info.unit)];
+      }
+
       ctx.font = '600 20px Georgia, serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      var tw = ctx.measureText(text).width;
+      var tw = Math.max.apply(null, lines.map(function (t) { return ctx.measureText(t).width; }));
+      var lh = 24, boxH = lh*lines.length + 8;
       ctx.fillStyle = 'rgba(245,236,216,0.92)';
       ctx.strokeStyle = '#c94b4b'; ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.roundRect ? ctx.roundRect(mx-tw/2-8, my-16, tw+16, 32, 6) : ctx.rect(mx-tw/2-8, my-16, tw+16, 32);
+      var bx = lx-tw/2-8, by = ly-boxH/2, bw = tw+16;
+      ctx.roundRect ? ctx.roundRect(bx, by, bw, boxH, 6) : ctx.rect(bx, by, bw, boxH);
       ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#3a2b18';
-      ctx.fillText(text, mx, my+1);
+      for (var li = 0; li < lines.length; li++) {
+        ctx.fillText(lines[li], lx, by + lh*li + lh/2 + 4);
+      }
       ctx.restore();
     },
 

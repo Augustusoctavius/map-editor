@@ -32,6 +32,8 @@ node run-layer-undo-test.mjs         # layer add/delete undo, pixel-level fideli
 node run-fps.mjs                     # frame budget at 1024/2048/4096, idle+pan+zoom
 node run-mapgen-test.mjs             # renders 3 landmass templates to /tmp/mapgen-shots for eyeballing
 node run-mapgen-features-test.mjs    # tectonic template, auto-biome, auto-rivers, symbol legend
+node run-editor-features-test.mjs    # multi-segment/area measure, recent symbols, shortcuts screen,
+                                      # save-history thumbnails, auto-roads, auto-settlements
 ```
 
 Two gotchas when writing more of these: **`requestAnimationFrame` is throttled in headless Chrome**, so

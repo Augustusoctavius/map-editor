@@ -29,7 +29,10 @@
       o_typography:'Tipografi', o_font:'Yazı ailesi', o_banner:'Kapıt', o_banner_none:'Yok', o_banner_ribbon:'Kurdele', o_banner_plate:'Levha', o_banner_scroll:'Tomar', o_banner_stone:'Taş', o_caps:'Büyük harf', o_outline:'Dış hat', o_shadow:'Gölge', h_font_missing:'Bu yazı ailesi bu cihazda kurulu değil; en yakın karşılığı kullanılıyor. Listede • ile işaretli olanlar kurulu.',
       grp_navigate:'Gezinme', grp_terrain:'Arazi', grp_water:'Su & Yollar', grp_markers:'İşaretler', grp_regions:'Bölge & Ölçüm',
       t_select:'Seç', t_landmass:'Kara', t_erase:'Deniz', t_fill:'Doldur', t_terrain:'Arazi', t_symbol:'Sembol',
-      t_river:'Nehir', t_road:'Yol', t_label:'Etiket', t_pan:'Kaydır', t_eyedrop:'Örnekle', t_measure:'Ölç', h_measure:'Haritada sürükleyerek iki nokta arası gerçek mesafeyi ölçek çubuğuna göre hesapla. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez.', t_lasso:'Kement', h_lasso:'Sürükleyerek kapalı bir alan çiz: Kara + Arazi + Yükselti o alanda birlikte kaldırılıp taşınabilir hâle gelir. Sürükleyerek taşı, üstteki tutamaçla döndür. Enter ile onayla, Escape ile iptal et, Delete ile alanı tamamen sil.',
+      t_river:'Nehir', t_road:'Yol', t_label:'Etiket', t_pan:'Kaydır', t_eyedrop:'Örnekle', t_measure:'Ölç', h_measure:'Tıklayarak nokta ekle, çok parçalı bir mesafe ölçün. Enter / çift tık ile bitir, Esc ile iptal. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez.',
+      sc_title:'Klavye kısayolları', sc_general:'Genel', sc_undo:'Geri al', sc_redo:'Yinele', sc_save:'Kaydet',
+      sc_pan:'Kaydır', sc_panfast:'Hızlı kaydır', sc_zoom:'Yakınlaştır / uzaklaştır', sc_fit:'Tümünü sığdır',
+      sc_finish:'Yolu bitir', sc_cancel:'İptal / seçimi kaldır', sc_delete:'Seçileni sil', sc_rotsym:'Sembolü döndür', sc_help:'Bu ekranı aç', t_lasso:'Kement', h_lasso:'Sürükleyerek kapalı bir alan çiz: Kara + Arazi + Yükselti o alanda birlikte kaldırılıp taşınabilir hâle gelir. Sürükleyerek taşı, üstteki tutamaçla döndür. Enter ile onayla, Escape ile iptal et, Delete ile alanı tamamen sil.',
       o_landmass:'Kara / Kıyı', o_brushsize:'Fırça boyutu', o_rough:'Kıyı sertliği',
       o_landcolor:'Kara rengi', o_shorew:'Kıyı genişliği', o_shorestyle:'Kıyı stili', o_shore_sandy:'Kumsal', o_shore_rocky:'Kayalık', o_shore_reef:'Resif',
       o_smooth:'Kıyıyı yumuşat', o_clearland:'Karayı temizle',
@@ -37,6 +40,8 @@
       o_terrain:'Arazi boyama', o_opacity:'Opaklık', o_clip:'Sadece karaya boya',
       o_biomegen:'Biyomu otomatik ata', o_biomegen_go:'🌍 Biyom ata', h_biomegen:'Yükselti ve enleme göre arazi katmanını otomatik doldurur; mevcut arazi katmanının yerine geçer.', biomegen_empty:'Önce kara çizilmeli.',
       o_rivergen:'Nehirleri otomatik üret', o_rivergen_go:'💧 Nehir üret', h_rivergen:'Yükselti gridinden denize akan nehirler ekler. "Yükselti" fırçasıyla dağ/tepe çizilmiş olması gerekir.', rivergen_noelev:'Önce "Yükselti" fırçasıyla dağ/tepe çizilmeli.', rivergen_none:'Uygun nehir kaynağı bulunamadı.',
+      o_roadgen:'Yolları otomatik üret', o_roadgen_go:'🛤️ Yol üret', h_roadgen:'Yerleşim sembolleri arasında (şehir/kasaba/köy/kale/liman) yamaçtan kaçınan yollar çizer. Sembol yoksa birkaç rastgele kara noktasını bağlar.', roadgen_noland:'Yol için yeterli kara/nokta bulunamadı.', roadgen_none:'Hiçbir yol üretilemedi — kara parçaları birbirinden kopuk olabilir.',
+      o_settlegen:'Yerleşimleri otomatik yerleştir', o_settlegen_go:'🏰 Yerleşim yerleştir', h_settlegen:'Düz ve kıyıya yakın kara üzerine şehir/kasaba/köy sembolleri dağıtır — en iyi konum kale/liman, geri kalanlar kasaba/köy olur. "Yol üret" bu sembolleri bulup birbirine bağlar.', settlegen_noland:'Yerleşim için uygun kara bulunamadı.', settlegen_none:'Hiçbir yerleşim yerleştirilemedi.',
       o_symlegend:'Lejant',
       o_clearterrain:'Arazi katmanını temizle',
       h_terrain:'Doku her fırça vuruşunda rastgele serpilir — tekrar eden örüntü oluşmaz.', t_elevation:'Yükselti', o_elevation:'Yükselti', o_elevstrength:'Şiddet', o_elevlower:'Alçaltma modu', o_clearelevation:'Yükseltiyi temizle', o_elevdisplay:'Görünüm', o_elevhillshade:'Gölgelendirme (hillshade)', o_elevcontours:'Kontur çizgileri', o_contourinterval:'Kontur aralığı', h_elevation:'Sürükleyerek yükselt; "Alçaltma modu" işaretliyken çukurlaştırır. Gölgelendirme haritayı otomatik günceller.',
@@ -65,7 +70,7 @@
       h_pan:'Sağ tık + sürükle, orta tık, Space + sürükle veya yön tuşları ile kaydır.',
       tab_layers:'Katmanlar', tab_library:'Kütüphane', tab_history:'Geçmiş',
       ref_title:'Referans görsel', ref_export:"Export'a dahil et", ref_clear:'Referansı kaldır', ref_trace:'İz sürme modu (üstte göster + kıyı kenetleme)', layer_drag_hint:'Katmanı sürükleyip yeniden sıralamak için buradan tutun', blend_sourceover:'Normal', blend_multiply:'Çarpma', blend_overlay:'Bindirme', blend_softlight:'Yumuşak ışık', blend_screen:'Ekranlama', nav_home:'Ana Sayfa', nav_canvas:'Tuval', nav_tutorial:'Rehber', nav_community:'Topluluk', home_tagline:'Fantastik dünyalar için tarayıcı tabanlı harita editörü', home_desc:'Kara ve deniz sınırlarını çiz, ormanları ve dağları boya, kaleler ve köyler yerleştir, nehirler ve yollar döşe — hepsi tek bir tuvalde, kurulum gerektirmeden tarayıcında.', home_cta:'Haritana başla', home_video_caption:'Tanıtım videosu yakında', canvas_new_title:'Yeni tuval oluştur', canvas_custom:'Özel ölçü…', canvas_name_ph:'Harita adı', canvas_create:'Oluştur', canvas_import:'.json dosyasından içe aktar', canvas_saved_title:'Kayıtlı tuvaller', canvas_empty:'Bu tarayıcıda henüz kayıtlı bir tuval yok. Editördeyken "Kaydet" ile otomatik burada listelenir.', canvas_open:'Aç', canvas_delete:'Sil', canvas_delete_confirm:'Bu tuvali silmek istediğine emin misin? Bu işlem geri alınamaz.', canvas_unnamed:'Adsız harita', tutorial_title:'Rehber', tutorial_intro:'Sol araç çubuğundaki her araç, sağ panelde kendi ayarlarını açar. Aşağıda her aracın ne işe yaradığının kısa özeti var.', community_title:'Topluluk', community_desc:'Wayborne Map Editor açık kaynaklı, sürekli gelişen bir projedir.', community_github_desc:'Kaynak kod, hata bildirimi ve katkı', community_soon:'Yakında', lib_full:'Tarayıcı depolama alanı dolu — eski bir tuvali sil ya da .json olarak dışa aktar.', tut_h_select:'Nesneleri seç, taşı, döndür; Shift ile çoklu seçim yap.', tut_h_erase:'Boyanmış karayı ve üzerindeki arazi dokusunu tek adımda siler.', tut_h_fill:'Kapalı bir kıyı çevriminin içini tek tıkla doldurur.', tut_h_river:'Tıklayarak nokta ekle, akarsu çiz; Enter ile bitir.', tut_h_road:'Tıklayarak nokta ekle, yol çiz; Enter ile bitir.',
-      sym_upload:'+ PNG Sembol yükle', sym_upload_done:'sembol yüklendi', sym_del:'Sil', sym_search:'Sembol ara...',
+      sym_upload:'+ PNG Sembol yükle', sym_upload_done:'sembol yüklendi', sym_del:'Sil', sym_search:'Sembol ara...', sym_recent:'Son kullanılanlar',
       st_pos:'Konum', st_zoom:'Yakınlık', st_size:'Tuval', st_tool:'Araç',
       cancel:'Vazgeç', ok:'Tamam',
       locked:'Katman kilitli veya gizli.', needtext:'Önce etiket metnini yaz.', nopathnear:'Yakında nehir/yol bulunamadı.', fill_toolarge:'Alan çok büyük — kapalı bir sınır içinde deneyin.',
@@ -102,7 +107,10 @@
       o_typography:'Typography', o_font:'Typeface', o_banner:'Banner', o_banner_none:'None', o_banner_ribbon:'Ribbon', o_banner_plate:'Plate', o_banner_scroll:'Scroll', o_banner_stone:'Stone', o_caps:'Uppercase', o_outline:'Outline', o_shadow:'Shadow', h_font_missing:'This typeface is not installed on this device; the closest match is used instead. Entries marked · are installed.',
       grp_navigate:'Navigate', grp_terrain:'Terrain', grp_water:'Water & Routes', grp_markers:'Markers', grp_regions:'Regions & Measure',
       t_select:'Select', t_landmass:'Land', t_erase:'Sea', t_fill:'Fill', t_terrain:'Terrain', t_symbol:'Symbol',
-      t_river:'River', t_road:'Road', t_label:'Label', t_pan:'Pan', t_eyedrop:'Sample', t_measure:'Measure', h_measure:'Drag on the map to compute the real distance between two points based on the scale bar. Measurement lines can be selected, moved, or deleted; they are excluded from PNG/SVG export.', t_lasso:'Lasso', h_lasso:'Drag to draw a closed area: Land + Terrain + Elevation are lifted together within it and become movable. Drag to move, use the top handle to rotate. Enter to commit, Escape to cancel, Delete to remove the area entirely.',
+      t_river:'River', t_road:'Road', t_label:'Label', t_pan:'Pan', t_eyedrop:'Sample', t_measure:'Measure', h_measure:'Click to add points and measure a multi-segment distance. Enter / double-click to finish, Esc to cancel. Measurement lines can be selected, moved, or deleted; they are excluded from PNG/SVG export.',
+      sc_title:'Keyboard shortcuts', sc_general:'General', sc_undo:'Undo', sc_redo:'Redo', sc_save:'Save',
+      sc_pan:'Pan', sc_panfast:'Pan faster', sc_zoom:'Zoom in / out', sc_fit:'Fit to view',
+      sc_finish:'Finish path', sc_cancel:'Cancel / deselect', sc_delete:'Delete selection', sc_rotsym:'Rotate symbol', sc_help:'Open this screen', t_lasso:'Lasso', h_lasso:'Drag to draw a closed area: Land + Terrain + Elevation are lifted together within it and become movable. Drag to move, use the top handle to rotate. Enter to commit, Escape to cancel, Delete to remove the area entirely.',
       o_landmass:'Landmass / Coast', o_brushsize:'Brush size', o_rough:'Coast roughness',
       o_landcolor:'Land colour', o_shorew:'Shore width', o_shorestyle:'Shore style', o_shore_sandy:'Sandy', o_shore_rocky:'Rocky', o_shore_reef:'Reef',
       o_smooth:'Smooth coastline', o_clearland:'Clear landmass',
@@ -110,6 +118,8 @@
       o_terrain:'Terrain painting', o_opacity:'Opacity', o_clip:'Paint on land only',
       o_biomegen:'Auto-assign biomes', o_biomegen_go:'🌍 Assign biomes', h_biomegen:'Fills the terrain layer automatically by elevation and latitude; replaces the current terrain layer.', biomegen_empty:'Draw land first.',
       o_rivergen:'Auto-generate rivers', o_rivergen_go:'💧 Generate rivers', h_rivergen:'Adds rivers flowing to the sea from the elevation grid. Requires mountains/hills painted with the "Elevation" brush.', rivergen_noelev:'Paint mountains/hills with the "Elevation" brush first.', rivergen_none:'No suitable river source found.',
+      o_roadgen:'Auto-generate roads', o_roadgen_go:'🛤️ Generate roads', h_roadgen:'Draws roads between settlement symbols (city/town/village/castle/port) avoiding steep slopes. Connects a few random land points if there are no settlements.', roadgen_noland:'Not enough land/points found for roads.', roadgen_none:'No roads could be generated — landmasses may be disconnected.',
+      o_settlegen:'Auto-place settlements', o_settlegen_go:'🏰 Place settlements', h_settlegen:'Scatters city/town/village symbols on flat land near the coast — the best spot gets a castle/port, the rest get towns/villages. "Generate roads" finds these symbols and connects them.', settlegen_noland:'No suitable land found for settlements.', settlegen_none:'No settlements could be placed.',
       o_symlegend:'Legend',
       o_clearterrain:'Clear terrain layer',
       h_terrain:'Marks scatter randomly on every stroke — no repeating pattern.', t_elevation:'Elevation', o_elevation:'Elevation', o_elevstrength:'Strength', o_elevlower:'Lower mode', o_clearelevation:'Clear elevation', o_elevdisplay:'Display', o_elevhillshade:'Hillshade', o_elevcontours:'Contour lines', o_contourinterval:'Contour interval', h_elevation:'Drag to raise terrain; enable "Lower mode" to carve it down. Hillshade updates the map automatically.',
@@ -138,7 +148,7 @@
       h_pan:'Right-click drag, middle-click, Space + drag, or arrow keys to pan.',
       tab_layers:'Layers', tab_library:'Library', tab_history:'History',
       ref_title:'Reference image', ref_export:'Include in export', ref_clear:'Remove reference', ref_trace:'Trace mode (show on top + coastline snap)', layer_drag_hint:'Grab here to drag and reorder the layer', blend_sourceover:'Normal', blend_multiply:'Multiply', blend_overlay:'Overlay', blend_softlight:'Soft light', blend_screen:'Screen', nav_home:'Home', nav_canvas:'Canvas', nav_tutorial:'Tutorial', nav_community:'Community', home_tagline:'A browser-based map editor for fantasy worlds', home_desc:'Draw land and sea boundaries, paint forests and mountains, place castles and villages, lay down rivers and roads — all on one canvas, in your browser, no install required.', home_cta:'Start your map', home_video_caption:'Intro video coming soon', canvas_new_title:'Create a new canvas', canvas_custom:'Custom size…', canvas_name_ph:'Map name', canvas_create:'Create', canvas_import:'Import from .json file', canvas_saved_title:'Saved canvases', canvas_empty:'No canvases saved in this browser yet. They\'re listed here automatically when you hit "Save" in the editor.', canvas_open:'Open', canvas_delete:'Delete', canvas_delete_confirm:'Delete this canvas? This cannot be undone.', canvas_unnamed:'Untitled map', tutorial_title:'Tutorial', tutorial_intro:'Each tool in the left toolbar opens its own settings in the right panel. Below is a quick summary of what each tool does.', community_title:'Community', community_desc:'Wayborne Map Editor is an open-source, actively evolving project.', community_github_desc:'Source code, bug reports and contributions', community_soon:'Coming soon', lib_full:'Browser storage is full — delete an old canvas or export it as .json.', tut_h_select:'Select, move and rotate objects; Shift-click for multi-select.', tut_h_erase:'Erases painted land and the terrain texture on top of it in one step.', tut_h_fill:'Fills the inside of a closed coastline outline with one click.', tut_h_river:'Click to add points and draw a river; Enter to finish.', tut_h_road:'Click to add points and draw a road; Enter to finish.',
-      sym_upload:'+ Upload PNG Symbol', sym_upload_done:'symbol(s) loaded', sym_del:'Delete', sym_search:'Search symbols...',
+      sym_upload:'+ Upload PNG Symbol', sym_upload_done:'symbol(s) loaded', sym_del:'Delete', sym_search:'Search symbols...', sym_recent:'Recently used',
       st_pos:'Pos', st_zoom:'Zoom', st_size:'Canvas', st_tool:'Tool',
       cancel:'Cancel', ok:'OK',
       locked:'Layer is locked or hidden.', needtext:'Type the label text first.', nopathnear:'No river/road found nearby.', fill_toolarge:'Area too large — try inside a closed boundary.',
@@ -175,7 +185,7 @@
       o_typography:'Typografie', o_font:'Schriftart', o_banner:'Banner', o_banner_none:'Keins', o_banner_ribbon:'Band', o_banner_plate:'Tafel', o_banner_scroll:'Schriftrolle', o_banner_stone:'Stein', o_caps:'Großbuchstaben', o_outline:'Kontur', o_shadow:'Schatten', h_font_missing:'Diese Schriftart ist auf diesem Gerät nicht installiert; die nächstbeste wird verwendet. Mit · markierte Einträge sind installiert.',
       grp_navigate:'Navigation', grp_terrain:'Gelände', grp_water:'Wasser & Wege', grp_markers:'Marker', grp_regions:'Regionen & Maß',
       t_select:'Auswahl', t_landmass:'Land', t_erase:'Meer', t_fill:'Füllen', t_terrain:'Gelände', t_symbol:'Symbol',
-      t_river:'Fluss', t_road:'Straße', t_label:'Beschriftung', t_pan:'Verschieben', t_eyedrop:'Pipette', t_measure:'Messen', h_measure:'Auf der Karte ziehen, um die reale Entfernung zwischen zwei Punkten anhand des Maßstabsbalkens zu berechnen. Messlinien können ausgewählt, verschoben oder gelöscht werden; sie sind vom PNG/SVG-Export ausgeschlossen.', t_lasso:'Lasso', h_lasso:'Ziehen, um einen geschlossenen Bereich zu zeichnen: Land + Gelände + Höhenrelief werden darin gemeinsam angehoben und verschiebbar. Ziehen zum Verschieben, oberer Griff zum Drehen. Enter bestätigt, Escape bricht ab, Entf löscht den Bereich vollständig.',
+      t_river:'Fluss', t_road:'Straße', t_label:'Beschriftung', t_pan:'Verschieben', t_eyedrop:'Pipette', t_measure:'Messen', h_measure:'Klicken, um Punkte hinzuzufügen und eine mehrteilige Entfernung zu messen. Enter / Doppelklick zum Abschließen, Esc zum Abbrechen. Messlinien können ausgewählt, verschoben oder gelöscht werden; sie sind vom PNG/SVG-Export ausgeschlossen.', t_lasso:'Lasso', h_lasso:'Ziehen, um einen geschlossenen Bereich zu zeichnen: Land + Gelände + Höhenrelief werden darin gemeinsam angehoben und verschiebbar. Ziehen zum Verschieben, oberer Griff zum Drehen. Enter bestätigt, Escape bricht ab, Entf löscht den Bereich vollständig.',
       o_landmass:'Land / Küste', o_brushsize:'Pinselgröße', o_rough:'Küstenrauheit',
       o_landcolor:'Landfarbe', o_shorew:'Küstenbreite', o_shorestyle:'Küstenstil', o_shore_sandy:'Sandig', o_shore_rocky:'Felsig', o_shore_reef:'Riff',
       o_smooth:'Küste glätten', o_clearland:'Land löschen',
@@ -208,7 +218,7 @@
       h_pan:'Rechtsklick + ziehen, Mittelklick, Leertaste + ziehen oder Pfeiltasten zum Verschieben.',
       tab_layers:'Ebenen', tab_library:'Bibliothek', tab_history:'Verlauf',
       ref_title:'Referenzbild', ref_export:'In Export einschließen', ref_clear:'Referenz entfernen', ref_trace:'Nachzeichenmodus (oben anzeigen + Küstenlinie einrasten)', layer_drag_hint:'Zum Verschieben der Ebene hier ziehen', blend_sourceover:'Normal', blend_multiply:'Multiplizieren', blend_overlay:'Überlagern', blend_softlight:'Weiches Licht', blend_screen:'Negativ multiplizieren', nav_home:'Startseite', nav_canvas:'Leinwand', nav_tutorial:'Anleitung', nav_community:'Community', home_tagline:'Ein browserbasierter Karteneditor für Fantasiewelten', home_desc:'Zeichne Land- und Meeresgrenzen, male Wälder und Berge, platziere Burgen und Dörfer, lege Flüsse und Straßen an — alles auf einer Leinwand, im Browser, ohne Installation.', home_cta:'Karte starten', home_video_caption:'Vorstellungsvideo folgt bald', canvas_new_title:'Neue Leinwand erstellen', canvas_custom:'Benutzerdefiniert…', canvas_name_ph:'Kartenname', canvas_create:'Erstellen', canvas_import:'Aus .json-Datei importieren', canvas_saved_title:'Gespeicherte Leinwände', canvas_empty:'In diesem Browser sind noch keine Leinwände gespeichert. Sie erscheinen hier automatisch, sobald du im Editor auf "Speichern" klickst.', canvas_open:'Öffnen', canvas_delete:'Löschen', canvas_delete_confirm:'Diese Leinwand löschen? Das kann nicht rückgängig gemacht werden.', canvas_unnamed:'Unbenannte Karte', tutorial_title:'Anleitung', tutorial_intro:'Jedes Werkzeug in der linken Werkzeugleiste öffnet seine eigenen Einstellungen im rechten Panel. Unten eine kurze Übersicht, was jedes Werkzeug macht.', community_title:'Community', community_desc:'Wayborne Map Editor ist ein quelloffenes, stetig weiterentwickeltes Projekt.', community_github_desc:'Quellcode, Fehlermeldungen und Beiträge', community_soon:'Demnächst', lib_full:'Der Browserspeicher ist voll — lösche eine alte Leinwand oder exportiere sie als .json.', tut_h_select:'Objekte auswählen, verschieben, drehen; Shift-Klick für Mehrfachauswahl.', tut_h_erase:'Löscht bemaltes Land und die darüberliegende Geländetextur in einem Schritt.', tut_h_fill:'Füllt das Innere eines geschlossenen Küstenumrisses mit einem Klick.', tut_h_river:'Klicken, um Punkte hinzuzufügen und einen Fluss zu zeichnen; Enter zum Beenden.', tut_h_road:'Klicken, um Punkte hinzuzufügen und eine Straße zu zeichnen; Enter zum Beenden.',
-      sym_upload:'+ PNG-Symbol hochladen', sym_upload_done:'Symbol(e) geladen', sym_del:'Löschen', sym_search:'Symbole durchsuchen...',
+      sym_upload:'+ PNG-Symbol hochladen', sym_upload_done:'Symbol(e) geladen', sym_del:'Löschen', sym_search:'Symbole durchsuchen...', sym_recent:'Zuletzt verwendet',
       st_pos:'Position', st_zoom:'Zoom', st_size:'Leinwand', st_tool:'Werkzeug',
       cancel:'Abbrechen', ok:'OK',
       locked:'Ebene ist gesperrt oder ausgeblendet.', needtext:'Zuerst den Beschriftungstext eingeben.', nopathnear:'In der Nähe kein Fluss/keine Straße gefunden.', fill_toolarge:'Fläche zu groß — innerhalb einer geschlossenen Grenze versuchen.',
@@ -245,7 +255,7 @@
       o_typography:'Typographie', o_font:'Police', o_banner:'Bannière', o_banner_none:'Aucune', o_banner_ribbon:'Ruban', o_banner_plate:'Plaque', o_banner_scroll:'Parchemin', o_banner_stone:'Pierre', o_caps:'Majuscules', o_outline:'Contour', o_shadow:'Ombre', h_font_missing:'Cette police n’est pas installée sur cet appareil ; la plus proche est utilisée. Les entrées marquées · sont installées.',
       grp_navigate:'Navigation', grp_terrain:'Terrain', grp_water:'Eaux & Routes', grp_markers:'Repères', grp_regions:'Régions & Mesure',
       t_select:'Sélection', t_landmass:'Terre', t_erase:'Mer', t_fill:'Remplir', t_terrain:'Terrain', t_symbol:'Symbole',
-      t_river:'Rivière', t_road:'Route', t_label:'Étiquette', t_pan:'Déplacer', t_eyedrop:'Pipette', t_measure:'Mesurer', h_measure:'Faites glisser sur la carte pour calculer la distance réelle entre deux points selon l\'échelle. Les lignes de mesure peuvent être sélectionnées, déplacées ou supprimées ; elles sont exclues de l\'export PNG/SVG.', t_lasso:'Lasso', h_lasso:'Faites glisser pour tracer une zone fermée : Terre + Terrain + Relief y sont soulevés ensemble et deviennent déplaçables. Glissez pour déplacer, utilisez la poignée du haut pour pivoter. Entrée pour valider, Échap pour annuler, Suppr pour effacer entièrement la zone.',
+      t_river:'Rivière', t_road:'Route', t_label:'Étiquette', t_pan:'Déplacer', t_eyedrop:'Pipette', t_measure:'Mesurer', h_measure:'Cliquez pour ajouter des points et mesurer une distance en plusieurs segments. Entrée / double-clic pour terminer, Échap pour annuler. Les lignes de mesure peuvent être sélectionnées, déplacées ou supprimées ; elles sont exclues de l\'export PNG/SVG.', t_lasso:'Lasso', h_lasso:'Faites glisser pour tracer une zone fermée : Terre + Terrain + Relief y sont soulevés ensemble et deviennent déplaçables. Glissez pour déplacer, utilisez la poignée du haut pour pivoter. Entrée pour valider, Échap pour annuler, Suppr pour effacer entièrement la zone.',
       o_landmass:'Terre / Côte', o_brushsize:'Taille du pinceau', o_rough:'Irrégularité de la côte',
       o_landcolor:'Couleur de la terre', o_shorew:'Largeur du rivage', o_shorestyle:'Style de côte', o_shore_sandy:'Sablonneuse', o_shore_rocky:'Rocheuse', o_shore_reef:'Récif',
       o_smooth:'Lisser la côte', o_clearland:'Effacer la terre',
@@ -278,7 +288,7 @@
       h_pan:'Clic droit + glisser, clic molette, Espace + glisser, ou flèches pour vous déplacer.',
       tab_layers:'Calques', tab_library:'Bibliothèque', tab_history:'Historique',
       ref_title:'Image de référence', ref_export:"Inclure dans l'export", ref_clear:'Retirer la référence', ref_trace:'Mode de calque (afficher au-dessus + accrochage au littoral)', layer_drag_hint:'Saisissez ici pour glisser-déposer le calque', blend_sourceover:'Normal', blend_multiply:'Produit', blend_overlay:'Incrustation', blend_softlight:'Lumière douce', blend_screen:'Superposition', nav_home:'Accueil', nav_canvas:'Toile', nav_tutorial:'Tutoriel', nav_community:'Communauté', home_tagline:'Un éditeur de cartes pour mondes fantastiques, dans le navigateur', home_desc:'Dessinez les frontières terre/mer, peignez forêts et montagnes, placez châteaux et villages, tracez rivières et routes — tout sur une seule toile, dans votre navigateur, sans installation.', home_cta:'Commencer votre carte', home_video_caption:'Vidéo de présentation bientôt disponible', canvas_new_title:'Créer une nouvelle toile', canvas_custom:'Taille personnalisée…', canvas_name_ph:'Nom de la carte', canvas_create:'Créer', canvas_import:'Importer depuis un fichier .json', canvas_saved_title:'Toiles enregistrées', canvas_empty:'Aucune toile enregistrée dans ce navigateur pour l\'instant. Elles apparaissent ici automatiquement dès que vous cliquez sur « Enregistrer » dans l\'éditeur.', canvas_open:'Ouvrir', canvas_delete:'Supprimer', canvas_delete_confirm:'Supprimer cette toile ? Cette action est irréversible.', canvas_unnamed:'Carte sans titre', tutorial_title:'Tutoriel', tutorial_intro:'Chaque outil de la barre latérale gauche ouvre ses propres réglages dans le panneau de droite. Voici un résumé rapide du rôle de chaque outil.', community_title:'Communauté', community_desc:'Wayborne Map Editor est un projet open source en constante évolution.', community_github_desc:'Code source, rapports de bugs et contributions', community_soon:'Bientôt disponible', lib_full:'Le stockage du navigateur est plein — supprimez une ancienne toile ou exportez-la en .json.', tut_h_select:'Sélectionnez, déplacez et faites pivoter des objets ; Maj+clic pour la sélection multiple.', tut_h_erase:'Efface la terre peinte et la texture de terrain qui s\'y trouve, en une seule fois.', tut_h_fill:'Remplit l\'intérieur d\'un contour côtier fermé en un clic.', tut_h_river:'Cliquez pour ajouter des points et tracer une rivière ; Entrée pour terminer.', tut_h_road:'Cliquez pour ajouter des points et tracer une route ; Entrée pour terminer.',
-      sym_upload:'+ Importer un symbole PNG', sym_upload_done:'symbole(s) chargé(s)', sym_del:'Supprimer', sym_search:'Rechercher un symbole...',
+      sym_upload:'+ Importer un symbole PNG', sym_upload_done:'symbole(s) chargé(s)', sym_del:'Supprimer', sym_search:'Rechercher un symbole...', sym_recent:'Récemment utilisés',
       st_pos:'Position', st_zoom:'Zoom', st_size:'Toile', st_tool:'Outil',
       cancel:'Annuler', ok:'OK',
       locked:'Le calque est verrouillé ou masqué.', needtext:"Saisissez d'abord le texte de l'étiquette.", nopathnear:"Aucune rivière/route trouvée à proximité.", fill_toolarge:'Zone trop grande — essayez à l\'intérieur d\'une limite fermée.',
@@ -315,7 +325,7 @@
       o_typography:'Tipografía', o_font:'Tipo de letra', o_banner:'Banderola', o_banner_none:'Ninguna', o_banner_ribbon:'Cinta', o_banner_plate:'Placa', o_banner_scroll:'Pergamino', o_banner_stone:'Piedra', o_caps:'Mayúsculas', o_outline:'Contorno', o_shadow:'Sombra', h_font_missing:'Esta tipografía no está instalada en este dispositivo; se usa la más parecida. Las entradas marcadas con · están instaladas.',
       grp_navigate:'Navegación', grp_terrain:'Terreno', grp_water:'Agua y Rutas', grp_markers:'Marcadores', grp_regions:'Regiones y Medida',
       t_select:'Seleccionar', t_landmass:'Tierra', t_erase:'Mar', t_fill:'Rellenar', t_terrain:'Terreno', t_symbol:'Símbolo',
-      t_river:'Río', t_road:'Camino', t_label:'Etiqueta', t_pan:'Desplazar', t_eyedrop:'Muestra', t_measure:'Medir', h_measure:'Arrastra en el mapa para calcular la distancia real entre dos puntos según la escala. Las líneas de medición se pueden seleccionar, mover o eliminar; se excluyen de la exportación PNG/SVG.', t_lasso:'Lazo', h_lasso:'Arrastra para trazar un área cerrada: Tierra + Terreno + Relieve se levantan juntos dentro de ella y se vuelven movibles. Arrastra para mover, usa el tirador superior para rotar. Intro para confirmar, Esc para cancelar, Supr para eliminar el área por completo.',
+      t_river:'Río', t_road:'Camino', t_label:'Etiqueta', t_pan:'Desplazar', t_eyedrop:'Muestra', t_measure:'Medir', h_measure:'Haz clic para añadir puntos y medir una distancia de varios segmentos. Intro / doble clic para terminar, Esc para cancelar. Las líneas de medición se pueden seleccionar, mover o eliminar; se excluyen de la exportación PNG/SVG.', t_lasso:'Lazo', h_lasso:'Arrastra para trazar un área cerrada: Tierra + Terreno + Relieve se levantan juntos dentro de ella y se vuelven movibles. Arrastra para mover, usa el tirador superior para rotar. Intro para confirmar, Esc para cancelar, Supr para eliminar el área por completo.',
       o_landmass:'Tierra / Costa', o_brushsize:'Tamaño del pincel', o_rough:'Rugosidad de la costa',
       o_landcolor:'Color de la tierra', o_shorew:'Ancho de la costa', o_shorestyle:'Estilo de costa', o_shore_sandy:'Arenosa', o_shore_rocky:'Rocosa', o_shore_reef:'Arrecife',
       o_smooth:'Suavizar costa', o_clearland:'Borrar tierra',
@@ -348,7 +358,7 @@
       h_pan:'Clic derecho + arrastrar, clic central, Espacio + arrastrar, o flechas para desplazarte.',
       tab_layers:'Capas', tab_library:'Biblioteca', tab_history:'Historial',
       ref_title:'Imagen de referencia', ref_export:'Incluir en la exportación', ref_clear:'Quitar referencia', ref_trace:'Modo de calco (mostrar encima + ajuste a la costa)', layer_drag_hint:'Arrastra desde aquí para reordenar la capa', blend_sourceover:'Normal', blend_multiply:'Multiplicar', blend_overlay:'Superposición', blend_softlight:'Luz suave', blend_screen:'Trama', nav_home:'Inicio', nav_canvas:'Lienzo', nav_tutorial:'Tutorial', nav_community:'Comunidad', home_tagline:'Un editor de mapas para mundos de fantasía, en el navegador', home_desc:'Dibuja los límites entre tierra y mar, pinta bosques y montañas, coloca castillos y aldeas, traza ríos y caminos — todo en un solo lienzo, en tu navegador, sin instalación.', home_cta:'Empieza tu mapa', home_video_caption:'Vídeo de presentación próximamente', canvas_new_title:'Crear un nuevo lienzo', canvas_custom:'Tamaño personalizado…', canvas_name_ph:'Nombre del mapa', canvas_create:'Crear', canvas_import:'Importar desde archivo .json', canvas_saved_title:'Lienzos guardados', canvas_empty:'Aún no hay lienzos guardados en este navegador. Se listan aquí automáticamente al pulsar «Guardar» en el editor.', canvas_open:'Abrir', canvas_delete:'Eliminar', canvas_delete_confirm:'¿Eliminar este lienzo? Esta acción no se puede deshacer.', canvas_unnamed:'Mapa sin título', tutorial_title:'Tutorial', tutorial_intro:'Cada herramienta de la barra izquierda abre sus propios ajustes en el panel derecho. Aquí tienes un resumen rápido de lo que hace cada una.', community_title:'Comunidad', community_desc:'Wayborne Map Editor es un proyecto de código abierto en constante evolución.', community_github_desc:'Código fuente, reportes de errores y contribuciones', community_soon:'Próximamente', lib_full:'El almacenamiento del navegador está lleno — elimina un lienzo antiguo o expórtalo como .json.', tut_h_select:'Selecciona, mueve y rota objetos; Mayús+clic para selección múltiple.', tut_h_erase:'Borra la tierra pintada y la textura de terreno que tiene encima, en un solo paso.', tut_h_fill:'Rellena el interior de un contorno costero cerrado con un solo clic.', tut_h_river:'Haz clic para añadir puntos y dibujar un río; Intro para terminar.', tut_h_road:'Haz clic para añadir puntos y dibujar un camino; Intro para terminar.',
-      sym_upload:'+ Subir símbolo PNG', sym_upload_done:'símbolo(s) cargado(s)', sym_del:'Borrar', sym_search:'Buscar símbolos...',
+      sym_upload:'+ Subir símbolo PNG', sym_upload_done:'símbolo(s) cargado(s)', sym_del:'Borrar', sym_search:'Buscar símbolos...', sym_recent:'Usados recientemente',
       st_pos:'Posición', st_zoom:'Zoom', st_size:'Lienzo', st_tool:'Herramienta',
       cancel:'Cancelar', ok:'Aceptar',
       locked:'La capa está bloqueada u oculta.', needtext:'Escribe primero el texto de la etiqueta.', nopathnear:'No se encontró ningún río/camino cerca.', fill_toolarge:'Área demasiado grande — pruébalo dentro de un límite cerrado.',
@@ -385,7 +395,7 @@
       o_typography:'Tipografia', o_font:'Carattere', o_banner:'Cartiglio', o_banner_none:'Nessuno', o_banner_ribbon:'Nastro', o_banner_plate:'Targa', o_banner_scroll:'Pergamena', o_banner_stone:'Pietra', o_caps:'Maiuscolo', o_outline:'Contorno', o_shadow:'Ombra', h_font_missing:'Questo carattere non è installato su questo dispositivo; viene usato il più simile. Le voci con · sono installate.',
       grp_navigate:'Navigazione', grp_terrain:'Terreno', grp_water:'Acque e Vie', grp_markers:'Segnalini', grp_regions:'Regioni e Misura',
       t_select:'Seleziona', t_landmass:'Terra', t_erase:'Mare', t_fill:'Riempi', t_terrain:'Terreno', t_symbol:'Simbolo',
-      t_river:'Fiume', t_road:'Strada', t_label:'Etichetta', t_pan:'Sposta', t_eyedrop:'Campiona', t_measure:'Misura', h_measure:'Trascina sulla mappa per calcolare la distanza reale tra due punti in base alla scala. Le linee di misura possono essere selezionate, spostate o eliminate; sono escluse dall\'esportazione PNG/SVG.', t_lasso:'Laccio', h_lasso:'Trascina per disegnare un\'area chiusa: Terra + Terreno + Rilievo vengono sollevati insieme al suo interno e diventano spostabili. Trascina per spostare, usa la maniglia superiore per ruotare. Invio per confermare, Esc per annullare, Canc per eliminare completamente l\'area.',
+      t_river:'Fiume', t_road:'Strada', t_label:'Etichetta', t_pan:'Sposta', t_eyedrop:'Campiona', t_measure:'Misura', h_measure:'Fai clic per aggiungere punti e misurare una distanza a più segmenti. Invio / doppio clic per terminare, Esc per annullare. Le linee di misura possono essere selezionate, spostate o eliminate; sono escluse dall\'esportazione PNG/SVG.', t_lasso:'Laccio', h_lasso:'Trascina per disegnare un\'area chiusa: Terra + Terreno + Rilievo vengono sollevati insieme al suo interno e diventano spostabili. Trascina per spostare, usa la maniglia superiore per ruotare. Invio per confermare, Esc per annullare, Canc per eliminare completamente l\'area.',
       o_landmass:'Terra / Costa', o_brushsize:'Dimensione pennello', o_rough:'Irregolarità della costa',
       o_landcolor:'Colore della terra', o_shorew:'Larghezza della costa', o_shorestyle:'Stile della costa', o_shore_sandy:'Sabbiosa', o_shore_rocky:'Rocciosa', o_shore_reef:'Barriera corallina',
       o_smooth:'Smussa la costa', o_clearland:'Cancella terra',
@@ -418,7 +428,7 @@
       h_pan:'Clic destro + trascina, clic centrale, Spazio + trascina, o frecce per spostarti.',
       tab_layers:'Livelli', tab_library:'Libreria', tab_history:'Cronologia',
       ref_title:'Immagine di riferimento', ref_export:"Includi nell'esportazione", ref_clear:'Rimuovi riferimento', ref_trace:'Modalità ricalco (mostra sopra + aggancio alla costa)', layer_drag_hint:'Trascina da qui per riordinare il livello', blend_sourceover:'Normale', blend_multiply:'Moltiplica', blend_overlay:'Overlay', blend_softlight:'Luce soffusa', blend_screen:'Scherma', nav_home:'Home', nav_canvas:'Tela', nav_tutorial:'Guida', nav_community:'Community', home_tagline:'Un editor di mappe per mondi fantasy, nel browser', home_desc:'Disegna i confini tra terra e mare, colora foreste e montagne, posiziona castelli e villaggi, traccia fiumi e strade — tutto su un\'unica tela, nel browser, senza installazione.', home_cta:'Inizia la tua mappa', home_video_caption:'Video di presentazione in arrivo', canvas_new_title:'Crea una nuova tela', canvas_custom:'Dimensione personalizzata…', canvas_name_ph:'Nome della mappa', canvas_create:'Crea', canvas_import:'Importa da file .json', canvas_saved_title:'Tele salvate', canvas_empty:'Nessuna tela salvata in questo browser. Vengono elencate qui automaticamente quando premi "Salva" nell\'editor.', canvas_open:'Apri', canvas_delete:'Elimina', canvas_delete_confirm:'Eliminare questa tela? L\'operazione non può essere annullata.', canvas_unnamed:'Mappa senza titolo', tutorial_title:'Guida', tutorial_intro:'Ogni strumento nella barra laterale sinistra apre le proprie impostazioni nel pannello destro. Di seguito un breve riepilogo di cosa fa ciascuno strumento.', community_title:'Community', community_desc:'Wayborne Map Editor è un progetto open source in continua evoluzione.', community_github_desc:'Codice sorgente, segnalazioni di bug e contributi', community_soon:'Prossimamente', lib_full:'La memoria del browser è piena — elimina una tela vecchia oppure esportala come .json.', tut_h_select:'Seleziona, sposta e ruota gli oggetti; Shift+clic per la selezione multipla.', tut_h_erase:'Cancella la terra dipinta e la texture del terreno sovrastante in un solo passaggio.', tut_h_fill:'Riempie l\'interno di un contorno costiero chiuso con un clic.', tut_h_river:'Clicca per aggiungere punti e disegnare un fiume; Invio per terminare.', tut_h_road:'Clicca per aggiungere punti e disegnare una strada; Invio per terminare.',
-      sym_upload:'+ Carica simbolo PNG', sym_upload_done:'simbolo/i caricato/i', sym_del:'Elimina', sym_search:'Cerca simboli...',
+      sym_upload:'+ Carica simbolo PNG', sym_upload_done:'simbolo/i caricato/i', sym_del:'Elimina', sym_search:'Cerca simboli...', sym_recent:'Usati di recente',
       st_pos:'Posizione', st_zoom:'Zoom', st_size:'Tela', st_tool:'Strumento',
       cancel:'Annulla', ok:'OK',
       locked:'Il livello è bloccato o nascosto.', needtext:"Scrivi prima il testo dell'etichetta.", nopathnear:'Nessun fiume/strada trovato nelle vicinanze.', fill_toolarge:'Area troppo grande — prova all\'interno di un confine chiuso.',
@@ -455,7 +465,7 @@
       o_typography:'Tipografia', o_font:'Tipo de letra', o_banner:'Faixa', o_banner_none:'Nenhuma', o_banner_ribbon:'Fita', o_banner_plate:'Placa', o_banner_scroll:'Pergaminho', o_banner_stone:'Pedra', o_caps:'Maiúsculas', o_outline:'Contorno', o_shadow:'Sombra', h_font_missing:'Este tipo de letra não está instalado neste dispositivo; é usado o mais próximo. As entradas marcadas com · estão instaladas.',
       grp_navigate:'Navegação', grp_terrain:'Terreno', grp_water:'Água e Rotas', grp_markers:'Marcadores', grp_regions:'Regiões e Medida',
       t_select:'Selecionar', t_landmass:'Terra', t_erase:'Mar', t_fill:'Preencher', t_terrain:'Terreno', t_symbol:'Símbolo',
-      t_river:'Rio', t_road:'Estrada', t_label:'Etiqueta', t_pan:'Deslocar', t_eyedrop:'Amostra', t_measure:'Medir', h_measure:'Arraste no mapa para calcular a distância real entre dois pontos com base na escala. As linhas de medição podem ser selecionadas, movidas ou eliminadas; são excluídas da exportação PNG/SVG.', t_lasso:'Laço', h_lasso:'Arraste para desenhar uma área fechada: Terra + Terreno + Relevo são levantados juntos nessa área e tornam-se móveis. Arraste para mover, use a pega superior para rodar. Enter para confirmar, Esc para cancelar, Delete para eliminar a área por completo.',
+      t_river:'Rio', t_road:'Estrada', t_label:'Etiqueta', t_pan:'Deslocar', t_eyedrop:'Amostra', t_measure:'Medir', h_measure:'Clique para adicionar pontos e medir uma distância em vários segmentos. Enter / duplo clique para terminar, Esc para cancelar. As linhas de medição podem ser selecionadas, movidas ou eliminadas; são excluídas da exportação PNG/SVG.', t_lasso:'Laço', h_lasso:'Arraste para desenhar uma área fechada: Terra + Terreno + Relevo são levantados juntos nessa área e tornam-se móveis. Arraste para mover, use a pega superior para rodar. Enter para confirmar, Esc para cancelar, Delete para eliminar a área por completo.',
       o_landmass:'Terra / Costa', o_brushsize:'Tamanho do pincel', o_rough:'Irregularidade da costa',
       o_landcolor:'Cor da terra', o_shorew:'Largura da costa', o_shorestyle:'Estilo da costa', o_shore_sandy:'Arenosa', o_shore_rocky:'Rochosa', o_shore_reef:'Recife',
       o_smooth:'Suavizar costa', o_clearland:'Limpar terra',
@@ -488,7 +498,7 @@
       h_pan:'Clique direito + arrastar, clique do meio, Espaço + arrastar, ou setas para deslocar.',
       tab_layers:'Camadas', tab_library:'Biblioteca', tab_history:'Histórico',
       ref_title:'Imagem de referência', ref_export:'Incluir na exportação', ref_clear:'Remover referência', ref_trace:'Modo de decalque (mostrar por cima + fixação ao litoral)', layer_drag_hint:'Arraste a partir daqui para reordenar a camada', blend_sourceover:'Normal', blend_multiply:'Multiplicar', blend_overlay:'Sobrepor', blend_softlight:'Luz suave', blend_screen:'Ecrã', nav_home:'Início', nav_canvas:'Tela', nav_tutorial:'Tutorial', nav_community:'Comunidade', home_tagline:'Um editor de mapas para mundos de fantasia, no navegador', home_desc:'Desenha as fronteiras entre terra e mar, pinta florestas e montanhas, posiciona castelos e aldeias, traça rios e estradas — tudo numa só tela, no navegador, sem instalação.', home_cta:'Começa o teu mapa', home_video_caption:'Vídeo de apresentação brevemente', canvas_new_title:'Criar nova tela', canvas_custom:'Tamanho personalizado…', canvas_name_ph:'Nome do mapa', canvas_create:'Criar', canvas_import:'Importar de ficheiro .json', canvas_saved_title:'Telas guardadas', canvas_empty:'Ainda não há telas guardadas neste navegador. São listadas aqui automaticamente ao clicar em "Guardar" no editor.', canvas_open:'Abrir', canvas_delete:'Eliminar', canvas_delete_confirm:'Eliminar esta tela? Esta ação não pode ser desfeita.', canvas_unnamed:'Mapa sem título', tutorial_title:'Tutorial', tutorial_intro:'Cada ferramenta na barra lateral esquerda abre as suas próprias definições no painel direito. Abaixo, um breve resumo do que cada uma faz.', community_title:'Comunidade', community_desc:'Wayborne Map Editor é um projeto de código aberto em constante evolução.', community_github_desc:'Código-fonte, relatórios de erros e contribuições', community_soon:'Brevemente', lib_full:'O armazenamento do navegador está cheio — elimina uma tela antiga ou exporta-a como .json.', tut_h_select:'Seleciona, move e roda objetos; Shift+clique para seleção múltipla.', tut_h_erase:'Apaga a terra pintada e a textura de terreno sobre ela, num só passo.', tut_h_fill:'Preenche o interior de um contorno costeiro fechado com um clique.', tut_h_river:'Clica para adicionar pontos e desenhar um rio; Enter para terminar.', tut_h_road:'Clica para adicionar pontos e desenhar uma estrada; Enter para terminar.',
-      sym_upload:'+ Carregar símbolo PNG', sym_upload_done:'símbolo(s) carregado(s)', sym_del:'Apagar', sym_search:'Pesquisar símbolos...',
+      sym_upload:'+ Carregar símbolo PNG', sym_upload_done:'símbolo(s) carregado(s)', sym_del:'Apagar', sym_search:'Pesquisar símbolos...', sym_recent:'Usados recentemente',
       st_pos:'Posição', st_zoom:'Zoom', st_size:'Tela', st_tool:'Ferramenta',
       cancel:'Cancelar', ok:'OK',
       locked:'A camada está bloqueada ou oculta.', needtext:'Escreva primeiro o texto da etiqueta.', nopathnear:'Nenhum rio/estrada encontrado nas proximidades.', fill_toolarge:'Área demasiado grande — tente dentro de um limite fechado.',
@@ -525,7 +535,7 @@
       o_typography:'Typografie', o_font:'Lettertype', o_banner:'Banier', o_banner_none:'Geen', o_banner_ribbon:'Lint', o_banner_plate:'Plaat', o_banner_scroll:'Perkament', o_banner_stone:'Steen', o_caps:'Hoofdletters', o_outline:'Omlijning', o_shadow:'Schaduw', h_font_missing:'Dit lettertype is niet op dit apparaat geïnstalleerd; het dichtstbijzijnde wordt gebruikt. Items met · zijn geïnstalleerd.',
       grp_navigate:'Navigatie', grp_terrain:'Terrein', grp_water:'Water & Routes', grp_markers:'Markeringen', grp_regions:"Regio's & Meten",
       t_select:'Selecteren', t_landmass:'Land', t_erase:'Zee', t_fill:'Vullen', t_terrain:'Terrein', t_symbol:'Symbool',
-      t_river:'Rivier', t_road:'Weg', t_label:'Label', t_pan:'Verschuiven', t_eyedrop:'Pipet', t_measure:'Meten', h_measure:'Sleep op de kaart om de werkelijke afstand tussen twee punten te berekenen op basis van de schaal. Meetlijnen kunnen worden geselecteerd, verplaatst of verwijderd; ze worden niet meegenomen in de PNG/SVG-export.', t_lasso:'Lasso', h_lasso:'Sleep om een gesloten gebied te tekenen: Land + Terrein + Reliëf worden daarbinnen samen opgetild en verplaatsbaar. Sleep om te verplaatsen, gebruik de bovenste handgreep om te draaien. Enter om te bevestigen, Escape om te annuleren, Delete om het gebied volledig te verwijderen.',
+      t_river:'Rivier', t_road:'Weg', t_label:'Label', t_pan:'Verschuiven', t_eyedrop:'Pipet', t_measure:'Meten', h_measure:'Klik om punten toe te voegen en een meerdelige afstand te meten. Enter / dubbelklik om te voltooien, Escape om te annuleren. Meetlijnen kunnen worden geselecteerd, verplaatst of verwijderd; ze worden niet meegenomen in de PNG/SVG-export.', t_lasso:'Lasso', h_lasso:'Sleep om een gesloten gebied te tekenen: Land + Terrein + Reliëf worden daarbinnen samen opgetild en verplaatsbaar. Sleep om te verplaatsen, gebruik de bovenste handgreep om te draaien. Enter om te bevestigen, Escape om te annuleren, Delete om het gebied volledig te verwijderen.',
       o_landmass:'Land / Kust', o_brushsize:'Penseelgrootte', o_rough:'Ruwheid van de kust',
       o_landcolor:'Landkleur', o_shorew:'Kustbreedte', o_shorestyle:'Kuststijl', o_shore_sandy:'Zandig', o_shore_rocky:'Rotsachtig', o_shore_reef:'Rif',
       o_smooth:'Kust gladstrijken', o_clearland:'Land wissen',
@@ -558,7 +568,7 @@
       h_pan:'Rechtsklikken + slepen, middelklik, Spatie + slepen, of pijltjestoetsen om te verschuiven.',
       tab_layers:'Lagen', tab_library:'Bibliotheek', tab_history:'Geschiedenis',
       ref_title:'Referentieafbeelding', ref_export:'Opnemen in export', ref_clear:'Referentie verwijderen', ref_trace:'Overtrekmodus (bovenop tonen + kustlijn uitlijnen)', layer_drag_hint:'Sleep hiervandaan om de laag te herschikken', blend_sourceover:'Normaal', blend_multiply:'Vermenigvuldigen', blend_overlay:'Overlay', blend_softlight:'Zacht licht', blend_screen:'Zeef', nav_home:'Home', nav_canvas:'Canvas', nav_tutorial:'Handleiding', nav_community:'Community', home_tagline:'Een browsergebaseerde kaarteditor voor fantasiewerelden', home_desc:'Teken land- en zeegrenzen, schilder bossen en bergen, plaats kastelen en dorpen, leg rivieren en wegen aan — alles op één canvas, in je browser, zonder installatie.', home_cta:'Begin je kaart', home_video_caption:'Introductievideo binnenkort', canvas_new_title:'Nieuw canvas maken', canvas_custom:'Aangepaste afmeting…', canvas_name_ph:'Kaartnaam', canvas_create:'Aanmaken', canvas_import:'Importeren uit .json-bestand', canvas_saved_title:'Opgeslagen canvassen', canvas_empty:'Nog geen opgeslagen canvassen in deze browser. Ze verschijnen hier automatisch zodra je in de editor op "Opslaan" klikt.', canvas_open:'Openen', canvas_delete:'Verwijderen', canvas_delete_confirm:'Dit canvas verwijderen? Dit kan niet ongedaan worden gemaakt.', canvas_unnamed:'Naamloze kaart', tutorial_title:'Handleiding', tutorial_intro:'Elk gereedschap in de linker werkbalk opent zijn eigen instellingen in het rechterpaneel. Hieronder een korte samenvatting van wat elk gereedschap doet.', community_title:'Community', community_desc:'Wayborne Map Editor is een open source project dat voortdurend evolueert.', community_github_desc:'Broncode, bugmeldingen en bijdragen', community_soon:'Binnenkort', lib_full:'De browseropslag is vol — verwijder een oud canvas of exporteer het als .json.', tut_h_select:'Selecteer, verplaats en draai objecten; Shift-klik voor meervoudige selectie.', tut_h_erase:'Wist geschilderd land en de terreintextuur erop in één stap.', tut_h_fill:'Vult het binnenste van een gesloten kustlijn met één klik.', tut_h_river:'Klik om punten toe te voegen en een rivier te tekenen; Enter om te voltooien.', tut_h_road:'Klik om punten toe te voegen en een weg te tekenen; Enter om te voltooien.',
-      sym_upload:'+ PNG-symbool uploaden', sym_upload_done:'symbo(o)l(en) geladen', sym_del:'Verwijderen', sym_search:'Symbolen zoeken...',
+      sym_upload:'+ PNG-symbool uploaden', sym_upload_done:'symbo(o)l(en) geladen', sym_del:'Verwijderen', sym_search:'Symbolen zoeken...', sym_recent:'Recent gebruikt',
       st_pos:'Positie', st_zoom:'Zoom', st_size:'Canvas', st_tool:'Gereedschap',
       cancel:'Annuleren', ok:'OK',
       locked:'Laag is vergrendeld of verborgen.', needtext:'Typ eerst de labeltekst.', nopathnear:'Geen rivier/weg in de buurt gevonden.', fill_toolarge:'Gebied te groot — probeer binnen een gesloten grens.',
@@ -595,7 +605,7 @@
       o_typography:'Typografia', o_font:'Krój pisma', o_banner:'Banderola', o_banner_none:'Brak', o_banner_ribbon:'Wstęga', o_banner_plate:'Tablica', o_banner_scroll:'Zwój', o_banner_stone:'Kamień', o_caps:'Wersaliki', o_outline:'Obrys', o_shadow:'Cień', h_font_missing:'Ten krój pisma nie jest zainstalowany na tym urządzeniu; użyto najbliższego zamiennika. Pozycje oznaczone · są zainstalowane.',
       grp_navigate:'Nawigacja', grp_terrain:'Teren', grp_water:'Woda i Drogi', grp_markers:'Znaczniki', grp_regions:'Regiony i Pomiar',
       t_select:'Zaznacz', t_landmass:'Ląd', t_erase:'Morze', t_fill:'Wypełnij', t_terrain:'Teren', t_symbol:'Symbol',
-      t_river:'Rzeka', t_road:'Droga', t_label:'Etykieta', t_pan:'Przesuń', t_eyedrop:'Próbnik', t_measure:'Mierz', h_measure:'Przeciągnij po mapie, aby obliczyć rzeczywistą odległość między dwoma punktami na podstawie skali. Linie pomiarowe można zaznaczać, przesuwać lub usuwać; nie są uwzględniane w eksporcie PNG/SVG.', t_lasso:'Lasso', h_lasso:'Przeciągnij, aby narysować zamknięty obszar: Ląd + Teren + Rzeźba terenu są w nim razem podnoszone i stają się przesuwalne. Przeciągnij, aby przesunąć, użyj górnego uchwytu, aby obrócić. Enter zatwierdza, Escape anuluje, Delete całkowicie usuwa obszar.',
+      t_river:'Rzeka', t_road:'Droga', t_label:'Etykieta', t_pan:'Przesuń', t_eyedrop:'Próbnik', t_measure:'Mierz', h_measure:'Kliknij, aby dodać punkty i zmierzyć wieloodcinkową odległość. Enter / podwójne kliknięcie kończy, Esc anuluje. Linie pomiarowe można zaznaczać, przesuwać lub usuwać; nie są uwzględniane w eksporcie PNG/SVG.', t_lasso:'Lasso', h_lasso:'Przeciągnij, aby narysować zamknięty obszar: Ląd + Teren + Rzeźba terenu są w nim razem podnoszone i stają się przesuwalne. Przeciągnij, aby przesunąć, użyj górnego uchwytu, aby obrócić. Enter zatwierdza, Escape anuluje, Delete całkowicie usuwa obszar.',
       o_landmass:'Ląd / Wybrzeże', o_brushsize:'Rozmiar pędzla', o_rough:'Nieregularność wybrzeża',
       o_landcolor:'Kolor lądu', o_shorew:'Szerokość wybrzeża', o_shorestyle:'Styl wybrzeża', o_shore_sandy:'Piaszczyste', o_shore_rocky:'Skaliste', o_shore_reef:'Rafa',
       o_smooth:'Wygładź wybrzeże', o_clearland:'Wyczyść ląd',
@@ -628,7 +638,7 @@
       h_pan:'Prawy przycisk + przeciągnij, środkowy przycisk, Spacja + przeciągnij lub strzałki, aby przesuwać.',
       tab_layers:'Warstwy', tab_library:'Biblioteka', tab_history:'Historia',
       ref_title:'Obraz referencyjny', ref_export:'Uwzględnij w eksporcie', ref_clear:'Usuń obraz referencyjny', ref_trace:'Tryb kalkowania (pokaż na wierzchu + przyciąganie do linii brzegowej)', layer_drag_hint:'Przeciągnij stąd, aby zmienić kolejność warstwy', blend_sourceover:'Normalny', blend_multiply:'Mnożenie', blend_overlay:'Nakładka', blend_softlight:'Łagodne światło', blend_screen:'Ekran', nav_home:'Strona główna', nav_canvas:'Płótno', nav_tutorial:'Poradnik', nav_community:'Społeczność', home_tagline:'Edytor map dla fantastycznych światów w przeglądarce', home_desc:'Rysuj granice lądu i morza, maluj lasy i góry, umieszczaj zamki i wioski, prowadź rzeki i drogi — wszystko na jednym płótnie, w przeglądarce, bez instalacji.', home_cta:'Zacznij swoją mapę', home_video_caption:'Wkrótce film wprowadzający', canvas_new_title:'Utwórz nowe płótno', canvas_custom:'Niestandardowy rozmiar…', canvas_name_ph:'Nazwa mapy', canvas_create:'Utwórz', canvas_import:'Importuj z pliku .json', canvas_saved_title:'Zapisane płótna', canvas_empty:'W tej przeglądarce nie zapisano jeszcze żadnych płócien. Pojawiają się tu automatycznie po kliknięciu "Zapisz" w edytorze.', canvas_open:'Otwórz', canvas_delete:'Usuń', canvas_delete_confirm:'Usunąć to płótno? Tej operacji nie można cofnąć.', canvas_unnamed:'Mapa bez nazwy', tutorial_title:'Poradnik', tutorial_intro:'Każde narzędzie na lewym pasku otwiera własne ustawienia w prawym panelu. Poniżej krótkie podsumowanie działania każdego narzędzia.', community_title:'Społeczność', community_desc:'Wayborne Map Editor to projekt open source, wciąż rozwijany.', community_github_desc:'Kod źródłowy, zgłoszenia błędów i wkład', community_soon:'Wkrótce', lib_full:'Pamięć przeglądarki jest pełna — usuń stare płótno lub wyeksportuj je jako .json.', tut_h_select:'Zaznaczaj, przesuwaj i obracaj obiekty; Shift+klik dla zaznaczenia wielokrotnego.', tut_h_erase:'Usuwa pomalowany ląd i teksturę terenu nad nim w jednym kroku.', tut_h_fill:'Wypełnia wnętrze zamkniętego zarysu wybrzeża jednym kliknięciem.', tut_h_river:'Kliknij, aby dodać punkty i narysować rzekę; Enter, aby zakończyć.', tut_h_road:'Kliknij, aby dodać punkty i narysować drogę; Enter, aby zakończyć.',
-      sym_upload:'+ Wgraj symbol PNG', sym_upload_done:'wczytano symboli', sym_del:'Usuń', sym_search:'Szukaj symboli...',
+      sym_upload:'+ Wgraj symbol PNG', sym_upload_done:'wczytano symboli', sym_del:'Usuń', sym_search:'Szukaj symboli...', sym_recent:'Ostatnio używane',
       st_pos:'Pozycja', st_zoom:'Powiększenie', st_size:'Płótno', st_tool:'Narzędzie',
       cancel:'Anuluj', ok:'OK',
       locked:'Warstwa jest zablokowana lub ukryta.', needtext:'Najpierw wpisz tekst etykiety.', nopathnear:'Nie znaleziono w pobliżu rzeki/drogi.', fill_toolarge:'Obszar zbyt duży — spróbuj wewnątrz zamkniętej granicy.',
@@ -692,7 +702,7 @@
       grp_navigate:'التنقّل', grp_terrain:'التضاريس', grp_water:'المياه والطرق', grp_markers:'العلامات',
       grp_regions:'المناطق والقياس', t_select:'تحديد', t_landmass:'يابسة', t_erase:'بحر', t_fill:'تعبئة', t_terrain:'تضاريس',
       t_symbol:'رمز', t_river:'نهر', t_road:'طريق', t_label:'تسمية', t_pan:'تحريك', t_eyedrop:'أخذ عيّنة', t_measure:'قياس',
-      h_measure:'اسحب على الخريطة لحساب المسافة الحقيقية بين نقطتين استنادًا إلى شريط المقياس. يمكن تحديد خطوط القياس ونقلها وحذفها؛ وهي مستثناة من تصدير PNG/SVG.',
+      h_measure:'انقر لإضافة نقاط وقياس مسافة متعددة الأجزاء. Enter أو النقر المزدوج للإنهاء، Esc للإلغاء. يمكن تحديد خطوط القياس ونقلها وحذفها؛ وهي مستثناة من تصدير PNG/SVG.',
       t_lasso:'أُنشوطة',
       h_lasso:'اسحب لرسم منطقة مغلقة: تُرفَع اليابسة والتضاريس والارتفاع داخلها معًا وتصبح قابلة للنقل. اسحب للنقل، واستخدم المقبض العلوي للتدوير. Enter للتثبيت، Escape للإلغاء، Delete لحذف المنطقة كليًا.',
       o_landmass:'اليابسة / الساحل', o_brushsize:'حجم الفرشاة', o_rough:'خشونة الساحل', o_landcolor:'لون اليابسة',
@@ -741,7 +751,7 @@
       tut_h_select:'حدِّد الكائنات وانقلها ودوِّرها؛ Shift مع النقر للتحديد المتعدّد.',
       tut_h_erase:'يمحو اليابسة المرسومة ونسيج التضاريس فوقها في خطوة واحدة.', tut_h_fill:'يملأ داخل خطّ ساحلي مغلق بنقرة واحدة.',
       tut_h_river:'انقر لإضافة نقاط ورسم نهر؛ Enter للإنهاء.', tut_h_road:'انقر لإضافة نقاط ورسم طريق؛ Enter للإنهاء.',
-      sym_upload:'+ ارفع رمز PNG', sym_upload_done:'رمز/رموز حُمِّلت', sym_del:'حذف', sym_search:'ابحث في الرموز…',
+      sym_upload:'+ ارفع رمز PNG', sym_upload_done:'رمز/رموز حُمِّلت', sym_del:'حذف', sym_search:'ابحث في الرموز…', sym_recent:'المستخدمة مؤخرًا',
       st_pos:'الموضع', st_zoom:'التقريب', st_size:'اللوحة', st_tool:'الأداة', cancel:'إلغاء', ok:'موافق',
       locked:'الطبقة مقفلة أو مخفية.', needtext:'اكتب نصّ التسمية أولًا.', nopathnear:'لا يوجد نهر أو طريق قريب.',
       fill_toolarge:'المنطقة كبيرة جدًا — جرِّب داخل حدّ مغلق.', exported:'صُدِّر:', saved:'حُفظ المشروع.',
@@ -779,7 +789,7 @@
       o_typography:'Типографика', o_font:'Гарнитура', o_banner:'Лента', o_banner_none:'Нет', o_banner_ribbon:'Лента', o_banner_plate:'Табличка', o_banner_scroll:'Свиток', o_banner_stone:'Камень', o_caps:'Прописные', o_outline:'Обводка', o_shadow:'Тень', h_font_missing:'Эта гарнитура не установлена на устройстве; используется ближайшая замена. Пункты с · установлены.',
       grp_navigate:'Навигация', grp_terrain:'Рельеф', grp_water:'Вода и пути', grp_markers:'Метки', grp_regions:'Регионы и мера',
       t_select:'Выделение', t_landmass:'Суша', t_erase:'Море', t_fill:'Заливка', t_terrain:'Местность', t_symbol:'Символ',
-      t_river:'Река', t_road:'Дорога', t_label:'Надпись', t_pan:'Перемещение', t_eyedrop:'Пипетка', t_measure:'Измерить', h_measure:'Перетаскивайте по карте, чтобы вычислить реальное расстояние между двумя точками по масштабной линейке. Линии измерения можно выделять, перемещать или удалять; они не входят в экспорт PNG/SVG.', t_lasso:'Лассо', h_lasso:'Перетаскивайте, чтобы нарисовать замкнутую область: Суша + Местность + Рельеф поднимаются в ней вместе и становятся перемещаемыми. Перетаскивайте для перемещения, используйте верхний маркер для поворота. Enter — подтвердить, Escape — отменить, Delete — полностью удалить область.',
+      t_river:'Река', t_road:'Дорога', t_label:'Надпись', t_pan:'Перемещение', t_eyedrop:'Пипетка', t_measure:'Измерить', h_measure:'Щёлкайте, чтобы добавлять точки и измерять расстояние из нескольких отрезков. Enter / двойной щелчок — завершить, Escape — отменить. Линии измерения можно выделять, перемещать или удалять; они не входят в экспорт PNG/SVG.', t_lasso:'Лассо', h_lasso:'Перетаскивайте, чтобы нарисовать замкнутую область: Суша + Местность + Рельеф поднимаются в ней вместе и становятся перемещаемыми. Перетаскивайте для перемещения, используйте верхний маркер для поворота. Enter — подтвердить, Escape — отменить, Delete — полностью удалить область.',
       o_landmass:'Суша / Берег', o_brushsize:'Размер кисти', o_rough:'Неровность берега',
       o_landcolor:'Цвет суши', o_shorew:'Ширина берега', o_shorestyle:'Стиль берега', o_shore_sandy:'Песчаный', o_shore_rocky:'Скалистый', o_shore_reef:'Риф',
       o_smooth:'Сгладить берег', o_clearland:'Очистить сушу',
@@ -812,7 +822,7 @@
       h_pan:'ПКМ + перетаскивание, СКМ, Пробел + перетаскивание или стрелки для перемещения.',
       tab_layers:'Слои', tab_library:'Библиотека', tab_history:'История',
       ref_title:'Референс-изображение', ref_export:'Включить в экспорт', ref_clear:'Убрать референс', ref_trace:'Режим трассировки (показать сверху + привязка к береговой линии)', layer_drag_hint:'Перетащите отсюда, чтобы изменить порядок слоя', blend_sourceover:'Обычный', blend_multiply:'Умножение', blend_overlay:'Перекрытие', blend_softlight:'Мягкий свет', blend_screen:'Экран', nav_home:'Главная', nav_canvas:'Холст', nav_tutorial:'Обучение', nav_community:'Сообщество', home_tagline:'Редактор карт фэнтезийных миров прямо в браузере', home_desc:'Рисуйте границы суши и моря, закрашивайте леса и горы, размещайте замки и деревни, прокладывайте реки и дороги — всё на одном холсте, в браузере, без установки.', home_cta:'Начать карту', home_video_caption:'Видео скоро появится', canvas_new_title:'Создать новый холст', canvas_custom:'Свой размер…', canvas_name_ph:'Название карты', canvas_create:'Создать', canvas_import:'Импорт из файла .json', canvas_saved_title:'Сохранённые холсты', canvas_empty:'В этом браузере пока нет сохранённых холстов. Они появятся здесь автоматически после нажатия «Сохранить» в редакторе.', canvas_open:'Открыть', canvas_delete:'Удалить', canvas_delete_confirm:'Удалить этот холст? Это действие необратимо.', canvas_unnamed:'Карта без названия', tutorial_title:'Обучение', tutorial_intro:'Каждый инструмент на левой панели открывает свои настройки в правой панели. Ниже — краткое описание каждого инструмента.', community_title:'Сообщество', community_desc:'Wayborne Map Editor — проект с открытым исходным кодом, который постоянно развивается.', community_github_desc:'Исходный код, отчёты об ошибках и вклад в проект', community_soon:'Скоро', lib_full:'Хранилище браузера заполнено — удалите старый холст или экспортируйте его как .json.', tut_h_select:'Выделяйте, перемещайте и вращайте объекты; Shift+клик для множественного выбора.', tut_h_erase:'Стирает закрашенную сушу и текстуру местности на ней за один шаг.', tut_h_fill:'Заливает внутреннюю часть замкнутого контура побережья одним щелчком.', tut_h_river:'Щёлкайте, чтобы добавить точки и нарисовать реку; Enter — завершить.', tut_h_road:'Щёлкайте, чтобы добавить точки и нарисовать дорогу; Enter — завершить.',
-      sym_upload:'+ Загрузить PNG-символ', sym_upload_done:'символ(ов) загружено', sym_del:'Удалить', sym_search:'Поиск символов...',
+      sym_upload:'+ Загрузить PNG-символ', sym_upload_done:'символ(ов) загружено', sym_del:'Удалить', sym_search:'Поиск символов...', sym_recent:'Недавно использованные',
       st_pos:'Позиция', st_zoom:'Масштаб', st_size:'Холст', st_tool:'Инструмент',
       cancel:'Отмена', ok:'ОК',
       locked:'Слой заблокирован или скрыт.', needtext:'Сначала введите текст надписи.', nopathnear:'Река/дорога поблизости не найдена.', fill_toolarge:'Область слишком велика — попробуйте внутри замкнутой границы.',
@@ -884,6 +894,23 @@
       { id:'regionlink', key:'M',     ico:'◈', hint:'h_regionlink' },
       { id:'measure',    key:'Q',     ico:'↔︎', hint:'h_measure' }
     ]}
+  ];
+
+  /* Klavye kısayolları ekranının "Genel" bölümü — araç kısayolları zaten
+     TUTORIAL_GROUPS'tan geliyor, burada yalnızca komut/gezinme tuşları. */
+  var SHORTCUT_GENERAL = [
+    { key:'Ctrl+Z',            label:'sc_undo' },
+    { key:'Ctrl+Shift+Z / Y',  label:'sc_redo' },
+    { key:'Ctrl+S',            label:'sc_save' },
+    { key:'↑ ↓ ← →',           label:'sc_pan' },
+    { key:'Shift+↑ ↓ ← →',     label:'sc_panfast' },
+    { key:'+ / -',             label:'sc_zoom' },
+    { key:'0',                 label:'sc_fit' },
+    { key:'Enter / çift tık',  label:'sc_finish' },
+    { key:'Esc',               label:'sc_cancel' },
+    { key:'Delete / Backspace',label:'sc_delete' },
+    { key:'[ / ]',             label:'sc_rotsym' },
+    { key:'?',                 label:'sc_help' }
   ];
 
   function $(id){ return document.getElementById(id); }
@@ -1142,12 +1169,19 @@
         card.className = 'cv-card';
         var nameEl = document.createElement('div'); nameEl.className = 'cv-card-name';
         var metaEl = document.createElement('div'); metaEl.className = 'cv-card-meta';
-        var thumb = document.createElement('div'); thumb.className = 'cv-card-thumb'; thumb.textContent = '⚔';
+        var thumb = document.createElement('div'); thumb.className = 'cv-card-thumb';
+        if (entry.thumb) {
+          var img = document.createElement('img'); img.src = entry.thumb; img.alt = entry.name; img.loading = 'lazy';
+          thumb.appendChild(img);
+        } else {
+          thumb.textContent = '⚔';
+        }
         var actions = document.createElement('div'); actions.className = 'cv-card-actions';
         var openBtn = document.createElement('button'); openBtn.textContent = self.t('canvas_open');
         var delBtn = document.createElement('button'); delBtn.textContent = self.t('canvas_delete');
         nameEl.textContent = entry.name;
-        metaEl.textContent = entry.W + '×' + entry.H + ' · ' + new Date(entry.updatedAt).toLocaleDateString();
+        var d = new Date(entry.updatedAt);
+        metaEl.textContent = entry.W + '×' + entry.H + ' · ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
         actions.appendChild(openBtn); actions.appendChild(delBtn);
         card.appendChild(thumb); card.appendChild(nameEl); card.appendChild(metaEl); card.appendChild(actions);
 
@@ -1515,6 +1549,9 @@
         if (self.selIs('symbols')) Tools.applyToSelection({ wear:v/100 });
       }, function (v) { return (v/100).toFixed(2); });
       on('sy-jitter', 'change', function (e) { App.symbol.jitter = e.target.checked; });
+      on('btn-settlegen', 'click', function () {
+        Tools.autoSettle(null, Math.floor(Math.random()*4294967296));
+      });
 
       /* --- nehir --- */
       this.range('rv-w', 'v-rv-w', function (v) {
@@ -1554,6 +1591,12 @@
         App.road.color = e.target.value;
         if (self.selIs('roads')) Tools.applyToSelection({ color:e.target.value });
       });
+      on('btn-roadgen', 'click', function () {
+        Tools.generateRoads(Math.floor(Math.random()*4294967296));
+      });
+
+      /* --- ölçüm --- */
+      on('ms-area', 'change', function (e) { App.measure.area = e.target.checked; });
 
       /* --- etiket --- */
       function labelEdit(props) { if (self.selIs('labels')) Tools.applyToSelection(props); }
@@ -2000,6 +2043,40 @@
     },
 
     /* ================= sembol kütüphanesi ================= */
+    RECENT_SYM_KEY: 'wayborne_recent_symbols',
+    RECENT_SYM_MAX: 12,
+
+    loadRecentSymbols: function () {
+      try {
+        var raw = localStorage.getItem(this.RECENT_SYM_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) { return []; }
+    },
+
+    /* Bir sembol kütüphaneden seçildiğinde (fırça için aktif olsun ya da
+       doğrudan yerleştirilsin) en başa taşınır — böylece "son kullanılan"
+       tepsisi her zaman gerçekten kullanılanları, en yeniden en eskiye
+       gösterir. localStorage'a yazılır (oturumlar arası kalıcı). */
+    pushRecentSymbol: function (id) {
+      if (!id || Sym.isCustom(id)) return; /* özel semboller kendi ızgarasında zaten görünür */
+      var list = this.loadRecentSymbols().filter(function (x) { return x !== id; });
+      list.unshift(id);
+      if (list.length > this.RECENT_SYM_MAX) list.length = this.RECENT_SYM_MAX;
+      try { localStorage.setItem(this.RECENT_SYM_KEY, JSON.stringify(list)); } catch (e) {}
+      this.renderRecentSymGrid();
+    },
+
+    renderRecentSymGrid: function () {
+      var bar = $('sym-recent-bar'), grid = $('sym-recent-grid');
+      if (!bar || !grid) return;
+      var list = this.loadRecentSymbols().map(function (id) { return Sym.get(id); }).filter(Boolean);
+      if (!list.length) { bar.style.display = 'none'; return; }
+      bar.style.display = '';
+      grid.innerHTML = '';
+      var self = this;
+      list.forEach(function (def) { grid.appendChild(self.makeSymCell(grid, def)); });
+    },
+
     buildSymbolLibrary: function () {
       var sel = $('sym-cat');
       if (!sel) return;
@@ -2015,6 +2092,7 @@
       });
       sel.value = cur && Sym.SYMBOLS[cur] ? cur : 'castles';
       this.renderSymbolGrid();
+      this.renderRecentSymGrid();
     },
 
     makeSymCell: function (grid, def) {
@@ -2030,10 +2108,10 @@
       cell.appendChild(s);
       cell.addEventListener('click', function () {
         App.symbol.id = def.id;
-        grid.querySelectorAll('.sym-cell').forEach(function (e) { e.classList.remove('active'); });
-        document.querySelectorAll('#custom-sym-grid .sym-cell').forEach(function (e) { e.classList.remove('active'); });
+        document.querySelectorAll('.sym-grid .sym-cell').forEach(function (e) { e.classList.remove('active'); });
         cell.classList.add('active');
         self.setTool('symbol');
+        self.pushRecentSymbol(def.id);
       });
       return cell;
     },
@@ -2547,7 +2625,11 @@
     /* ================= modal ================= */
     modal: function (title, bodyHTML, onOk) {
       $('modal-title').textContent = title;
-      $('modal-body').innerHTML = bodyHTML;
+      var body = $('modal-body');
+      body.innerHTML = bodyHTML;
+      body.classList.remove('shortcuts-body');
+      var box = document.querySelector('.modal-box');
+      if (box) box.classList.remove('wide');
       var m = $('modal');
       m.classList.remove('hidden');
       function close() {
@@ -2558,6 +2640,34 @@
       function ok() { if (onOk) onOk(); close(); }
       $('modal-ok').addEventListener('click', ok);
       $('modal-cancel').addEventListener('click', close);
+    },
+
+    /* '?' ile açılan hızlı başvuru — Rehber sayfasının aksine kısa, aranmadan
+       tüm kısayolları tek ekranda gösterir. Araç kısayolları TUTORIAL_GROUPS'tan
+       (Rehber'le aynı kaynak, iki liste asla birbirinden sapmaz), komut
+       kısayolları SHORTCUT_GENERAL'dan gelir. */
+    showShortcuts: function () {
+      var self = this;
+      var html = '<div class="shortcuts-cols">';
+      TUTORIAL_GROUPS.forEach(function (grp) {
+        html += '<div class="shortcuts-group"><div class="shortcuts-group-label">' + self.t(grp.label) + '</div>';
+        grp.tools.forEach(function (tl) {
+          html += '<div class="shortcuts-row"><span class="shortcuts-name">' + self.t('t_' + tl.id) +
+                  '</span><span class="shortcuts-key">' + tl.key + '</span></div>';
+        });
+        html += '</div>';
+      });
+      html += '<div class="shortcuts-group"><div class="shortcuts-group-label">' + self.t('sc_general') + '</div>';
+      SHORTCUT_GENERAL.forEach(function (sc) {
+        html += '<div class="shortcuts-row"><span class="shortcuts-name">' + self.t(sc.label) +
+                '</span><span class="shortcuts-key">' + sc.key + '</span></div>';
+      });
+      html += '</div></div>';
+
+      this.modal(this.t('sc_title'), html);
+      $('modal-body').classList.add('shortcuts-body');
+      var box = document.querySelector('.modal-box');
+      if (box) box.classList.add('wide');
     },
 
     /* ================= klavye ================= */
@@ -2621,6 +2731,7 @@
           if (self.selIs('symbols')) Tools.applyToSelection({ rot: App.symbol.rot });
           Cv.requestRender(); return;
         }
+        if (ev.key === '?') { self.showShortcuts(); return; }
         if (map[ev.key.toLowerCase()]) self.setTool(map[ev.key.toLowerCase()]);
       });
 

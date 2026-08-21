@@ -723,19 +723,39 @@
       } catch (e) { return []; }
     },
 
+    /* Kayıt geçmişi kartlarında gösterilecek küçük önizleme — tam çözünürlüklü
+       PNG yerine düşük kaliteli JPEG (haritanın rengi/dokusu zaten fotoğraf
+       gibi, PNG'nin kayıpsız avantajı burada gereksiz yer kaplar; localStorage
+       kotası kolayca dolar). Uzun kenar sabit, en-boy oranı korunur. */
+    libThumb: function (maxDim) {
+      maxDim = maxDim || 240;
+      var k = Math.min(1, maxDim / Math.max(Cv.W, Cv.H));
+      var c = this.renderToCanvas(Cv.W*k, Cv.H*k);
+      return c.toDataURL('image/jpeg', 0.6);
+    },
+
     libSave: function (name, existingId) {
       var list = this.libList();
       var data = this.buildProjectData();
       var id = existingId || ('cv' + Date.now().toString(36) + Math.floor(Math.random()*1e6).toString(36));
-      var entry = { id:id, name:name || 'Adsız harita', updatedAt:Date.now(), W:Cv.W, H:Cv.H, data:data };
+      var entry = { id:id, name:name || 'Adsız harita', updatedAt:Date.now(), W:Cv.W, H:Cv.H, data:data, thumb:this.libThumb() };
       var idx = list.findIndex(function (e) { return e.id === id; });
       if (idx >= 0) list[idx] = entry; else list.unshift(entry);
       try {
         localStorage.setItem(this.LIB_KEY, JSON.stringify(list));
         return id;
       } catch (e) {
-        UI.msg(UI.t('lib_full'));
-        return null;
+        /* kota muhtemelen küçük resimler yüzünden doldu — bu kaydın
+           önizlemesini atıp tekrar dene; önizlemesiz bir kayıt hiç kayıt
+           olmamasından iyidir */
+        entry.thumb = null;
+        try {
+          localStorage.setItem(this.LIB_KEY, JSON.stringify(list));
+          return id;
+        } catch (e2) {
+          UI.msg(UI.t('lib_full'));
+          return null;
+        }
       }
     },
 

@@ -367,6 +367,9 @@
         <input type="range" id="sy-brush-density" min="5" max="100" value="50">
         <label class="chk"><input type="checkbox" id="sy-clip-land" checked><span data-i18n="o_clipland">Karaya kenetle (fırça)</span></label>
         <p class="hint" data-i18n="h_symbol">Kütüphaneden sembol seç, haritaya tıkla. [ ] tuşlarıyla döndür. Fırça modunda sürükle.</p>
+        <h3 style="margin-top:16px" data-i18n="o_settlegen">Yerleşimleri otomatik yerleştir</h3>
+        <button class="btn wide" id="btn-settlegen" data-i18n="o_settlegen_go">🏰 Yerleşim yerleştir</button>
+        <p class="hint" data-i18n="h_settlegen">Düz ve kıyıya yakın kara üzerine şehir/kasaba/köy sembolleri dağıtır — en iyi konum kale/liman, geri kalanlar kasaba/köy olur. "Yol üret" bu sembolleri bulup birbirine bağlar.</p>
       </section>
 
       <!-- LAKE -->
@@ -455,6 +458,9 @@
         <label class="row"><span data-i18n="o_color">Renk</span></label>
         <input type="color" id="rd-color" value="#6b4f2a">
         <p class="hint" data-i18n="h_path">Tıklayarak nokta ekle. Enter / çift tık ile bitir, Esc ile iptal.</p>
+        <h3 style="margin-top:16px" data-i18n="o_roadgen">Yolları otomatik üret</h3>
+        <button class="btn wide" id="btn-roadgen" data-i18n="o_roadgen_go">🛤️ Yol üret</button>
+        <p class="hint" data-i18n="h_roadgen">Yerleşim sembolleri arasında (şehir/kasaba/köy/kale/liman) yamaçtan kaçınan yollar çizer. Sembol yoksa birkaç rastgele kara noktasını bağlar.</p>
       </section>
 
       <!-- LABEL -->
@@ -538,7 +544,8 @@
       <!-- MEASURE -->
       <section class="opt-group" data-for="measure">
         <h3 data-i18n="t_measure">Ölç</h3>
-        <p class="hint" data-i18n="h_measure">Haritada sürükleyerek iki nokta arası gerçek mesafeyi ölçek çubuğuna göre hesapla. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez.</p>
+        <label class="chk"><input type="checkbox" id="ms-area"><span data-i18n="o_measurearea">Alan olarak kapat</span></label>
+        <p class="hint" data-i18n="h_measure">Tıklayarak nokta ekle, çok parçalı bir mesafe ölçün. Enter / çift tık ile bitir, Esc ile iptal. "Alan olarak kapat" işaretliyse en az 3 noktalı ölçüm otomatik kapanır ve alanı da hesaplar. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez.</p>
       </section>
 
       <!-- LASSO -->
@@ -696,6 +703,10 @@
         <button class="btn wide" id="btn-sym-upload" data-i18n="sym_upload">+ PNG Sembol yükle</button>
         <input type="file" id="sym-file" accept="image/png,image/jpeg,image/svg+xml,image/webp" multiple hidden>
         <div id="custom-sym-grid" class="sym-grid" style="margin-top:8px"></div>
+      </div>
+      <div id="sym-recent-bar" style="display:none">
+        <label class="row"><span data-i18n="sym_recent">Son kullanılanlar</span></label>
+        <div id="sym-recent-grid" class="sym-grid"></div>
       </div>
       <input type="text" id="sym-search" class="sel" data-i18n-placeholder="sym_search" placeholder="Sembol ara...">
       <select id="sym-cat" class="sel"></select>
