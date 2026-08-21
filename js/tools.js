@@ -1406,28 +1406,40 @@
       }
       sctx.putImageData(img, 0, 0);
 
-      /* büyük tuvale yumuşak (bilinear) ölçekle, sonra alpha eşiği + düz renk
-         doldurma ile smoothCoast'takiyle aynı temiz-kenar tekniğini uygula */
-      var raw = document.createElement('canvas'); raw.width = w; raw.height = h;
+      /* CSS blur filtresi + getImageData, piksel sayısıyla orantılı maliyetli —
+         8192² tuvalde (67M piksel) bu adım tek başına onlarca saniye sürüyordu.
+         Bulanıklaştırma+eşikleme adımını sabit bir üst sınırda (GEN_MAX) çalıştırıp
+         sonucu gerçek tuval boyutuna bilinear ölçekle büyütüyoruz — kıyı çizgisinin
+         asıl yumuşatması zaten render anında shore efektiyle (Cv.buildShoreCanvas)
+         geliyor, burada tek amaç ham blob şeklinin pürüzsüz bir sınırı olması. */
+      var GEN_MAX = 2048;
+      var gk = Math.min(1, GEN_MAX / Math.max(w, h));
+      var gw = Math.max(1, Math.round(w*gk)), gh = Math.max(1, Math.round(h*gk));
+
+      var raw = document.createElement('canvas'); raw.width = gw; raw.height = gh;
       var rctx = raw.getContext('2d');
       rctx.imageSmoothingEnabled = true;
-      rctx.drawImage(small, 0, 0, w, h);
+      rctx.drawImage(small, 0, 0, gw, gh);
 
-      var big = document.createElement('canvas'); big.width = w; big.height = h;
-      var bctx = big.getContext('2d', { willReadFrequently:true });
-      bctx.filter = 'blur(' + Math.max(2, Math.round(w*0.0015)) + 'px)';
-      bctx.drawImage(raw, 0, 0);
-      bctx.filter = 'none';
-      var bid = bctx.getImageData(0, 0, w, h), bd = bid.data;
+      var mid = document.createElement('canvas'); mid.width = gw; mid.height = gh;
+      var mctx = mid.getContext('2d', { willReadFrequently:true });
+      mctx.filter = 'blur(' + Math.max(2, Math.round(gw*0.0015)) + 'px)';
+      mctx.drawImage(raw, 0, 0);
+      mctx.filter = 'none';
+      var bid = mctx.getImageData(0, 0, gw, gh), bd = bid.data;
       for (var p = 0; p < bd.length; p += 4) bd[p+3] = bd[p+3] > 128 ? 255 : 0;
-      bctx.putImageData(bid, 0, 0);
-      bctx.globalCompositeOperation = 'source-in';
-      bctx.fillStyle = App.brush.color;
-      bctx.fillRect(0, 0, w, h);
-      bctx.globalCompositeOperation = 'source-over';
+      mctx.putImageData(bid, 0, 0);
+      mctx.globalCompositeOperation = 'source-in';
+      mctx.fillStyle = App.brush.color;
+      mctx.fillRect(0, 0, gw, gh);
+      mctx.globalCompositeOperation = 'source-over';
 
+      /* mid'i doğrudan katmana çiz — ayrı bir 'big' ara tuvaline kopyalayıp
+         oradan tekrar katmana çizmek 8192² gibi boyutlarda tek başına
+         saniyeler süren gereksiz bir ikinci tam-tuval kopyasıydı. */
       L.ctx.clearRect(0, 0, w, h);
-      L.ctx.drawImage(big, 0, 0);
+      L.ctx.imageSmoothingEnabled = true;
+      L.ctx.drawImage(mid, 0, 0, w, h);
 
       History.pushRaster('landmass', before, L.canvas, {x:0,y:0,w:w,h:h}, 'landgen:'+template);
       Cv.shoreDirty = true;
