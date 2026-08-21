@@ -285,6 +285,21 @@ const TEST_CODE = `(async function () {
       const s = Sym.SYMBOLS[cats[0]].items[0];
       return !!window.i18nName(s.id, s.tr, s.en, 'de');
     })());
+    ok('i18n', '891 sembolün tamamı Arapça\\'ya çevrildi', (() => {
+      const arabicRe = /[؀-ۿ]/;
+      let total = 0, withAr = 0;
+      const seen = new Set();
+      Object.keys(Sym.SYMBOLS).forEach(cat => {
+        Sym.SYMBOLS[cat].items.forEach(def => {
+          if (seen.has(def.id)) return;
+          seen.add(def.id);
+          total++;
+          const name = window.i18nName(def.id, def.tr, def.en, 'ar');
+          if (arabicRe.test(name)) withAr++;
+        });
+      });
+      return total === 891 && withAr === 891;
+    })());
 
     /* ---------- 13. RENDER ---------- */
     const t1 = performance.now();
