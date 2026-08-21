@@ -16,6 +16,13 @@
     return m ? { r:parseInt(m[1],16), g:parseInt(m[2],16), b:parseInt(m[3],16) } : { r:0, g:0, b:0 };
   }
 
+  /* Yumuşak fırça kenarı için: aynı rengin saydam hâli. Doğrudan
+     'transparent' kullanmak bazı tarayıcılarda gradyanı siyaha kaydırır. */
+  function rgbaOf(hex, a) {
+    var c = hexToRgb(hex);
+    return 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + a + ')';
+  }
+
   /* Fırça vuruşu sırasında (stampTerrain/eyedropStamp) tekrar tekrar canvas
      oluşturmamak için tek seferlik, sadece büyüyen bir scratch canvas havuzu. */
   var _scratchPool = {};
@@ -163,6 +170,10 @@
     symBrushLast:null,
     symBrushBefore:null,
     lasso:null, floating:null, floatDrag:null, floatRotateDrag:null,
+    /* iki parmaklı yakınlaştırma/kaydırma (mobil çekirdek jestler) —
+       pointerId'ye göre aktif dokunuşları izler; ayrıntı için onDown/onMove/
+       onUp içindeki dokunmatik erken-çıkış bloklarına bak. */
+    _touches:{}, _pinch:null,
     LASSO_LAYERS: ['landmass','terrain','elevation'],
     /* nokta-tabanlı vektör katmanlar — kement alanının içine düşen semboller,
        kaynaklar, etiketler ve harita bağlantıları da rasterle BİRLİKTE taşınır. */
@@ -208,6 +219,22 @@
 
     /* ================= POINTER DOWN ================= */
     onDown: function (e) {
+      /* iki parmakla dokunma → çizim/kaydırma yerine yakınlaştırma jesti.
+         İkinci parmak indiğinde önce birinci parmağın başlattığı tekli
+         işlem varsa (fırça darbesi, kaydırma...) onUp() ile düzgünce
+         bitirilir/işlenir, sonra bu ve sonraki dokunuşlar çizim
+         yollamasına girmeden pinch durumuna yönlendirilir. */
+      if (e.pointerType === 'touch') {
+        this._touches[e.pointerId] = { x:e.clientX, y:e.clientY };
+        var tids = Object.keys(this._touches);
+        if (tids.length >= 2) {
+          if (!this._pinch) this.onUp();
+          var ta = this._touches[tids[0]], tb = this._touches[tids[1]];
+          this._pinch = { dist: Math.hypot(ta.x-tb.x, ta.y-tb.y) };
+          return;
+        }
+      }
+
       var p = this.pos(e);
       Cv.mouse.x = p.x; Cv.mouse.y = p.y; Cv.mouse.over = true;
 
@@ -219,7 +246,10 @@
         return;
       }
       if (e.button !== 0) return;
-      Cv.view.setPointerCapture(e.pointerId);
+      /* Bazı ortamlarda (sentetik olaylar, ya da parmak zaten kalkmışsa)
+         setPointerCapture NotFoundError fırlatabilir — bu, izleyen çizim
+         mantığını sessizce iptal etmemeli. */
+      try { Cv.view.setPointerCapture(e.pointerId); } catch (ptrErr) {}
 
       /* windrose tutamağı */
       if (App.windrose && App.windrose.visible && this.hitWindrose(p)) {
@@ -271,6 +301,16 @@
         case 'fill':     this.floodFill(p.x, p.y); break;
         case 'terrain':  this.startRaster('terrain',  p, 'terrain'); break;
         case 'elevation': this.startRaster('elevation', p, 'elevation'); break;
+        case 'sketch': {
+          /* Çizim her zaman *aktif* katmana yazar ve yalnız kullanıcı
+             katmanına izin verilir — yerleşik katmanlara serbest boya
+             sızdırmak, o katmanların anlamını (kara maskesi, yükselti
+             gri tonu) bozardı. */
+          var sl = Layers.get(Layers.active);
+          if (!sl || !sl.custom) { UI.msg(UI.t('sketch_need_layer')); break; }
+          this.startRaster(sl.id, p, 'sketch');
+          break;
+        }
         case 'symbol':
           if (App.symbol.brushMode) this.startSymbolBrush(p);
           else this.placeSymbol(p);
@@ -278,11 +318,11 @@
         case 'lake':
         case 'river':
         case 'road':
-        case 'territory': this.addPathPoint(p); break;
+        case 'territory':
+        case 'measure':  this.addPathPoint(p); break;
         case 'label':    this.placeLabel(p); break;
         case 'resource': this.placeResource(p); break;
         case 'regionlink': this.placeRegionLink(p); break;
-        case 'measure':  this.measureFrom = p; break;
         case 'lasso':    this.onLassoDown(p); break;
         case 'select':   this.startSelect(p, e.shiftKey); break;
       }
@@ -291,20 +331,34 @@
 
     /* ================= POINTER MOVE ================= */
     onMove: function (e) {
+      if (e.pointerType === 'touch' && this._touches[e.pointerId]) {
+        this._touches[e.pointerId] = { x:e.clientX, y:e.clientY };
+        var mids = Object.keys(this._touches);
+        if (this._pinch && mids.length >= 2) {
+          var ma = this._touches[mids[0]], mb = this._touches[mids[1]];
+          var md = Math.hypot(ma.x-mb.x, ma.y-mb.y);
+          var mr = Cv.view.getBoundingClientRect();
+          var mx = (ma.x+mb.x)/2 - mr.left, my = (ma.y+mb.y)/2 - mr.top;
+          if (this._pinch.dist > 0 && md > 0) Cv.setZoom(Cv.zoom * (md/this._pinch.dist), mx, my);
+          this._pinch.dist = md;
+          return;
+        }
+      }
+
       var p = this.pos(e);
       Cv.mouse.x = p.x; Cv.mouse.y = p.y; Cv.mouse.over = true;
 
       if (this.panning && this.panStart) {
         Cv.panX = this.panStart.px + (e.clientX-this.panStart.x);
         Cv.panY = this.panStart.py + (e.clientY-this.panStart.y);
-        Cv.requestRender();
+        Cv.requestViewRender();
         return;
       }
 
       if (this.lasso && this.lasso.dragging) {
         var lpts = this.lasso.pts, lastP = lpts[lpts.length-1];
         if (Math.hypot(p.x-lastP[0], p.y-lastP[1]) >= 4) lpts.push([p.x, p.y]);
-        Cv.requestRender();
+        Cv.requestViewRender();
         return;
       }
 
@@ -312,7 +366,7 @@
         var frd = this.floatRotateDrag, f0 = this.floating;
         var cx0 = f0.center.x+f0.ox, cy0 = f0.center.y+f0.oy;
         f0.rot = frd.baseRot + (Math.atan2(p.y-cy0, p.x-cx0) - frd.baseAngle);
-        Cv.requestRender();
+        Cv.requestViewRender();
         return;
       }
 
@@ -375,20 +429,17 @@
         App.eyedrop.radius = Math.max(8, ed);
         var el = $('eye-r'); if (el) el.value = Math.min(400, Math.round(ed));
         var vl = $('v-eye-r'); if (vl) vl.textContent = Math.min(400, Math.round(ed));
-        Cv.requestRender();
-        return;
-      }
-
-      if (this.measureFrom) {
-        this.measureTo = p;
-        Cv.requestRender();
+        Cv.requestViewRender();
         return;
       }
 
       if (this.painting) {
+        var _prev = this.last;
         if (this.mode === 'eyedrop') this.eyedropStrokeTo(p);
         else this.strokeTo(p);
-        Cv.requestRender();
+        /* yalnızca vuruşun dokunduğu dikdörtgeni yeniden beste — tüm
+           haritayı yeniden kurmak yerine (bkz. Cv.ensureComposite) */
+        Cv.requestRender(this._strokeRect(_prev, p));
         return;
       }
 
@@ -432,7 +483,12 @@
     },
 
     /* ================= POINTER UP ================= */
-    onUp: function () {
+    onUp: function (e) {
+      if (e && e.pointerType === 'touch') {
+        delete this._touches[e.pointerId];
+        if (this._pinch && Object.keys(this._touches).length < 2) this._pinch = null;
+      }
+
       if (this.panning) { this.panning = false; Cv.view.classList.remove('panning'); return; }
 
       if (this.lasso && this.lasso.dragging) {
@@ -498,22 +554,6 @@
 
       if (this.mode === 'symbolBrush') {
         this.endSymbolBrush();
-        return;
-      }
-
-      if (this.measureFrom) {
-        var mf = this.measureFrom, mt = this.measureTo || p;
-        this.measureFrom = null; this.measureTo = null;
-        if (Math.hypot(mt.x-mf.x, mt.y-mf.y) > 4) {
-          var ML = Layers.get('measures');
-          var mbefore = JSON.parse(JSON.stringify(ML.objects));
-          var mo = { id:uid(), pts:[[mf.x,mf.y],[mt.x,mt.y]] };
-          ML.objects.push(mo);
-          App.selection = { layerId:'measures', id:mo.id };
-          History.pushVector('measures', mbefore, JSON.parse(JSON.stringify(ML.objects)), 'measure');
-          UI.refreshHistory(); UI.refreshSelection();
-        }
-        Cv.requestRender();
         return;
       }
 
@@ -591,7 +631,8 @@
     strokeTo: function (p) {
       if (!this.last) { this.last = p; return; }
       var r = (this.mode === 'terrain' ? App.terrain.size :
-                this.mode === 'elevation' ? App.elevation.brushSize : App.brush.size)/2;
+                this.mode === 'elevation' ? App.elevation.brushSize :
+                this.mode === 'sketch' ? App.sketch.size : App.brush.size)/2;
       var step = Math.max(1.5, r * 0.26);
       var dx = p.x-this.last.x, dy = p.y-this.last.y;
       var n = Math.max(1, Math.ceil(Math.hypot(dx,dy)/step));
@@ -627,6 +668,26 @@
         Terrain.scatter(ctx, App.terrain.type, x, y, r, App.terrain.opacity, this._terrainDensityScale);
       }
       this.expandBox(x, y, r + pad2);
+    },
+
+    /* Bir fırça hareketinin görsel olarak etkilediği dikdörtgen.
+       Kara fırçası kıyı efektini, yükselti fırçası gölgelendirmeyi de
+       değiştirir; bu efektler fırçanın biraz dışına taştığı için pay
+       eklenir. Arazi fırçası hiçbir global önbelleği etkilemez. */
+    _strokeRect: function (a, b) {
+      if (!a) a = b;
+      var r = (this.mode === 'terrain'   ? App.terrain.size :
+               this.mode === 'elevation' ? App.elevation.brushSize :
+               this.mode === 'eyedrop'   ? App.eyedrop.radius * 2 :
+               this.mode === 'sketch'    ? App.sketch.size :
+                                           App.brush.size) / 2;
+      var pad = r + 8;
+      if (this.mode === 'paint' || this.mode === 'erase') pad += (Cv.shoreWidth || 26) + 24;
+      else if (this.mode === 'elevation') pad += 32;
+      return {
+        x0: Math.min(a.x, b.x) - pad, y0: Math.min(a.y, b.y) - pad,
+        x1: Math.max(a.x, b.x) + pad, y1: Math.max(a.y, b.y) + pad
+      };
     },
 
     expandBox: function (x, y, r) {
@@ -672,6 +733,32 @@
         ctx.restore();
         Cv.elevationDirty = true;
         this.expandBox(x, y, er + 4);
+        return;
+      }
+
+      /* ---- ÇİZİM: kullanıcı katmanına serbest fırça ----
+         Yumuşak kenarlı yuvarlak damga; sertlik damganın ne kadarının
+         tam opak kaldığını belirler. Silgi modunda aynı damga
+         'destination-out' ile uygulanır, böylece aynı fırça hem çizer
+         hem siler. Hiçbir global önbelleği (kıyı/gölgelendirme)
+         etkilemez — kullanıcı katmanı yalnız kendi başına çizilir. */
+      if (this.mode === 'sketch') {
+        var sr = App.sketch.size/2;
+        var hard = Math.max(0, Math.min(1, App.sketch.hardness));
+        ctx.save();
+        ctx.globalAlpha = App.sketch.opacity;
+        if (App.sketch.eraser) ctx.globalCompositeOperation = 'destination-out';
+        if (hard > 0.985) {
+          ctx.fillStyle = App.sketch.color;
+        } else {
+          var sg = ctx.createRadialGradient(x, y, sr*hard, x, y, sr);
+          sg.addColorStop(0, App.sketch.color);
+          sg.addColorStop(1, rgbaOf(App.sketch.color, 0));
+          ctx.fillStyle = sg;
+        }
+        ctx.beginPath(); ctx.arc(x, y, sr, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+        this.expandBox(x, y, sr + 2);
         return;
       }
 
@@ -756,7 +843,12 @@
 
       this.box = null; this.last = null;
       this.beforeMain = null; this.beforeAux = null;
-      Cv.shoreDirty = true;
+      /* Kıyıyı yalnızca kara sınırını gerçekten değiştiren darbeler
+         geçersizleştirir; arazi/yükselti/çizim darbeleri kıyıyı
+         etkilemez ve boşuna yeniden inşa ettirmemeli. */
+      if (this.mode !== 'terrain' && this.mode !== 'elevation' && this.mode !== 'sketch') {
+        Cv.shoreDirty = true;
+      }
       UI.refreshHistory();
       Cv.requestRender();
     },
@@ -1228,42 +1320,125 @@
       var octaves = 3 + Math.round(roughness*3);      /* 3..6 */
       var freq = 2.2 + roughness*4;                    /* pürüzlülük arttıkça daha sık desen */
 
-      /* takımada için birkaç rastgele ada merkezi */
-      var islands = [];
-      if (template === 'archipelago') {
+      /* ---- kaynak noktaları (tohum) — şablona göre 1..9 arası ----
+         Bunlar artık analitik bir daireye "falloff" ile değil, aşağıdaki
+         blobFill() ile ızgara üzerinde rastgele bir su baskını (flood-fill)
+         gibi yayılıyor; bu, Azgaar's Fantasy Map Generator'ın "en basit ve
+         en iyi sonuç veren" yükselti algoritmasıyla aynı fikir: komşu
+         hücrelere geçişte küçük rastgele bir çürüme (decay) uygulamak,
+         analitik dairelerin asla üretemeyeceği koy/yarımada/parmak gibi
+         gerçekçi, düzensiz kıyı biçimleri doğurur. */
+      var seeds = [];
+      if (template === 'island') {
+        var ibCount = 3 + Math.floor(noise.next() * 4);  /* 3..6 */
+        for (var ib = 0; ib < ibCount; ib++) {
+          seeds.push({
+            x: 0.5 + (noise.next() - 0.5) * 0.30,
+            y: 0.5 + (noise.next() - 0.5) * 0.30,
+            r: 0.12 + noise.next() * 0.15,
+            h: ib === 0 ? 1.0 : 0.55 + noise.next() * 0.3
+          });
+        }
+      } else if (template === 'archipelago') {
         var count = 5 + Math.floor(noise.next()*5);
         for (var ii = 0; ii < count; ii++) {
-          islands.push({
+          seeds.push({
             x: 0.15 + noise.next()*0.7, y: 0.15 + noise.next()*0.7,
-            r: 0.10 + noise.next()*0.14
+            r: 0.10 + noise.next()*0.14,
+            h: 0.75 + noise.next() * 0.25
+          });
+        }
+      } else if (template === 'tectonic') {
+        /* Fay hattı şablonu: tohumlar dairesel bir kümede değil, kıvrılarak
+           ilerleyen tek bir çizgi (fay hattı) boyunca diziliyor. Bu, kıta/
+           ada şablonlarının asla üretemeyeceği uzun, sırt gibi bir siluet
+           doğurur — dağ silsilesiyle omurgalanmış bir kıta hissi verir.
+           Uçlara doğru yükseklik düşer (h küçülür) böylece fay hattının iki
+           ucu ince bir yarımada gibi sivrilir, ortası geniş kalır. */
+        var flen = 6 + Math.floor(noise.next() * 3);      /* 6..8 fay adımı */
+        var fx = 0.16 + noise.next() * 0.12;
+        var fy = 0.20 + noise.next() * 0.15;
+        var fang = -0.35 + noise.next() * 0.7;              /* başlangıç yönü */
+        for (var fseg = 0; fseg <= flen; fseg++) {
+          var branch = 2 + Math.floor(noise.next() * 2);    /* fay hattının eni */
+          for (var fb = 0; fb < branch; fb++) {
+            var off = (noise.next() - 0.5) * 0.10;
+            seeds.push({
+              x: fx + Math.cos(fang + Math.PI/2) * off,
+              y: fy + Math.sin(fang + Math.PI/2) * off,
+              r: 0.11 + noise.next() * 0.11,
+              h: (fseg === 0 || fseg === flen) ? 0.5 + noise.next()*0.25 : 0.85 + noise.next()*0.15
+            });
+          }
+          fang += (noise.next() - 0.5) * 0.6;               /* fay hattı kıvrılır */
+          var fstep = 0.07 + noise.next() * 0.04;
+          fx = Math.max(0.08, Math.min(0.92, fx + Math.cos(fang) * fstep));
+          fy = Math.max(0.08, Math.min(0.92, fy + Math.sin(fang) * fstep));
+        }
+      } else { /* continent */
+        var cbCount = 4 + Math.floor(noise.next() * 4);  /* 4..7 */
+        var cCX = 0.5 + (noise.next() - 0.5) * 0.18, cCY = 0.5 + (noise.next() - 0.5) * 0.12;
+        for (var cbi = 0; cbi < cbCount; cbi++) {
+          seeds.push({
+            x: cCX + (noise.next() - 0.5) * 0.42,
+            y: cCY + (noise.next() - 0.5) * 0.32,
+            r: 0.16 + noise.next() * 0.20,
+            h: cbi === 0 ? 1.0 : 0.6 + noise.next() * 0.3
           });
         }
       }
 
-      function smoothstep(a, b, t) { t = Math.max(0, Math.min(1, (t-a)/(b-a))); return t*t*(3-2*t); }
+      /* Çok kaynaklı, rastgele-çürümeli taşkın doldurma: her tohumdan
+         8-komşulukla yayılır, her adımda hedef yarıçapına göre hesaplanan
+         çürüme oranına küçük bir jitter eklenir. Bir hücrenin yüksekliği
+         yalnızca daha önce ulaşılandan yüksekse güncellenir (gevşetme),
+         böylece örtüşen tohumlar doğal biçimde birleşir. */
+      function blobFill(N, seedList, roughness, rng) {
+        var hgt = new Float32Array(N * N);
+        var dec = new Float32Array(N * N);
+        var queue = [];
+        var jitter = 0.05 + roughness * 0.09;
+        seedList.forEach(function (s) {
+          var gx = Math.max(0, Math.min(N-1, Math.round(s.x * N)));
+          var gy = Math.max(0, Math.min(N-1, Math.round(s.y * N)));
+          var rCells = Math.max(2, s.r * N);
+          var seedDecay = Math.pow(0.02 / s.h, 1 / rCells); /* h * decay^rCells ≈ 0.02 */
+          var idx = gy * N + gx;
+          if (s.h > hgt[idx]) { hgt[idx] = s.h; dec[idx] = seedDecay; queue.push(idx); }
+        });
+        var qi = 0;
+        while (qi < queue.length) {
+          var cur = queue[qi++];
+          var cx = cur % N, cy = (cur / N) | 0;
+          var curH = hgt[cur], curD = dec[cur];
+          if (curH <= 0.02) continue;
+          for (var dy = -1; dy <= 1; dy++) {
+            for (var dx = -1; dx <= 1; dx++) {
+              if (dx === 0 && dy === 0) continue;
+              var nx2 = cx + dx, ny2 = cy + dy;
+              if (nx2 < 0 || nx2 >= N || ny2 < 0 || ny2 >= N) continue;
+              var nidx = ny2 * N + nx2;
+              var effDecay = Math.max(0.5, Math.min(0.995, curD * (1 + (rng.next()-0.5) * jitter)));
+              var nh = curH * effDecay;
+              if (nh > hgt[nidx] + 0.001) {
+                hgt[nidx] = nh; dec[nidx] = curD;
+                queue.push(nidx);
+              }
+            }
+          }
+        }
+        return hgt;
+      }
+
+      var heightGrid = blobFill(N, seeds, roughness, noise);
 
       var small = document.createElement('canvas'); small.width = N; small.height = N;
       var sctx = small.getContext('2d');
       var img = sctx.createImageData(N, N);
       for (var gy = 0; gy < N; gy++) {
         for (var gx = 0; gx < N; gx++) {
-          var nx = gx/N - 0.5, ny = gy/N - 0.5;
           var base = noise.fbm(gx/N*freq, gy/N*freq, octaves, 0.5);
-          var falloff;
-          if (template === 'island') {
-            var d = Math.sqrt(nx*nx+ny*ny)*2.3;
-            falloff = 1 - smoothstep(0.12, 0.5, d);
-          } else if (template === 'archipelago') {
-            falloff = -1;
-            for (var k=0; k<islands.length; k++) {
-              var isl = islands[k];
-              var dd = Math.hypot(nx+0.5-isl.x, ny+0.5-isl.y)/isl.r;
-              falloff = Math.max(falloff, 1 - smoothstep(0.4, 1.0, dd));
-            }
-          } else { /* continent */
-            var d2 = Math.sqrt(nx*nx+ny*ny)*1.35;
-            falloff = 1 - smoothstep(0.32, 0.78, d2);
-          }
+          var falloff = heightGrid[gy*N+gx];
           var value = (falloff - 0.5) + base*(0.22 + roughness*0.5);
           var a = Math.max(0, Math.min(1, value/0.12 + 0.5));
           var idx = (gy*N+gx)*4;
@@ -1273,31 +1448,548 @@
       }
       sctx.putImageData(img, 0, 0);
 
-      /* büyük tuvale yumuşak (bilinear) ölçekle, sonra alpha eşiği + düz renk
-         doldurma ile smoothCoast'takiyle aynı temiz-kenar tekniğini uygula */
-      var raw = document.createElement('canvas'); raw.width = w; raw.height = h;
+      /* CSS blur filtresi + getImageData, piksel sayısıyla orantılı maliyetli —
+         8192² tuvalde (67M piksel) bu adım tek başına onlarca saniye sürüyordu.
+         Bulanıklaştırma+eşikleme adımını sabit bir üst sınırda (GEN_MAX) çalıştırıp
+         sonucu gerçek tuval boyutuna bilinear ölçekle büyütüyoruz — kıyı çizgisinin
+         asıl yumuşatması zaten render anında shore efektiyle (Cv.buildShoreCanvas)
+         geliyor, burada tek amaç ham blob şeklinin pürüzsüz bir sınırı olması. */
+      var GEN_MAX = 2048;
+      var gk = Math.min(1, GEN_MAX / Math.max(w, h));
+      var gw = Math.max(1, Math.round(w*gk)), gh = Math.max(1, Math.round(h*gk));
+
+      var raw = document.createElement('canvas'); raw.width = gw; raw.height = gh;
       var rctx = raw.getContext('2d');
       rctx.imageSmoothingEnabled = true;
-      rctx.drawImage(small, 0, 0, w, h);
+      rctx.drawImage(small, 0, 0, gw, gh);
 
-      var big = document.createElement('canvas'); big.width = w; big.height = h;
-      var bctx = big.getContext('2d', { willReadFrequently:true });
-      bctx.filter = 'blur(' + Math.max(2, Math.round(w*0.0015)) + 'px)';
-      bctx.drawImage(raw, 0, 0);
-      bctx.filter = 'none';
-      var bid = bctx.getImageData(0, 0, w, h), bd = bid.data;
+      var mid = document.createElement('canvas'); mid.width = gw; mid.height = gh;
+      var mctx = mid.getContext('2d', { willReadFrequently:true });
+      mctx.filter = 'blur(' + Math.max(2, Math.round(gw*0.0015)) + 'px)';
+      mctx.drawImage(raw, 0, 0);
+      mctx.filter = 'none';
+      var bid = mctx.getImageData(0, 0, gw, gh), bd = bid.data;
       for (var p = 0; p < bd.length; p += 4) bd[p+3] = bd[p+3] > 128 ? 255 : 0;
-      bctx.putImageData(bid, 0, 0);
-      bctx.globalCompositeOperation = 'source-in';
-      bctx.fillStyle = App.brush.color;
-      bctx.fillRect(0, 0, w, h);
-      bctx.globalCompositeOperation = 'source-over';
+      mctx.putImageData(bid, 0, 0);
+      mctx.globalCompositeOperation = 'source-in';
+      mctx.fillStyle = App.brush.color;
+      mctx.fillRect(0, 0, gw, gh);
+      mctx.globalCompositeOperation = 'source-over';
 
+      /* mid'i doğrudan katmana çiz — ayrı bir 'big' ara tuvaline kopyalayıp
+         oradan tekrar katmana çizmek 8192² gibi boyutlarda tek başına
+         saniyeler süren gereksiz bir ikinci tam-tuval kopyasıydı. */
       L.ctx.clearRect(0, 0, w, h);
-      L.ctx.drawImage(big, 0, 0);
+      L.ctx.imageSmoothingEnabled = true;
+      L.ctx.drawImage(mid, 0, 0, w, h);
 
       History.pushRaster('landmass', before, L.canvas, {x:0,y:0,w:w,h:h}, 'landgen:'+template);
       Cv.shoreDirty = true;
+      UI.refreshHistory();
+      Cv.requestRender();
+    },
+
+    /* ================= BİYOM OTOMATİK ATAMA =================
+       Arazi katmanını, kara/deniz maskesi + yükselti verisine göre
+       otomatik dolduruyor. Bant mantığı gerçek coğrafyadan ödünç:
+       enlem (tuval y ekseni, kenarlar kutup / orta satır ekvator) sıcaklık
+       bandını, yükselti (elevation katmanı, 128=deniz seviyesi) dağ/yayla
+       bandını belirliyor; her bandın içinde bir gürültü değeri (moist)
+       birkaç yakın biyom arasında çeşitlilik sağlıyor. Elle boyanmış
+       herhangi bir terrain gibi Terrain.scatter ile damgalanıyor, sonra
+       tek seferde landmass'a clip'leniyor. */
+    autoBiome: function (seed) {
+      var Lm = Layers.get('landmass'), Ev = Layers.get('elevation'), T = Layers.get('terrain');
+      if (!Lm || !Ev || !T) return;
+      if (T.locked) { UI.msg(UI.t('locked')); return; }
+      var w = T.canvas.width, h = T.canvas.height;
+      var before = snap(T.canvas);
+      var rnd = this._noiseGrid((seed >>> 0) || Math.floor(Math.random()*4294967296));
+
+      var N = Math.max(24, Math.min(90, Math.round(Math.min(w,h)/48)));
+      var sw = N, sh = Math.max(1, Math.round(N * h/w));
+
+      var lc = document.createElement('canvas'); lc.width = sw; lc.height = sh;
+      var lctx = lc.getContext('2d', { willReadFrequently:true });
+      lctx.drawImage(Lm.canvas, 0, 0, sw, sh);
+      var land = lctx.getImageData(0, 0, sw, sh).data;
+
+      var ec = document.createElement('canvas'); ec.width = sw; ec.height = sh;
+      var ectx = ec.getContext('2d', { willReadFrequently:true });
+      ectx.drawImage(Ev.canvas, 0, 0, sw, sh);
+      var elev = ectx.getImageData(0, 0, sw, sh).data;
+
+      function pickBiome(e, lat, moist) {
+        if (e > 0.62) {
+          if (lat > 0.72) return 'glacier';
+          if (moist < 0.12) return 'volcanic';
+          return 'mountain';
+        }
+        if (e > 0.36) return lat > 0.6 ? 'taiga' : 'highland';
+        if (lat > 0.84) return moist < 0.5 ? 'tundra' : 'snow';
+        if (lat > 0.62) return moist < 0.55 ? 'taiga' : 'darkforest';
+        if (lat > 0.40) return moist < 0.30 ? 'shrubland' : (moist < 0.65 ? 'forest' : 'meadow');
+        if (lat > 0.18) return moist < 0.35 ? 'savanna' : (moist < 0.70 ? 'grassland' : 'swamp');
+        return moist < 0.45 ? 'desert' : (moist < 0.80 ? 'savanna' : 'marsh');
+      }
+
+      T.ctx.clearRect(0, 0, w, h);
+      var cellW = w/sw, cellH = h/sh;
+      var r = Math.max(cellW, cellH) * 0.95;
+      var placed = 0;
+
+      for (var gy = 0; gy < sh; gy++) {
+        for (var gx = 0; gx < sw; gx++) {
+          var i = (gy*sw + gx) * 4;
+          var a = land[i+3] / 255;
+          if (a < 0.4) continue;
+          var ea = elev[i+3] / 255;
+          var height = ea > 0.02 ? (elev[i]*ea + 128*(1-ea)) : 128;
+          var e = Math.max(0, (height - 128) / 127);
+          var lat = Math.abs((gy+0.5)/sh - 0.5) * 2;
+          var biome = pickBiome(e, lat, rnd.next());
+          var cx = (gx+0.5)*cellW, cy = (gy+0.5)*cellH;
+          Terrain.scatter(T.ctx, biome, cx, cy, r, 1, 1);
+          placed++;
+        }
+      }
+
+      if (!placed) { UI.msg(UI.t('biomegen_empty')); return; }
+
+      T.ctx.globalCompositeOperation = 'destination-in';
+      T.ctx.drawImage(Lm.canvas, 0, 0);
+      T.ctx.globalCompositeOperation = 'source-over';
+
+      History.pushRaster('terrain', before, T.canvas, {x:0,y:0,w:w,h:h}, 'biomegen');
+      UI.refreshHistory();
+      Cv.requestRender();
+    },
+
+    /* ================= NEHİR OTOMATİK ÜRETİMİ =================
+       Yükselti gridinde yüksek noktalardan başlayıp her adımda en alçak
+       komşuya inen (steepest-descent) bir akış izliyor; kara bitip denize
+       (veya tuval kenarına) ulaşınca nehir ağzı tamamlanmış olur. Izgara
+       noktaları seyrekleştirilip vektör 'rivers' nesnesi olarak ekleniyor
+       — eğrilik zaten render anında Geo.sample'ın Catmull-Rom'undan gelir,
+       burada ekstra yumuşatmaya gerek yok. */
+    generateRivers: function (count, seed) {
+      var Lm = Layers.get('landmass'), Ev = Layers.get('elevation'), Rv = Layers.get('rivers');
+      if (!Lm || !Ev || !Rv) return;
+      if (Rv.locked) { UI.msg(UI.t('locked')); return; }
+      var w = Lm.canvas.width, h = Lm.canvas.height;
+      var rnd = this._noiseGrid((seed >>> 0) || Math.floor(Math.random()*4294967296));
+
+      var N = Math.max(60, Math.min(160, Math.round(Math.min(w,h)/24)));
+      var sw = N, sh = Math.max(1, Math.round(N * h/w));
+
+      var lc = document.createElement('canvas'); lc.width = sw; lc.height = sh;
+      var lctx = lc.getContext('2d', { willReadFrequently:true });
+      lctx.drawImage(Lm.canvas, 0, 0, sw, sh);
+      var land = lctx.getImageData(0, 0, sw, sh).data;
+
+      var ec = document.createElement('canvas'); ec.width = sw; ec.height = sh;
+      var ectx = ec.getContext('2d', { willReadFrequently:true });
+      ectx.drawImage(Ev.canvas, 0, 0, sw, sh);
+      var elev = ectx.getImageData(0, 0, sw, sh).data;
+
+      function isLand(gx, gy) {
+        if (gx < 0 || gy < 0 || gx >= sw || gy >= sh) return false;
+        return land[(gy*sw+gx)*4+3]/255 > 0.4;
+      }
+      function heightAt(gx, gy) {
+        var i = (gy*sw+gx)*4;
+        var a = elev[i+3]/255;
+        return a > 0.02 ? (elev[i]*a + 128*(1-a)) : 128;
+      }
+
+      var candidates = [];
+      for (var gy = 0; gy < sh; gy++) {
+        for (var gx = 0; gx < sw; gx++) {
+          if (!isLand(gx, gy)) continue;
+          var hgt = heightAt(gx, gy);
+          if (hgt > 148) candidates.push({ gx:gx, gy:gy, h:hgt });
+        }
+      }
+      if (!candidates.length) { UI.msg(UI.t('rivergen_noelev')); return; }
+      candidates.sort(function (a, b) { return b.h - a.h; });
+
+      var wanted = count || Math.max(2, Math.min(8, Math.round(candidates.length/40)));
+      var before = JSON.parse(JSON.stringify(Rv.objects));
+      var used = new Uint8Array(sw*sh);
+      var minSepCells = Math.max(3, Math.round(sw*0.06));
+      var made = 0, tries = 0;
+
+      while (made < wanted && tries < candidates.length*2) {
+        tries++;
+        var idx = Math.min(candidates.length-1, Math.floor(rnd.next() * Math.min(candidates.length, wanted*15)));
+        var src = candidates[idx];
+        if (used[src.gy*sw+src.gx]) continue;
+
+        var path = [[src.gx, src.gy]];
+        var cx = src.gx, cy = src.gy;
+        var visited = {};
+        var steps = 0, maxSteps = sw + sh;
+        while (steps++ < maxSteps) {
+          visited[cy*sw+cx] = 1;
+          if (!isLand(cx, cy)) break;
+          var bestH = heightAt(cx, cy), bestX = -1, bestY = -1;
+          for (var dy = -1; dy <= 1; dy++) {
+            for (var dx = -1; dx <= 1; dx++) {
+              if (!dx && !dy) continue;
+              var nx = cx+dx, ny = cy+dy;
+              if (nx < 0 || ny < 0 || nx >= sw || ny >= sh) { bestX = nx; bestY = ny; bestH = -1e9; continue; }
+              if (visited[ny*sw+nx]) continue;
+              if (!isLand(nx, ny)) { bestX = nx; bestY = ny; bestH = -1e9; continue; }
+              var nh = heightAt(nx, ny);
+              if (nh < bestH) { bestH = nh; bestX = nx; bestY = ny; }
+            }
+          }
+          if (bestX === -1) break;
+          cx = bestX; cy = bestY;
+          path.push([cx, cy]);
+          if (!isLand(cx, cy)) break;
+        }
+
+        if (path.length < 4) continue;
+
+        path.forEach(function (pt) {
+          for (var oy = -minSepCells; oy <= minSepCells; oy++) {
+            for (var ox = -minSepCells; ox <= minSepCells; ox++) {
+              var ux = pt[0]+ox, uy = pt[1]+oy;
+              if (ux >= 0 && uy >= 0 && ux < sw && uy < sh) used[uy*sw+ux] = 1;
+            }
+          }
+        });
+
+        var step = Math.max(1, Math.floor(path.length/28));
+        var pts = [];
+        for (var pi = 0; pi < path.length; pi += step) {
+          var px = Math.max(0, Math.min(w, path[pi][0]/sw*w));
+          var py = Math.max(0, Math.min(h, path[pi][1]/sh*h));
+          if (pts.length) {
+            var lp = pts[pts.length-1];
+            if (Math.hypot(px-lp[0], py-lp[1]) < Math.min(w,h)*0.01) continue;
+          }
+          pts.push([px, py]);
+        }
+        var lastPt = path[path.length-1];
+        var lpx = Math.max(0, Math.min(w, lastPt[0]/sw*w)), lpy = Math.max(0, Math.min(h, lastPt[1]/sh*h));
+        if (!pts.length || Math.hypot(lpx-pts[pts.length-1][0], lpy-pts[pts.length-1][1]) > 1) pts.push([lpx, lpy]);
+        if (pts.length < 2) continue;
+
+        Rv.objects.push({
+          id: uid(), pts: pts, width: App.river.width * (0.6 + rnd.next()*0.5),
+          meander: App.river.meander, taper: true,
+          color: App.river.color, opacity: 1
+        });
+        made++;
+      }
+
+      if (!made) { UI.msg(UI.t('rivergen_none')); return; }
+      History.pushVector('rivers', before, JSON.parse(JSON.stringify(Rv.objects)), 'rivergen');
+      UI.refreshHistory();
+      Cv.requestRender();
+    },
+
+    /* ================= YOL OTOMATİK ÜRETİMİ =================
+       Yerleşim sembolleri (şehir/kasaba/köy/kale/liman) varsa onları,
+       yoksa iyi ayrılmış birkaç rastgele kara noktasını bir asgari yayılan
+       ağaç (MST, düz-çizgi mesafesiyle) ile eşleştirir; her kenar için
+       yükselti-maliyetli A* ile en az dik yamaçtan geçen, denize hiç
+       girmeyen bir yol bulur. Nehir akışının aksine (tek yönlü, en dik
+       iniş) burada gerçek graf araması gerekiyor çünkü yol iki sabit uç
+       arasında olmalı. */
+    ROAD_SETTLE_CATS: { cities:1, towns:1, villages:1, castles:1, ports:1 },
+
+    generateRoads: function (seed) {
+      var Lm = Layers.get('landmass'), Ev = Layers.get('elevation'), Rd = Layers.get('roads'), Sy = Layers.get('symbols');
+      if (!Lm || !Rd) return;
+      if (Rd.locked) { UI.msg(UI.t('locked')); return; }
+      var w = Lm.canvas.width, h = Lm.canvas.height;
+      var rnd = this._noiseGrid((seed >>> 0) || Math.floor(Math.random()*4294967296));
+
+      var N = Math.max(50, Math.min(120, Math.round(Math.min(w,h)/32)));
+      var sw = N, sh = Math.max(1, Math.round(N * h/w));
+
+      var lc = document.createElement('canvas'); lc.width = sw; lc.height = sh;
+      var lctx = lc.getContext('2d', { willReadFrequently:true });
+      lctx.drawImage(Lm.canvas, 0, 0, sw, sh);
+      var land = lctx.getImageData(0, 0, sw, sh).data;
+
+      var ec = document.createElement('canvas'); ec.width = sw; ec.height = sh;
+      var ectx = ec.getContext('2d', { willReadFrequently:true });
+      ectx.drawImage(Ev.canvas, 0, 0, sw, sh);
+      var elev = ectx.getImageData(0, 0, sw, sh).data;
+
+      function isLand(gx, gy) {
+        if (gx < 0 || gy < 0 || gx >= sw || gy >= sh) return false;
+        return land[(gy*sw+gx)*4+3]/255 > 0.4;
+      }
+      function heightAt(gx, gy) {
+        var i = (gy*sw+gx)*4;
+        var a = elev[i+3]/255;
+        return a > 0.02 ? (elev[i]*a + 128*(1-a)) : 128;
+      }
+
+      var self = this;
+      var pts = [];
+      if (Sy) {
+        Sy.objects.forEach(function (o) {
+          if (!o.sym) return;
+          var cat = Sym.catOf(o.sym);
+          if (!self.ROAD_SETTLE_CATS[cat]) return;
+          var gx = Math.round(o.x/w*sw), gy = Math.round(o.y/h*sh);
+          if (isLand(gx, gy)) pts.push({ x:o.x, y:o.y, gx:gx, gy:gy });
+        });
+      }
+      if (pts.length < 2) {
+        var landCells = [];
+        for (var gy0 = 0; gy0 < sh; gy0++) {
+          for (var gx0 = 0; gx0 < sw; gx0++) if (isLand(gx0, gy0)) landCells.push([gx0, gy0]);
+        }
+        if (landCells.length < 2) { UI.msg(UI.t('roadgen_noland')); return; }
+        var wanted = Math.max(3, Math.min(6, Math.round(landCells.length/900)));
+        var picked = [], tries = 0;
+        while (picked.length < wanted && tries < 500) {
+          tries++;
+          var cand = landCells[Math.floor(rnd.next()*landCells.length)];
+          var ok = true;
+          for (var pi0 = 0; pi0 < picked.length; pi0++) {
+            var dx0 = picked[pi0][0]-cand[0], dy0 = picked[pi0][1]-cand[1];
+            if (Math.hypot(dx0, dy0) < sw*0.18) { ok = false; break; }
+          }
+          if (ok) picked.push(cand);
+        }
+        pts = picked.map(function (c) { return { x:(c[0]+0.5)/sw*w, y:(c[1]+0.5)/sh*h, gx:c[0], gy:c[1] }; });
+        if (pts.length < 2) { UI.msg(UI.t('roadgen_noland')); return; }
+      }
+
+      /* düz-çizgi mesafesiyle asgari yayılan ağaç (Prim) — hangi noktaların
+         yolla bağlanacağını belirler, gerçek yol şeklini değil */
+      var n = pts.length;
+      var inMST = [], distMST = [], parent = [];
+      for (var i = 0; i < n; i++) { inMST.push(false); distMST.push(Infinity); parent.push(-1); }
+      distMST[0] = 0;
+      var edges = [];
+      for (var it = 0; it < n; it++) {
+        var u = -1, best = Infinity;
+        for (var j = 0; j < n; j++) if (!inMST[j] && distMST[j] < best) { best = distMST[j]; u = j; }
+        if (u === -1) break;
+        inMST[u] = true;
+        if (parent[u] !== -1) edges.push([parent[u], u]);
+        for (var k = 0; k < n; k++) {
+          if (inMST[k]) continue;
+          var dd = Math.hypot(pts[u].x-pts[k].x, pts[u].y-pts[k].y);
+          if (dd < distMST[k]) { distMST[k] = dd; parent[k] = u; }
+        }
+      }
+
+      /* A* — 8 komşuluk, adım maliyeti yükselti farkına göre artar (yol
+         dik yamaçtan kaçınır), deniz hücreleri tamamen kapalı */
+      function astar(sx, sy, tx, ty) {
+        var heap = [];
+        function pushHeap(item) {
+          heap.push(item);
+          var idx = heap.length-1;
+          while (idx > 0) {
+            var p = (idx-1) >> 1;
+            if (heap[p][0] <= heap[idx][0]) break;
+            var t = heap[p]; heap[p] = heap[idx]; heap[idx] = t;
+            idx = p;
+          }
+        }
+        function popHeap() {
+          var top = heap[0], last = heap.pop();
+          if (heap.length) {
+            heap[0] = last;
+            var idx = 0;
+            while (true) {
+              var l = idx*2+1, r = idx*2+2, s = idx;
+              if (l < heap.length && heap[l][0] < heap[s][0]) s = l;
+              if (r < heap.length && heap[r][0] < heap[s][0]) s = r;
+              if (s === idx) break;
+              var t = heap[idx]; heap[idx] = heap[s]; heap[s] = t;
+              idx = s;
+            }
+          }
+          return top;
+        }
+
+        var startIdx = sy*sw+sx, targetIdx = ty*sw+tx;
+        var total = sw*sh;
+        var gScore = new Array(total), cameFrom = new Array(total);
+        var visited = new Uint8Array(total);
+        for (var gi = 0; gi < total; gi++) { gScore[gi] = Infinity; cameFrom[gi] = -1; }
+        gScore[startIdx] = 0;
+        pushHeap([Math.hypot(tx-sx, ty-sy), startIdx]);
+
+        while (heap.length) {
+          var cur = popHeap(), ci = cur[1];
+          if (visited[ci]) continue;
+          visited[ci] = 1;
+          if (ci === targetIdx) break;
+          var cx = ci % sw, cy = (ci/sw)|0;
+          for (var dy = -1; dy <= 1; dy++) {
+            for (var dx = -1; dx <= 1; dx++) {
+              if (!dx && !dy) continue;
+              var nx = cx+dx, ny = cy+dy;
+              if (!isLand(nx, ny)) continue;
+              var ni = ny*sw+nx;
+              if (visited[ni]) continue;
+              var slope = Math.abs(heightAt(nx, ny) - heightAt(cx, cy));
+              var cost = Math.hypot(dx, dy) * (1 + slope*0.05);
+              var ng = gScore[ci] + cost;
+              if (ng < gScore[ni]) {
+                gScore[ni] = ng;
+                cameFrom[ni] = ci;
+                pushHeap([ng + Math.hypot(tx-nx, ty-ny), ni]);
+              }
+            }
+          }
+        }
+
+        if (cameFrom[targetIdx] === -1 && targetIdx !== startIdx) return null;
+        var path = [], cur2 = targetIdx, guard = 0;
+        while (cur2 !== -1 && guard++ < total) {
+          path.push([cur2 % sw, (cur2/sw)|0]);
+          if (cur2 === startIdx) break;
+          cur2 = cameFrom[cur2];
+        }
+        path.reverse();
+        return path;
+      }
+
+      var before = JSON.parse(JSON.stringify(Rd.objects));
+      var made = 0;
+      edges.forEach(function (e) {
+        var a = pts[e[0]], b = pts[e[1]];
+        var path = astar(a.gx, a.gy, b.gx, b.gy);
+        if (!path || path.length < 2) return;
+
+        var step = Math.max(1, Math.floor(path.length/40));
+        var rpts = [];
+        for (var pi = 0; pi < path.length; pi += step) {
+          var px = (path[pi][0]+0.5)/sw*w, py = (path[pi][1]+0.5)/sh*h;
+          if (rpts.length) {
+            var lp = rpts[rpts.length-1];
+            if (Math.hypot(px-lp[0], py-lp[1]) < Math.min(w,h)*0.008) continue;
+          }
+          rpts.push([px, py]);
+        }
+        var lastc = path[path.length-1];
+        var lpx = (lastc[0]+0.5)/sw*w, lpy = (lastc[1]+0.5)/sh*h;
+        if (!rpts.length || Math.hypot(lpx-rpts[rpts.length-1][0], lpy-rpts[rpts.length-1][1]) > 1) rpts.push([lpx, lpy]);
+        if (rpts.length < 2) return;
+
+        Rd.objects.push({ id:uid(), pts:rpts, width:App.road.width, style:App.road.style, color:App.road.color, opacity:1 });
+        made++;
+      });
+
+      if (!made) { UI.msg(UI.t('roadgen_none')); return; }
+      History.pushVector('roads', before, JSON.parse(JSON.stringify(Rd.objects)), 'roadgen');
+      UI.refreshHistory();
+      Cv.requestRender();
+    },
+
+    /* ================= YERLEŞİM OTOMATİK YERLEŞTİRME =================
+       Düz (düşük yükselti) ve kıyıya yakın kara hücrelerini puanlayıp en
+       iyilerini seçer — en yüksek puanlı kale/liman, sonraki birkaçı
+       kasaba, geri kalanı köy sembolü olur. generateRoads ile aynı
+       ROAD_SETTLE_CATS kategori kümesini kullanır, böylece "Yol üret"
+       burada yerleştirilen sembolleri otomatik bulup birbirine bağlar. */
+    autoSettle: function (count, seed) {
+      var Lm = Layers.get('landmass'), Ev = Layers.get('elevation'), Sy = Layers.get('symbols');
+      if (!Lm || !Sy) return;
+      if (Sy.locked || !Sy.visible) { UI.msg(UI.t('locked')); return; }
+      var w = Lm.canvas.width, h = Lm.canvas.height;
+      var rnd = this._noiseGrid((seed >>> 0) || Math.floor(Math.random()*4294967296));
+
+      var N = Math.max(50, Math.min(120, Math.round(Math.min(w,h)/32)));
+      var sw = N, sh = Math.max(1, Math.round(N * h/w));
+
+      var lc = document.createElement('canvas'); lc.width = sw; lc.height = sh;
+      var lctx = lc.getContext('2d', { willReadFrequently:true });
+      lctx.drawImage(Lm.canvas, 0, 0, sw, sh);
+      var land = lctx.getImageData(0, 0, sw, sh).data;
+
+      var ec = document.createElement('canvas'); ec.width = sw; ec.height = sh;
+      var ectx = ec.getContext('2d', { willReadFrequently:true });
+      ectx.drawImage(Ev.canvas, 0, 0, sw, sh);
+      var elev = ectx.getImageData(0, 0, sw, sh).data;
+
+      function isLand(gx, gy) {
+        if (gx < 0 || gy < 0 || gx >= sw || gy >= sh) return false;
+        return land[(gy*sw+gx)*4+3]/255 > 0.4;
+      }
+      function heightAt(gx, gy) {
+        var i = (gy*sw+gx)*4;
+        var a = elev[i+3]/255;
+        return a > 0.02 ? (elev[i]*a + 128*(1-a)) : 128;
+      }
+      function isCoastal(gx, gy) {
+        for (var dy = -2; dy <= 2; dy++) {
+          for (var dx = -2; dx <= 2; dx++) {
+            if (!dx && !dy) continue;
+            if (!isLand(gx+dx, gy+dy)) return true;
+          }
+        }
+        return false;
+      }
+
+      var cells = [];
+      for (var gy = 0; gy < sh; gy++) {
+        for (var gx = 0; gx < sw; gx++) {
+          if (!isLand(gx, gy)) continue;
+          var e = Math.max(0, (heightAt(gx, gy)-128)/127);
+          if (e > 0.55) continue; /* çok dik/dağlık arazi — yerleşim uygun değil */
+          var coastal = isCoastal(gx, gy);
+          var score = (1-e) + (coastal ? 0.6 : 0) + rnd.next()*0.25;
+          cells.push({ gx:gx, gy:gy, score:score, coastal:coastal });
+        }
+      }
+      if (!cells.length) { UI.msg(UI.t('settlegen_noland')); return; }
+      cells.sort(function (a, b) { return b.score - a.score; });
+
+      var wanted = count || Math.max(3, Math.min(9, Math.round(cells.length/700)));
+      var minSepCells = Math.max(3, Math.round(sw*0.10));
+
+      var existing = [];
+      Sy.objects.forEach(function (o) { existing.push([o.x/w*sw, o.y/h*sh]); });
+
+      var picked = [];
+      for (var ci = 0; ci < cells.length && picked.length < wanted; ci++) {
+        var c = cells[ci];
+        var ok = true;
+        for (var pi = 0; pi < picked.length; pi++) {
+          if (Math.hypot(picked[pi].gx-c.gx, picked[pi].gy-c.gy) < minSepCells) { ok = false; break; }
+        }
+        if (ok) {
+          for (var ei = 0; ei < existing.length; ei++) {
+            if (Math.hypot(existing[ei][0]-c.gx, existing[ei][1]-c.gy) < minSepCells*0.6) { ok = false; break; }
+          }
+        }
+        if (ok) picked.push(c);
+      }
+      if (!picked.length) { UI.msg(UI.t('settlegen_none')); return; }
+
+      var before = JSON.parse(JSON.stringify(Sy.objects));
+      picked.forEach(function (c, idx) {
+        var cat, sizeBase;
+        if (idx === 0)    { cat = (c.coastal && Sym.SYMBOLS.ports) ? 'ports' : 'castles'; sizeBase = 84; }
+        else if (idx < 3) { cat = 'towns'; sizeBase = 68; }
+        else              { cat = 'villages'; sizeBase = 52; }
+        var catDef = Sym.SYMBOLS[cat] || Sym.SYMBOLS.villages;
+        var items = catDef.items;
+        var def = items[Math.floor(rnd.next()*items.length)];
+        var x = (c.gx+0.5)/sw*w, y = (c.gy+0.5)/sh*h;
+        Sy.objects.push({
+          id:uid(), sym:def.id, x:x, y:y,
+          size: sizeBase * (0.9 + rnd.next()*0.2), rot:0,
+          hue:0, opacity:1, wear:0
+        });
+      });
+
+      History.pushVector('symbols', before, JSON.parse(JSON.stringify(Sy.objects)), 'settlegen');
       UI.refreshHistory();
       Cv.requestRender();
     },
@@ -1500,6 +2192,7 @@
     pathLayerId: function (tool) {
       if (tool === 'river' || tool === 'lake') return 'rivers';
       if (tool === 'territory') return 'territories';
+      if (tool === 'measure') return 'measures';
       return 'roads';
     },
 
@@ -1516,6 +2209,7 @@
       var isLake      = App.tool === 'lake';
       var isTerritory = App.tool === 'territory';
       var isRiver     = App.tool === 'river';
+      var isMeasure   = App.tool === 'measure';
       var minPts = (isLake || isTerritory) ? 3 : 2;
       if (this.pathPts.length < minPts) { this.pathPts = []; Cv.requestRender(); return; }
       var lid = this.pathLayerId(App.tool);
@@ -1532,6 +2226,8 @@
       } else if (isRiver) {
         o = { id:uid(), pts:this.pathPts.slice(), width:App.river.width, meander:App.river.meander,
               taper:App.river.taper, color:App.river.color, opacity:1 };
+      } else if (isMeasure) {
+        o = { id:uid(), pts:this.pathPts.slice(), closed: App.measure.area && this.pathPts.length >= 3 };
       } else {
         o = { id:uid(), pts:this.pathPts.slice(), width:App.road.width, style:App.road.style,
               color:App.road.color, opacity:1 };
@@ -1690,7 +2386,7 @@
          verisi de temizlenir — yoksa proje dosyasında sonsuza dek öksüz kalır */
       if (s.layerId === 'links') {
         var delObj = L.objects.filter(function (o) { return o.id === s.id; })[0];
-        if (delObj && App.maps[delObj.targetMapId]) delete App.maps[delObj.targetMapId];
+        if (delObj) App.deleteMapRecursive(delObj.targetMapId);
       }
       L.objects = L.objects.filter(function (o) { return o.id !== s.id; });
       App.selection = null;
@@ -1785,8 +2481,10 @@
       var L = Layers.get('symbols');
       var before = JSON.parse(JSON.stringify(L.objects));
       var idx = L.objects.findIndex(function(ob){ return ob.id === o.id; });
+      if (idx < 0) return;   /* grup listede yoksa splice(-1) yanlış nesneyi silerdi */
       var members = o.members || [];
-      L.objects.splice(idx, 1, ...members);
+      /* ES5: spread yerine apply — kod tabanının geri kalanıyla aynı seviyede kal */
+      Array.prototype.splice.apply(L.objects, [idx, 1].concat(members));
       App.selection = members.length > 0
         ? { multi:true, layerId:'symbols', ids:members.map(function(m){return m.id;}), objs:members }
         : null;
@@ -1811,10 +2509,6 @@
     /* ================= ÜST KATMAN ================= */
     drawOverlay: function (ctx) {
       var z = Cv.zoom;
-
-      if (this.measureFrom && this.measureTo) {
-        Cv.drawMeasure(ctx, { pts:[[this.measureFrom.x,this.measureFrom.y],[this.measureTo.x,this.measureTo.y]] });
-      }
 
       if (this.lasso && this.lasso.pts.length) {
         var lp = this.lasso.pts;
@@ -1882,7 +2576,13 @@
         ctx.restore();
       }
 
-      if (this.pathPts.length) {
+      if (this.pathPts.length && App.tool === 'measure') {
+        var mpts = this.pathPts.slice();
+        if (this.pathHover) mpts.push([this.pathHover.x, this.pathHover.y]);
+        if (mpts.length >= 2) {
+          Cv.drawMeasure(ctx, { pts:mpts, closed: App.measure.area && mpts.length >= 3 });
+        }
+      } else if (this.pathPts.length) {
         var pts = this.pathPts.slice();
         if (this.pathHover) pts.push([this.pathHover.x, this.pathHover.y]);
         var sm = Geo.sample(pts, 14);

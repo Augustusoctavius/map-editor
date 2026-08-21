@@ -24,6 +24,7 @@ Uygulama artık düz editör yerine, üstte dört sekmeli bir karşılama ekran�
 
 - **Ana Sayfa** — proje tanıtımı ve "Haritana başla" butonu.
 - **Tuval** — hazır ölçülerden veya özel genişlik/yükseklikten yeni bir tuval oluşturur, `.json` dosyasından proje içe aktarır, ve bu tarayıcıda daha önce kaydedilmiş tuvalleri listeler (açma/silme). Kayıtlar tarayıcının `localStorage`'ında tutulur — backend yoktur, bu yüzden başka bir cihazdan görünmez; gerçek yedekleme/taşıma için hâlâ `.json` dışa/içe aktarma kullanılır. Editördeki "Kaydet" butonu `.json` indirmeye ek olarak bu listeyi de otomatik günceller. Ayrıca sessiz oto-kayıt vardır: editörden Ana Sayfa/Tuval gibi başka bir sekmeye geçildiğinde ve editördeyken her 10 dakikada bir, üzerinde çizim yapılmış tuval otomatik olarak bu listeye kaydedilir.
+- **Tuval → Şablonla başla** — Boş tuval yerine hazır bir kıyı çizgisiyle başlamak için altı şablon: Kıta, Ada, Takımada, Krallık, Savaş alanı (altıgen ızgaralı) ve Boş tuval. Şablonlar yeni bir mekanik değildir; mevcut prosedürel kara üretecini hazır şablon/pürüzlülük değerleriyle çağırır, arazi türünü seçer ve gerekiyorsa ızgarayı açar. Boyut ve harita adı yeni-tuval formundan okunur.
 - **Rehber** — sol araç çubuğundaki her aracın kısa açıklaması.
 - **Topluluk** — proje hakkında ve GitHub bağlantısı.
 
@@ -39,7 +40,9 @@ Bir tuval oluşturulduğunda veya açıldığında, bildiğiniz editör ekranın
 | **↶ / ↷ (Geri al / Yinele)** | 50 adıma kadar geri al/yinele geçmişi. `Ctrl+Z` / `Ctrl+Shift+Z` / `Ctrl+Y`. |
 | **PNG / PNG 2× / PNG 4×** | Haritayı normal, 2× veya 4× çözünürlükte PNG olarak dışa aktarır. |
 | **SVG** | Haritayı gerçek vektör SVG olarak dışa aktarır — sembol yolları (`Path2D` verisi) doğrudan `<path>` olarak yazılır, bitmap gömme değildir. Kıyı parlaması ve yükselti gölgelendirmesi gibi raster efektler base64 `<image>` olarak gömülür. |
-| **🌐 Dil** | 10 dilli arayüz dili seçici (bayraklı, açılır menü). |
+| **HTML** | Haritayı **tek bir `.html` dosyası** olarak dışa aktarır: görüntü ve küçük bir görüntüleyici (sürükle-kaydır, tekerlekle yakınlaş, çift tıkla sığdır) dosyanın içine gömülüdür. Dış istek, sunucu veya betik kütüphanesi yok — dosyayı yollayıp çift tıklamak yeterli. En uzun kenar (1280–4096 px) ve biçim (PNG kayıpsız / JPEG küçük dosya) seçilebilir. |
+| **🖨 Baskı / PDF** | Haritayı sayfa boyu (A5–Tabloid), yön, kenar boşluğu ve DPI (96 / 150 / 300) seçerek tarayıcının baskı iletişimine gönderir. Oradan yazıcıya basılabilir ya da "PDF olarak kaydet" ile gerçek PDF üretilebilir; ayrı bir PDF kütüphanesi kullanılmaz. Harita, seçilen sayfanın basılabilir alanına en-boy oranı korunarak sığdırılır. |
+| **🌐 Dil** | 11 dilli arayüz dili seçici (bayraklı, açılır menü). Arapça seçildiğinde arayüz sağdan sola döner (araç rayı sağa, seçenek paneli sola geçer); tuval her zaman aynı kalır. |
 
 ## Araç çubuğu (sol taraf, dikey)
 
@@ -80,7 +83,8 @@ bölümünü açar ve tuşuyla da seçilebilir. Rehber sayfası da aynı gruplam
 |---|---|---|
 | **Sembol** | `S` | ~200+ düz (ink-style) sembol ve onlarca izometrik bina/yapıdan (kale, kulübe, değirmen, köprü vb.) birini yerleştirir. Renk tonu (hue) ve "yıpranma/wear" (eskime lekesi) kaydırıcıları ile özelleştirilebilir; `[` / `]` ile döndürülür. **Fırça modu** açıkken sürükleyerek onlarca sembolü otomatik kümeleyerek dizer (orman/dağ sırası gibi); "Karaya kenetle" işaretliyken denize taşan noktalar otomatik atlanır ve sonradan deniz o bölgeye genişlerse sembol otomatik gizlenir. |
 | **Kaynak** | `Y` | Maden, tarım, avlanma, balıkçılık, ticaret ve taş ocağı olmak üzere 6 türden birini seçip haritaya oyun-tasarımı amaçlı kaynak işareti yerleştirir (kervan/ticaret temalı haritalar için). |
-| **Etiket** | `L` | Metin etiketi yerleştirir; hazır stil (başlık, şehir adı, bölge adı vb.) ön ayarları mevcuttur. **"Yola oturt"** işaretliyse ve tıklama bir nehre/yola yakınsa, etiket o çizginin gerçek şekline harf harf oturur (dairesel yay değil, çizilmiş eğrinin kendisi). |
+| **Etiket** | `L` | Metin etiketi yerleştirir; hazır stil (başlık, şehir adı, bölge adı vb.) ön ayarları mevcuttur. **"Yola oturt"** işaretliyse ve tıklama bir nehre/yola yakınsa, etiket o çizginin gerçek şekline harf harf oturur (dairesel yay değil, çizilmiş eğrinin kendisi). | **Tipografi** bölümünden yazı ailesi (on tarihsel aile: eski kitap, anıtsal, Roma kitabesi, ünsiyal, gotik yazı, divani el yazısı, kalın serif, fantastik, sade, daktilo), kapıt (kurdele/levha/tomar/taş), büyük harf, dış hat + rengi ve gölge ayrı ayrı denetlenir; stil şablonu yalnızca bir başlangıç noktasıdır. Proje harici font yüklemez — her aile bir yığındır (macOS/Windows/Linux karşılıkları sırayla denenir), kurulu olanlar listede `·` ile işaretlenir. Ayrıca **ad üreteci**: yedi kültür (Batı, Akdeniz, Kuzey, Doğu, Taş, Orman halkı, Yaban) × sekiz coğrafi tür için hece tabanlı, sözlüksüz yer adı önerileri — öneriye tıklayınca metin alanına yazılır.
+| **Çizim** | `N` | Serbest fırça — yalnızca **kendi eklediğin** katmanlara çizer (renk, boyut, sertlik, opaklık, silgi modu). Yerleşik katmanlara serbest boya sızdırmaz: kara maskesi ve yükselti gri tonu anlamlarını korur. |
 
 ### Bölge & Ölçüm
 
@@ -118,7 +122,7 @@ Bir nesne seçildiğinde ek işlemler görünür: **Çoğalt**, **Sil**, öne/ar
 
 ## Alt/yan panel sekmeleri
 
-- **Katmanlar** — Referans görsel, Kara, Arazi, Yükselti, Bölgeler, Nehirler, Yollar, Semboller, Kaynaklar, Harita bağlantıları, Ölçümler, Etiketler, Kaplama olmak üzere 13 katman; her biri görünürlük ve opaklık kontrolüyle açılıp kapatılabilir, sıralanabilir.
+- **Katmanlar** — Referans görsel, Kara, Arazi, Yükselti, Bölgeler, Nehirler, Yollar, Semboller, Kaynaklar, Harita bağlantıları, Ölçümler, Etiketler, Kaplama olmak üzere 13 katman; her biri görünürlük ve opaklık kontrolüyle açılıp kapatılabilir, sıralanabilir. Bunlara ek olarak **"+ Katman ekle"** ile en fazla 12 kendi katmanını ekleyebilirsin: serbest çizim/not katmanları. Adları çift tıkla değiştirilir (dil değişse de değişmez), × ile silinir, yerleşik katmanlarla aynı şekilde sıralanır ve karışım modu alır. `.json` kaydı bu katmanları içeriğiyle birlikte taşır. **Katman ekleme/silme geri alınamaz** — silme onay ister.
 - **Kütüphane** — Tüm sembol/bina kataloğu; kategoriye göre gezinilebilir ve arama kutusuyla filtrelenebilir. Kendi PNG sembolünüzü de yükleyip kütüphaneye ekleyebilirsiniz. İzometrik binalarda malzeme/çatı varyantları arasında yaşlanma (yosunlu, yanık, yıpranmış) ve kültürel çeşitlilik (kilden/kerpiç, bambu, Doğu Asya pagoda kuleleri) temaları da bulunur; binaların altında artık yuvarlak zemin diski yok.
 - **Geçmiş** — Yapılan işlemlerin (fırça darbesi, nesne ekleme/silme vb.) kronolojik listesi; herhangi bir adıma geri dönülebilir.
 
@@ -130,6 +134,21 @@ Bir nesne seçildiğinde ek işlemler görünür: **Çoğalt**, **Sil**, öne/ar
 - **Izgaraya yapış** — Sembol/nokta yerleştirmeyi belirli bir aralığa hizalar.
 - **Minimap** — Sağ altta, tüm haritanın küçük genel görünümü ve hızlı gezinme.
 - **Klavye kısayolları** — Araç seçimi için tek harf tuşları (yukarıdaki tabloda), yön tuşlarıyla kaydırma, `+`/`-`/`0` ile yakınlaştır/uzaklaştır/sığdır, `Delete` ile seçili nesneyi (veya son yol noktasını) sil, `Escape` ile çizimi iptal et.
+
+## Sağdan sola diller (RTL)
+
+Arayüz Arapça'yı destekler; `fa`/`he`/`ur` eklemek artık yalnızca veri işi. Yön `<html dir>`'e yazılır ve düzen
+kendiliğinden aynalanır, çünkü yöne duyarlı CSS mantıksal özellikler kullanır (`border-inline-start`,
+`padding-inline-end`, `inset-inline-end`, `text-align:start`). Tuvalin kendisi bir metin akışı olmadığı için
+aynalanmaz.
+
+Bundan bağımsız olarak **harita etiketleri** de düzeltildi: etiket motoru harf aralığı, yay ve yola oturma için
+harfleri tek tek konumlandırıyordu; bu, Arapça/Farsça'da harflerin bitişme biçimlerini ve iki yönlü (bidi) sırayı
+bozuyor, Hint yazılarında birleşik harfleri dağıtıyordu. Artık bu yazılarda etiket tek parça çiziliyor (harf aralığı
+ve yay devre dışı, yola oturan etiket yolun orta noktasındaki teğete yerleşiyor); PNG ve SVG çıktısında da aynı
+şekilde. Latin/Kiril etiketler eski davranışı aynen sürdürür. Bu düzeltme arayüz dili ne olursa olsun geçerlidir —
+Türkçe arayüzde Arapça yer adı yazan biri de doğru sonucu alır.
+
 
 ## Ekran uyumluluğu
 

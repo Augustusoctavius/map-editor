@@ -30,18 +30,258 @@
 
     png: function (scale) {
       scale = scale || 1;
-      var w = Math.round(Cv.W*scale), h = Math.round(Cv.H*scale);
-      var c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      var x = c.getContext('2d');
-      x.save();
-      x.scale(scale, scale);
-      Cv.renderMap(x, { includeReference: App.exportReference, includeLinks: false });
-      x.restore();
+      /* ızgara açıksa çıktıya da girer — altıgen ızgaranın asıl değeri
+         basılan/paylaşılan haritada olmasıdır (bkz. renderToCanvas) */
+      var c = this.renderToCanvas(Cv.W*scale, Cv.H*scale);
+      var w = c.width, h = c.height;
       c.toBlob(function (b) {
         download(b, 'harita-' + stamp() + (scale > 1 ? '-' + scale + 'x' : '') + '.png');
         UI.msg(UI.t('exported') + ' PNG ' + w + '×' + h);
       }, 'image/png');
+    },
+
+    /* Haritayı istenen ölçekte tek bir <canvas>'a çizer. PNG/HTML/baskı
+       çıktılarının ortak adımı — hepsi aynı renderMap yolundan geçsin
+       diye ayrı bir yardımcıya alındı. */
+    renderToCanvas: function (targetW, targetH) {
+      var c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(targetW));
+      c.height = Math.max(1, Math.round(targetH));
+      var x = c.getContext('2d');
+      x.save();
+      x.scale(c.width / Cv.W, c.height / Cv.H);
+      Cv.renderMap(x, { includeReference: App.exportReference, includeLinks: false });
+      if (Cv.grid) Cv.drawGrid(x, { x0:0, y0:0, x1:Cv.W, y1:Cv.H, w:Cv.W, h:Cv.H }, true);
+      x.restore();
+      return c;
+    },
+
+    /* Uzun kenarı maxDim'i aşmayacak ölçek — en-boy oranı korunur, hiçbir
+       zaman büyütülmez (küçük bir tuvali 4096'ya şişirmek dosyayı büyütür,
+       görüntüyü iyileştirmez). */
+    _fitScale: function (maxDim) {
+      return Math.min(1, maxDim / Math.max(Cv.W, Cv.H));
+    },
+
+    /* ================= TEK DOSYA HTML =================
+       Haritayı gömülü bir görüntü + minik bir görüntüleyiciyle tek bir
+       .html dosyasına yazar. Sunucu, betik kütüphanesi, dış istek yok —
+       dosyayı e-postayla yollayıp çift tıklamak yeterli. */
+    html: function (opts) {
+      opts = opts || {};
+      var maxDim = opts.maxDim || 2048;
+      var fmt = opts.format === 'jpeg' ? 'jpeg' : 'png';
+      var title = (opts.title || App.currentCanvasName || 'Wayborne').trim() || 'Wayborne';
+
+      var k = this._fitScale(maxDim);
+      var c = this.renderToCanvas(Cv.W * k, Cv.H * k);
+      var data = (fmt === 'jpeg')
+        ? c.toDataURL('image/jpeg', 0.88)
+        : c.toDataURL('image/png');
+
+      var doc = this._viewerHTML(title, data, c.width, c.height);
+      download(new Blob([doc], { type:'text/html;charset=utf-8' }),
+               this._slug(title) + '-' + stamp() + '.html');
+      UI.msg(UI.t('exported') + ' HTML · ' + c.width + '×' + c.height +
+             ' · ' + this._humanSize(doc.length));
+    },
+
+    _slug: function (s) {
+      return String(s).toLowerCase()
+        .replace(/[ğ]/g,'g').replace(/[ü]/g,'u').replace(/[ş]/g,'s')
+        .replace(/[ı]/g,'i').replace(/[ö]/g,'o').replace(/[ç]/g,'c')
+        .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0, 48) || 'harita';
+    },
+
+    /* ================= PAYLAŞIM LİNKİ =================
+       Sunucu yok, bu yüzden "link" aslında haritanın küçültülmüş bir
+       görüntüsünü doğrudan URL'nin hash kısmına gömüyor. Hash tarayıcıdan
+       dışarı, ağa hiç gitmez (sunucu logunda bile görünmez) — bu yüzden
+       statik barındırılan bu sayfanın kendisi hem düzenleyici hem de
+       (hash varken) salt-okunur bir görüntüleyici olarak çalışabiliyor.
+       base64 → base64url dönüşümü '+','/','=' karakterlerini kaçış
+       gerektirmeyen '-','_' ile değiştirip URL'yi şişirmiyor. */
+    _b64urlEncode: function (b64) {
+      return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    },
+    _b64urlDecode: function (s) {
+      s = s.replace(/-/g, '+').replace(/_/g, '/');
+      while (s.length % 4) s += '=';
+      return s;
+    },
+
+    buildShareURL: function (opts) {
+      opts = opts || {};
+      var maxDim = opts.maxDim || 1600;
+      var title = (opts.title || App.currentCanvasName || 'Wayborne').trim() || 'Wayborne';
+
+      var k = this._fitScale(maxDim);
+      var c = this.renderToCanvas(Cv.W * k, Cv.H * k);
+      var dataURI = c.toDataURL('image/jpeg', 0.82);
+      var payload = this._b64urlEncode(dataURI.split(',')[1]);
+
+      var hash = 'd=' + payload + '&t=' + encodeURIComponent(title) +
+                 '&w=' + c.width + '&h=' + c.height + '&f=jpeg';
+      return location.origin + location.pathname + '#' + hash;
+    },
+
+    /* Aynı linki iframe'e gömülebilir hâle getirir: e=1 bayrağı
+       kabuk gezinmesini ve üst çubuğu gizler, sadece harita kalır. */
+    embedCode: function (url, w, h) {
+      var embedURL = url + '&e=1';
+      return '<iframe src="' + embedURL + '" width="' + (w||800) + '" height="' + (h||600) +
+             '" style="border:0" loading="lazy" allowfullscreen></iframe>';
+    },
+
+    /* location.hash'i ayrıştırır; paylaşım verisi yoksa null döner. */
+    parseShareHash: function () {
+      var h = location.hash;
+      if (!h || h.indexOf('d=') < 0) return null;
+      var raw = h.charAt(0) === '#' ? h.slice(1) : h;
+      var params = new URLSearchParams(raw);
+      var d = params.get('d');
+      if (!d) return null;
+      var fmt = params.get('f') || 'jpeg';
+      return {
+        title: params.get('t') || 'Wayborne',
+        dataURI: 'data:image/' + fmt + ';base64,' + this._b64urlDecode(d),
+        w: parseInt(params.get('w'), 10) || 0,
+        h: parseInt(params.get('h'), 10) || 0,
+        embed: params.get('e') === '1'
+      };
+    },
+
+    _humanSize: function (n) {
+      if (n < 1024) return n + ' B';
+      if (n < 1024*1024) return (n/1024).toFixed(0) + ' KB';
+      return (n/(1024*1024)).toFixed(1) + ' MB';
+    },
+
+    /* Gömülü görüntüleyici: sürükle-kaydır, tekerlekle yakınlaş, çift
+       tıkla sığdır. Tek dosyada kalması için her şey satır içi. */
+    _viewerHTML: function (title, dataURI, w, h) {
+      var t = esc(title);
+      var lang = (UI && UI.lang) || 'tr';
+      var hint = esc(UI.t('viewer_hint'));
+      var tIn = esc(UI.t('viewer_in')), tOut = esc(UI.t('viewer_out')), tFit = esc(UI.t('viewer_fit'));
+      return '<!doctype html>\n<html lang="' + lang + '"><head><meta charset="utf-8">\n' +
+'<meta name="viewport" content="width=device-width,initial-scale=1">\n' +
+'<title>' + t + '</title>\n<style>\n' +
+'*{margin:0;padding:0;box-sizing:border-box}\n' +
+'html,body{height:100%;background:#160f07;color:#e8dcc4;overflow:hidden;\n' +
+'  font:14px/1.5 Georgia,"Times New Roman",serif}\n' +
+'#stage{position:absolute;inset:0;cursor:grab;touch-action:none}\n' +
+'#stage.drag{cursor:grabbing}\n' +
+'#map{position:absolute;top:0;left:0;transform-origin:0 0;\n' +
+'  image-rendering:auto;box-shadow:0 30px 90px -20px #000c;user-select:none;-webkit-user-drag:none}\n' +
+'#bar{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:14px;\n' +
+'  padding:10px 16px;background:linear-gradient(#160f07ee,#160f0700);pointer-events:none}\n' +
+'#bar h1{font-size:16px;font-weight:600;letter-spacing:.04em;color:#e8dcc4;\n' +
+'  text-shadow:0 2px 8px #000}\n' +
+'#hint{margin-left:auto;font-size:11px;color:#c08a3e;opacity:.85}\n' +
+'#zoom{position:absolute;right:14px;bottom:14px;display:flex;gap:6px}\n' +
+'#zoom button{width:32px;height:32px;border:1px solid #4a3a24;background:#241708cc;\n' +
+'  color:#c08a3e;border-radius:5px;cursor:pointer;font:15px/1 Georgia,serif}\n' +
+'#zoom button:hover{border-color:#c08a3e}\n' +
+'</style></head><body>\n' +
+'<div id="stage"><img id="map" alt="' + t + '" src="' + dataURI + '"></div>\n' +
+'<div id="bar"><h1>' + t + '</h1><span id="hint">' + hint + '</span></div>\n' +
+'<div id="zoom"><button id="zo" title="' + tOut + '">&minus;</button>' +
+'<button id="zf" title="' + tFit + '">&#9633;</button>' +
+'<button id="zi" title="' + tIn + '">&plus;</button></div>\n' +
+'<script>\n' +
+'(function(){\n' +
+'var W=' + w + ',H=' + h + ';\n' +
+'var st=document.getElementById("stage"),im=document.getElementById("map");\n' +
+'var z=1,ox=0,oy=0;\n' +
+'function apply(){im.style.transform="translate("+ox+"px,"+oy+"px) scale("+z+")";}\n' +
+'function fit(){var p=24;z=Math.min((st.clientWidth-p*2)/W,(st.clientHeight-p*2)/H);\n' +
+'  ox=(st.clientWidth-W*z)/2;oy=(st.clientHeight-H*z)/2;apply();}\n' +
+'function zoomAt(cx,cy,f){var nz=Math.max(0.02,Math.min(12,z*f));\n' +
+'  ox=cx-(cx-ox)*(nz/z);oy=cy-(cy-oy)*(nz/z);z=nz;apply();}\n' +
+'st.addEventListener("wheel",function(e){e.preventDefault();\n' +
+'  var r=st.getBoundingClientRect();\n' +
+'  zoomAt(e.clientX-r.left,e.clientY-r.top,e.deltaY<0?1.12:1/1.12);},{passive:false});\n' +
+'var down=false,px=0,py=0;\n' +
+'st.addEventListener("pointerdown",function(e){down=true;px=e.clientX;py=e.clientY;\n' +
+'  st.classList.add("drag");st.setPointerCapture(e.pointerId);});\n' +
+'st.addEventListener("pointermove",function(e){if(!down)return;\n' +
+'  ox+=e.clientX-px;oy+=e.clientY-py;px=e.clientX;py=e.clientY;apply();});\n' +
+'st.addEventListener("pointerup",function(){down=false;st.classList.remove("drag");});\n' +
+'st.addEventListener("dblclick",fit);\n' +
+'document.getElementById("zi").onclick=function(){zoomAt(st.clientWidth/2,st.clientHeight/2,1.3);};\n' +
+'document.getElementById("zo").onclick=function(){zoomAt(st.clientWidth/2,st.clientHeight/2,1/1.3);};\n' +
+'document.getElementById("zf").onclick=fit;\n' +
+'addEventListener("resize",fit);\n' +
+'if(im.complete)fit();else im.onload=fit;\n' +
+'})();\n' +
+'<\/script>\n</body></html>\n';
+    },
+
+    /* ================= BASKI / PDF =================
+       Ayrı bir kütüphane yok: haritayı hedef sayfa ve DPI'ya göre
+       ölçekleyip gizli bir iframe'e @page kuralıyla basıyoruz.
+       Tarayıcının "PDF olarak kaydet" seçeneği gerçek PDF üretir. */
+    PAGES: {
+      a4:     { w:210, h:297 },
+      a3:     { w:297, h:420 },
+      a5:     { w:148, h:210 },
+      letter: { w:215.9, h:279.4 },
+      tabloid:{ w:279.4, h:431.8 }
+    },
+
+    print: function (opts) {
+      opts = opts || {};
+      var page = this.PAGES[opts.page] || this.PAGES.a4;
+      var landscape = opts.orient === 'landscape';
+      var pw = landscape ? page.h : page.w;
+      var ph = landscape ? page.w : page.h;
+      var margin = Math.max(0, Math.min(40, opts.margin === undefined ? 10 : opts.margin));
+      var dpi = opts.dpi || 150;
+
+      /* basılabilir alan (mm) -> hedef piksel */
+      var availW = pw - margin*2, availH = ph - margin*2;
+      var mm2px = dpi / 25.4;
+      var fit = Math.min(availW / Cv.W, availH / Cv.H);   /* mm / harita pikseli */
+      var outW = Math.round(Cv.W * fit * mm2px);
+      var outH = Math.round(Cv.H * fit * mm2px);
+
+      /* Aşırı büyük çıktıyı sınırla: 300 DPI A3 tam sayfa ~ 4900px, bunun
+         üstü tarayıcıyı kilitler ve baskıda fark etmez. */
+      var CAP = 6000;
+      if (Math.max(outW, outH) > CAP) {
+        var s = CAP / Math.max(outW, outH);
+        outW = Math.round(outW*s); outH = Math.round(outH*s);
+      }
+
+      var c = this.renderToCanvas(outW, outH);
+      var data = c.toDataURL('image/png');
+      var title = esc((opts.title || App.currentCanvasName || 'Wayborne').trim());
+      var pageCss = (landscape ? (page.h + 'mm ' + page.w + 'mm') : (page.w + 'mm ' + page.h + 'mm'));
+
+      var doc = '<!doctype html><html><head><meta charset="utf-8"><title>' + title + '</title><style>' +
+        '@page{size:' + pageCss + ';margin:' + margin + 'mm}' +
+        'html,body{margin:0;padding:0;background:#fff}' +
+        'img{display:block;width:' + (Cv.W*fit).toFixed(2) + 'mm;height:' + (Cv.H*fit).toFixed(2) + 'mm;margin:0 auto}' +
+        '</style></head><body><img src="' + data + '"></body></html>';
+
+      /* Yeni sekme yerine gizli iframe: açılır pencere engelleyicilerine
+         takılmaz ve editörden çıkmaz. */
+      var old = document.getElementById('wb-print-frame');
+      if (old) old.parentNode.removeChild(old);
+      var f = document.createElement('iframe');
+      f.id = 'wb-print-frame';
+      f.setAttribute('aria-hidden', 'true');
+      f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+      document.body.appendChild(f);
+      f.onload = function () {
+        try {
+          f.contentWindow.focus();
+          f.contentWindow.print();
+        } catch (e) { UI.msg(UI.t('print_failed')); }
+      };
+      f.srcdoc = doc;
+      UI.msg(UI.t('printing') + ' · ' + outW + '×' + outH + ' · ' + dpi + ' DPI');
     },
 
     svg: function () {
@@ -142,10 +382,17 @@
               }
             } else if (l.id === 'territories') {
               var tpts = Cv.lakeSmoothPts(o, 24);
-              var tdash = o.borderWidth ? ' stroke-dasharray="'+(o.borderWidth*3)+','+(o.borderWidth*2)+'"' : '';
-              s.push('<path d="' + Geo.svgPolyD(tpts, true) + '" fill="' + (o.color||'#8a5a3a') +
-                     '" opacity="' + (o.opacity===undefined?0.30:o.opacity) + '" stroke="' + (o.borderColor||'#5a3a20') +
-                     '" stroke-width="' + (o.borderWidth||2) + '"' + tdash + ' stroke-linejoin="round"/>');
+              if (Cv.political) {
+                /* siyasi görünüm: opak alan, düz ve belirgin sınır */
+                s.push('<path d="' + Geo.svgPolyD(tpts, true) + '" fill="' + (o.color||'#8a5a3a') +
+                       '" opacity="' + Cv.politicalFill + '" stroke="' + (o.borderColor||'#4a3020') +
+                       '" stroke-width="' + (Math.max(2, o.borderWidth||2)*1.6) + '" stroke-linejoin="round"/>');
+              } else {
+                var tdash = o.borderWidth ? ' stroke-dasharray="'+(o.borderWidth*3)+','+(o.borderWidth*2)+'"' : '';
+                s.push('<path d="' + Geo.svgPolyD(tpts, true) + '" fill="' + (o.color||'#8a5a3a') +
+                       '" opacity="' + (o.opacity===undefined?0.30:o.opacity) + '" stroke="' + (o.borderColor||'#5a3a20') +
+                       '" stroke-width="' + (o.borderWidth||2) + '"' + tdash + ' stroke-linejoin="round"/>');
+              }
             } else if (l.id === 'symbols') {
               s.push(Sym.toSVG(o.sym, o));
             } else if (l.id === 'labels') {
@@ -161,6 +408,8 @@
                '" fill="#d9c79a" opacity="0.28" style="mix-blend-mode:multiply"/>');
       }
 
+      if (Cv.grid) s.push(Exporter.gridSVG(W, H));
+
       if (App.scale && App.scale.visible) s.push(Exporter.scaleSVG(App.scale));
       if (App.windrose && App.windrose.visible) s.push(Exporter.windroseSVG(App.windrose));
 
@@ -173,6 +422,51 @@
       s.push('</svg>');
       download(new Blob([s.join('\n')], { type:'image/svg+xml' }), 'harita-' + stamp() + '.svg');
       UI.msg(UI.t('exported') + ' SVG');
+    },
+
+    /* Izgarayı GERÇEK VEKTÖR olarak yazar. Kare ve nokta bir <pattern>
+       ile tek seferde tanımlanır (kaç hücre olursa olsun birkaç satır);
+       altıgen için de aynı yöntem kullanılır — desen karosu, sivri tepeli
+       ızgaranın (w × 2·vstep) tekrar biriminden üretilir. */
+    gridSVG: function (W, H) {
+      var g = Cv.gridSize;
+      if (!(g > 0)) return '';
+      var col = Cv.gridColor || '#1e281e';
+      var op  = Cv.gridOpacity;
+      var lw  = Math.max(1, g*0.012).toFixed(2);
+      var id  = 'wbGrid';
+      var body, tw, th;
+
+      if (Cv.gridType === 'dot') {
+        var r = Math.max(1.2, g*0.035).toFixed(2);
+        tw = th = g;
+        body = '<circle cx="0" cy="0" r="'+r+'" fill="'+col+'"/>' +
+               '<circle cx="'+g+'" cy="0" r="'+r+'" fill="'+col+'"/>' +
+               '<circle cx="0" cy="'+g+'" r="'+r+'" fill="'+col+'"/>' +
+               '<circle cx="'+g+'" cy="'+g+'" r="'+r+'" fill="'+col+'"/>';
+      } else if (Cv.gridType === 'hex') {
+        var hgt = g * 2 / Math.sqrt(3);
+        var vstep = hgt * 0.75, q = hgt / 4;
+        tw = g; th = vstep * 2;
+        /* karo içinde iki satır: biri hizalı, biri yarım hücre kaydırılmış */
+        function hex(cx, cy) {
+          return 'M'+cx+' '+(cy-hgt/2)+
+                 'L'+(cx+g/2)+' '+(cy-q)+'L'+(cx+g/2)+' '+(cy+q)+
+                 'L'+cx+' '+(cy+hgt/2)+
+                 'L'+(cx-g/2)+' '+(cy+q)+'L'+(cx-g/2)+' '+(cy-q)+'Z';
+        }
+        var d = [hex(0,0), hex(g,0), hex(g/2, vstep), hex(-g/2, vstep),
+                 hex(0, vstep*2), hex(g, vstep*2)].join('');
+        body = '<path d="'+d+'" fill="none" stroke="'+col+'" stroke-width="'+lw+'" stroke-linejoin="round"/>';
+      } else {
+        tw = th = g;
+        body = '<path d="M0 0 H'+g+' M0 0 V'+g+'" fill="none" stroke="'+col+
+               '" stroke-width="'+lw+'"/>';
+      }
+
+      return '<defs><pattern id="'+id+'" patternUnits="userSpaceOnUse" ' +
+             'width="'+tw+'" height="'+th+'">'+body+'</pattern></defs>' +
+             '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="url(#'+id+')" opacity="'+op+'"/>';
     },
 
     windroseSVG: function (wr) {
@@ -274,9 +568,16 @@
         out.push('</g>');
       }
 
+      /* Bitişik yazılarda (Arapça, Farsça, İbranice, Hint yazıları) harf
+         aralığı bağlanma biçimlerini bozar; ayrıca sağdan sola yazıda
+         yönün açıkça belirtilmesi gerekir — canvas tarafındaki tek parça
+         çizimin SVG karşılığı. */
+      var complex = Cv.isComplexText(text);
+      var track = complex ? 0 : (o.track||0);
+      var dirAttr = complex && Cv.isRTLText(text) ? ' direction="rtl"' : '';
       var common = 'font-family="'+esc(fam)+'" font-size="'+(o.size||32)+
-                   '" font-weight="600" letter-spacing="'+(o.track||0)+
-                   '" fill="'+(o.color||'#3a2b18')+'"' +
+                   '" font-weight="600" letter-spacing="'+track+
+                   '" fill="'+(o.color||'#3a2b18')+'"' + dirAttr +
                    (o.outline ? ' stroke="'+(o.outlineColor||'#f5ecd8')+'" stroke-width="'+
                      Math.max(1.5,(o.size||32)*0.16)+'" paint-order="stroke"' : '');
 
@@ -292,7 +593,7 @@
         return out.join('');
       }
 
-      if (!o.curve) {
+      if (!o.curve || complex) {
         out.push('<text x="'+o.x+'" y="'+o.y+'" text-anchor="middle" dominant-baseline="middle" '+
                  common+rot+'>'+esc(text)+'</text>');
         return out.join('');
@@ -324,12 +625,18 @@
         app:'cartographer', version:3,
         W:Cv.W, H:Cv.H,
         parchment:Cv.parchment, grid:Cv.grid,
+        political:Cv.political, politicalFill:Cv.politicalFill,
+        politicalMuteTerrain:Cv.politicalMuteTerrain, politicalLegend:Cv.politicalLegend,
+        symbolLegend:Cv.symbolLegend,
+        gridType:Cv.gridType, gridSize:Cv.gridSize,
+        gridColor:Cv.gridColor, gridOpacity:Cv.gridOpacity,
         shore:Cv.shore, shoreWidth:Cv.shoreWidth, shoreStyle:Cv.shoreStyle, frame:Cv.frame,
         elevShowHillshade:App.elevation.showHillshade,
         elevShowContours:App.elevation.showContours,
         elevContourInterval:App.elevation.contourInterval,
         exportReference:App.exportReference,
         scale:App.scale,
+        windrose:App.windrose,
         customSymbols: Sym.serializeCustom(),
         maps: App.maps,
         layers: App.maps.root || Layers.serialize(true)
@@ -363,6 +670,15 @@
       Cv.setSize(d.W||2048, d.H||2048, false);
       Cv.parchment = !!d.parchment;
       Cv.grid = !!d.grid;
+      Cv.political = !!d.political;
+      if (d.politicalFill !== undefined) Cv.politicalFill = d.politicalFill;
+      if (d.politicalMuteTerrain !== undefined) Cv.politicalMuteTerrain = d.politicalMuteTerrain;
+      if (d.politicalLegend !== undefined) Cv.politicalLegend = d.politicalLegend;
+      if (d.symbolLegend !== undefined) Cv.symbolLegend = d.symbolLegend;
+      if (d.gridType)  Cv.gridType  = d.gridType;
+      if (d.gridSize)  Cv.gridSize  = d.gridSize;
+      if (d.gridColor) Cv.gridColor = d.gridColor;
+      if (d.gridOpacity !== undefined) Cv.gridOpacity = d.gridOpacity;
       Cv.shore = d.shore !== false;
       Cv.shoreWidth = d.shoreWidth || 26;
       Cv.shoreStyle = d.shoreStyle || 'sandy';
@@ -372,9 +688,19 @@
       App.elevation.contourInterval = d.elevContourInterval || 32;
       App.exportReference = !!d.exportReference;
       if (d.scale) App.scale = d.scale;
+      if (d.windrose) App.windrose = d.windrose;
 
       document.getElementById('chk-parchment').checked = Cv.parchment;
       document.getElementById('chk-grid').checked = Cv.grid;
+      var _po=document.getElementById('pol-on');     if (_po) _po.checked = Cv.political;
+      var _pm=document.getElementById('pol-mute');   if (_pm) _pm.checked = Cv.politicalMuteTerrain;
+      var _pl=document.getElementById('pol-legend'); if (_pl) _pl.checked = Cv.politicalLegend;
+      var _sl=document.getElementById('chk-legend'); if (_sl) _sl.checked = Cv.symbolLegend;
+      var _pf=document.getElementById('pol-fill');   if (_pf) _pf.value = Math.round(Cv.politicalFill*100);
+      var _gt=document.getElementById('grid-type');  if (_gt) _gt.value = Cv.gridType;
+      var _gs=document.getElementById('grid-size');  if (_gs) _gs.value = Cv.gridSize;
+      var _gc=document.getElementById('grid-color'); if (_gc) _gc.value = Cv.gridColor;
+      var _go=document.getElementById('grid-op');    if (_go) _go.value = Math.round(Cv.gridOpacity*100);
       document.getElementById('chk-shore').checked = Cv.shore;
       document.getElementById('ref-export').checked = App.exportReference;
       document.getElementById('sel-canvas-size').value = String(d.W||2048);
@@ -455,19 +781,39 @@
       } catch (e) { return []; }
     },
 
+    /* Kayıt geçmişi kartlarında gösterilecek küçük önizleme — tam çözünürlüklü
+       PNG yerine düşük kaliteli JPEG (haritanın rengi/dokusu zaten fotoğraf
+       gibi, PNG'nin kayıpsız avantajı burada gereksiz yer kaplar; localStorage
+       kotası kolayca dolar). Uzun kenar sabit, en-boy oranı korunur. */
+    libThumb: function (maxDim) {
+      maxDim = maxDim || 240;
+      var k = Math.min(1, maxDim / Math.max(Cv.W, Cv.H));
+      var c = this.renderToCanvas(Cv.W*k, Cv.H*k);
+      return c.toDataURL('image/jpeg', 0.6);
+    },
+
     libSave: function (name, existingId) {
       var list = this.libList();
       var data = this.buildProjectData();
       var id = existingId || ('cv' + Date.now().toString(36) + Math.floor(Math.random()*1e6).toString(36));
-      var entry = { id:id, name:name || 'Adsız harita', updatedAt:Date.now(), W:Cv.W, H:Cv.H, data:data };
+      var entry = { id:id, name:name || 'Adsız harita', updatedAt:Date.now(), W:Cv.W, H:Cv.H, data:data, thumb:this.libThumb() };
       var idx = list.findIndex(function (e) { return e.id === id; });
       if (idx >= 0) list[idx] = entry; else list.unshift(entry);
       try {
         localStorage.setItem(this.LIB_KEY, JSON.stringify(list));
         return id;
       } catch (e) {
-        UI.msg(UI.t('lib_full'));
-        return null;
+        /* kota muhtemelen küçük resimler yüzünden doldu — bu kaydın
+           önizlemesini atıp tekrar dene; önizlemesiz bir kayıt hiç kayıt
+           olmamasından iyidir */
+        entry.thumb = null;
+        try {
+          localStorage.setItem(this.LIB_KEY, JSON.stringify(list));
+          return id;
+        } catch (e2) {
+          UI.msg(UI.t('lib_full'));
+          return null;
+        }
       }
     },
 

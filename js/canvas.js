@@ -142,6 +142,19 @@
       return len;
     },
 
+    /* Kapalı bir çokgenin alanı (shoelace formülü, piksel²). pts kapanışı
+       (son nokta = ilk nokta) içermese de olur — kapatan kenar zımnen
+       eklenir. */
+    polygonArea: function (pts) {
+      if (!pts || pts.length < 3) return 0;
+      var a = 0;
+      for (var i = 0; i < pts.length; i++) {
+        var p1 = pts[i], p2 = pts[(i+1) % pts.length];
+        a += p1[0]*p2[1] - p2[0]*p1[1];
+      }
+      return Math.abs(a) / 2;
+    },
+
     /* verilen kümülatif uzunlukta {x,y,ang} döner (ang: teğet açısı, radyan) */
     pointAtLength: function (pts, len) {
       if (!pts || pts.length < 2) return { x:0, y:0, ang:0 };
@@ -180,13 +193,79 @@
   };
 
   /* ================= yazı tipleri ================= */
+  /* ================= ETİKET YAZI AİLELERİ =================
+     Proje harici font yüklemez (ne CDN ne gömülü dosya), bu yüzden her
+     aile bir *yığın*: önce o karakteri en iyi veren sistem fontu, sonra
+     macOS / Windows / Linux karşılıkları, en sonda jenerik bir sınıf.
+     Böylece hiçbir sistemde "yazı kayboldu" durumu olmaz; yalnızca
+     karakter zayıflar. fontAvailable(key) ile arayüz hangi ailenin
+     gerçekten kurulu olduğunu işaretler.
+
+     Anahtarlar geriye dönük: fantasy/serif/sans/mono/black eski
+     kayıtlarda ve presetlerde geçtiği için korunuyor. */
   var FONTS = {
-    fantasy:'"Papyrus","Luminari","Trattatello","Copperplate",fantasy',
-    serif:'Georgia,"Iowan Old Style","Times New Roman",serif',
-    sans:'"Segoe UI",Helvetica,Arial,sans-serif',
-    mono:'"SFMono-Regular",Consolas,monospace',
-    black:'"Cinzel","Trajan Pro",Georgia,serif'
+    serif:      'Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"URW Palladio L","Liberation Serif","Times New Roman",serif',
+    black:      '"Cinzel","Trajan Pro","Optima","Copperplate","Copperplate Gothic Light","Bookman Old Style","URW Bookman L",Georgia,serif',
+    fantasy:    '"Luminari","Papyrus","Trattatello","Herculanum","Copperplate",fantasy,serif',
+    sans:       '"Optima","Gill Sans","Gill Sans MT","Segoe UI","DejaVu Sans",Helvetica,Arial,sans-serif',
+    mono:       '"SFMono-Regular","Menlo",Consolas,"DejaVu Sans Mono","Liberation Mono",monospace',
+    /* --- yeni tarihsel aileler --- */
+    uncial:     '"Luminari","Herculanum","Papyrus","Bradley Hand","Segoe Print",fantasy,serif',
+    blackletter:'"UnifrakturMaguntia","Old English Text MT","Blackadder ITC","Lucida Blackletter","Cloister Black",Georgia,serif',
+    roman:      '"Trajan Pro","Cinzel","Copperplate","Copperplate Gothic Bold","Perpetua Titling MT","Nimbus Roman No9 L","Times New Roman",serif',
+    chancery:   '"Zapfino","Edwardian Script ITC","Apple Chancery","URW Chancery L","Segoe Script","Brush Script MT",cursive,serif',
+    slab:       '"Rockwell","Bookman Old Style","URW Bookman L","Roboto Slab","Courier New",Georgia,serif'
   };
+
+  /* Tek bir font adının kurulu olup olmadığını ölçer: aday font ile
+     jenerik bir taban aynı metni aynı genişlikte çiziyorsa font yoktur
+     (tarayıcı tabana düşmüştür). Üç farklı tabana bakılır, çünkü aday
+     tesadüfen tabanlardan biriyle aynı metriklere sahip olabilir. */
+  var _fontProbe = null, _fontSeen = {};
+  function faceInstalled(name) {
+    if (name in _fontSeen) return _fontSeen[name];
+    if (!_fontProbe) _fontProbe = document.createElement('canvas').getContext('2d');
+    var probe = 'MWQ@ilg 0123 mmmwww';
+    var base = ['monospace', 'serif', 'sans-serif'];
+    var found = false;
+    for (var i = 0; i < base.length && !found; i++) {
+      _fontProbe.font = '72px ' + base[i];
+      var ref = _fontProbe.measureText(probe).width;
+      _fontProbe.font = '72px "' + name + '",' + base[i];
+      if (Math.abs(_fontProbe.measureText(probe).width - ref) > 0.5) found = true;
+    }
+    return (_fontSeen[name] = found);
+  }
+
+  /* Bir ailenin *karakterini* veren fontlardan en az biri kurulu mu?
+     Yığının sonundaki jenerik yedekler (Georgia, serif …) sayılmaz —
+     gotik bir yığın Georgia'ya düştüğünde ailenin karakteri kaybolur,
+     dolayısıyla o aile "yok" sayılmalıdır. faces === null olan aileler
+     zaten jenerik tasarlandığı için her yerde var kabul edilir. */
+  function fontAvailable(key) {
+    var f = FONT_BY_KEY[key];
+    if (!f) return true;
+    if (!f.faces) return true;
+    for (var i = 0; i < f.faces.length; i++) if (faceInstalled(f.faces[i])) return true;
+    return false;
+  }
+
+  /* Arayüzde gösterilen sıra + ad. i18n-names.js 'font_<key>' ile
+     diğer dilleri tamamlar. */
+  var FONT_LIST = [
+    { key:'serif',       tr:'Eski kitap',      en:'Old book',        faces:null },
+    { key:'black',       tr:'Anıtsal',         en:'Monumental',      faces:['Cinzel','Trajan Pro','Optima','Copperplate','Copperplate Gothic Light'] },
+    { key:'roman',       tr:'Roma kitabesi',   en:'Roman capitals',  faces:['Trajan Pro','Cinzel','Copperplate','Copperplate Gothic Bold','Perpetua Titling MT'] },
+    { key:'uncial',      tr:'Ünsiyal',         en:'Uncial',          faces:['Luminari','Herculanum','Papyrus'] },
+    { key:'blackletter', tr:'Gotik yazı',      en:'Blackletter',     faces:['UnifrakturMaguntia','Old English Text MT','Blackadder ITC','Lucida Blackletter','Cloister Black'] },
+    { key:'chancery',    tr:'Divani el yazısı',en:'Chancery script', faces:['Zapfino','Edwardian Script ITC','Apple Chancery','URW Chancery L','Segoe Script','Brush Script MT'] },
+    { key:'slab',        tr:'Kalın serif',     en:'Slab serif',      faces:['Rockwell','Bookman Old Style','URW Bookman L','Roboto Slab'] },
+    { key:'fantasy',     tr:'Fantastik',       en:'Fantasy',         faces:['Luminari','Papyrus','Trattatello','Herculanum','Copperplate'] },
+    { key:'sans',        tr:'Sade',            en:'Plain',           faces:null },
+    { key:'mono',        tr:'Daktilo',         en:'Typewriter',      faces:null }
+  ];
+  var FONT_BY_KEY = {};
+  FONT_LIST.forEach(function (f) { FONT_BY_KEY[f.key] = f; });
 
   /* ================= ETİKET PRESETLERİ =================
      banner: null | 'ribbon' | 'plate' | 'scroll' | 'stone'   */
@@ -298,7 +377,7 @@
       this.view.width = Math.max(1, Math.round(r.width * this.dpr));
       this.view.height = Math.max(1, Math.round(r.height * this.dpr));
       this.vw = r.width; this.vh = r.height;
-      this.requestRender();
+      this.requestViewRender();
     },
 
     setSize: function (w, h, keep) {
@@ -316,7 +395,7 @@
       this.zoom = s;
       this.panX = (this.vw - this.W*s)/2;
       this.panY = (this.vh - this.H*s)/2;
-      this.requestRender();
+      this.requestViewRender();
     },
 
     setZoom: function (z, cx, cy) {
@@ -326,13 +405,13 @@
       this.zoom = z;
       this.panX = cx - mx*z;
       this.panY = cy - my*z;
-      this.requestRender();
+      this.requestViewRender();
       if (global.UI) UI.status();
     },
 
     panBy: function (dx, dy) {
       this.panX += dx; this.panY += dy;
-      this.requestRender();
+      this.requestViewRender();
     },
 
     screenToMap: function (sx, sy) { return { x:(sx-this.panX)/this.zoom, y:(sy-this.panY)/this.zoom }; },
@@ -357,26 +436,250 @@
       return c;
     },
 
-    requestRender: function () {
+    /* ================= KOMPOZİT ÖNBELLEK =================
+       renderMap() tüm katmanları tuval boyutunda besteler; pan/zoom bunu
+       değiştirmez, yalnızca görüntü dönüşümünü değiştirir. Bu yüzden
+       besteyi bir kez mapCanvas'a yazıp her karede sadece GÖRÜNEN
+       dikdörtgeni blit ediyoruz. Kare maliyeti tuvalin değil ekranın
+       alanıyla orantılı hâle geliyor.
+
+       Güvenlik için varsayılan taraf "kirli": requestRender() içeriği
+       geçersiz kılar, yani bir düzenleme yolunu işaretlemeyi unutmak
+       bayat harita üretemez — yalnızca gereksiz yeniden beste yapar.
+       Sıcak görüntü yolları (pan/zoom/imleç) requestViewRender() ile
+       açıkça hızlı tarafı seçer. */
+    mapCanvas: null,
+    mapDirty: true,
+    mapDirtyRect: null,
+
+    /* ÖLÇEK KADEMESİ (LOD): sığdırma zumunda tüm harita görünür olduğu için
+       kırpma işe yaramaz — 8192² bir besteyi her karede ~800px'e küçültmek
+       kare başına 67 milyon kaynak pikseli örneklemek demek. Bunun yerine
+       küçültülmüş bir kopya tutup düşük zumda ondan blit ediyoruz. */
+    mapLod: null,
+    LOD_MAX: 2048,
+
+    /* PAHALI EFEKT KISITLAMASI: kıyı parlaması ve yükselti gölgelendirmesi
+       tüm siluet üzerinden yeniden hesaplanır (2048²'de ~145 ms). Fırça
+       sürüklenirken bunu her karede yapmak kareyi 5 fps'e düşürüyordu.
+       Vuruş sürerken en fazla FX_THROTTLE_MS'de bir yeniden kuruyoruz;
+       dirty bayrağı temizlenmediği için vuruş biter bitmez tam doğru
+       hâline geliyor. */
+    _fxAt: 0,
+    _fxCost: 0,
+    _fxStart: 0,
+    FX_THROTTLE_MS: 130,
+
+    /* Bekleme süresi ölçülen maliyete göre kendini ayarlar: efekt ne kadar
+       pahalıysa o kadar seyrek kurulur. Böylece 1024²'de neredeyse anlık,
+       8192²'de ise kareyi boğmayacak sıklıkta çalışır — sabit bir eşik
+       ayarlamaya gerek kalmaz. */
+    _fxThrottled: function () {
+      if (!global.Tools || !Tools.painting) return false;
+      var now = performance.now();
+      var wait = Math.max(this.FX_THROTTLE_MS, this._fxCost * 5);
+      if (now - this._fxAt < wait) return true;
+      this._fxAt = now;
+      this._fxStart = now;
+      return false;
+    },
+
+    _fxDone: function () {
+      if (this._fxStart) {
+        this._fxCost = performance.now() - this._fxStart;
+        this._fxStart = 0;
+      }
+    },
+
+    /* içerik değişti — tüm besteyi (veya verilen dikdörtgeni) yenile */
+    requestRender: function (rect) {
+      if (rect) this._addDirtyRect(rect);
+      else { this.mapDirty = true; this.mapDirtyRect = null; }
+      this.requestViewRender();
+    },
+
+    /* yalnızca görüntü değişti (pan / zoom / imleç) — besteye dokunma */
+    requestViewRender: function () {
       var self = this;
       if (this._raf) return;
       this._raf = requestAnimationFrame(function () { self._raf = 0; self.render(); });
+    },
+
+    _addDirtyRect: function (r) {
+      if (this.mapDirty) return;            /* zaten tamamı yenilenecek */
+      var d = this.mapDirtyRect;
+      if (!d) { this.mapDirtyRect = { x0:r.x0, y0:r.y0, x1:r.x1, y1:r.y1 }; return; }
+      if (r.x0 < d.x0) d.x0 = r.x0;
+      if (r.y0 < d.y0) d.y0 = r.y0;
+      if (r.x1 > d.x1) d.x1 = r.x1;
+      if (r.y1 > d.y1) d.y1 = r.y1;
+    },
+
+    ensureComposite: function () {
+      var c = this.mapCanvas;
+      if (!c || c.width !== this.W || c.height !== this.H) {
+        c = this.mapCanvas = document.createElement('canvas');
+        c.width = this.W; c.height = this.H;
+        this.mapDirty = true; this.mapDirtyRect = null;
+      }
+      if (!this.mapDirty && !this.mapDirtyRect) return c;
+
+      var mctx = c.getContext('2d');
+      mctx.setTransform(1,0,0,1,0,0);
+
+      if (this.mapDirty) {
+        this._syncMini(null);
+        mctx.clearRect(0, 0, this.W, this.H);
+        this.renderMap(mctx, { includeReference:true, trace:true });
+      } else {
+        /* kısmi yenileme: fırça vuruşu gibi yerel değişikliklerde yalnızca
+           etkilenen dikdörtgen yeniden bestelenir */
+        var d = this.mapDirtyRect;
+        var x0 = Math.max(0, Math.floor(d.x0)), y0 = Math.max(0, Math.floor(d.y0));
+        var x1 = Math.min(this.W, Math.ceil(d.x1)), y1 = Math.min(this.H, Math.ceil(d.y1));
+        if (x1 > x0 && y1 > y0) {
+          this._syncMini({ x0:x0, y0:y0, x1:x1, y1:y1 });
+          mctx.save();
+          mctx.beginPath();
+          mctx.rect(x0, y0, x1-x0, y1-y0);
+          mctx.clip();
+          mctx.clearRect(x0, y0, x1-x0, y1-y0);
+          /* renderMap içindeki yardımcı scratch tuvalleri (nehir/yol kara
+             kırpması) ayrı yüzeylerde çalışır; ctx clip'i onları bağlamaz.
+             Bu yüzden etkin dikdörtgeni ayrıca duyuruyoruz. */
+          this._clipRect = { x:x0, y:y0, w:x1-x0, h:y1-y0 };
+          this.renderMap(mctx, { includeReference:true, trace:true });
+          this._clipRect = null;
+          mctx.restore();
+        }
+      }
+      this._lodSync(this.mapDirty ? null : this.mapDirtyRect);
+      this.mapDirty = false;
+      this.mapDirtyRect = null;
+      return c;
+    },
+
+    /* KÜÇÜK AYNALAR: kıyı hesabı kara ve arazi katmanının küçültülmüş
+       hâlini ister. Eskiden her çağrıda tam boyuttan küçültülüyordu —
+       8192²'de tek bir kıyı yenilemesi 67 milyon kaynak piksel okumak
+       demekti. Bunun yerine 1024²'lik aynaları fırçanın dokunduğu
+       dikdörtgen kadar artımlı güncelliyoruz. */
+    MINI_MAX: 1024,
+    _miniScale: 1,
+
+    /* Birikim: kirli dikdörtgeni sakla, işi kıyı gerçekten kurulana ertele.
+       Arazi fırçası kıyıyı bayatlatmadığı için o vuruşlarda hiç bedel ödenmez. */
+    _miniDirty: null,
+    _miniAll: true,
+
+    _syncMini: function (rect) {
+      if (!rect) { this._miniAll = true; this._miniDirty = null; return; }
+      if (this._miniAll) return;
+      var d = this._miniDirty;
+      if (!d) { this._miniDirty = { x0:rect.x0, y0:rect.y0, x1:rect.x1, y1:rect.y1 }; return; }
+      if (rect.x0 < d.x0) d.x0 = rect.x0;
+      if (rect.y0 < d.y0) d.y0 = rect.y0;
+      if (rect.x1 > d.x1) d.x1 = rect.x1;
+      if (rect.y1 > d.y1) d.y1 = rect.y1;
+    },
+
+    _miniFlush: function () {
+      var rect = this._miniAll ? null : this._miniDirty;
+      if (!this._miniAll && !rect) return;      /* değişiklik yok */
+      this._miniAll = false; this._miniDirty = null;
+      var sc = Math.min(1, this.MINI_MAX / Math.max(this.W, this.H));
+      var sw = Math.max(1, Math.round(this.W*sc)), sh = Math.max(1, Math.round(this.H*sc));
+      this._miniScale = sc;
+      var self = this;
+      ['landmass','terrain'].forEach(function (id) {
+        var L = Layers.get(id);
+        if (!L || !L.canvas) return;
+        var key = '_mini_' + id;
+        var m = self[key], fresh = false;
+        if (!m || m.width !== sw || m.height !== sh) {
+          m = self[key] = document.createElement('canvas');
+          m.width = sw; m.height = sh; fresh = true;
+        }
+        var c = m.getContext('2d');
+        c.setTransform(1,0,0,1,0,0);
+        c.globalCompositeOperation = 'source-over';
+        if (fresh || !rect) {
+          c.clearRect(0,0,sw,sh);
+          c.drawImage(L.canvas, 0, 0, sw, sh);
+          return;
+        }
+        var x0 = Math.max(0, Math.floor(rect.x0)), y0 = Math.max(0, Math.floor(rect.y0));
+        var x1 = Math.min(self.W, Math.ceil(rect.x1)), y1 = Math.min(self.H, Math.ceil(rect.y1));
+        if (x1 <= x0 || y1 <= y0) return;
+        var dx = Math.floor(x0*sc), dy = Math.floor(y0*sc);
+        var dw = Math.ceil((x1-x0)*sc)+1, dh = Math.ceil((y1-y0)*sc)+1;
+        c.clearRect(dx, dy, dw, dh);
+        c.drawImage(L.canvas, x0, y0, x1-x0, y1-y0, dx, dy, dw, dh);
+      });
+    },
+
+    /* LOD'u besteyle eşitle. rect verilirse yalnızca o bölge güncellenir —
+       fırça vuruşu sırasında tüm haritayı yeniden küçültmemek için. */
+    _lodSync: function (rect) {
+      var scale = Math.min(1, this.LOD_MAX / Math.max(this.W, this.H));
+      if (scale >= 1) { this.mapLod = null; return; }   /* küçük tuval: gerek yok */
+      var lw = Math.max(1, Math.round(this.W * scale));
+      var lh = Math.max(1, Math.round(this.H * scale));
+      var l = this.mapLod;
+      var fresh = false;
+      if (!l || l.width !== lw || l.height !== lh) {
+        l = this.mapLod = document.createElement('canvas');
+        l.width = lw; l.height = lh;
+        l._scale = scale;
+        fresh = true;
+      }
+      var lctx = l.getContext('2d');
+      lctx.setTransform(1,0,0,1,0,0);
+      if (fresh || !rect) {
+        lctx.clearRect(0, 0, lw, lh);
+        lctx.drawImage(this.mapCanvas, 0, 0, lw, lh);
+        return;
+      }
+      /* kısmi: dikdörtgeni ölçekleyip yalnızca o parçayı tazele */
+      var x0 = Math.max(0, Math.floor(rect.x0)), y0 = Math.max(0, Math.floor(rect.y0));
+      var x1 = Math.min(this.W, Math.ceil(rect.x1)), y1 = Math.min(this.H, Math.ceil(rect.y1));
+      if (x1 <= x0 || y1 <= y0) return;
+      var dx = Math.floor(x0*scale), dy = Math.floor(y0*scale);
+      var dw = Math.ceil((x1-x0)*scale) + 1, dh = Math.ceil((y1-y0)*scale) + 1;
+      lctx.clearRect(dx, dy, dw, dh);
+      lctx.drawImage(this.mapCanvas, x0, y0, x1-x0, y1-y0, dx, dy, dw, dh);
+    },
+
+    /* ekranda görünen harita dikdörtgeni (harita koordinatlarında) */
+    visibleMapRect: function () {
+      var x0 = -this.panX / this.zoom;
+      var y0 = -this.panY / this.zoom;
+      var x1 = x0 + this.vw / this.zoom;
+      var y1 = y0 + this.vh / this.zoom;
+      x0 = Math.max(0, Math.floor(x0)); y0 = Math.max(0, Math.floor(y0));
+      x1 = Math.min(this.W, Math.ceil(x1)); y1 = Math.min(this.H, Math.ceil(y1));
+      return { x0:x0, y0:y0, x1:x1, y1:y1, w:x1-x0, h:y1-y0 };
     },
 
     /* ---------- KIYI EFEKTİ ----------
        Kara silüetini bulanıklaştırıp açık kum/sığ su tonunda
        birkaç halka olarak karanın altına çizer.                */
     buildShore: function () {
+      /* vuruş sürerken kısıtla — dirty bayrağı korunur, vuruş bitince kurulur */
+      if (this._fxThrottled() && this.shoreCanvas) return this.shoreCanvas;
       var L = Layers.get('landmass');
       var T = Layers.get('terrain');
       if (!L || !L.canvas) return null;
+      this._miniFlush();
+      if (!this._mini_landmass) { this._miniAll = true; this._miniFlush(); }
+      var miniL = this._mini_landmass || L.canvas;
+      var miniT = this._mini_terrain || (T ? T.canvas : L.canvas);
       var result = Terrain.buildShoreCanvas(
-        L.canvas, T ? T.canvas : L.canvas,
-        this.shoreWidth, this.W, this.H, this.shoreStyle
+        miniL, miniT,
+        this.shoreWidth, this.W, this.H, this.shoreStyle,
+        !!this._mini_landmass
       );
       this.shoreCanvas = result.canvas;
-      this._shoreScW   = result.sw;
-      this._shoreScH   = result.sh;
       this.shoreDirty  = false;
       /* kıyı çizgisi değişti — nehir kesim noktaları geçersiz olabilir */
       this._riverCrossingCache = {};
@@ -389,6 +692,7 @@
       sctx.drawImage(L.canvas, 0, 0, LS, LS);
       this.landSample = { data: sctx.getImageData(0,0,LS,LS).data, size: LS, scale: LS / this.W };
 
+      this._fxDone();
       return result.canvas;
     },
 
@@ -408,6 +712,7 @@
        önbelleğe alınmış katman olarak terrain'in üstüne, diğer
        nesnelerin altına bindirilir — kıyı efektiyle aynı mimari. */
     buildElevationEffect: function () {
+      if (this._fxThrottled() && this.elevationCanvas) return this.elevationCanvas;
       var Lv = Layers.get('elevation');
       if (!Lv || !Lv.canvas) return null;
       /* Bu efekt dirty-flag ile tembel yeniden hesaplanıyor (her karede değil,
@@ -419,8 +724,11 @@
       var sc = Math.min(1, MAX/Math.max(W,H));
       var sw = Math.max(1, Math.round(W*sc)), sh = Math.max(1, Math.round(H*sc));
 
-      var tC = document.createElement('canvas'); tC.width = sw; tC.height = sh;
+      var tC = this._getScratchCanvas('elevfx', sw, sh);
       var tctx = tC.getContext('2d', { willReadFrequently:true });
+      tctx.setTransform(1,0,0,1,0,0);
+      tctx.globalCompositeOperation = 'source-over';
+      tctx.clearRect(0, 0, sw, sh);
       tctx.drawImage(Lv.canvas, 0, 0, sw, sh);
       var data = tctx.getImageData(0, 0, sw, sh).data;
 
@@ -474,6 +782,7 @@
 
       this.elevationCanvas = tC;
       this.elevationDirty = false;
+      this._fxDone();
       return tC;
     },
 
@@ -483,6 +792,10 @@
       ctx.setTransform(1,0,0,1,0,0);
       ctx.clearRect(0, 0, this.view.width, this.view.height);
       ctx.setTransform(this.dpr,0,0,this.dpr,0,0);
+
+      /* beste yalnızca içerik değiştiğinde yeniden kurulur */
+      var comp = this.ensureComposite();
+
       ctx.save();
       ctx.translate(this.panX, this.panY);
       ctx.scale(this.zoom, this.zoom);
@@ -494,13 +807,25 @@
       ctx.fillRect(0, 0, this.W, this.H);
       ctx.restore();
 
-      this.renderMap(ctx, { includeReference:true, trace:true });
+      /* GÖRÜNÜR ALAN KIRPMASI: haritanın yalnızca ekrana düşen parçası
+         blit edilir; 8192² bir tuvalde bile maliyet ekran alanı kadardır.
+         Düşük zumda kaynak olarak küçültülmüş LOD kullanılır — aynı ekran
+         sonucunu üretir ama örneklenen kaynak piksel sayısı çok azdır. */
+      var v = this.visibleMapRect();
+      if (v.w > 0 && v.h > 0) {
+        var src = comp, k = 1;
+        var lod = this.mapLod;
+        if (lod && this.zoom <= lod._scale) { src = lod; k = lod._scale; }
+        ctx.drawImage(src,
+          v.x0*k, v.y0*k, v.w*k, v.h*k,
+          v.x0,   v.y0,   v.w,   v.h);
+      }
 
       ctx.strokeStyle = 'rgba(0,0,0,0.6)';
       ctx.lineWidth = 1/this.zoom;
       ctx.strokeRect(0, 0, this.W, this.H);
 
-      if (this.grid) this.drawGrid(ctx);
+      if (this.grid) this.drawGrid(ctx, v);
       if (global.Tools) Tools.drawOverlay(ctx);
 
       ctx.restore();
@@ -564,7 +889,7 @@
       for (var i = 0; i < Layers.list.length; i++) {
         var l = Layers.list[i];
         if (!l.visible) continue;
-        if (l.id === 'roads') continue; /* yukarıda erken çizildi */
+        if (l.id === 'roads') continue; /* 'rivers' bloğunda nehirlerle birlikte çizildi */
 
         if (l.id === 'reference') {
           if (!opt.includeReference || !l.image) continue;
@@ -576,6 +901,7 @@
         }
 
         if (l.id === 'elevation') {
+          if (this.political && this.politicalMuteTerrain) continue;
           if (App.elevation && (App.elevation.showHillshade || App.elevation.showContours)) {
             if (this.elevationDirty || !this.elevationCanvas) this.buildElevationEffect();
             if (this.elevationCanvas) {
@@ -591,6 +917,11 @@
         if (l.type === 'raster') {
           ctx.save();
           ctx.globalAlpha = l.opacity;
+          /* siyasi görünümde arazi dokusu susturulur: devlet renkleri
+             okunabilsin diye zemin sakinleşir, ama tamamen kaybolmaz */
+          if (this.political && this.politicalMuteTerrain && l.id === 'terrain') {
+            ctx.globalAlpha = l.opacity * 0.22;
+          }
           ctx.globalCompositeOperation = l.blend || 'source-over';
           ctx.drawImage(l.canvas, 0, 0, W, H);
           ctx.restore();
@@ -612,20 +943,37 @@
                ortasında asılı kalmasın; nehir/göl ile aynı kara-kırpma
                tekniği (bkz. aşağıdaki 'rivers' bloğu). */
               var Lm2 = Layers.get('landmass');
-              var rc2 = (Lm2 && Lm2.canvas) ? this._getScratchCanvas('roads', W, H) : null;
+              /* nesne yoksa tam boyutlu scratch tahsis etme — 8192² bir
+                 tuvalde bu tek başına 268 MB'lık boş bir yüzey demekti */
+              var rc2 = (Lm2 && Lm2.canvas && roadsLayerNow.objects.length)
+                        ? this._getScratchCanvas('roads', W, H) : null;
               var rdctx = ctx;
-              if (rc2) { rdctx = rc2.getContext('2d'); rdctx.clearRect(0, 0, W, H); }
+              var cr2 = this._clipRect;
+              if (rc2) {
+                rdctx = rc2.getContext('2d');
+                rdctx.setTransform(1,0,0,1,0,0);
+                if (cr2) {
+                  rdctx.clearRect(cr2.x, cr2.y, cr2.w, cr2.h);
+                  rdctx.save();
+                  rdctx.beginPath(); rdctx.rect(cr2.x, cr2.y, cr2.w, cr2.h); rdctx.clip();
+                } else {
+                  rdctx.clearRect(0, 0, W, H);
+                }
+              }
               else { ctx.save(); ctx.globalAlpha = roadsLayerNow.opacity; }
               for (var ri = 0; ri < roadsLayerNow.objects.length; ri++) {
                 this.drawRoad(rdctx, roadsLayerNow.objects[ri]);
               }
               if (rc2) {
                 rdctx.globalCompositeOperation = 'destination-in';
-                rdctx.drawImage(Lm2.canvas, 0, 0);
+                if (cr2) rdctx.drawImage(Lm2.canvas, cr2.x, cr2.y, cr2.w, cr2.h, cr2.x, cr2.y, cr2.w, cr2.h);
+                else     rdctx.drawImage(Lm2.canvas, 0, 0);
                 rdctx.globalCompositeOperation = 'source-over';
+                if (cr2) rdctx.restore();
                 ctx.save();
                 ctx.globalAlpha = roadsLayerNow.opacity;
-                ctx.drawImage(rc2, 0, 0);
+                if (cr2) ctx.drawImage(rc2, cr2.x, cr2.y, cr2.w, cr2.h, cr2.x, cr2.y, cr2.w, cr2.h);
+                else     ctx.drawImage(rc2, 0, 0);
                 ctx.restore();
               } else {
                 ctx.restore();
@@ -639,9 +987,20 @@
                ediyoruz; böylece mevcut 4 geçişli çizim mantığına dokunmadan
                tek noktadan kırpma uygulanmış oluyor. */
             var Lm_ = Layers.get('landmass');
-            var rc = (Lm_ && Lm_.canvas) ? this._getScratchCanvas('rivers', W, H) : null;
+            var rc = (Lm_ && Lm_.canvas && l.objects.length)
+                     ? this._getScratchCanvas('rivers', W, H) : null;
             var rctx3 = rc ? rc.getContext('2d') : null;
-            if (rctx3) rctx3.clearRect(0, 0, W, H);
+            var cr = this._clipRect;
+            if (rctx3) {
+              rctx3.setTransform(1,0,0,1,0,0);
+              if (cr) {
+                rctx3.clearRect(cr.x, cr.y, cr.w, cr.h);
+                rctx3.save();
+                rctx3.beginPath(); rctx3.rect(cr.x, cr.y, cr.w, cr.h); rctx3.clip();
+              } else {
+                rctx3.clearRect(0, 0, W, H);
+              }
+            }
             var dctx = rctx3 || ctx;
 
             /* 1. pass: göl kıyı bantları — nehirlerin altında */
@@ -669,15 +1028,55 @@
 
             if (rc) {
               rctx3.globalCompositeOperation = 'destination-in';
-              rctx3.drawImage(Lm_.canvas, 0, 0);
+              if (cr) rctx3.drawImage(Lm_.canvas, cr.x, cr.y, cr.w, cr.h, cr.x, cr.y, cr.w, cr.h);
+              else    rctx3.drawImage(Lm_.canvas, 0, 0);
               rctx3.globalCompositeOperation = 'source-over';
-              ctx.drawImage(rc, 0, 0);
+              if (cr) { rctx3.restore(); ctx.drawImage(rc, cr.x, cr.y, cr.w, cr.h, cr.x, cr.y, cr.w, cr.h); }
+              else    ctx.drawImage(rc, 0, 0);
+            }
+          } else if (l.id === 'territories') {
+            /* Bölgeler karaya kırpılır: siyasi haritada bir devlet denize
+               taşmaz. Nehir/yol ile aynı destination-in tekniği. */
+            var LmT = Layers.get('landmass');
+            var tc = (LmT && LmT.canvas && l.objects.length)
+                     ? this._getScratchCanvas('terr', W, H) : null;
+            var crT = this._clipRect;
+            var tctx2 = ctx;
+            if (tc) {
+              tctx2 = tc.getContext('2d');
+              tctx2.setTransform(1,0,0,1,0,0);
+              tctx2.globalCompositeOperation = 'source-over';
+              tctx2.globalAlpha = 1;
+              if (crT) {
+                tctx2.clearRect(crT.x, crT.y, crT.w, crT.h);
+                tctx2.save();
+                tctx2.beginPath(); tctx2.rect(crT.x, crT.y, crT.w, crT.h); tctx2.clip();
+              } else {
+                tctx2.clearRect(0, 0, W, H);
+              }
+            }
+            for (var jt = 0; jt < l.objects.length; jt++) {
+              this.drawTerritory(tctx2, l.objects[jt]);
+            }
+            if (tc) {
+              tctx2.globalCompositeOperation = 'destination-in';
+              if (crT) tctx2.drawImage(LmT.canvas, crT.x, crT.y, crT.w, crT.h, crT.x, crT.y, crT.w, crT.h);
+              else     tctx2.drawImage(LmT.canvas, 0, 0);
+              tctx2.globalCompositeOperation = 'source-over';
+              if (crT) { tctx2.restore(); ctx.drawImage(tc, crT.x, crT.y, crT.w, crT.h, crT.x, crT.y, crT.w, crT.h); }
+              else     ctx.drawImage(tc, 0, 0);
+            }
+            /* devlet adları kırpmanın dışında — kıyıya taşan uzun bir ad
+               yarıda kesilmemeli */
+            if (this.political) {
+              for (var jn = 0; jn < l.objects.length; jn++) {
+                this.drawTerritoryName(ctx, l.objects[jn]);
+              }
             }
           } else {
             for (var j = 0; j < l.objects.length; j++) {
               var o = l.objects[j];
-              if (l.id === 'territories') this.drawTerritory(ctx, o);
-              else if (l.id === 'symbols') {
+              if (l.id === 'symbols') {
                 if (o.clip && !this.isOnLand(o.x, o.y)) { /* kara sınırı dışına taştı — çizme */ }
                 else if (o.kind === 'group') {
                   o.members.forEach(function(m){ Sym.draw(ctx, m.sym, m, function(){ Cv.requestRender(); }); });
@@ -727,6 +1126,10 @@
           ctx.restore();
         }
       }
+
+      /* --- siyasi harita lejantı --- */
+      if (this.political && this.politicalLegend) this.drawPoliticalLegend(ctx);
+      if (this.symbolLegend) this.drawSymbolLegend(ctx);
 
       /* --- ölçek çubuğu (en üstte) --- */
       if (global.App && App.scale && App.scale.visible) this.drawScaleBar(ctx, App.scale);
@@ -1256,6 +1659,23 @@
       ctx.lineJoin = 'round';
       var path = Geo.polyPath(pts);
       path.closePath();
+
+      if (this.political) {
+        /* SİYASİ GÖRÜNÜM: devlet alanı opak, sınır düz ve belirgin.
+           Fizikî haritada bölge yalnızca bir gölgelendirmedir; siyasi
+           haritada ise asıl konudur. */
+        ctx.globalAlpha *= (this.politicalFill === undefined ? 0.92 : this.politicalFill);
+        ctx.fillStyle = o.color || '#8a5a3a';
+        ctx.fill(path);
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = o.borderColor || '#4a3020';
+        ctx.lineWidth = Math.max(2, o.borderWidth || 2) * 1.6;
+        ctx.setLineDash([]);
+        ctx.stroke(path);
+        ctx.restore();
+        return;
+      }
+
       ctx.globalAlpha *= (o.opacity === undefined ? 0.30 : o.opacity);
       ctx.fillStyle = o.color || '#8a5a3a';
       ctx.fill(path);
@@ -1265,6 +1685,175 @@
         ctx.lineWidth = o.borderWidth;
         ctx.setLineDash([o.borderWidth*3, o.borderWidth*2]);
         ctx.stroke(path);
+      }
+      ctx.restore();
+    },
+
+    /* ---------- siyasi harita ----------
+       Ayrı bir katman değil, mevcut "Bölgeler" katmanının bir GÖRÜNÜM
+       modu: aynı poligonlar devlet alanı olarak okunur. Böylece kullanıcı
+       çizdiği bölgeleri kaybetmeden fizikî ve siyasi sunum arasında
+       geçiş yapabiliyor. */
+    political: false,
+    politicalFill: 0.92,
+    politicalMuteTerrain: true,
+    politicalLegend: true,
+
+    /* Sembol lejantı: siyasi görünümden bağımsız, haritadaki sembol
+       katmanında fiilen kullanılan sembol türlerini listeler. */
+    symbolLegend: false,
+
+    /* Devletlere görsel olarak birbirinden ayrılan renkler atar. Altın
+       açı ile hue dağıtımı, komşu bölgelerin benzer renk almasını
+       istatistiksel olarak engeller. */
+    assignPoliticalColors: function () {
+      var L = Layers.get('territories');
+      if (!L || !L.objects.length) return 0;
+      var n = L.objects.length;
+      for (var i = 0; i < n; i++) {
+        var h = (i * 137.508) % 360;                 /* altın açı */
+        var s = 42 + (i % 3) * 9;
+        var l = 52 + (i % 2) * 8;
+        L.objects[i].color = this._hsl(h, s, l);
+        L.objects[i].borderColor = this._hsl(h, Math.min(70, s + 18), 24);
+      }
+      return n;
+    },
+
+    _hsl: function (h, s, l) {
+      s /= 100; l /= 100;
+      var c = (1 - Math.abs(2*l - 1)) * s;
+      var x = c * (1 - Math.abs(((h/60) % 2) - 1));
+      var m = l - c/2, r=0, g=0, b=0;
+      if (h < 60)       { r=c; g=x; }
+      else if (h < 120) { r=x; g=c; }
+      else if (h < 180) { g=c; b=x; }
+      else if (h < 240) { g=x; b=c; }
+      else if (h < 300) { r=x; b=c; }
+      else              { r=c; b=x; }
+      var f = function (v) {
+        var t = Math.round((v + m) * 255).toString(16);
+        return t.length < 2 ? '0'+t : t;
+      };
+      return '#' + f(r) + f(g) + f(b);
+    },
+
+    /* Devlet adlarını alan merkezine yazar. */
+    drawTerritoryName: function (ctx, o) {
+      if (!o.name) return;
+      var pts = o.pts;
+      var cx = 0, cy = 0;
+      for (var i = 0; i < pts.length; i++) { cx += pts[i][0]; cy += pts[i][1]; }
+      cx /= pts.length; cy /= pts.length;
+      var size = o.nameSize || Math.max(18, Math.min(this.W, this.H) * 0.022);
+      ctx.save();
+      ctx.font = '600 ' + size + 'px ' + FONTS.serif;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = size * 0.22;
+      ctx.strokeStyle = 'rgba(255,252,242,0.85)';
+      ctx.strokeText(o.name, cx, cy);
+      ctx.fillStyle = o.nameColor || '#2e2013';
+      ctx.fillText(o.name, cx, cy);
+      ctx.restore();
+    },
+
+    /* Sağ alt köşeye devletlerin renk anahtarını çizer. */
+    drawPoliticalLegend: function (ctx) {
+      var L = Layers.get('territories');
+      if (!L || !L.visible) return;
+      var items = L.objects.filter(function (o) { return o.name; });
+      if (!items.length) return;
+
+      var pad = Math.max(10, this.W * 0.006);
+      var row = Math.max(16, this.W * 0.014);
+      var fs  = row * 0.62;
+      var boxW = Math.max(this.W * 0.14, 160);
+      var boxH = pad*2 + row*items.length;
+      var x = this.W - boxW - pad*2, y = this.H - boxH - pad*2;
+
+      ctx.save();
+      ctx.globalAlpha = 0.93;
+      ctx.fillStyle = '#f4ead2';
+      ctx.strokeStyle = '#5a4326';
+      ctx.lineWidth = Math.max(1.2, this.W*0.0012);
+      ctx.beginPath();
+      ctx.rect(x, y, boxW, boxH);
+      ctx.fill(); ctx.stroke();
+
+      ctx.globalAlpha = 1;
+      ctx.font = '600 ' + fs + 'px ' + FONTS.serif;
+      ctx.textBaseline = 'middle';
+      for (var i = 0; i < items.length; i++) {
+        var iy = y + pad + row*i + row/2;
+        ctx.fillStyle = items[i].color || '#8a5a3a';
+        ctx.strokeStyle = items[i].borderColor || '#4a3020';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.rect(x + pad, iy - row*0.28, row*0.7, row*0.56);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#2e2013';
+        ctx.textAlign = 'left';
+        ctx.fillText(items[i].name, x + pad + row*0.95, iy);
+      }
+      ctx.restore();
+    },
+
+    /* Sembol lejantı: 'symbols' katmanında fiilen kullanılan her sembol
+       türünden bir örnek — siyasi lejantın (devlet renkleri) muadili ama
+       sembol katalogu için. Elle tutulan bir metadata gerekmez: L.objects
+       üzerinden dedupe edip Sym.draw ile gerçek ikonu çiziyoruz, böylece
+       lejant her zaman haritada ne varsa onu gösterir. */
+    drawSymbolLegend: function (ctx) {
+      var L = Layers.get('symbols');
+      if (!L || !L.visible) return;
+      var seen = {}, items = [];
+      L.objects.forEach(function (o) {
+        if (!o.sym || seen[o.sym]) return;
+        var def = Sym.get(o.sym);
+        if (!def) return;
+        seen[o.sym] = 1;
+        items.push({ id:o.sym, def:def });
+      });
+      if (!items.length) return;
+
+      var lang = (UI && UI.lang) || 'tr';
+      items.forEach(function (it) {
+        it.name = Sym.isCustom(it.id) ? (it.def.tr || it.def.en || it.id)
+                : (global.i18nName ? global.i18nName(it.id, it.def.tr, it.def.en, lang)
+                                    : (lang === 'tr' ? it.def.tr : it.def.en));
+      });
+      items.sort(function (a, b) { return a.name.localeCompare(b.name); });
+      var MAXROWS = 24;
+      if (items.length > MAXROWS) items = items.slice(0, MAXROWS);
+
+      var pad = Math.max(10, this.W * 0.006);
+      var row = Math.max(18, this.W * 0.014);
+      var fs  = row * 0.58;
+      var boxW = Math.max(this.W * 0.17, 200);
+      var boxH = pad*2 + row*items.length;
+      var x = pad*2, y = this.H - boxH - pad*2;
+
+      ctx.save();
+      ctx.globalAlpha = 0.93;
+      ctx.fillStyle = '#f4ead2';
+      ctx.strokeStyle = '#5a4326';
+      ctx.lineWidth = Math.max(1.2, this.W*0.0012);
+      ctx.beginPath();
+      ctx.rect(x, y, boxW, boxH);
+      ctx.fill(); ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      for (var i = 0; i < items.length; i++) {
+        var iy = y + pad + row*i + row/2;
+        var ix = x + pad + row*0.5;
+        Sym.draw(ctx, items[i].id, { x:ix, y:iy, size: row*0.85 });
+        ctx.fillStyle = '#2e2013';
+        ctx.font = '600 ' + fs + 'px ' + FONTS.serif;
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'left';
+        ctx.fillText(items[i].name, x + pad + row*1.1, iy);
       }
       ctx.restore();
     },
@@ -1309,7 +1898,7 @@
         ctx.lineTo(0, 0);
         ctx.lineTo(-side, -base);
         ctx.closePath();
-        ctx.fillStyle = isCard ? col : col;
+        ctx.fillStyle = col;
         ctx.globalAlpha = isCard ? 1.0 : 0.65;
         ctx.fill();
         ctx.strokeStyle = col;
@@ -1444,10 +2033,31 @@
       return o.caps ? t.toUpperCase() : t;
     },
 
+    /* Harf harf çizim (harf aralığı, yay, yola oturma) yalnızca her
+       harfin bağımsız çizildiği yazılarda doğrudur. Arapça/Farsça gibi
+       bitişik yazılarda harfleri tek tek çizmek bağlanma biçimlerini
+       yok eder ve iki yönlü (bidi) sırayı bozar; Hint yazılarında da
+       birleşik harfler (ligatür) dağılır. Bu yazılarda etiket tek
+       parça çizilir — tarayıcının kendi şekillendirmesi devreye girer. */
+    RTL_RE: /[\u0590-\u05FF\u0600-\u06FF\u0700-\u074F\u0750-\u077F\u0780-\u07BF\u07C0-\u07FF\u08A0-\u08FF\uFB1D-\uFB4F\uFB50-\uFDFF\uFE70-\uFEFF]/,
+    COMPLEX_RE: /[\u0590-\u05FF\u0600-\u06FF\u0700-\u074F\u0750-\u077F\u0780-\u07BF\u07C0-\u07FF\u0900-\u0DFF\u0E80-\u0EFF\u0F00-\u0FFF\u1780-\u17FF\u08A0-\u08FF\uFB1D-\uFB4F\uFB50-\uFDFF\uFE70-\uFEFF]/,
+
+    isComplexText: function (t) { return this.COMPLEX_RE.test(t || ''); },
+    isRTLText:     function (t) { return this.RTL_RE.test(t || ''); },
+
     measureLabel: function (ctx, o) {
       ctx.save();
       ctx.font = this.labelFont(o);
-      var tr = o.track || 0, w = 0, t = this.labelText(o);
+      var t = this.labelText(o), w;
+      if (this.isComplexText(t)) {
+        /* şekillendirilmiş genişlik: harflerin tek tek toplamı bitişik
+           yazıda gerçek genişlikten belirgin biçimde geniş çıkar */
+        w = ctx.measureText(t).width;
+        ctx.restore();
+        return Math.max(1, w);
+      }
+      var tr = o.track || 0;
+      w = 0;
       for (var i = 0; i < t.length; i++) w += ctx.measureText(t[i]).width + tr;
       ctx.restore();
       return Math.max(1, w - tr);
@@ -1524,11 +2134,23 @@
       return { px: s.len/num, unit: unit };
     },
 
+    /* Nehir/yol'un aksine ölçüm çizgisi kasıtlı olarak Catmull-Rom ile
+       yumuşatılmıyor: eğri, keskin köşeli bir çokgende (ör. dört köşeli
+       bir alan) köşelerden taşarak gerçek alanı ~%15-20 büyük gösterir.
+       Bir cetvel doğru olmalı — düz kenar, tıklanan noktaların tam
+       kendisini ölçer. */
     measureLength: function (o) {
-      var pts = o.handles ? Geo.sampleBezier(o.pts, o.handles, 18, false) : Geo.sample(o.pts, 18);
+      var pts = o.pts.slice();
       var len = Geo.polylineLength(pts);
+      if (o.closed) len += Math.hypot(pts[0][0]-pts[pts.length-1][0], pts[0][1]-pts[pts.length-1][1]);
       var conv = this.pxPerScaleUnit();
-      return { px:len, real: len/conv.px, unit: conv.unit, pts:pts };
+      var real = len/conv.px;
+      var area = null;
+      if (o.closed) {
+        var pxArea = Geo.polygonArea(pts);
+        area = { px: pxArea, real: pxArea/(conv.px*conv.px), unit: conv.unit };
+      }
+      return { px:len, real:real, unit:conv.unit, pts:pts, area:area };
     },
 
     formatDistance: function (real, unit) {
@@ -1536,41 +2158,71 @@
       return r + (unit ? ' ' + unit : '');
     },
 
+    formatArea: function (real, unit) {
+      var r = real >= 100 ? Math.round(real) : Math.round(real*10)/10;
+      return r + (unit ? ' ' + unit + '²' : '');
+    },
+
     drawMeasure: function (ctx, o) {
       var info = this.measureLength(o);
       var pts = info.pts;
       if (pts.length < 2) return;
       ctx.save();
+
+      if (o.closed && pts.length >= 3) {
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for (var ci = 1; ci < pts.length; ci++) ctx.lineTo(pts[ci][0], pts[ci][1]);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(201,75,75,0.12)';
+        ctx.fill();
+      }
+
       ctx.strokeStyle = '#c94b4b';
       ctx.lineWidth = 2.5;
       ctx.setLineDash([9, 6]);
       ctx.beginPath();
       ctx.moveTo(pts[0][0], pts[0][1]);
       for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+      if (o.closed) ctx.closePath();
       ctx.stroke();
       ctx.setLineDash([]);
 
-      /* uç işaretleri */
-      [pts[0], pts[pts.length-1]].forEach(function (pt) {
+      /* köşe işaretleri — kapalıysa hepsi, açıksa yalnız uçlar */
+      var markPts = o.closed ? pts : [pts[0], pts[pts.length-1]];
+      markPts.forEach(function (pt) {
         ctx.beginPath(); ctx.arc(pt[0], pt[1], 5, 0, Math.PI*2);
         ctx.fillStyle = '#c94b4b'; ctx.fill();
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
       });
 
-      /* orta noktada mesafe etiketi */
-      var midIdx = Math.floor(pts.length/2);
-      var mx = pts[midIdx][0], my = pts[midIdx][1];
-      var text = this.formatDistance(info.real, info.unit);
+      /* etiket: kapalıysa merkezde alan+çevre, açıksa orta noktada mesafe */
+      var lx, ly, lines;
+      if (o.closed) {
+        var cx = 0, cy = 0;
+        for (var pj = 0; pj < pts.length; pj++) { cx += pts[pj][0]; cy += pts[pj][1]; }
+        lx = cx/pts.length; ly = cy/pts.length;
+        lines = [this.formatArea(info.area.real, info.area.unit), this.formatDistance(info.real, info.unit)];
+      } else {
+        var midIdx = Math.floor(pts.length/2);
+        lx = pts[midIdx][0]; ly = pts[midIdx][1];
+        lines = [this.formatDistance(info.real, info.unit)];
+      }
+
       ctx.font = '600 20px Georgia, serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      var tw = ctx.measureText(text).width;
+      var tw = Math.max.apply(null, lines.map(function (t) { return ctx.measureText(t).width; }));
+      var lh = 24, boxH = lh*lines.length + 8;
       ctx.fillStyle = 'rgba(245,236,216,0.92)';
       ctx.strokeStyle = '#c94b4b'; ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.roundRect ? ctx.roundRect(mx-tw/2-8, my-16, tw+16, 32, 6) : ctx.rect(mx-tw/2-8, my-16, tw+16, 32);
+      var bx = lx-tw/2-8, by = ly-boxH/2, bw = tw+16;
+      ctx.roundRect ? ctx.roundRect(bx, by, bw, boxH, 6) : ctx.rect(bx, by, bw, boxH);
       ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#3a2b18';
-      ctx.fillText(text, mx, my+1);
+      for (var li = 0; li < lines.length; li++) {
+        ctx.fillText(lines[li], lx, by + lh*li + lh/2 + 4);
+      }
       ctx.restore();
     },
 
@@ -1685,6 +2337,8 @@
       ctx.miterLimit = 2;
 
       var total = this.measureLabel(ctx, o);
+      var complex = this.isComplexText(text);
+      if (complex) ctx.direction = this.isRTLText(text) ? 'rtl' : 'ltr';
 
       /* --- nehir/yol üzerine oturan etiket: gerçek çizilmiş eğriyi izler,
          daire yayı değil, sabit poligon (o.pathPts, oluşturulduğu anda alınmış) --- */
@@ -1698,6 +2352,24 @@
         var center = (o.pathCenter != null) ? o.pathCenter : pathLen/2;
         var startLen = center - total/2;
         var tr3 = o.track||0;
+        /* bitişik yazı: yay boyunca harf harf dağıtmak yerine, yolun orta
+           noktasındaki teğete oturan tek bir parça */
+        if (complex) {
+          var cp = Geo.pointAtLength(o.pathPts, center);
+          ctx.save();
+          ctx.translate(cp.x, cp.y);
+          ctx.rotate(cp.ang);
+          if (o.outline) {
+            ctx.strokeStyle = o.outlineColor || '#f5ecd8';
+            ctx.lineWidth = Math.max(1.5, (o.size||32)*0.16);
+            ctx.strokeText(text, 0, 0);
+          }
+          ctx.fillStyle = o.color || '#3a2b18';
+          ctx.fillText(text, 0, 0);
+          ctx.restore();
+          ctx.restore();
+          return;
+        }
         var cursor = startLen;
         for (var pi = 0; pi < text.length; pi++) {
           var cw3 = ctx.measureText(text[pi]).width;
@@ -1757,6 +2429,14 @@
         }
         ctx.fillStyle = o.color || '#3a2b18';
         ctx.fillText(ch, cx, 0);
+      }
+
+      /* bitişik yazıda harf aralığı ve yay devre dışı: ikisi de harfleri
+         tek tek konumlandırmayı gerektirir. */
+      if (complex) {
+        paint(text, 0);
+        ctx.restore();
+        return;
       }
 
       if (!arc || Math.abs(arc) < 0.01) {
@@ -1845,17 +2525,90 @@
       ctx.restore();
     },
 
-    /* ---------- ızgara ---------- */
-    drawGrid: function (ctx) {
+    /* ---------- ızgara ----------
+       Üç tür: kare, altıgen (TTRPG standardı) ve nokta. Hepsi görünür
+       dikdörtgene kırpılır — 8192² tuvalde küçük hücre boyunda bile
+       yalnızca ekrandaki hücreler üretilir. */
+    gridType: 'square',
+    gridColor: '#1e281e',
+    gridOpacity: 0.28,
+
+    _gridStroke: function () {
+      var h = (this.gridColor || '#1e281e').replace('#','');
+      if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+      var r = parseInt(h.substr(0,2),16), g = parseInt(h.substr(2,2),16), b = parseInt(h.substr(4,2),16);
+      return 'rgba('+r+','+g+','+b+','+this.gridOpacity+')';
+    },
+
+    drawGrid: function (ctx, vis, forExport) {
       var g = this.gridSize;
+      if (!(g > 0)) return;
+      var v = vis || this.visibleMapRect();
+      if (v.w <= 0 || v.h <= 0) return;
+
+      /* çok uzaklaşıldığında ızgara okunmaz bir gri lekeye dönüşür —
+         ekranda 4 pikselden ince hücrelerde çizmiyoruz (çıktıda geçerli değil) */
+      if (!forExport && g * this.zoom < 4) return;
+
       ctx.save();
-      ctx.strokeStyle = 'rgba(30,40,30,0.28)';
-      ctx.lineWidth = 1/this.zoom;
-      ctx.beginPath();
-      for (var x = 0; x <= this.W; x += g) { ctx.moveTo(x, 0); ctx.lineTo(x, this.H); }
-      for (var y = 0; y <= this.H; y += g) { ctx.moveTo(0, y); ctx.lineTo(this.W, y); }
-      ctx.stroke();
+      ctx.strokeStyle = this._gridStroke();
+      ctx.fillStyle = this._gridStroke();
+      ctx.lineWidth = forExport ? Math.max(1, g*0.012) : 1/this.zoom;
+
+      if (this.gridType === 'hex') {
+        this._drawHexGrid(ctx, v, g);
+      } else if (this.gridType === 'dot') {
+        var dr = forExport ? Math.max(1.2, g*0.035)
+                           : Math.max(0.8/this.zoom, Math.min(2.4/this.zoom, g*0.035));
+        var dsx = Math.floor(v.x0/g)*g, dsy = Math.floor(v.y0/g)*g;
+        ctx.beginPath();
+        for (var dx0 = dsx; dx0 <= v.x1; dx0 += g) {
+          for (var dy0 = dsy; dy0 <= v.y1; dy0 += g) {
+            ctx.moveTo(dx0+dr, dy0);
+            ctx.arc(dx0, dy0, dr, 0, Math.PI*2);
+          }
+        }
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        var sx = Math.floor(v.x0/g)*g, sy = Math.floor(v.y0/g)*g;
+        for (var x = sx; x <= v.x1; x += g) { ctx.moveTo(x, v.y0); ctx.lineTo(x, v.y1); }
+        for (var y = sy; y <= v.y1; y += g) { ctx.moveTo(v.x0, y); ctx.lineTo(v.x1, y); }
+        ctx.stroke();
+      }
       ctx.restore();
+    },
+
+    /* Sivri-tepeli (pointy-top) altıgen ızgara: g hücrenin genişliği.
+       Yatay adım = g, dikey adım = 3/4 · yükseklik; tek satırlar yarım
+       hücre kaydırılır. Yalnızca görünür aralık dolaşılır. */
+    _drawHexGrid: function (ctx, v, g) {
+      var w = g;                    /* hücre genişliği  */
+      var hgt = w * 2 / Math.sqrt(3);   /* sivri tepeli yükseklik */
+      var vstep = hgt * 0.75;
+      var row0 = Math.floor(v.y0 / vstep) - 1;
+      var row1 = Math.ceil(v.y1 / vstep) + 1;
+      var q = hgt / 4;
+      ctx.beginPath();
+      for (var row = row0; row <= row1; row++) {
+        var cy = row * vstep;
+        var offset = (row & 1) ? w/2 : 0;
+        var col0 = Math.floor((v.x0 - offset) / w) - 1;
+        var col1 = Math.ceil((v.x1 - offset) / w) + 1;
+        for (var col = col0; col <= col1; col++) {
+          var cx = col * w + offset;
+          /* altıgenin üst yarısı — alt yarı komşu satırdan gelir,
+             böylece her kenar bir kez çizilir */
+          ctx.moveTo(cx,        cy - hgt/2);
+          ctx.lineTo(cx + w/2,  cy - q);
+          ctx.lineTo(cx + w/2,  cy + q);
+          ctx.lineTo(cx,        cy + hgt/2);
+          ctx.lineTo(cx - w/2,  cy + q);
+          ctx.lineTo(cx - w/2,  cy - q);
+          ctx.closePath();
+        }
+      }
+      ctx.stroke();
     },
 
     /* ---------- fırça imleci ---------- */
@@ -1885,10 +2638,12 @@
       var s = S/Math.max(this.W, this.H);
       m.setTransform(1,0,0,1,0,0);
       m.clearRect(0, 0, S, S);
-      m.save();
-      m.scale(s, s);
-      this.renderMap(m, { includeReference:false });
-      m.restore();
+      /* Besteyi küçülterek çiz — eskiden burada renderMap() yeniden
+         çalışıyordu; küçük tuvale çizse bile nehir/yol kırpması için
+         tam boyutlu scratch işlemleri yapıyordu (200 ms'de bir). */
+      if (this.mapCanvas) {
+        m.drawImage(this.mapCanvas, 0, 0, this.W*s, this.H*s);
+      }
       var tl = this.screenToMap(0, 0), br = this.screenToMap(this.vw, this.vh);
       m.strokeStyle = '#c08a3e';
       m.lineWidth = 1.5;
@@ -1898,7 +2653,7 @@
     centerOn: function (mx, my) {
       this.panX = this.vw/2 - mx*this.zoom;
       this.panY = this.vh/2 - my*this.zoom;
-      this.requestRender();
+      this.requestViewRender();
     }
   };
 
@@ -1912,6 +2667,8 @@
 
   global.Geo = Geo;
   global.FONTS = FONTS;
+  global.FONT_LIST = FONT_LIST;
+  global.fontAvailable = fontAvailable;
   global.LABEL_PRESETS = LABEL_PRESETS;
   global.Cv = Cv;
 })(window);

@@ -38,6 +38,31 @@
 #view-editor{display:contents}
 #view-editor.hidden{display:none}
 
+/* ---------- paylaşım görüntüleyici ---------- */
+#view-share{padding:0; overflow:hidden}
+#view-share.embed{top:0}
+#share-stage{position:absolute; inset:0; cursor:grab; touch-action:none}
+#share-stage.drag{cursor:grabbing}
+#share-img{position:absolute; top:0; left:0; transform-origin:0 0; max-width:none;
+  box-shadow:0 30px 90px -20px #000c; user-select:none; -webkit-user-drag:none}
+#share-bar{
+  position:absolute; left:0; right:0; top:0; z-index:2;
+  display:flex; align-items:center; gap:14px; padding:14px 18px;
+  background:linear-gradient(var(--ink-900),transparent); pointer-events:none;
+}
+#share-bar h1{font-size:14.5px; font-weight:600; letter-spacing:.03em; color:var(--text); margin:0}
+.share-edit-btn{
+  margin-inline-start:auto; pointer-events:auto; font-size:11.5px; color:var(--brass);
+  text-decoration:none; border:1px solid var(--line); border-radius:var(--radius); padding:5px 10px;
+}
+.share-edit-btn:hover{border-color:var(--brass-dim)}
+#share-zoom{position:absolute; right:16px; bottom:16px; z-index:2; display:flex; gap:6px}
+#share-zoom button{
+  width:34px; height:34px; border:1px solid var(--line); background:var(--ink-800);
+  color:var(--brass); border-radius:5px; cursor:pointer; font-size:16px;
+}
+#share-zoom button:hover{border-color:var(--brass-dim)}
+
 /* Kabuk sayfaları 360px telefondan 4K TV'ye kadar tek akışkan ölçekle
    çalışır: clamp() ile tipografi viewport'a bağlı büyür, üst sınır çok
    büyük ekranda satır uzunluğunu okunur tutar. */
@@ -75,7 +100,7 @@
 .video-play{
   width:56px; height:56px; border-radius:50%; border:2px solid var(--brass-dim);
   display:flex; align-items:center; justify-content:center;
-  font-size:18px; color:var(--brass); padding-left:3px;
+  font-size:18px; color:var(--brass); padding-inline-start:3px;
 }
 
 /* ---------- canvas sayfası ---------- */
@@ -105,11 +130,12 @@ label.btn.wide{display:block; text-align:center; cursor:pointer; margin-top:6px;
 }
 .cv-card:hover{border-color:var(--brass-dim)}
 .cv-card-thumb{
-  aspect-ratio:1; border-radius:6px; margin-bottom:10px;
+  aspect-ratio:1; border-radius:6px; margin-bottom:10px; overflow:hidden;
   background:linear-gradient(160deg,var(--ink-600),var(--ink-700));
   display:flex; align-items:center; justify-content:center;
   font-size:22px; color:var(--brass-dim);
 }
+.cv-card-thumb img{width:100%; height:100%; object-fit:cover; display:block}
 .cv-card-name{font-size:13px; color:var(--text); margin-bottom:3px; word-break:break-word}
 .cv-card-meta{font-size:10.5px; color:var(--text-dim); font-family:var(--f-mono)}
 .cv-card-actions{display:flex; gap:6px; margin-top:10px}
@@ -127,7 +153,7 @@ label.btn.wide{display:block; text-align:center; cursor:pointer; margin-top:6px;
   display:flex; align-items:center; gap:10px;
   font-family:var(--f-display); font-size:10px; letter-spacing:.15em;
   text-transform:uppercase; color:var(--brass); opacity:.85;
-  margin:22px 0 4px; padding-left:2px;
+  margin:22px 0 4px; padding-inline-start:2px;
 }
 .tutorial-group-label:first-child{margin-top:0}
 .tutorial-group-label::after{
@@ -164,37 +190,6 @@ label.btn.wide{display:block; text-align:center; cursor:pointer; margin-top:6px;
 .community-card-title{font-size:14px; color:var(--text); font-weight:600}
 .community-card-desc{font-size:11.5px; color:var(--text-dim)}
 
-/* ---------- dar ekran kapısı ---------- */
-.narrow-gate{
-  min-height:100%; display:flex; align-items:center; justify-content:center;
-  padding:32px 20px 60px;
-}
-.narrow-card{
-  max-width:520px; text-align:center;
-  background:var(--ink-800); border:1px solid var(--line); border-radius:10px;
-  padding:clamp(28px, 6vw, 44px) clamp(20px, 5vw, 40px);
-  box-shadow:0 24px 60px -30px #000a;
-}
-.narrow-ico{
-  width:clamp(56px, 16vw, 76px); height:auto; color:var(--brass-dim);
-  margin-bottom:18px;
-}
-.narrow-card h2{
-  font-family:var(--f-display); font-size:clamp(17px, 4.4vw, 22px);
-  color:var(--brass); margin:0 0 12px; letter-spacing:.02em; text-wrap:balance;
-}
-.narrow-card p{
-  font-size:clamp(13px, 3.4vw, 14.5px); line-height:1.65;
-  color:var(--text-dim); margin:0 0 12px; text-wrap:pretty;
-}
-.narrow-hint{color:var(--text) !important; opacity:.85}
-.narrow-size{
-  display:inline-flex; align-items:center; gap:8px; margin:6px 0 22px;
-  padding:6px 14px; border:1px solid var(--line); border-radius:20px;
-  font-size:12px; color:var(--text-dim);
-}
-.narrow-size b{color:var(--brass); font-family:var(--f-mono); font-weight:500}
-
 /* ---------- dar ekranlar ---------- */
 @media (max-width:640px){
   #shell-nav{gap:6px; padding:0 10px}
@@ -215,3 +210,20 @@ label.btn.wide{display:block; text-align:center; cursor:pointer; margin-top:6px;
 @media (max-width:400px){
   .shell-tab{padding:8px 6px; font-size:11px; letter-spacing:0}
 }
+
+/* ---------- başlangıç şablonları ---------- */
+.canvas-templates{margin-bottom:44px}
+.tpl-grid{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:14px; margin-top:16px;
+}
+.tpl-card{
+  background:var(--ink-800); border:1px solid var(--line); border-radius:8px;
+  padding:0; cursor:pointer; overflow:hidden; text-align:start;
+  transition:border-color .12s; color:inherit; font:inherit;
+}
+.tpl-card:hover{border-color:var(--brass-dim)}
+.tpl-card canvas{display:block; width:100%; height:96px; background:#3f6b74}
+.tpl-card .tpl-name{display:block; font-size:12.5px; color:var(--text); padding:9px 10px 3px}
+.tpl-card .tpl-sub{display:block; font-size:10.5px; color:var(--text-dim); padding:0 10px 10px}
+@media (max-width:640px){ .tpl-grid{grid-template-columns:1fr 1fr} }

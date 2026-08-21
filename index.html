@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wayborne Map Editor</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23241708%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23c08a3e%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M8%2024%20L24%208%22%2F%3E%3Cpath%20d%3D%22M24%2024%20L8%208%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%223.1%22%20fill%3D%22%23241708%22%20stroke%3D%22%23c08a3e%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/toolbar.css">
 <link rel="stylesheet" href="css/canvas.css">
@@ -16,11 +17,11 @@
     <span class="brand-mark">⚔</span>
     <span class="brand-name">Wayborne</span>
   </div>
-  <div class="shell-tabs">
-    <button class="shell-tab active" data-view-link="home" data-i18n="nav_home">Ana Sayfa</button>
-    <button class="shell-tab" data-view-link="canvas" data-i18n="nav_canvas">Tuval</button>
-    <button class="shell-tab" data-view-link="tutorial" data-i18n="nav_tutorial">Rehber</button>
-    <button class="shell-tab" data-view-link="community" data-i18n="nav_community">Topluluk</button>
+  <div class="shell-tabs" role="tablist" aria-label="Sayfalar">
+    <button class="shell-tab active" data-view-link="home" role="tab" aria-selected="true" data-i18n="nav_home">Ana Sayfa</button>
+    <button class="shell-tab" data-view-link="canvas" role="tab" aria-selected="false" data-i18n="nav_canvas">Tuval</button>
+    <button class="shell-tab" data-view-link="tutorial" role="tab" aria-selected="false" data-i18n="nav_tutorial">Rehber</button>
+    <button class="shell-tab" data-view-link="community" role="tab" aria-selected="false" data-i18n="nav_community">Topluluk</button>
   </div>
   <div class="lang-switch" id="lang-switch-shell">
     <button class="tb-btn lang" id="btn-lang-shell" title="Language / Dil" aria-label="Language"><svg class="ico-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><ellipse cx="10" cy="10" rx="3.2" ry="7.5"/><path d="M2.7 7.5h14.6M2.7 12.5h14.6"/></svg></button>
@@ -76,6 +77,14 @@
       <label class="btn wide" for="file-open-canvas" data-i18n="canvas_import">.json dosyasından içe aktar</label>
       <input type="file" id="file-open-canvas" accept="application/json,.json" hidden>
     </section>
+
+    <!-- Boş tuval yaratıcı araçlarda en büyük terk sebebidir; şablonlar
+         kullanıcıyı doğrudan çizilebilir bir dünyanın içine bırakır. -->
+    <section class="canvas-templates">
+      <h2 data-i18n="tpl_title">Şablonla başla</h2>
+      <p class="hint" data-i18n="tpl_desc">Hazır bir kıyı çizgisiyle başla, sonra üzerine kendi dünyanı kur.</p>
+      <div id="tpl-grid" class="tpl-grid"></div>
+    </section>
     <section class="canvas-saved">
       <h2 data-i18n="canvas_saved_title">Kayıtlı tuvaller</h2>
       <div id="cv-list" class="cv-grid"></div>
@@ -117,30 +126,23 @@
   </div>
 </div>
 
-<!-- ============ DAR EKRAN KAPISI ============
-     Editör üç sütunlu sabit yerleşime dayanır (araç rayı + tuval + katman
-     paneli); ~1024px altında tuval alanı negatife düşer. Bozuk bir arayüz
-     göstermek yerine burada ne gerektiğini açıkça söylüyoruz. -->
-<div id="view-narrow" class="shell-view hidden">
-  <div class="narrow-gate">
-    <div class="narrow-card">
-      <svg class="narrow-ico" viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="2"
-           stroke-linejoin="round" aria-hidden="true">
-        <rect x="2" y="2" width="60" height="38" rx="3"/>
-        <path d="M2 33h60"/>
-        <path d="M24 44h16M32 40v4"/>
-      </svg>
-      <h2 data-i18n="narrow_title">Editör için daha geniş bir ekran gerekli</h2>
-      <p data-i18n="narrow_desc">Harita editörü; araç rayı, tuval ve katman paneliyle yan yana
-        çalışan bir masaüstü yerleşimi kullanır. Bu düzenin sığması için en az
-        1024 × 600 piksel gerekir.</p>
-      <p class="narrow-hint" data-i18n="narrow_hint">Tablet kullanıyorsan cihazı yatay çevirmeyi dene.</p>
-      <div class="narrow-size">
-        <span data-i18n="narrow_current">Bu ekran</span>
-        <b id="narrow-current-size">—</b>
-      </div>
-      <button class="btn primary big" data-view-link="home" data-i18n="narrow_back">Ana sayfaya dön</button>
-    </div>
+<!-- ============ PAYLAŞIM GÖRÜNTÜLEYİCİ ============
+     URL hash'inde (#d=...) gömülü bir harita görüntüsü varsa gösterilir.
+     Sunucu yok: hash asla ağa gitmez, bu yüzden bu tamamen istemci
+     tarafında çalışan bir "harita linki" oluşturur. embed=1 ile üst
+     çubuk/kabuk gezinmesi gizlenir — iframe'e gömmeye uygun. -->
+<div id="view-share" class="shell-view hidden">
+  <div id="share-stage">
+    <img id="share-img" alt="">
+  </div>
+  <div id="share-bar">
+    <h1 id="share-title"></h1>
+    <a id="share-edit-link" class="share-edit-btn" href="./" data-i18n="share_editbtn">Wayborne'da aç</a>
+  </div>
+  <div id="share-zoom">
+    <button id="share-zo" title="&minus;">&minus;</button>
+    <button id="share-zf" title="fit">&#9633;</button>
+    <button id="share-zi" title="+">&plus;</button>
   </div>
 </div>
 
@@ -171,9 +173,24 @@
 
   <div class="tb-group">
     <button class="tb-btn" id="btn-export-png">PNG</button>
-    <button class="tb-btn" id="btn-export-png2" title="2× çözünürlük">PNG 2×</button>
-    <button class="tb-btn" id="btn-export-png4" title="4× çözünürlük">PNG 4×</button>
+    <button class="tb-btn" id="btn-export-png2" data-i18n-title="exp_png2_t">PNG 2×</button>
+    <button class="tb-btn" id="btn-export-png4" data-i18n-title="exp_png4_t">PNG 4×</button>
     <button class="tb-btn" id="btn-export-svg">SVG</button>
+    <button class="tb-btn" id="btn-export-html" data-i18n-title="exp_html_t">HTML</button>
+    <button class="tb-btn" id="btn-share-link" data-i18n-title="exp_share_t">
+      <svg class="ico-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="6" r="2.6"/><circle cx="18" cy="18" r="2.6"/>
+        <path d="M8.2 10.8 15.8 7.2M8.2 13.2l7.6 3.6"/>
+      </svg>
+    </button>
+    <button class="tb-btn" id="btn-print" data-i18n-title="exp_print_t">
+      <svg class="ico-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/>
+        <path d="M6 17h12v4H6z"/>
+      </svg>
+    </button>
   </div>
 
   <div class="tb-spacer"></div>
@@ -182,6 +199,7 @@
     <label class="chk"><input type="checkbox" id="chk-shore" checked><span data-i18n="shore">Kıyı</span></label>
     <label class="chk"><input type="checkbox" id="chk-parchment"><span data-i18n="parchment">Parşömen</span></label>
     <label class="chk"><input type="checkbox" id="chk-grid"><span data-i18n="grid">Izgara</span></label>
+    <label class="chk"><input type="checkbox" id="chk-legend"><span data-i18n="o_symlegend">Lejant</span></label>
   </div>
 
   <div class="tb-sep"></div>
@@ -201,57 +219,58 @@
 <main id="workspace">
 
   <!-- ============ SOL PANEL ============ -->
-  <aside id="left-panel">
+  <aside id="left-panel" aria-label="Araçlar ve seçenekler">
     <!-- Araçlar işleve göre 5 gruba ayrılmıştır; her grup 3 veya 6 araç
          içerdiğinden 3 sütunlu ızgarada satırlar tam dolar. Butonların
          .tool sınıfı ve data-tool niteliği JS bağlaması için korunmalıdır. -->
-    <div class="tool-rail" id="tool-rail">
+    <div class="tool-rail" id="tool-rail" role="toolbar" aria-label="Araçlar" aria-orientation="vertical">
 
       <div class="tool-group">
         <div class="tool-group-label" data-i18n="grp_navigate">Gezinme</div>
-        <div class="tool-grid">
-          <button class="tool" data-tool="select" title="V"><span class="ico">➤</span><em data-i18n="t_select">Seç</em></button>
-          <button class="tool" data-tool="lasso"  title="X"><span class="ico">⌁</span><em data-i18n="t_lasso">Kement</em></button>
-          <button class="tool" data-tool="pan"    title="Space"><span class="ico">✥</span><em data-i18n="t_pan">Kaydır</em></button>
+        <div class="tool-grid" role="group">
+          <button class="tool" data-tool="select" title="V" aria-pressed="false"><span class="ico">➤</span><em data-i18n="t_select">Seç</em></button>
+          <button class="tool" data-tool="lasso"  title="X" aria-pressed="false"><span class="ico">⌁</span><em data-i18n="t_lasso">Kement</em></button>
+          <button class="tool" data-tool="pan"    title="Space" aria-pressed="false"><span class="ico">✥</span><em data-i18n="t_pan">Kaydır</em></button>
         </div>
       </div>
 
       <div class="tool-group">
         <div class="tool-group-label" data-i18n="grp_terrain">Arazi</div>
-        <div class="tool-grid">
-          <button class="tool" data-tool="landmass"  title="B"><span class="ico">◕</span><em data-i18n="t_landmass">Kara</em></button>
-          <button class="tool" data-tool="erase"     title="E"><span class="ico">◌</span><em data-i18n="t_erase">Deniz</em></button>
-          <button class="tool" data-tool="fill"      title="F"><span class="ico">◆</span><em data-i18n="t_fill">Doldur</em></button>
-          <button class="tool" data-tool="terrain"   title="T"><span class="ico">▨</span><em data-i18n="t_terrain">Arazi</em></button>
-          <button class="tool" data-tool="elevation" title="U"><span class="ico">▲</span><em data-i18n="t_elevation">Yükselti</em></button>
-          <button class="tool" data-tool="eyedrop"   title="I"><span class="ico">⊙</span><em data-i18n="t_eyedrop">Örnekle</em></button>
+        <div class="tool-grid" role="group">
+          <button class="tool" data-tool="landmass"  title="B" aria-pressed="false"><span class="ico">◕</span><em data-i18n="t_landmass">Kara</em></button>
+          <button class="tool" data-tool="erase"     title="E" aria-pressed="false"><span class="ico">◌</span><em data-i18n="t_erase">Deniz</em></button>
+          <button class="tool" data-tool="fill"      title="F" aria-pressed="false"><span class="ico">◆</span><em data-i18n="t_fill">Doldur</em></button>
+          <button class="tool" data-tool="terrain"   title="T" aria-pressed="false"><span class="ico">▨</span><em data-i18n="t_terrain">Arazi</em></button>
+          <button class="tool" data-tool="elevation" title="U" aria-pressed="false"><span class="ico">▲</span><em data-i18n="t_elevation">Yükselti</em></button>
+          <button class="tool" data-tool="eyedrop"   title="I" aria-pressed="false"><span class="ico">⊙</span><em data-i18n="t_eyedrop">Örnekle</em></button>
         </div>
       </div>
 
       <div class="tool-group">
         <div class="tool-group-label" data-i18n="grp_water">Su &amp; Yollar</div>
-        <div class="tool-grid">
-          <button class="tool" data-tool="river" title="R"><span class="ico">≈</span><em data-i18n="t_river">Nehir</em></button>
-          <button class="tool" data-tool="lake"  title="K"><span class="ico">◎</span><em data-i18n="t_lake">Göl</em></button>
-          <button class="tool" data-tool="road"  title="D"><span class="ico">⋯</span><em data-i18n="t_road">Yol</em></button>
+        <div class="tool-grid" role="group">
+          <button class="tool" data-tool="river" title="R" aria-pressed="false"><span class="ico">≈</span><em data-i18n="t_river">Nehir</em></button>
+          <button class="tool" data-tool="lake"  title="K" aria-pressed="false"><span class="ico">◎</span><em data-i18n="t_lake">Göl</em></button>
+          <button class="tool" data-tool="road"  title="D" aria-pressed="false"><span class="ico">⋯</span><em data-i18n="t_road">Yol</em></button>
         </div>
       </div>
 
       <div class="tool-group">
         <div class="tool-group-label" data-i18n="grp_markers">İşaretler</div>
-        <div class="tool-grid">
-          <button class="tool" data-tool="symbol"   title="S"><span class="ico">⛰︎</span><em data-i18n="t_symbol">Sembol</em></button>
-          <button class="tool" data-tool="resource" title="Y"><span class="ico">⛏︎</span><em data-i18n="t_resource">Kaynak</em></button>
-          <button class="tool" data-tool="label"    title="L"><span class="ico">A</span><em data-i18n="t_label">Etiket</em></button>
+        <div class="tool-grid" role="group">
+          <button class="tool" data-tool="symbol"   title="S" aria-pressed="false"><span class="ico">⛰︎</span><em data-i18n="t_symbol">Sembol</em></button>
+          <button class="tool" data-tool="resource" title="Y" aria-pressed="false"><span class="ico">⛏︎</span><em data-i18n="t_resource">Kaynak</em></button>
+          <button class="tool" data-tool="label"    title="L" aria-pressed="false"><span class="ico">A</span><em data-i18n="t_label">Etiket</em></button>
+          <button class="tool" data-tool="sketch"   title="N" aria-pressed="false"><span class="ico">✎︎</span><em data-i18n="t_sketch">Çizim</em></button>
         </div>
       </div>
 
       <div class="tool-group">
         <div class="tool-group-label" data-i18n="grp_regions">Bölge &amp; Ölçüm</div>
-        <div class="tool-grid">
-          <button class="tool" data-tool="territory"  title="G"><span class="ico">▧</span><em data-i18n="t_territory">Bölge</em></button>
-          <button class="tool" data-tool="regionlink" title="M"><span class="ico">◈</span><em data-i18n="t_regionlink">Bölge bağlantısı</em></button>
-          <button class="tool" data-tool="measure"    title="Q"><span class="ico">↔︎</span><em data-i18n="t_measure">Ölç</em></button>
+        <div class="tool-grid" role="group">
+          <button class="tool" data-tool="territory"  title="G" aria-pressed="false"><span class="ico">▧</span><em data-i18n="t_territory">Bölge</em></button>
+          <button class="tool" data-tool="regionlink" title="M" aria-pressed="false"><span class="ico">◈</span><em data-i18n="t_regionlink">Bölge bağlantısı</em></button>
+          <button class="tool" data-tool="measure"    title="Q" aria-pressed="false"><span class="ico">↔︎</span><em data-i18n="t_measure">Ölç</em></button>
         </div>
       </div>
 
@@ -288,6 +307,7 @@
           <option value="continent" data-i18n="o_landgen_continent">Kıta</option>
           <option value="island" data-i18n="o_landgen_island">Ada</option>
           <option value="archipelago" data-i18n="o_landgen_archipelago">Takımada</option>
+          <option value="tectonic" data-i18n="o_landgen_tectonic">Tektonik</option>
         </select>
         <label class="row"><span data-i18n="o_landgenrough">Detay / pürüzlülük</span><b id="v-lg-rough">0.50</b></label>
         <input type="range" id="lg-rough" min="5" max="100" value="50">
@@ -306,6 +326,9 @@
         <label class="chk"><input type="checkbox" id="tr-clip" checked><span data-i18n="o_clip">Sadece karaya boya</span></label>
         <button class="btn wide" id="btn-clear-terrain" data-i18n="o_clearterrain">Arazi katmanını temizle</button>
         <p class="hint" data-i18n="h_terrain">Doku her fırça vuruşunda rastgele serpilir — tekrar eden örüntü oluşmaz.</p>
+        <h3 style="margin-top:16px" data-i18n="o_biomegen">Biyomu otomatik ata</h3>
+        <button class="btn wide" id="btn-biomegen" data-i18n="o_biomegen_go">🌍 Biyom ata</button>
+        <p class="hint" data-i18n="h_biomegen">Yükselti ve enleme göre arazi katmanını otomatik doldurur; mevcut arazi katmanının yerine geçer.</p>
       </section>
 
       <!-- ELEVATION -->
@@ -344,6 +367,9 @@
         <input type="range" id="sy-brush-density" min="5" max="100" value="50">
         <label class="chk"><input type="checkbox" id="sy-clip-land" checked><span data-i18n="o_clipland">Karaya kenetle (fırça)</span></label>
         <p class="hint" data-i18n="h_symbol">Kütüphaneden sembol seç, haritaya tıkla. [ ] tuşlarıyla döndür. Fırça modunda sürükle.</p>
+        <h3 style="margin-top:16px" data-i18n="o_settlegen">Yerleşimleri otomatik yerleştir</h3>
+        <button class="btn wide" id="btn-settlegen" data-i18n="o_settlegen_go">🏰 Yerleşim yerleştir</button>
+        <p class="hint" data-i18n="h_settlegen">Düz ve kıyıya yakın kara üzerine şehir/kasaba/köy sembolleri dağıtır — en iyi konum kale/liman, geri kalanlar kasaba/köy olur. "Yol üret" bu sembolleri bulup birbirine bağlar.</p>
       </section>
 
       <!-- LAKE -->
@@ -366,6 +392,17 @@
         <label class="row"><span data-i18n="o_width">Kalınlık</span><b id="v-tt-bw">2</b></label>
         <input type="range" id="tt-bw" min="0" max="10" value="2">
         <p class="hint" data-i18n="h_territory">Tıklayarak nokta ekle, 3+ nokta sonra Enter ile kapat.</p>
+
+        <h3 style="margin-top:20px" data-i18n="o_polsec">Siyasi Harita</h3>
+        <label class="chk"><input type="checkbox" id="pol-on"><span data-i18n="o_polmode">Siyasi görünüm</span></label>
+        <label class="chk"><input type="checkbox" id="pol-mute" checked><span data-i18n="o_polmute">Arazi dokusunu sustur</span></label>
+        <label class="chk"><input type="checkbox" id="pol-legend" checked><span data-i18n="o_pollegend">Lejant göster</span></label>
+        <label class="row"><span data-i18n="o_polfill">Dolgu yoğunluğu</span><b id="v-pol-fill">0.92</b></label>
+        <input type="range" id="pol-fill" min="40" max="100" value="92">
+        <button class="btn wide" id="btn-pol-colors" data-i18n="o_polcolors">Devlet renklerini otomatik ata</button>
+        <label class="row" style="margin-top:12px"><span data-i18n="o_polname">Seçili bölgenin adı</span></label>
+        <input type="text" id="tt-name" class="sel" data-i18n-placeholder="o_polname_ph" placeholder="Devlet adı">
+        <p class="hint" data-i18n="h_political">Siyasi görünüm ayrı bir katman değil; çizdiğin bölgeleri devlet alanı olarak sunar. Fizikî ve siyasi görünüm arasında geçiş yapabilirsin.</p>
       </section>
 
       <!-- REGION LINK -->
@@ -402,6 +439,9 @@
         <label class="row"><span data-i18n="o_color">Renk</span></label>
         <input type="color" id="rv-color" value="#5b8aa6">
         <p class="hint" data-i18n="h_path">Tıklayarak nokta ekle. Enter / çift tık ile bitir, Esc ile iptal.</p>
+        <h3 style="margin-top:16px" data-i18n="o_rivergen">Nehirleri otomatik üret</h3>
+        <button class="btn wide" id="btn-rivergen" data-i18n="o_rivergen_go">💧 Nehir üret</button>
+        <p class="hint" data-i18n="h_rivergen">Yükselti gridinden denize akan nehirler ekler. "Yükselti" fırçasıyla dağ/tepe çizilmiş olması gerekir.</p>
       </section>
 
       <!-- ROAD -->
@@ -418,12 +458,36 @@
         <label class="row"><span data-i18n="o_color">Renk</span></label>
         <input type="color" id="rd-color" value="#6b4f2a">
         <p class="hint" data-i18n="h_path">Tıklayarak nokta ekle. Enter / çift tık ile bitir, Esc ile iptal.</p>
+        <h3 style="margin-top:16px" data-i18n="o_roadgen">Yolları otomatik üret</h3>
+        <button class="btn wide" id="btn-roadgen" data-i18n="o_roadgen_go">🛤️ Yol üret</button>
+        <p class="hint" data-i18n="h_roadgen">Yerleşim sembolleri arasında (şehir/kasaba/köy/kale/liman) yamaçtan kaçınan yollar çizer. Sembol yoksa birkaç rastgele kara noktasını bağlar.</p>
       </section>
 
       <!-- LABEL -->
       <section class="opt-group" data-for="label">
         <h3 data-i18n="o_label">Etiket</h3>
         <textarea id="lb-text" rows="2" placeholder="Sideria"></textarea>
+        <div class="row2" style="margin-top:0">
+          <div>
+            <span class="mini" data-i18n="o_nameculture">Kültür</span>
+            <select id="nm-culture" class="sel"></select>
+          </div>
+          <div>
+            <span class="mini" data-i18n="o_namefeature">Tür</span>
+            <select id="nm-feature" class="sel">
+              <option value="settlement" data-i18n="o_nf_settlement">Yerleşim</option>
+              <option value="city" data-i18n="o_nf_city">Şehir</option>
+              <option value="river" data-i18n="o_nf_river">Nehir</option>
+              <option value="mountain" data-i18n="o_nf_mountain">Dağ</option>
+              <option value="forest" data-i18n="o_nf_forest">Orman</option>
+              <option value="region" data-i18n="o_nf_region">Bölge</option>
+              <option value="lake" data-i18n="o_nf_lake">Göl</option>
+              <option value="sea" data-i18n="o_nf_sea">Deniz</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn wide" id="btn-nm-gen" data-i18n="o_namegen">🎲 Ad öner</button>
+        <div id="nm-suggest" class="nm-suggest"></div>
         <label class="row"><span data-i18n="o_preset">Stil şablonu</span></label>
         <select id="lb-preset" class="sel"></select>
         <div id="lb-preview-wrap"><canvas id="lb-preview" width="220" height="64"></canvas></div>
@@ -437,15 +501,51 @@
         <input type="range" id="lb-rot" min="-180" max="180" value="0">
         <label class="row"><span data-i18n="o_color">Metin rengi</span></label>
         <input type="color" id="lb-color" value="#3a2b18">
+        <div class="sub-sec">
+          <span class="mini" data-i18n="o_typography">Tipografi</span>
+          <label class="row"><span data-i18n="o_font">Yazı ailesi</span></label>
+          <select id="lb-font" class="sel"></select>
+          <p class="hint" id="lb-font-note" data-i18n="h_font_missing">Bu yazı ailesi bu cihazda kurulu değil; en yakın karşılığı kullanılıyor.</p>
+          <label class="row"><span data-i18n="o_banner">Kapıt</span></label>
+          <select id="lb-banner" class="sel">
+            <option value="" data-i18n="o_banner_none">Yok</option>
+            <option value="ribbon" data-i18n="o_banner_ribbon">Kurdele</option>
+            <option value="plate" data-i18n="o_banner_plate">Levha</option>
+            <option value="scroll" data-i18n="o_banner_scroll">Tomar</option>
+            <option value="stone" data-i18n="o_banner_stone">Taş</option>
+          </select>
+          <label class="chk"><input type="checkbox" id="lb-caps"><span data-i18n="o_caps">Büyük harf</span></label>
+          <label class="chk"><input type="checkbox" id="lb-outline"><span data-i18n="o_outline">Dış hat</span></label>
+          <span class="mini" data-i18n="o_outlinecolor">Dış hat rengi</span>
+          <input type="color" id="lb-outline-color" value="#f5ecd8">
+          <label class="chk"><input type="checkbox" id="lb-shadow"><span data-i18n="o_shadow">Gölge</span></label>
+        </div>
         <label class="chk"><input type="checkbox" id="lb-snap-path"><span data-i18n="o_snappath">Yola oturt (nehir/yol)</span></label>
         <p class="hint" data-i18n="h_label">Şablon seç, metni yaz, haritaya tıkla. Seçili etikette ayarlar anında uygulanır.</p>
+      </section>
+
+      <!-- SKETCH -->
+      <section class="opt-group" data-for="sketch">
+        <h3 data-i18n="o_sketch">Çizim</h3>
+        <p class="hint" data-i18n="h_sketch">Serbest fırça, yalnızca kendi eklediğin katmanlara çizer. Katman panelinden "+ Katman" ile bir katman ekle, listeden onu seç, sonra haritaya çiz.</p>
+        <div id="sk-target" class="sk-target"></div>
+        <label class="row"><span data-i18n="o_color">Renk</span></label>
+        <input type="color" id="sk-color" value="#3a2b18">
+        <label class="row"><span data-i18n="o_brushsize">Fırça boyutu</span><b id="v-sk-size">26</b></label>
+        <input type="range" id="sk-size" min="2" max="300" value="26">
+        <label class="row"><span data-i18n="o_hardness">Sertlik</span><b id="v-sk-hard">0.70</b></label>
+        <input type="range" id="sk-hard" min="0" max="100" value="70">
+        <label class="row"><span data-i18n="o_opacity">Opaklık</span><b id="v-sk-op">0.90</b></label>
+        <input type="range" id="sk-op" min="5" max="100" value="90">
+        <label class="chk"><input type="checkbox" id="sk-eraser"><span data-i18n="o_sketch_eraser">Silgi modu</span></label>
       </section>
 
       <!-- EYEDROPPER -->
       <!-- MEASURE -->
       <section class="opt-group" data-for="measure">
         <h3 data-i18n="t_measure">Ölç</h3>
-        <p class="hint" data-i18n="h_measure">Haritada sürükleyerek iki nokta arası gerçek mesafeyi ölçek çubuğuna göre hesapla. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez.</p>
+        <label class="chk"><input type="checkbox" id="ms-area"><span data-i18n="o_measurearea">Alan olarak kapat</span></label>
+        <p class="hint" data-i18n="h_measure">Tıklayarak nokta ekle, çok parçalı bir mesafe ölçün. Enter / çift tık ile bitir, Esc ile iptal. "Alan olarak kapat" işaretliyse en az 3 noktalı ölçüm otomatik kapanır ve alanı da hesaplar. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez.</p>
       </section>
 
       <!-- LASSO -->
@@ -520,6 +620,21 @@
         <input type="color" id="wr-color" value="#3a2b18">
         <p class="hint" data-i18n="h_windrose">Haritada sürükleyerek taşı.</p>
 
+        <h3 style="margin-top:20px" data-i18n="o_gridsec">Izgara</h3>
+        <label class="row"><span data-i18n="o_gridtype">Tür</span></label>
+        <select id="grid-type" class="sel">
+          <option value="square" data-i18n="o_grid_square">Kare</option>
+          <option value="hex" data-i18n="o_grid_hex">Altıgen</option>
+          <option value="dot" data-i18n="o_grid_dot">Nokta</option>
+        </select>
+        <label class="row"><span data-i18n="o_gridcell">Hücre boyutu</span><b id="v-grid-size">128</b></label>
+        <input type="range" id="grid-size" min="16" max="512" value="128">
+        <label class="row"><span data-i18n="o_gridcolor">Renk</span></label>
+        <input type="color" id="grid-color" value="#1e281e">
+        <label class="row"><span data-i18n="o_gridop">Belirginlik</span><b id="v-grid-op">0.28</b></label>
+        <input type="range" id="grid-op" min="5" max="90" value="28">
+        <p class="hint" data-i18n="h_grid">Izgarayı üst çubuktaki "Izgara" kutusundan aç/kapat. Altıgen ızgara masaüstü rol yapma oyunlarının standardıdır.</p>
+
         <h3 style="margin-top:20px" data-i18n="o_snap">Izgaraya Yapış</h3>
         <label class="chk"><input type="checkbox" id="snap-enabled"><span data-i18n="o_snap">Aktif</span></label>
         <label class="row"><span data-i18n="o_snapsize">Izgara boyutu</span><b id="v-snap-size">64</b></label>
@@ -550,6 +665,8 @@
     </div>
   </aside>
 
+  <button type="button" class="panel-toggle panel-toggle-l" id="btn-toggle-left" data-i18n-title="panel_toggle_left" title="Sol paneli aç/kapat" aria-label="Sol paneli aç/kapat" aria-expanded="true">‹</button>
+
   <!-- ============ TUVAL ============ -->
   <section id="canvas-area">
     <div id="map-breadcrumb" class="hidden">
@@ -563,15 +680,19 @@
   </section>
 
   <!-- ============ SAĞ PANEL ============ -->
-  <aside id="right-panel">
-    <nav class="tabs">
-      <button class="tab active" data-tab="layers" data-i18n="tab_layers">Katmanlar</button>
-      <button class="tab" data-tab="library" data-i18n="tab_library">Kütüphane</button>
-      <button class="tab" data-tab="history" data-i18n="tab_history">Geçmiş</button>
+  <aside id="right-panel" aria-label="Katmanlar, kütüphane ve geçmiş">
+    <nav class="tabs" role="tablist" aria-label="Panel sekmeleri">
+      <button class="tab active" data-tab="layers" role="tab" aria-selected="true" data-i18n="tab_layers">Katmanlar</button>
+      <button class="tab" data-tab="library" role="tab" aria-selected="false" data-i18n="tab_library">Kütüphane</button>
+      <button class="tab" data-tab="history" role="tab" aria-selected="false" data-i18n="tab_history">Geçmiş</button>
+      <button class="tab" data-tab="regions" role="tab" aria-selected="false" data-i18n="tab_regions">Bölgeler</button>
+      <button class="tab" data-tab="todo" role="tab" aria-selected="false" data-i18n="tab_todo">Görevler</button>
     </nav>
 
     <div class="tab-body" data-tab="layers">
       <ul id="layer-list" class="layer-list"></ul>
+      <button class="btn wide" id="btn-add-layer" data-i18n="layer_add">+ Katman ekle</button>
+      <p class="hint" data-i18n="h_add_layer">Kendi eklediğin katmanlar serbest çizim içindir; "Çizim" aracıyla üzerlerine boyayabilirsin. Katman ekleme/silme geri alınamaz.</p>
       <div class="layer-extra">
         <h4 data-i18n="ref_title">Referans görsel</h4>
         <input type="file" id="ref-file" accept="image/*">
@@ -587,6 +708,10 @@
         <input type="file" id="sym-file" accept="image/png,image/jpeg,image/svg+xml,image/webp" multiple hidden>
         <div id="custom-sym-grid" class="sym-grid" style="margin-top:8px"></div>
       </div>
+      <div id="sym-recent-bar" style="display:none">
+        <label class="row"><span data-i18n="sym_recent">Son kullanılanlar</span></label>
+        <div id="sym-recent-grid" class="sym-grid"></div>
+      </div>
       <input type="text" id="sym-search" class="sel" data-i18n-placeholder="sym_search" placeholder="Sembol ara...">
       <select id="sym-cat" class="sel"></select>
       <div id="sym-grid" class="sym-grid"></div>
@@ -595,16 +720,39 @@
     <div class="tab-body hidden" data-tab="history">
       <ul id="history-list" class="history-list"></ul>
     </div>
+
+    <div class="tab-body hidden" data-tab="regions">
+      <div class="regions-section">
+        <h4 data-i18n="regions_political">Siyasi bölgeler</h4>
+        <ul id="territory-list" class="territory-list"></ul>
+        <p class="hint" id="territory-empty-hint" data-i18n="regions_political_empty">Henüz adlandırılmış bölge yok. "Bölge" aracıyla çiz, sonra ada ver.</p>
+      </div>
+      <div class="regions-section">
+        <h4 data-i18n="regions_maptree">Harita ağacı</h4>
+        <ul id="maptree-list" class="maptree-list"></ul>
+      </div>
+    </div>
+
+    <div class="tab-body hidden" data-tab="todo">
+      <div class="todo-add-row">
+        <input type="text" id="todo-input" class="sel" data-i18n-placeholder="todo_placeholder" placeholder="Yeni görev...">
+        <button class="btn" id="btn-todo-add" data-i18n="todo_add">Ekle</button>
+      </div>
+      <ul id="todo-list" class="todo-list"></ul>
+      <p class="hint" id="todo-empty-hint" data-i18n="todo_empty">Henüz görev yok.</p>
+    </div>
   </aside>
+
+  <button type="button" class="panel-toggle panel-toggle-r" id="btn-toggle-right" data-i18n-title="panel_toggle_right" title="Sağ paneli aç/kapat" aria-label="Sağ paneli aç/kapat" aria-expanded="true">›</button>
 </main>
 
-<footer id="statusbar">
+<footer id="statusbar" role="status" aria-live="polite">
   <span class="st"><i data-i18n="st_pos">Konum</i> <b id="st-pos">0, 0</b></span>
   <span class="st"><i data-i18n="st_zoom">Yakınlık</i> <b id="st-zoom">100%</b></span>
   <span class="st"><i data-i18n="st_size">Tuval</i> <b id="st-size">2048 × 2048</b></span>
   <span class="st"><i data-i18n="st_tool">Araç</i> <b id="st-tool">Kara</b></span>
   <span class="st right" id="st-msg"></span>
-  <span class="st right" style="opacity:0.45;font-size:11px;letter-spacing:0.04em">v0.63</span>
+  <span class="st right" style="opacity:0.45;font-size:11px;letter-spacing:0.04em">v0.67</span>
 </footer>
 
 </div><!-- /view-editor -->
@@ -627,6 +775,7 @@
 <script src="js/catalog2.js"></script>
 <script src="js/symbols.js"></script>
 <script src="js/i18n-names.js"></script>
+<script src="js/names.js"></script>
 <script src="js/history.js"></script>
 <script src="js/layers.js"></script>
 <script src="js/canvas.js"></script>
@@ -634,5 +783,15 @@
 <script src="js/export.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/app.js"></script>
+<script>
+  /* Uygulama zaten sıfır ağ isteği yapıyor — bu worker sayfayı bir kez
+     ziyaret ettikten sonra tamamen çevrimdışı açılabilir hâle getirir.
+     Kurulabilir uygulama değil (manifest yok), sadece önbellek. */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+</script>
 </body>
 </html>

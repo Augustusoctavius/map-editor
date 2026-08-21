@@ -6,19 +6,46 @@
 (function (global) {
   'use strict';
 
+  /* innerHTML ile kurulan modal gövdelerinde kullanıcı metni (harita adı)
+     ve çeviri dizeleri geçtiği için kaçış şart. */
+  function esc(v) {
+    return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
   var DICT = {
     tr: {
       new:'Yeni', open:'Aç', save:'Kaydet', parchment:'Parşömen', grid:'Izgara', shore:'Kıyı',
       narrow_title:'Editör için daha geniş bir ekran gerekli', narrow_desc:'Harita editörü; araç rayı, tuval ve katman paneliyle yan yana çalışan bir masaüstü yerleşimi kullanır. Bu düzenin sığması için en az 1024 × 600 piksel gerekir.',
       narrow_hint:'Tablet kullanıyorsan cihazı yatay çevirmeyi dene.', narrow_current:'Bu ekran', narrow_back:'Ana sayfaya dön',
+      o_gridsec:'Izgara', o_gridtype:'Tür', o_grid_square:'Kare', o_grid_hex:'Altıgen', o_grid_dot:'Nokta', o_gridcell:'Hücre boyutu', o_gridcolor:'Renk', o_gridop:'Belirginlik', h_grid:'Izgarayı üst çubuktaki \'Izgara\' kutusundan aç/kapat. Altıgen ızgara masaüstü rol yapma oyunlarının standardıdır.',
+      o_polsec:'Siyasi Harita', o_polmode:'Siyasi görünüm', o_polmute:'Arazi dokusunu sustur', o_pollegend:'Lejant göster', o_polfill:'Dolgu yoğunluğu', o_polcolors:'Devlet renklerini otomatik ata', o_polname:'Seçili bölgenin adı', o_polname_ph:'Devlet adı', h_political:'Siyasi görünüm ayrı bir katman değil; çizdiğin bölgeleri devlet alanı olarak sunar.', m_polon:'Siyasi görünüm açık', m_poloff:'Fizikî görünüm', m_polcolored:'bölge renklendirildi', m_polempty:'Önce bölge çiz',
+      o_nameculture:'Kültür', o_namefeature:'Tür', o_namegen:'🎲 Ad öner', o_nf_settlement:'Yerleşim', o_nf_city:'Şehir', o_nf_river:'Nehir', o_nf_mountain:'Dağ', o_nf_forest:'Orman', o_nf_region:'Bölge', o_nf_lake:'Göl', o_nf_sea:'Deniz',
+      tpl_title:'Şablonla başla', tpl_desc:'Hazır bir kıyı çizgisiyle başla, sonra üzerine kendi dünyanı kur.', tpl_ready:'tuval hazır',
+      tpl_continent:'Kıta', tpl_continent_d:'Geniş ana kara, girintili kıyılar', tpl_island:'Ada', tpl_island_d:'Tek büyük ada, çevresi açık deniz', tpl_archipelago:'Takımada', tpl_archipelago_d:'Dağınık adalar ve sığ boğazlar', tpl_kingdom:'Krallık', tpl_kingdom_d:'Yumuşak kıyılı, tarıma elverişli topraklar', tpl_battle:'Savaş alanı', tpl_battle_d:'Altıgen ızgaralı küçük arazi', tpl_blank:'Boş tuval', tpl_blank_d:'Her şeye sıfırdan başla',
+      o_outlinecolor:'Dış hat rengi',
+      exp_html_t:'Tek dosya HTML', exp_print_t:'Baskı / PDF', exp_png2_t:'2× çözünürlük', exp_png4_t:'4× çözünürlük', exp_maxdim:'En uzun kenar', exp_format:'Biçim', exp_fmt_png:'PNG · keskin, büyük dosya', exp_fmt_jpeg:'JPEG · küçük dosya', exp_title:'Başlık', exp_html_help:'Tek bir .html dosyası indirilir: harita ve küçük bir görüntüleyici içine gömülüdür. Sunucu gerekmez — dosyayı yollayıp çift tıklamak yeterli.', exp_page:'Sayfa boyu', exp_orient:'Yön', exp_portrait:'Dikey', exp_landscape:'Yatay', exp_margin:'Kenar boşluğu', exp_dpi:'Çözünürlük', exp_dpi_screen:'ekran', exp_dpi_normal:'normal baskı', exp_dpi_high:'yüksek kalite', exp_print_help:'Tarayıcının baskı penceresi açılır. Oradan yazıcıya gönderebilir ya da "PDF olarak kaydet" ile PDF üretebilirsin.', printing:'Baskı hazırlanıyor', print_failed:'Baskı penceresi açılamadı', viewer_hint:'sürükle · tekerlek · çift tık', viewer_in:'Yakınlaş', viewer_out:'Uzaklaş', viewer_fit:'Sığdır',
+      exp_share_t:'Paylaşım linki', exp_share_gen:'🔗 Link oluştur', exp_share_link:'Link', exp_share_embedcode:'Embed kodu (iframe)', copy:'Kopyala', copied:'Kopyalandı',
+      exp_share_help:'Sunucu yok — harita görüntüsü doğrudan linkin içine (URL\'nin # kısmına) gömülür. Link kimseye gönderilmeden hiçbir yere yüklenmez; büyük haritalarda link uzun olabilir.', exp_share_sizehint:'Link uzunluğu ≈ {kb} KB',
+      share_editbtn:"Wayborne'da aç",
+      t_sketch:'Çizim', o_sketch:'Çizim', h_sketch:'Serbest fırça, yalnızca kendi eklediğin katmanlara çizer. Katman panelinden "+ Katman ekle" ile bir katman ekle, listeden onu seç, sonra haritaya çiz.', o_hardness:'Sertlik', o_sketch_eraser:'Silgi modu', sketch_target:'Hedef katman', sketch_need_layer:'Önce kendi katmanını ekle ve listeden seç', layer_add:'+ Katman ekle', h_add_layer:'Kendi eklediğin katmanlar serbest çizim içindir; "Çizim" aracıyla üzerlerine boyayabilirsin.', layer_added:'Katman eklendi', layer_untitled:'Katman', layer_max:'En fazla 12 kullanıcı katmanı eklenebilir', layer_rename:'Katman adı', layer_rename_hint:'Adı değiştirmek için çift tıkla', layer_delete:'Katmanı sil', layer_delete_confirm:'Bu katmanı ve üzerindeki çizimi silmek istediğine emin misin?', tut_h_sketch:'Kendi eklediğin katmanlara serbest fırçayla çizer; renk, boyut, sertlik, opaklık ve silgi modu ayarlanabilir.',
+      o_typography:'Tipografi', o_font:'Yazı ailesi', o_banner:'Kapıt', o_banner_none:'Yok', o_banner_ribbon:'Kurdele', o_banner_plate:'Levha', o_banner_scroll:'Tomar', o_banner_stone:'Taş', o_caps:'Büyük harf', o_outline:'Dış hat', o_shadow:'Gölge', h_font_missing:'Bu yazı ailesi bu cihazda kurulu değil; en yakın karşılığı kullanılıyor. Listede • ile işaretli olanlar kurulu.',
       grp_navigate:'Gezinme', grp_terrain:'Arazi', grp_water:'Su & Yollar', grp_markers:'İşaretler', grp_regions:'Bölge & Ölçüm',
       t_select:'Seç', t_landmass:'Kara', t_erase:'Deniz', t_fill:'Doldur', t_terrain:'Arazi', t_symbol:'Sembol',
-      t_river:'Nehir', t_road:'Yol', t_label:'Etiket', t_pan:'Kaydır', t_eyedrop:'Örnekle', t_measure:'Ölç', h_measure:'Haritada sürükleyerek iki nokta arası gerçek mesafeyi ölçek çubuğuna göre hesapla. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez.', t_lasso:'Kement', h_lasso:'Sürükleyerek kapalı bir alan çiz: Kara + Arazi + Yükselti o alanda birlikte kaldırılıp taşınabilir hâle gelir. Sürükleyerek taşı, üstteki tutamaçla döndür. Enter ile onayla, Escape ile iptal et, Delete ile alanı tamamen sil.',
+      t_river:'Nehir', t_road:'Yol', t_label:'Etiket', t_pan:'Kaydır', t_eyedrop:'Örnekle', t_measure:'Ölç', h_measure:'Tıklayarak nokta ekle, çok parçalı bir mesafe ölçün. Enter / çift tık ile bitir, Esc ile iptal. Ölçüm çizgileri seçilip taşınabilir/silinebilir; PNG/SVG çıktısına dahil edilmez.',
+      sc_title:'Klavye kısayolları', sc_general:'Genel', sc_undo:'Geri al', sc_redo:'Yinele', sc_save:'Kaydet',
+      sc_pan:'Kaydır', sc_panfast:'Hızlı kaydır', sc_zoom:'Yakınlaştır / uzaklaştır', sc_fit:'Tümünü sığdır',
+      sc_finish:'Yolu bitir', sc_cancel:'İptal / seçimi kaldır', sc_delete:'Seçileni sil', sc_rotsym:'Sembolü döndür', sc_help:'Bu ekranı aç', t_lasso:'Kement', h_lasso:'Sürükleyerek kapalı bir alan çiz: Kara + Arazi + Yükselti o alanda birlikte kaldırılıp taşınabilir hâle gelir. Sürükleyerek taşı, üstteki tutamaçla döndür. Enter ile onayla, Escape ile iptal et, Delete ile alanı tamamen sil.',
       o_landmass:'Kara / Kıyı', o_brushsize:'Fırça boyutu', o_rough:'Kıyı sertliği',
       o_landcolor:'Kara rengi', o_shorew:'Kıyı genişliği', o_shorestyle:'Kıyı stili', o_shore_sandy:'Kumsal', o_shore_rocky:'Kayalık', o_shore_reef:'Resif',
       o_smooth:'Kıyıyı yumuşat', o_clearland:'Karayı temizle',
-      h_landmass:'Sürükleyerek kara çiz. "Deniz" aracı hem karayı hem araziyi siler.', o_landgen:'Rastgele kara üret', o_landgentpl:'Şablon', o_landgen_continent:'Kıta', o_landgen_island:'Ada', o_landgen_archipelago:'Takımada', o_landgenrough:'Detay / pürüzlülük', o_landgen_go:'🎲 Üret', h_landgen:'Mevcut kara katmanının yerine geçer. Aynı ayarlarla tekrar tıklayınca yeni bir rastgele sonuç üretir.',
+      h_landmass:'Sürükleyerek kara çiz. "Deniz" aracı hem karayı hem araziyi siler.', o_landgen:'Rastgele kara üret', o_landgentpl:'Şablon', o_landgen_continent:'Kıta', o_landgen_island:'Ada', o_landgen_archipelago:'Takımada', o_landgen_tectonic:'Tektonik', o_landgenrough:'Detay / pürüzlülük', o_landgen_go:'🎲 Üret', h_landgen:'Mevcut kara katmanının yerine geçer. Aynı ayarlarla tekrar tıklayınca yeni bir rastgele sonuç üretir.',
       o_terrain:'Arazi boyama', o_opacity:'Opaklık', o_clip:'Sadece karaya boya',
+      o_biomegen:'Biyomu otomatik ata', o_biomegen_go:'🌍 Biyom ata', h_biomegen:'Yükselti ve enleme göre arazi katmanını otomatik doldurur; mevcut arazi katmanının yerine geçer.', biomegen_empty:'Önce kara çizilmeli.',
+      o_rivergen:'Nehirleri otomatik üret', o_rivergen_go:'💧 Nehir üret', h_rivergen:'Yükselti gridinden denize akan nehirler ekler. "Yükselti" fırçasıyla dağ/tepe çizilmiş olması gerekir.', rivergen_noelev:'Önce "Yükselti" fırçasıyla dağ/tepe çizilmeli.', rivergen_none:'Uygun nehir kaynağı bulunamadı.',
+      o_roadgen:'Yolları otomatik üret', o_roadgen_go:'🛤️ Yol üret', h_roadgen:'Yerleşim sembolleri arasında (şehir/kasaba/köy/kale/liman) yamaçtan kaçınan yollar çizer. Sembol yoksa birkaç rastgele kara noktasını bağlar.', roadgen_noland:'Yol için yeterli kara/nokta bulunamadı.', roadgen_none:'Hiçbir yol üretilemedi — kara parçaları birbirinden kopuk olabilir.',
+      o_settlegen:'Yerleşimleri otomatik yerleştir', o_settlegen_go:'🏰 Yerleşim yerleştir', h_settlegen:'Düz ve kıyıya yakın kara üzerine şehir/kasaba/köy sembolleri dağıtır — en iyi konum kale/liman, geri kalanlar kasaba/köy olur. "Yol üret" bu sembolleri bulup birbirine bağlar.', settlegen_noland:'Yerleşim için uygun kara bulunamadı.', settlegen_none:'Hiçbir yerleşim yerleştirilemedi.',
+      o_symlegend:'Lejant',
       o_clearterrain:'Arazi katmanını temizle',
       h_terrain:'Doku her fırça vuruşunda rastgele serpilir — tekrar eden örüntü oluşmaz.', t_elevation:'Yükselti', o_elevation:'Yükselti', o_elevstrength:'Şiddet', o_elevlower:'Alçaltma modu', o_clearelevation:'Yükseltiyi temizle', o_elevdisplay:'Görünüm', o_elevhillshade:'Gölgelendirme (hillshade)', o_elevcontours:'Kontur çizgileri', o_contourinterval:'Kontur aralığı', h_elevation:'Sürükleyerek yükselt; "Alçaltma modu" işaretliyken çukurlaştırır. Gölgelendirme haritayı otomatik günceller.',
       o_symbol:'Sembol', o_size:'Boyut', o_rot:'Dönüş', o_hue:'Renk tonu',
@@ -45,8 +72,13 @@
       o_view:'Görünüm', o_fit:'Ekrana sığdır', o_100:'%100',
       h_pan:'Sağ tık + sürükle, orta tık, Space + sürükle veya yön tuşları ile kaydır.',
       tab_layers:'Katmanlar', tab_library:'Kütüphane', tab_history:'Geçmiş',
+      tab_regions:'Bölgeler', tab_todo:'Görevler',
+      regions_political:'Siyasi bölgeler', regions_political_empty:'Henüz adlandırılmış bölge yok. "Bölge" aracıyla çiz, sonra ad ver.',
+      regions_maptree:'Harita ağacı',
+      todo_placeholder:'Yeni görev...', todo_add:'Ekle', todo_empty:'Henüz görev yok.',
+      panel_toggle_left:'Sol paneli aç/kapat', panel_toggle_right:'Sağ paneli aç/kapat',
       ref_title:'Referans görsel', ref_export:"Export'a dahil et", ref_clear:'Referansı kaldır', ref_trace:'İz sürme modu (üstte göster + kıyı kenetleme)', layer_drag_hint:'Katmanı sürükleyip yeniden sıralamak için buradan tutun', blend_sourceover:'Normal', blend_multiply:'Çarpma', blend_overlay:'Bindirme', blend_softlight:'Yumuşak ışık', blend_screen:'Ekranlama', nav_home:'Ana Sayfa', nav_canvas:'Tuval', nav_tutorial:'Rehber', nav_community:'Topluluk', home_tagline:'Fantastik dünyalar için tarayıcı tabanlı harita editörü', home_desc:'Kara ve deniz sınırlarını çiz, ormanları ve dağları boya, kaleler ve köyler yerleştir, nehirler ve yollar döşe — hepsi tek bir tuvalde, kurulum gerektirmeden tarayıcında.', home_cta:'Haritana başla', home_video_caption:'Tanıtım videosu yakında', canvas_new_title:'Yeni tuval oluştur', canvas_custom:'Özel ölçü…', canvas_name_ph:'Harita adı', canvas_create:'Oluştur', canvas_import:'.json dosyasından içe aktar', canvas_saved_title:'Kayıtlı tuvaller', canvas_empty:'Bu tarayıcıda henüz kayıtlı bir tuval yok. Editördeyken "Kaydet" ile otomatik burada listelenir.', canvas_open:'Aç', canvas_delete:'Sil', canvas_delete_confirm:'Bu tuvali silmek istediğine emin misin? Bu işlem geri alınamaz.', canvas_unnamed:'Adsız harita', tutorial_title:'Rehber', tutorial_intro:'Sol araç çubuğundaki her araç, sağ panelde kendi ayarlarını açar. Aşağıda her aracın ne işe yaradığının kısa özeti var.', community_title:'Topluluk', community_desc:'Wayborne Map Editor açık kaynaklı, sürekli gelişen bir projedir.', community_github_desc:'Kaynak kod, hata bildirimi ve katkı', community_soon:'Yakında', lib_full:'Tarayıcı depolama alanı dolu — eski bir tuvali sil ya da .json olarak dışa aktar.', tut_h_select:'Nesneleri seç, taşı, döndür; Shift ile çoklu seçim yap.', tut_h_erase:'Boyanmış karayı ve üzerindeki arazi dokusunu tek adımda siler.', tut_h_fill:'Kapalı bir kıyı çevriminin içini tek tıkla doldurur.', tut_h_river:'Tıklayarak nokta ekle, akarsu çiz; Enter ile bitir.', tut_h_road:'Tıklayarak nokta ekle, yol çiz; Enter ile bitir.',
-      sym_upload:'+ PNG Sembol yükle', sym_upload_done:'sembol yüklendi', sym_del:'Sil', sym_search:'Sembol ara...',
+      sym_upload:'+ PNG Sembol yükle', sym_upload_done:'sembol yüklendi', sym_del:'Sil', sym_search:'Sembol ara...', sym_recent:'Son kullanılanlar',
       st_pos:'Konum', st_zoom:'Yakınlık', st_size:'Tuval', st_tool:'Araç',
       cancel:'Vazgeç', ok:'Tamam',
       locked:'Katman kilitli veya gizli.', needtext:'Önce etiket metnini yaz.', nopathnear:'Yakında nehir/yol bulunamadı.', fill_toolarge:'Alan çok büyük — kapalı bir sınır içinde deneyin.',
@@ -72,14 +104,34 @@
       new:'New', open:'Open', save:'Save', parchment:'Parchment', grid:'Grid', shore:'Shore',
       narrow_title:'The editor needs a wider screen', narrow_desc:'The map editor uses a desktop layout with the tool rail, canvas and layer panel side by side. It needs at least 1024 × 600 pixels to fit.',
       narrow_hint:'On a tablet, try rotating your device to landscape.', narrow_current:'This screen', narrow_back:'Back to home',
+      o_gridsec:'Grid', o_gridtype:'Type', o_grid_square:'Square', o_grid_hex:'Hex', o_grid_dot:'Dot', o_gridcell:'Cell size', o_gridcolor:'Colour', o_gridop:'Strength', h_grid:'Toggle the grid from the \'Grid\' box in the top bar. Hex is the tabletop RPG standard.',
+      o_polsec:'Political Map', o_polmode:'Political view', o_polmute:'Mute terrain texture', o_pollegend:'Show legend', o_polfill:'Fill strength', o_polcolors:'Auto-assign state colours', o_polname:'Name of selected region', o_polname_ph:'State name', h_political:'Political view is not a separate layer; it presents the regions you drew as states.', m_polon:'Political view on', m_poloff:'Physical view', m_polcolored:'regions coloured', m_polempty:'Draw a region first',
+      o_nameculture:'Culture', o_namefeature:'Type', o_namegen:'🎲 Suggest name', o_nf_settlement:'Settlement', o_nf_city:'City', o_nf_river:'River', o_nf_mountain:'Mountain', o_nf_forest:'Forest', o_nf_region:'Region', o_nf_lake:'Lake', o_nf_sea:'Sea',
+      tpl_title:'Start from a template', tpl_desc:'Begin with a ready-made coastline, then build your world on top of it.', tpl_ready:'canvas ready',
+      tpl_continent:'Continent', tpl_continent_d:'Broad landmass with indented coasts', tpl_island:'Island', tpl_island_d:'A single large island in open sea', tpl_archipelago:'Archipelago', tpl_archipelago_d:'Scattered isles and shallow straits', tpl_kingdom:'Kingdom', tpl_kingdom_d:'Gentle coasts, farmable inland', tpl_battle:'Battle map', tpl_battle_d:'Small terrain with a hex grid', tpl_blank:'Blank canvas', tpl_blank_d:'Start from nothing',
+      o_outlinecolor:'Outline colour',
+      exp_html_t:'Single-file HTML', exp_print_t:'Print / PDF', exp_png2_t:'2× resolution', exp_png4_t:'4× resolution', exp_maxdim:'Longest edge', exp_format:'Format', exp_fmt_png:'PNG · sharp, large file', exp_fmt_jpeg:'JPEG · small file', exp_title:'Title', exp_html_help:'Downloads one .html file with the map and a small viewer embedded inside it. No server needed — send the file and double-click it.', exp_page:'Page size', exp_orient:'Orientation', exp_portrait:'Portrait', exp_landscape:'Landscape', exp_margin:'Margin', exp_dpi:'Resolution', exp_dpi_screen:'screen', exp_dpi_normal:'normal print', exp_dpi_high:'high quality', exp_print_help:'Opens your browser’s print dialog. From there you can send it to a printer or choose “Save as PDF”.', printing:'Preparing print', print_failed:'Could not open the print dialog', viewer_hint:'drag · wheel · double-click', viewer_in:'Zoom in', viewer_out:'Zoom out', viewer_fit:'Fit',
+      exp_share_t:'Share link', exp_share_gen:'🔗 Generate link', exp_share_link:'Link', exp_share_embedcode:'Embed code (iframe)', copy:'Copy', copied:'Copied',
+      exp_share_help:'No server — the map image is embedded directly in the link (the URL\'s # part). The link is never uploaded anywhere unless you send it yourself; large maps make longer links.', exp_share_sizehint:'Link length ≈ {kb} KB',
+      share_editbtn:'Open in Wayborne',
+      t_sketch:'Sketch', o_sketch:'Sketch', h_sketch:'A freehand brush that only draws on layers you add yourself. Add one with "+ Add layer" in the layer panel, select it in the list, then draw on the map.', o_hardness:'Hardness', o_sketch_eraser:'Eraser mode', sketch_target:'Target layer', sketch_need_layer:'Add your own layer first, then select it in the list', layer_add:'+ Add layer', h_add_layer:'Layers you add yourself are for freehand drawing; paint on them with the "Sketch" tool.', layer_added:'Layer added', layer_untitled:'Layer', layer_max:'At most 12 user layers can be added', layer_rename:'Layer name', layer_rename_hint:'Double-click to rename', layer_delete:'Delete layer', layer_delete_confirm:'Delete this layer and everything drawn on it?', tut_h_sketch:'Draws freehand on layers you add yourself; colour, size, hardness, opacity and an eraser mode are adjustable.',
+      o_typography:'Typography', o_font:'Typeface', o_banner:'Banner', o_banner_none:'None', o_banner_ribbon:'Ribbon', o_banner_plate:'Plate', o_banner_scroll:'Scroll', o_banner_stone:'Stone', o_caps:'Uppercase', o_outline:'Outline', o_shadow:'Shadow', h_font_missing:'This typeface is not installed on this device; the closest match is used instead. Entries marked · are installed.',
       grp_navigate:'Navigate', grp_terrain:'Terrain', grp_water:'Water & Routes', grp_markers:'Markers', grp_regions:'Regions & Measure',
       t_select:'Select', t_landmass:'Land', t_erase:'Sea', t_fill:'Fill', t_terrain:'Terrain', t_symbol:'Symbol',
-      t_river:'River', t_road:'Road', t_label:'Label', t_pan:'Pan', t_eyedrop:'Sample', t_measure:'Measure', h_measure:'Drag on the map to compute the real distance between two points based on the scale bar. Measurement lines can be selected, moved, or deleted; they are excluded from PNG/SVG export.', t_lasso:'Lasso', h_lasso:'Drag to draw a closed area: Land + Terrain + Elevation are lifted together within it and become movable. Drag to move, use the top handle to rotate. Enter to commit, Escape to cancel, Delete to remove the area entirely.',
+      t_river:'River', t_road:'Road', t_label:'Label', t_pan:'Pan', t_eyedrop:'Sample', t_measure:'Measure', h_measure:'Click to add points and measure a multi-segment distance. Enter / double-click to finish, Esc to cancel. Measurement lines can be selected, moved, or deleted; they are excluded from PNG/SVG export.',
+      sc_title:'Keyboard shortcuts', sc_general:'General', sc_undo:'Undo', sc_redo:'Redo', sc_save:'Save',
+      sc_pan:'Pan', sc_panfast:'Pan faster', sc_zoom:'Zoom in / out', sc_fit:'Fit to view',
+      sc_finish:'Finish path', sc_cancel:'Cancel / deselect', sc_delete:'Delete selection', sc_rotsym:'Rotate symbol', sc_help:'Open this screen', t_lasso:'Lasso', h_lasso:'Drag to draw a closed area: Land + Terrain + Elevation are lifted together within it and become movable. Drag to move, use the top handle to rotate. Enter to commit, Escape to cancel, Delete to remove the area entirely.',
       o_landmass:'Landmass / Coast', o_brushsize:'Brush size', o_rough:'Coast roughness',
       o_landcolor:'Land colour', o_shorew:'Shore width', o_shorestyle:'Shore style', o_shore_sandy:'Sandy', o_shore_rocky:'Rocky', o_shore_reef:'Reef',
       o_smooth:'Smooth coastline', o_clearland:'Clear landmass',
-      h_landmass:'Drag to paint land. The "Sea" tool erases both land and terrain.', o_landgen:'Generate random land', o_landgentpl:'Template', o_landgen_continent:'Continent', o_landgen_island:'Island', o_landgen_archipelago:'Archipelago', o_landgenrough:'Detail / roughness', o_landgen_go:'🎲 Generate', h_landgen:'Replaces the current land layer. Click again with the same settings for a new random result.',
+      h_landmass:'Drag to paint land. The "Sea" tool erases both land and terrain.', o_landgen:'Generate random land', o_landgentpl:'Template', o_landgen_continent:'Continent', o_landgen_island:'Island', o_landgen_archipelago:'Archipelago', o_landgen_tectonic:'Tectonic', o_landgenrough:'Detail / roughness', o_landgen_go:'🎲 Generate', h_landgen:'Replaces the current land layer. Click again with the same settings for a new random result.',
       o_terrain:'Terrain painting', o_opacity:'Opacity', o_clip:'Paint on land only',
+      o_biomegen:'Auto-assign biomes', o_biomegen_go:'🌍 Assign biomes', h_biomegen:'Fills the terrain layer automatically by elevation and latitude; replaces the current terrain layer.', biomegen_empty:'Draw land first.',
+      o_rivergen:'Auto-generate rivers', o_rivergen_go:'💧 Generate rivers', h_rivergen:'Adds rivers flowing to the sea from the elevation grid. Requires mountains/hills painted with the "Elevation" brush.', rivergen_noelev:'Paint mountains/hills with the "Elevation" brush first.', rivergen_none:'No suitable river source found.',
+      o_roadgen:'Auto-generate roads', o_roadgen_go:'🛤️ Generate roads', h_roadgen:'Draws roads between settlement symbols (city/town/village/castle/port) avoiding steep slopes. Connects a few random land points if there are no settlements.', roadgen_noland:'Not enough land/points found for roads.', roadgen_none:'No roads could be generated — landmasses may be disconnected.',
+      o_settlegen:'Auto-place settlements', o_settlegen_go:'🏰 Place settlements', h_settlegen:'Scatters city/town/village symbols on flat land near the coast — the best spot gets a castle/port, the rest get towns/villages. "Generate roads" finds these symbols and connects them.', settlegen_noland:'No suitable land found for settlements.', settlegen_none:'No settlements could be placed.',
+      o_symlegend:'Legend',
       o_clearterrain:'Clear terrain layer',
       h_terrain:'Marks scatter randomly on every stroke — no repeating pattern.', t_elevation:'Elevation', o_elevation:'Elevation', o_elevstrength:'Strength', o_elevlower:'Lower mode', o_clearelevation:'Clear elevation', o_elevdisplay:'Display', o_elevhillshade:'Hillshade', o_elevcontours:'Contour lines', o_contourinterval:'Contour interval', h_elevation:'Drag to raise terrain; enable "Lower mode" to carve it down. Hillshade updates the map automatically.',
       o_symbol:'Symbol', o_size:'Size', o_rot:'Rotation', o_hue:'Hue shift',
@@ -106,8 +158,13 @@
       o_view:'View', o_fit:'Fit to screen', o_100:'100%',
       h_pan:'Right-click drag, middle-click, Space + drag, or arrow keys to pan.',
       tab_layers:'Layers', tab_library:'Library', tab_history:'History',
+      tab_regions:'Regions', tab_todo:'To-do',
+      regions_political:'Political regions', regions_political_empty:'No named regions yet. Draw with the "Territory" tool, then give it a name.',
+      regions_maptree:'Map tree',
+      todo_placeholder:'New task...', todo_add:'Add', todo_empty:'No tasks yet.',
+      panel_toggle_left:'Toggle left panel', panel_toggle_right:'Toggle right panel',
       ref_title:'Reference image', ref_export:'Include in export', ref_clear:'Remove reference', ref_trace:'Trace mode (show on top + coastline snap)', layer_drag_hint:'Grab here to drag and reorder the layer', blend_sourceover:'Normal', blend_multiply:'Multiply', blend_overlay:'Overlay', blend_softlight:'Soft light', blend_screen:'Screen', nav_home:'Home', nav_canvas:'Canvas', nav_tutorial:'Tutorial', nav_community:'Community', home_tagline:'A browser-based map editor for fantasy worlds', home_desc:'Draw land and sea boundaries, paint forests and mountains, place castles and villages, lay down rivers and roads — all on one canvas, in your browser, no install required.', home_cta:'Start your map', home_video_caption:'Intro video coming soon', canvas_new_title:'Create a new canvas', canvas_custom:'Custom size…', canvas_name_ph:'Map name', canvas_create:'Create', canvas_import:'Import from .json file', canvas_saved_title:'Saved canvases', canvas_empty:'No canvases saved in this browser yet. They\'re listed here automatically when you hit "Save" in the editor.', canvas_open:'Open', canvas_delete:'Delete', canvas_delete_confirm:'Delete this canvas? This cannot be undone.', canvas_unnamed:'Untitled map', tutorial_title:'Tutorial', tutorial_intro:'Each tool in the left toolbar opens its own settings in the right panel. Below is a quick summary of what each tool does.', community_title:'Community', community_desc:'Wayborne Map Editor is an open-source, actively evolving project.', community_github_desc:'Source code, bug reports and contributions', community_soon:'Coming soon', lib_full:'Browser storage is full — delete an old canvas or export it as .json.', tut_h_select:'Select, move and rotate objects; Shift-click for multi-select.', tut_h_erase:'Erases painted land and the terrain texture on top of it in one step.', tut_h_fill:'Fills the inside of a closed coastline outline with one click.', tut_h_river:'Click to add points and draw a river; Enter to finish.', tut_h_road:'Click to add points and draw a road; Enter to finish.',
-      sym_upload:'+ Upload PNG Symbol', sym_upload_done:'symbol(s) loaded', sym_del:'Delete', sym_search:'Search symbols...',
+      sym_upload:'+ Upload PNG Symbol', sym_upload_done:'symbol(s) loaded', sym_del:'Delete', sym_search:'Search symbols...', sym_recent:'Recently used',
       st_pos:'Pos', st_zoom:'Zoom', st_size:'Canvas', st_tool:'Tool',
       cancel:'Cancel', ok:'OK',
       locked:'Layer is locked or hidden.', needtext:'Type the label text first.', nopathnear:'No river/road found nearby.', fill_toolarge:'Area too large — try inside a closed boundary.',
@@ -133,9 +190,18 @@
       new:'Neu', open:'Öffnen', save:'Speichern', parchment:'Pergament', grid:'Raster', shore:'Küste',
       narrow_title:'Der Editor benötigt einen breiteren Bildschirm', narrow_desc:'Der Karteneditor nutzt ein Desktop-Layout mit Werkzeugleiste, Leinwand und Ebenenpanel nebeneinander. Dafür sind mindestens 1024 × 600 Pixel nötig.',
       narrow_hint:'Auf einem Tablet: Gerät ins Querformat drehen.', narrow_current:'Dieser Bildschirm', narrow_back:'Zur Startseite',
+      o_gridsec:'Raster', o_gridtype:'Typ', o_grid_square:'Quadrat', o_grid_hex:'Hexagon', o_grid_dot:'Punkt', o_gridcell:'Zellengröße', o_gridcolor:'Farbe', o_gridop:'Stärke', h_grid:'Raster über das Kästchen \'Raster\' oben ein-/ausschalten. Hexfelder sind Standard im Pen-and-Paper.',
+      o_polsec:'Politische Karte', o_polmode:'Politische Ansicht', o_polmute:'Geländetextur dämpfen', o_pollegend:'Legende zeigen', o_polfill:'Füllstärke', o_polcolors:'Staatsfarben automatisch vergeben', o_polname:'Name der gewählten Region', o_polname_ph:'Staatsname', h_political:'Die politische Ansicht ist keine eigene Ebene; sie zeigt die gezeichneten Regionen als Staaten.', m_polon:'Politische Ansicht an', m_poloff:'Physische Ansicht', m_polcolored:'Regionen eingefärbt', m_polempty:'Zuerst eine Region zeichnen',
+      o_nameculture:'Kultur', o_namefeature:'Typ', o_namegen:'🎲 Namen vorschlagen', o_nf_settlement:'Siedlung', o_nf_city:'Stadt', o_nf_river:'Fluss', o_nf_mountain:'Berg', o_nf_forest:'Wald', o_nf_region:'Region', o_nf_lake:'See', o_nf_sea:'Meer',
+      tpl_title:'Mit einer Vorlage beginnen', tpl_desc:'Starte mit einer fertigen Küstenlinie und baue deine Welt darauf auf.', tpl_ready:'Leinwand bereit',
+      tpl_continent:'Kontinent', tpl_continent_d:'Weite Landmasse mit zerklüfteten Küsten', tpl_island:'Insel', tpl_island_d:'Eine große Insel im offenen Meer', tpl_archipelago:'Archipel', tpl_archipelago_d:'Verstreute Inseln und flache Meerengen', tpl_kingdom:'Königreich', tpl_kingdom_d:'Sanfte Küsten, fruchtbares Hinterland', tpl_battle:'Schlachtkarte', tpl_battle_d:'Kleines Gelände mit Hexfeld-Raster', tpl_blank:'Leere Leinwand', tpl_blank_d:'Ganz von vorn anfangen',
+      o_outlinecolor:'Konturfarbe',
+      exp_html_t:'Einzeldatei-HTML', exp_print_t:'Drucken / PDF', exp_png2_t:'2× Auflösung', exp_png4_t:'4× Auflösung', exp_maxdim:'Längste Kante', exp_format:'Format', exp_fmt_png:'PNG · scharf, große Datei', exp_fmt_jpeg:'JPEG · kleine Datei', exp_title:'Titel', exp_html_help:'Lädt eine einzelne .html-Datei mit der Karte und einem kleinen Betrachter darin herunter. Kein Server nötig — Datei verschicken und doppelklicken.', exp_page:'Seitenformat', exp_orient:'Ausrichtung', exp_portrait:'Hochformat', exp_landscape:'Querformat', exp_margin:'Rand', exp_dpi:'Auflösung', exp_dpi_screen:'Bildschirm', exp_dpi_normal:'normaler Druck', exp_dpi_high:'hohe Qualität', exp_print_help:'Öffnet den Druckdialog des Browsers. Dort kannst du drucken oder „Als PDF speichern“ wählen.', printing:'Druck wird vorbereitet', print_failed:'Druckdialog konnte nicht geöffnet werden', viewer_hint:'ziehen · Rad · Doppelklick', viewer_in:'Vergrößern', viewer_out:'Verkleinern', viewer_fit:'Einpassen',
+      t_sketch:'Skizze', o_sketch:'Skizze', h_sketch:'Ein Freihandpinsel, der nur auf selbst hinzugefügten Ebenen zeichnet. Füge im Ebenenpanel mit „+ Ebene hinzufügen“ eine hinzu, wähle sie in der Liste und zeichne dann auf der Karte.', o_hardness:'Härte', o_sketch_eraser:'Radiermodus', sketch_target:'Zielebene', sketch_need_layer:'Füge zuerst eine eigene Ebene hinzu und wähle sie in der Liste', layer_add:'+ Ebene hinzufügen', h_add_layer:'Selbst hinzugefügte Ebenen dienen dem freien Zeichnen; male mit dem Werkzeug „Skizze“ darauf.', layer_added:'Ebene hinzugefügt', layer_untitled:'Ebene', layer_max:'Höchstens 12 eigene Ebenen möglich', layer_rename:'Ebenenname', layer_rename_hint:'Zum Umbenennen doppelklicken', layer_delete:'Ebene löschen', layer_delete_confirm:'Diese Ebene und alles darauf Gezeichnete löschen?', tut_h_sketch:'Zeichnet freihändig auf selbst hinzugefügten Ebenen; Farbe, Größe, Härte, Deckkraft und ein Radiermodus sind einstellbar.',
+      o_typography:'Typografie', o_font:'Schriftart', o_banner:'Banner', o_banner_none:'Keins', o_banner_ribbon:'Band', o_banner_plate:'Tafel', o_banner_scroll:'Schriftrolle', o_banner_stone:'Stein', o_caps:'Großbuchstaben', o_outline:'Kontur', o_shadow:'Schatten', h_font_missing:'Diese Schriftart ist auf diesem Gerät nicht installiert; die nächstbeste wird verwendet. Mit · markierte Einträge sind installiert.',
       grp_navigate:'Navigation', grp_terrain:'Gelände', grp_water:'Wasser & Wege', grp_markers:'Marker', grp_regions:'Regionen & Maß',
       t_select:'Auswahl', t_landmass:'Land', t_erase:'Meer', t_fill:'Füllen', t_terrain:'Gelände', t_symbol:'Symbol',
-      t_river:'Fluss', t_road:'Straße', t_label:'Beschriftung', t_pan:'Verschieben', t_eyedrop:'Pipette', t_measure:'Messen', h_measure:'Auf der Karte ziehen, um die reale Entfernung zwischen zwei Punkten anhand des Maßstabsbalkens zu berechnen. Messlinien können ausgewählt, verschoben oder gelöscht werden; sie sind vom PNG/SVG-Export ausgeschlossen.', t_lasso:'Lasso', h_lasso:'Ziehen, um einen geschlossenen Bereich zu zeichnen: Land + Gelände + Höhenrelief werden darin gemeinsam angehoben und verschiebbar. Ziehen zum Verschieben, oberer Griff zum Drehen. Enter bestätigt, Escape bricht ab, Entf löscht den Bereich vollständig.',
+      t_river:'Fluss', t_road:'Straße', t_label:'Beschriftung', t_pan:'Verschieben', t_eyedrop:'Pipette', t_measure:'Messen', h_measure:'Klicken, um Punkte hinzuzufügen und eine mehrteilige Entfernung zu messen. Enter / Doppelklick zum Abschließen, Esc zum Abbrechen. Messlinien können ausgewählt, verschoben oder gelöscht werden; sie sind vom PNG/SVG-Export ausgeschlossen.', t_lasso:'Lasso', h_lasso:'Ziehen, um einen geschlossenen Bereich zu zeichnen: Land + Gelände + Höhenrelief werden darin gemeinsam angehoben und verschiebbar. Ziehen zum Verschieben, oberer Griff zum Drehen. Enter bestätigt, Escape bricht ab, Entf löscht den Bereich vollständig.',
       o_landmass:'Land / Küste', o_brushsize:'Pinselgröße', o_rough:'Küstenrauheit',
       o_landcolor:'Landfarbe', o_shorew:'Küstenbreite', o_shorestyle:'Küstenstil', o_shore_sandy:'Sandig', o_shore_rocky:'Felsig', o_shore_reef:'Riff',
       o_smooth:'Küste glätten', o_clearland:'Land löschen',
@@ -168,7 +234,7 @@
       h_pan:'Rechtsklick + ziehen, Mittelklick, Leertaste + ziehen oder Pfeiltasten zum Verschieben.',
       tab_layers:'Ebenen', tab_library:'Bibliothek', tab_history:'Verlauf',
       ref_title:'Referenzbild', ref_export:'In Export einschließen', ref_clear:'Referenz entfernen', ref_trace:'Nachzeichenmodus (oben anzeigen + Küstenlinie einrasten)', layer_drag_hint:'Zum Verschieben der Ebene hier ziehen', blend_sourceover:'Normal', blend_multiply:'Multiplizieren', blend_overlay:'Überlagern', blend_softlight:'Weiches Licht', blend_screen:'Negativ multiplizieren', nav_home:'Startseite', nav_canvas:'Leinwand', nav_tutorial:'Anleitung', nav_community:'Community', home_tagline:'Ein browserbasierter Karteneditor für Fantasiewelten', home_desc:'Zeichne Land- und Meeresgrenzen, male Wälder und Berge, platziere Burgen und Dörfer, lege Flüsse und Straßen an — alles auf einer Leinwand, im Browser, ohne Installation.', home_cta:'Karte starten', home_video_caption:'Vorstellungsvideo folgt bald', canvas_new_title:'Neue Leinwand erstellen', canvas_custom:'Benutzerdefiniert…', canvas_name_ph:'Kartenname', canvas_create:'Erstellen', canvas_import:'Aus .json-Datei importieren', canvas_saved_title:'Gespeicherte Leinwände', canvas_empty:'In diesem Browser sind noch keine Leinwände gespeichert. Sie erscheinen hier automatisch, sobald du im Editor auf "Speichern" klickst.', canvas_open:'Öffnen', canvas_delete:'Löschen', canvas_delete_confirm:'Diese Leinwand löschen? Das kann nicht rückgängig gemacht werden.', canvas_unnamed:'Unbenannte Karte', tutorial_title:'Anleitung', tutorial_intro:'Jedes Werkzeug in der linken Werkzeugleiste öffnet seine eigenen Einstellungen im rechten Panel. Unten eine kurze Übersicht, was jedes Werkzeug macht.', community_title:'Community', community_desc:'Wayborne Map Editor ist ein quelloffenes, stetig weiterentwickeltes Projekt.', community_github_desc:'Quellcode, Fehlermeldungen und Beiträge', community_soon:'Demnächst', lib_full:'Der Browserspeicher ist voll — lösche eine alte Leinwand oder exportiere sie als .json.', tut_h_select:'Objekte auswählen, verschieben, drehen; Shift-Klick für Mehrfachauswahl.', tut_h_erase:'Löscht bemaltes Land und die darüberliegende Geländetextur in einem Schritt.', tut_h_fill:'Füllt das Innere eines geschlossenen Küstenumrisses mit einem Klick.', tut_h_river:'Klicken, um Punkte hinzuzufügen und einen Fluss zu zeichnen; Enter zum Beenden.', tut_h_road:'Klicken, um Punkte hinzuzufügen und eine Straße zu zeichnen; Enter zum Beenden.',
-      sym_upload:'+ PNG-Symbol hochladen', sym_upload_done:'Symbol(e) geladen', sym_del:'Löschen', sym_search:'Symbole durchsuchen...',
+      sym_upload:'+ PNG-Symbol hochladen', sym_upload_done:'Symbol(e) geladen', sym_del:'Löschen', sym_search:'Symbole durchsuchen...', sym_recent:'Zuletzt verwendet',
       st_pos:'Position', st_zoom:'Zoom', st_size:'Leinwand', st_tool:'Werkzeug',
       cancel:'Abbrechen', ok:'OK',
       locked:'Ebene ist gesperrt oder ausgeblendet.', needtext:'Zuerst den Beschriftungstext eingeben.', nopathnear:'In der Nähe kein Fluss/keine Straße gefunden.', fill_toolarge:'Fläche zu groß — innerhalb einer geschlossenen Grenze versuchen.',
@@ -194,9 +260,18 @@
       new:'Nouveau', open:'Ouvrir', save:'Enregistrer', parchment:'Parchemin', grid:'Grille', shore:'Rivage',
       narrow_title:'L\'éditeur nécessite un écran plus large', narrow_desc:'L\'éditeur de carte utilise une mise en page bureau avec la barre d\'outils, le canevas et le panneau de calques côte à côte. Il faut au moins 1024 × 600 pixels.',
       narrow_hint:'Sur tablette, essayez de passer en mode paysage.', narrow_current:'Cet écran', narrow_back:'Retour à l\'accueil',
+      o_gridsec:'Grille', o_gridtype:'Type', o_grid_square:'Carré', o_grid_hex:'Hexagone', o_grid_dot:'Point', o_gridcell:'Taille de cellule', o_gridcolor:'Couleur', o_gridop:'Intensité', h_grid:'Activez la grille via la case \'Grille\' en haut. L\'hexagone est le standard du jeu de rôle sur table.',
+      o_polsec:'Carte politique', o_polmode:'Vue politique', o_polmute:'Atténuer la texture du terrain', o_pollegend:'Afficher la légende', o_polfill:'Intensité du remplissage', o_polcolors:'Attribuer les couleurs d\'État', o_polname:'Nom de la région sélectionnée', o_polname_ph:'Nom de l\'État', h_political:'La vue politique n\'est pas un calque distinct ; elle présente vos régions comme des États.', m_polon:'Vue politique activée', m_poloff:'Vue physique', m_polcolored:'régions colorées', m_polempty:'Dessinez d\'abord une région',
+      o_nameculture:'Culture', o_namefeature:'Type', o_namegen:'🎲 Proposer un nom', o_nf_settlement:'Village', o_nf_city:'Ville', o_nf_river:'Rivière', o_nf_mountain:'Montagne', o_nf_forest:'Forêt', o_nf_region:'Région', o_nf_lake:'Lac', o_nf_sea:'Mer',
+      tpl_title:'Partir d’un modèle', tpl_desc:'Commence avec un littoral tout prêt, puis bâtis ton monde par-dessus.', tpl_ready:'toile prête',
+      tpl_continent:'Continent', tpl_continent_d:'Vaste masse terrestre aux côtes découpées', tpl_island:'Île', tpl_island_d:'Une grande île en pleine mer', tpl_archipelago:'Archipel', tpl_archipelago_d:'Îles éparses et détroits peu profonds', tpl_kingdom:'Royaume', tpl_kingdom_d:'Côtes douces, terres cultivables', tpl_battle:'Carte de bataille', tpl_battle_d:'Petit terrain avec grille hexagonale', tpl_blank:'Toile vierge', tpl_blank_d:'Tout créer depuis zéro',
+      o_outlinecolor:'Couleur du contour',
+      exp_html_t:'HTML en un seul fichier', exp_print_t:'Imprimer / PDF', exp_png2_t:'Résolution 2×', exp_png4_t:'Résolution 4×', exp_maxdim:'Plus grand côté', exp_format:'Format', exp_fmt_png:'PNG · net, fichier lourd', exp_fmt_jpeg:'JPEG · fichier léger', exp_title:'Titre', exp_html_help:'Télécharge un seul fichier .html contenant la carte et une petite visionneuse. Aucun serveur requis — envoyez le fichier et double-cliquez.', exp_page:'Format de page', exp_orient:'Orientation', exp_portrait:'Portrait', exp_landscape:'Paysage', exp_margin:'Marge', exp_dpi:'Résolution', exp_dpi_screen:'écran', exp_dpi_normal:'impression normale', exp_dpi_high:'haute qualité', exp_print_help:'Ouvre la fenêtre d’impression du navigateur. Vous pouvez y imprimer ou choisir « Enregistrer au format PDF ».', printing:'Préparation de l’impression', print_failed:'Impossible d’ouvrir la fenêtre d’impression', viewer_hint:'glisser · molette · double-clic', viewer_in:'Zoom avant', viewer_out:'Zoom arrière', viewer_fit:'Ajuster',
+      t_sketch:'Croquis', o_sketch:'Croquis', h_sketch:'Un pinceau à main levée qui ne dessine que sur les calques que vous ajoutez vous-même. Ajoutez-en un avec « + Ajouter un calque » dans le panneau des calques, sélectionnez-le dans la liste, puis dessinez sur la carte.', o_hardness:'Dureté', o_sketch_eraser:'Mode gomme', sketch_target:'Calque cible', sketch_need_layer:'Ajoutez d’abord votre propre calque, puis sélectionnez-le dans la liste', layer_add:'+ Ajouter un calque', h_add_layer:'Les calques que vous ajoutez servent au dessin libre ; peignez dessus avec l’outil « Croquis ».', layer_added:'Calque ajouté', layer_untitled:'Calque', layer_max:'12 calques utilisateur au maximum', layer_rename:'Nom du calque', layer_rename_hint:'Double-cliquez pour renommer', layer_delete:'Supprimer le calque', layer_delete_confirm:'Supprimer ce calque et tout ce qui y est dessiné ?', tut_h_sketch:'Dessine à main levée sur les calques que vous ajoutez ; couleur, taille, dureté, opacité et mode gomme réglables.',
+      o_typography:'Typographie', o_font:'Police', o_banner:'Bannière', o_banner_none:'Aucune', o_banner_ribbon:'Ruban', o_banner_plate:'Plaque', o_banner_scroll:'Parchemin', o_banner_stone:'Pierre', o_caps:'Majuscules', o_outline:'Contour', o_shadow:'Ombre', h_font_missing:'Cette police n’est pas installée sur cet appareil ; la plus proche est utilisée. Les entrées marquées · sont installées.',
       grp_navigate:'Navigation', grp_terrain:'Terrain', grp_water:'Eaux & Routes', grp_markers:'Repères', grp_regions:'Régions & Mesure',
       t_select:'Sélection', t_landmass:'Terre', t_erase:'Mer', t_fill:'Remplir', t_terrain:'Terrain', t_symbol:'Symbole',
-      t_river:'Rivière', t_road:'Route', t_label:'Étiquette', t_pan:'Déplacer', t_eyedrop:'Pipette', t_measure:'Mesurer', h_measure:'Faites glisser sur la carte pour calculer la distance réelle entre deux points selon l\'échelle. Les lignes de mesure peuvent être sélectionnées, déplacées ou supprimées ; elles sont exclues de l\'export PNG/SVG.', t_lasso:'Lasso', h_lasso:'Faites glisser pour tracer une zone fermée : Terre + Terrain + Relief y sont soulevés ensemble et deviennent déplaçables. Glissez pour déplacer, utilisez la poignée du haut pour pivoter. Entrée pour valider, Échap pour annuler, Suppr pour effacer entièrement la zone.',
+      t_river:'Rivière', t_road:'Route', t_label:'Étiquette', t_pan:'Déplacer', t_eyedrop:'Pipette', t_measure:'Mesurer', h_measure:'Cliquez pour ajouter des points et mesurer une distance en plusieurs segments. Entrée / double-clic pour terminer, Échap pour annuler. Les lignes de mesure peuvent être sélectionnées, déplacées ou supprimées ; elles sont exclues de l\'export PNG/SVG.', t_lasso:'Lasso', h_lasso:'Faites glisser pour tracer une zone fermée : Terre + Terrain + Relief y sont soulevés ensemble et deviennent déplaçables. Glissez pour déplacer, utilisez la poignée du haut pour pivoter. Entrée pour valider, Échap pour annuler, Suppr pour effacer entièrement la zone.',
       o_landmass:'Terre / Côte', o_brushsize:'Taille du pinceau', o_rough:'Irrégularité de la côte',
       o_landcolor:'Couleur de la terre', o_shorew:'Largeur du rivage', o_shorestyle:'Style de côte', o_shore_sandy:'Sablonneuse', o_shore_rocky:'Rocheuse', o_shore_reef:'Récif',
       o_smooth:'Lisser la côte', o_clearland:'Effacer la terre',
@@ -229,7 +304,7 @@
       h_pan:'Clic droit + glisser, clic molette, Espace + glisser, ou flèches pour vous déplacer.',
       tab_layers:'Calques', tab_library:'Bibliothèque', tab_history:'Historique',
       ref_title:'Image de référence', ref_export:"Inclure dans l'export", ref_clear:'Retirer la référence', ref_trace:'Mode de calque (afficher au-dessus + accrochage au littoral)', layer_drag_hint:'Saisissez ici pour glisser-déposer le calque', blend_sourceover:'Normal', blend_multiply:'Produit', blend_overlay:'Incrustation', blend_softlight:'Lumière douce', blend_screen:'Superposition', nav_home:'Accueil', nav_canvas:'Toile', nav_tutorial:'Tutoriel', nav_community:'Communauté', home_tagline:'Un éditeur de cartes pour mondes fantastiques, dans le navigateur', home_desc:'Dessinez les frontières terre/mer, peignez forêts et montagnes, placez châteaux et villages, tracez rivières et routes — tout sur une seule toile, dans votre navigateur, sans installation.', home_cta:'Commencer votre carte', home_video_caption:'Vidéo de présentation bientôt disponible', canvas_new_title:'Créer une nouvelle toile', canvas_custom:'Taille personnalisée…', canvas_name_ph:'Nom de la carte', canvas_create:'Créer', canvas_import:'Importer depuis un fichier .json', canvas_saved_title:'Toiles enregistrées', canvas_empty:'Aucune toile enregistrée dans ce navigateur pour l\'instant. Elles apparaissent ici automatiquement dès que vous cliquez sur « Enregistrer » dans l\'éditeur.', canvas_open:'Ouvrir', canvas_delete:'Supprimer', canvas_delete_confirm:'Supprimer cette toile ? Cette action est irréversible.', canvas_unnamed:'Carte sans titre', tutorial_title:'Tutoriel', tutorial_intro:'Chaque outil de la barre latérale gauche ouvre ses propres réglages dans le panneau de droite. Voici un résumé rapide du rôle de chaque outil.', community_title:'Communauté', community_desc:'Wayborne Map Editor est un projet open source en constante évolution.', community_github_desc:'Code source, rapports de bugs et contributions', community_soon:'Bientôt disponible', lib_full:'Le stockage du navigateur est plein — supprimez une ancienne toile ou exportez-la en .json.', tut_h_select:'Sélectionnez, déplacez et faites pivoter des objets ; Maj+clic pour la sélection multiple.', tut_h_erase:'Efface la terre peinte et la texture de terrain qui s\'y trouve, en une seule fois.', tut_h_fill:'Remplit l\'intérieur d\'un contour côtier fermé en un clic.', tut_h_river:'Cliquez pour ajouter des points et tracer une rivière ; Entrée pour terminer.', tut_h_road:'Cliquez pour ajouter des points et tracer une route ; Entrée pour terminer.',
-      sym_upload:'+ Importer un symbole PNG', sym_upload_done:'symbole(s) chargé(s)', sym_del:'Supprimer', sym_search:'Rechercher un symbole...',
+      sym_upload:'+ Importer un symbole PNG', sym_upload_done:'symbole(s) chargé(s)', sym_del:'Supprimer', sym_search:'Rechercher un symbole...', sym_recent:'Récemment utilisés',
       st_pos:'Position', st_zoom:'Zoom', st_size:'Toile', st_tool:'Outil',
       cancel:'Annuler', ok:'OK',
       locked:'Le calque est verrouillé ou masqué.', needtext:"Saisissez d'abord le texte de l'étiquette.", nopathnear:"Aucune rivière/route trouvée à proximité.", fill_toolarge:'Zone trop grande — essayez à l\'intérieur d\'une limite fermée.',
@@ -255,9 +330,18 @@
       new:'Nuevo', open:'Abrir', save:'Guardar', parchment:'Pergamino', grid:'Cuadrícula', shore:'Costa',
       narrow_title:'El editor necesita una pantalla más ancha', narrow_desc:'El editor de mapas usa un diseño de escritorio con la barra de herramientas, el lienzo y el panel de capas en paralelo. Necesita al menos 1024 × 600 píxeles.',
       narrow_hint:'En tablet, prueba a girar el dispositivo en horizontal.', narrow_current:'Esta pantalla', narrow_back:'Volver al inicio',
+      o_gridsec:'Cuadrícula', o_gridtype:'Tipo', o_grid_square:'Cuadrado', o_grid_hex:'Hexágono', o_grid_dot:'Punto', o_gridcell:'Tamaño de celda', o_gridcolor:'Color', o_gridop:'Intensidad', h_grid:'Activa la cuadrícula desde la casilla \'Cuadrícula\' de arriba. El hexágono es el estándar del rol de mesa.',
+      o_polsec:'Mapa político', o_polmode:'Vista política', o_polmute:'Atenuar textura del terreno', o_pollegend:'Mostrar leyenda', o_polfill:'Intensidad de relleno', o_polcolors:'Asignar colores de estado', o_polname:'Nombre de la región seleccionada', o_polname_ph:'Nombre del estado', h_political:'La vista política no es una capa aparte; presenta las regiones dibujadas como estados.', m_polon:'Vista política activada', m_poloff:'Vista física', m_polcolored:'regiones coloreadas', m_polempty:'Dibuja primero una región',
+      o_nameculture:'Cultura', o_namefeature:'Tipo', o_namegen:'🎲 Sugerir nombre', o_nf_settlement:'Asentamiento', o_nf_city:'Ciudad', o_nf_river:'Río', o_nf_mountain:'Montaña', o_nf_forest:'Bosque', o_nf_region:'Región', o_nf_lake:'Lago', o_nf_sea:'Mar',
+      tpl_title:'Empezar con una plantilla', tpl_desc:'Comienza con una costa ya hecha y construye tu mundo sobre ella.', tpl_ready:'lienzo listo',
+      tpl_continent:'Continente', tpl_continent_d:'Gran masa de tierra con costas recortadas', tpl_island:'Isla', tpl_island_d:'Una gran isla en mar abierto', tpl_archipelago:'Archipiélago', tpl_archipelago_d:'Islas dispersas y estrechos poco profundos', tpl_kingdom:'Reino', tpl_kingdom_d:'Costas suaves, interior cultivable', tpl_battle:'Mapa de batalla', tpl_battle_d:'Terreno pequeño con rejilla hexagonal', tpl_blank:'Lienzo en blanco', tpl_blank_d:'Empezar desde cero',
+      o_outlinecolor:'Color del contorno',
+      exp_html_t:'HTML de un solo archivo', exp_print_t:'Imprimir / PDF', exp_png2_t:'Resolución 2×', exp_png4_t:'Resolución 4×', exp_maxdim:'Lado más largo', exp_format:'Formato', exp_fmt_png:'PNG · nítido, archivo grande', exp_fmt_jpeg:'JPEG · archivo pequeño', exp_title:'Título', exp_html_help:'Descarga un único archivo .html con el mapa y un pequeño visor incrustado. No hace falta servidor — envía el archivo y haz doble clic.', exp_page:'Tamaño de página', exp_orient:'Orientación', exp_portrait:'Vertical', exp_landscape:'Horizontal', exp_margin:'Margen', exp_dpi:'Resolución', exp_dpi_screen:'pantalla', exp_dpi_normal:'impresión normal', exp_dpi_high:'alta calidad', exp_print_help:'Abre el diálogo de impresión del navegador. Desde allí puedes imprimir o elegir «Guardar como PDF».', printing:'Preparando la impresión', print_failed:'No se pudo abrir el diálogo de impresión', viewer_hint:'arrastrar · rueda · doble clic', viewer_in:'Acercar', viewer_out:'Alejar', viewer_fit:'Ajustar',
+      t_sketch:'Boceto', o_sketch:'Boceto', h_sketch:'Un pincel libre que solo dibuja en las capas que añades tú. Añade una con «+ Añadir capa» en el panel de capas, selecciónala en la lista y luego dibuja en el mapa.', o_hardness:'Dureza', o_sketch_eraser:'Modo borrador', sketch_target:'Capa de destino', sketch_need_layer:'Añade primero tu propia capa y selecciónala en la lista', layer_add:'+ Añadir capa', h_add_layer:'Las capas que añades sirven para dibujo libre; pinta sobre ellas con la herramienta «Boceto».', layer_added:'Capa añadida', layer_untitled:'Capa', layer_max:'Se pueden añadir 12 capas de usuario como máximo', layer_rename:'Nombre de la capa', layer_rename_hint:'Haz doble clic para renombrar', layer_delete:'Eliminar capa', layer_delete_confirm:'¿Eliminar esta capa y todo lo dibujado en ella?', tut_h_sketch:'Dibuja a mano alzada en las capas que añades tú; color, tamaño, dureza, opacidad y modo borrador ajustables.',
+      o_typography:'Tipografía', o_font:'Tipo de letra', o_banner:'Banderola', o_banner_none:'Ninguna', o_banner_ribbon:'Cinta', o_banner_plate:'Placa', o_banner_scroll:'Pergamino', o_banner_stone:'Piedra', o_caps:'Mayúsculas', o_outline:'Contorno', o_shadow:'Sombra', h_font_missing:'Esta tipografía no está instalada en este dispositivo; se usa la más parecida. Las entradas marcadas con · están instaladas.',
       grp_navigate:'Navegación', grp_terrain:'Terreno', grp_water:'Agua y Rutas', grp_markers:'Marcadores', grp_regions:'Regiones y Medida',
       t_select:'Seleccionar', t_landmass:'Tierra', t_erase:'Mar', t_fill:'Rellenar', t_terrain:'Terreno', t_symbol:'Símbolo',
-      t_river:'Río', t_road:'Camino', t_label:'Etiqueta', t_pan:'Desplazar', t_eyedrop:'Muestra', t_measure:'Medir', h_measure:'Arrastra en el mapa para calcular la distancia real entre dos puntos según la escala. Las líneas de medición se pueden seleccionar, mover o eliminar; se excluyen de la exportación PNG/SVG.', t_lasso:'Lazo', h_lasso:'Arrastra para trazar un área cerrada: Tierra + Terreno + Relieve se levantan juntos dentro de ella y se vuelven movibles. Arrastra para mover, usa el tirador superior para rotar. Intro para confirmar, Esc para cancelar, Supr para eliminar el área por completo.',
+      t_river:'Río', t_road:'Camino', t_label:'Etiqueta', t_pan:'Desplazar', t_eyedrop:'Muestra', t_measure:'Medir', h_measure:'Haz clic para añadir puntos y medir una distancia de varios segmentos. Intro / doble clic para terminar, Esc para cancelar. Las líneas de medición se pueden seleccionar, mover o eliminar; se excluyen de la exportación PNG/SVG.', t_lasso:'Lazo', h_lasso:'Arrastra para trazar un área cerrada: Tierra + Terreno + Relieve se levantan juntos dentro de ella y se vuelven movibles. Arrastra para mover, usa el tirador superior para rotar. Intro para confirmar, Esc para cancelar, Supr para eliminar el área por completo.',
       o_landmass:'Tierra / Costa', o_brushsize:'Tamaño del pincel', o_rough:'Rugosidad de la costa',
       o_landcolor:'Color de la tierra', o_shorew:'Ancho de la costa', o_shorestyle:'Estilo de costa', o_shore_sandy:'Arenosa', o_shore_rocky:'Rocosa', o_shore_reef:'Arrecife',
       o_smooth:'Suavizar costa', o_clearland:'Borrar tierra',
@@ -290,7 +374,7 @@
       h_pan:'Clic derecho + arrastrar, clic central, Espacio + arrastrar, o flechas para desplazarte.',
       tab_layers:'Capas', tab_library:'Biblioteca', tab_history:'Historial',
       ref_title:'Imagen de referencia', ref_export:'Incluir en la exportación', ref_clear:'Quitar referencia', ref_trace:'Modo de calco (mostrar encima + ajuste a la costa)', layer_drag_hint:'Arrastra desde aquí para reordenar la capa', blend_sourceover:'Normal', blend_multiply:'Multiplicar', blend_overlay:'Superposición', blend_softlight:'Luz suave', blend_screen:'Trama', nav_home:'Inicio', nav_canvas:'Lienzo', nav_tutorial:'Tutorial', nav_community:'Comunidad', home_tagline:'Un editor de mapas para mundos de fantasía, en el navegador', home_desc:'Dibuja los límites entre tierra y mar, pinta bosques y montañas, coloca castillos y aldeas, traza ríos y caminos — todo en un solo lienzo, en tu navegador, sin instalación.', home_cta:'Empieza tu mapa', home_video_caption:'Vídeo de presentación próximamente', canvas_new_title:'Crear un nuevo lienzo', canvas_custom:'Tamaño personalizado…', canvas_name_ph:'Nombre del mapa', canvas_create:'Crear', canvas_import:'Importar desde archivo .json', canvas_saved_title:'Lienzos guardados', canvas_empty:'Aún no hay lienzos guardados en este navegador. Se listan aquí automáticamente al pulsar «Guardar» en el editor.', canvas_open:'Abrir', canvas_delete:'Eliminar', canvas_delete_confirm:'¿Eliminar este lienzo? Esta acción no se puede deshacer.', canvas_unnamed:'Mapa sin título', tutorial_title:'Tutorial', tutorial_intro:'Cada herramienta de la barra izquierda abre sus propios ajustes en el panel derecho. Aquí tienes un resumen rápido de lo que hace cada una.', community_title:'Comunidad', community_desc:'Wayborne Map Editor es un proyecto de código abierto en constante evolución.', community_github_desc:'Código fuente, reportes de errores y contribuciones', community_soon:'Próximamente', lib_full:'El almacenamiento del navegador está lleno — elimina un lienzo antiguo o expórtalo como .json.', tut_h_select:'Selecciona, mueve y rota objetos; Mayús+clic para selección múltiple.', tut_h_erase:'Borra la tierra pintada y la textura de terreno que tiene encima, en un solo paso.', tut_h_fill:'Rellena el interior de un contorno costero cerrado con un solo clic.', tut_h_river:'Haz clic para añadir puntos y dibujar un río; Intro para terminar.', tut_h_road:'Haz clic para añadir puntos y dibujar un camino; Intro para terminar.',
-      sym_upload:'+ Subir símbolo PNG', sym_upload_done:'símbolo(s) cargado(s)', sym_del:'Borrar', sym_search:'Buscar símbolos...',
+      sym_upload:'+ Subir símbolo PNG', sym_upload_done:'símbolo(s) cargado(s)', sym_del:'Borrar', sym_search:'Buscar símbolos...', sym_recent:'Usados recientemente',
       st_pos:'Posición', st_zoom:'Zoom', st_size:'Lienzo', st_tool:'Herramienta',
       cancel:'Cancelar', ok:'Aceptar',
       locked:'La capa está bloqueada u oculta.', needtext:'Escribe primero el texto de la etiqueta.', nopathnear:'No se encontró ningún río/camino cerca.', fill_toolarge:'Área demasiado grande — pruébalo dentro de un límite cerrado.',
@@ -316,9 +400,18 @@
       new:'Nuovo', open:'Apri', save:'Salva', parchment:'Pergamena', grid:'Griglia', shore:'Costa',
       narrow_title:'L\'editor richiede uno schermo più ampio', narrow_desc:'L\'editor di mappe usa un layout desktop con barra strumenti, tela e pannello livelli affiancati. Servono almeno 1024 × 600 pixel.',
       narrow_hint:'Su tablet, prova a ruotare il dispositivo in orizzontale.', narrow_current:'Questo schermo', narrow_back:'Torna alla home',
+      o_gridsec:'Griglia', o_gridtype:'Tipo', o_grid_square:'Quadrato', o_grid_hex:'Esagono', o_grid_dot:'Punto', o_gridcell:'Dimensione cella', o_gridcolor:'Colore', o_gridop:'Intensità', h_grid:'Attiva la griglia dalla casella \'Griglia\' in alto. L\'esagono è lo standard dei giochi di ruolo da tavolo.',
+      o_polsec:'Mappa politica', o_polmode:'Vista politica', o_polmute:'Attenua la texture del terreno', o_pollegend:'Mostra legenda', o_polfill:'Intensità riempimento', o_polcolors:'Assegna colori agli stati', o_polname:'Nome della regione selezionata', o_polname_ph:'Nome dello stato', h_political:'La vista politica non è un livello separato; presenta le regioni disegnate come stati.', m_polon:'Vista politica attiva', m_poloff:'Vista fisica', m_polcolored:'regioni colorate', m_polempty:'Disegna prima una regione',
+      o_nameculture:'Cultura', o_namefeature:'Tipo', o_namegen:'🎲 Suggerisci nome', o_nf_settlement:'Insediamento', o_nf_city:'Città', o_nf_river:'Fiume', o_nf_mountain:'Montagna', o_nf_forest:'Foresta', o_nf_region:'Regione', o_nf_lake:'Lago', o_nf_sea:'Mare',
+      tpl_title:'Parti da un modello', tpl_desc:'Inizia con una costa già pronta, poi costruiscici sopra il tuo mondo.', tpl_ready:'tela pronta',
+      tpl_continent:'Continente', tpl_continent_d:'Ampia massa continentale dalle coste frastagliate', tpl_island:'Isola', tpl_island_d:'Una grande isola in mare aperto', tpl_archipelago:'Arcipelago', tpl_archipelago_d:'Isole sparse e stretti poco profondi', tpl_kingdom:'Regno', tpl_kingdom_d:'Coste dolci, entroterra coltivabile', tpl_battle:'Mappa di battaglia', tpl_battle_d:'Piccolo terreno con griglia esagonale', tpl_blank:'Tela vuota', tpl_blank_d:'Partire da zero',
+      o_outlinecolor:'Colore del contorno',
+      exp_html_t:'HTML in un solo file', exp_print_t:'Stampa / PDF', exp_png2_t:'Risoluzione 2×', exp_png4_t:'Risoluzione 4×', exp_maxdim:'Lato più lungo', exp_format:'Formato', exp_fmt_png:'PNG · nitido, file grande', exp_fmt_jpeg:'JPEG · file piccolo', exp_title:'Titolo', exp_html_help:'Scarica un unico file .html con la mappa e un piccolo visualizzatore incorporato. Nessun server richiesto — invia il file e fai doppio clic.', exp_page:'Formato pagina', exp_orient:'Orientamento', exp_portrait:'Verticale', exp_landscape:'Orizzontale', exp_margin:'Margine', exp_dpi:'Risoluzione', exp_dpi_screen:'schermo', exp_dpi_normal:'stampa normale', exp_dpi_high:'alta qualità', exp_print_help:'Apre la finestra di stampa del browser. Da lì puoi stampare o scegliere «Salva come PDF».', printing:'Preparazione della stampa', print_failed:'Impossibile aprire la finestra di stampa', viewer_hint:'trascina · rotella · doppio clic', viewer_in:'Ingrandisci', viewer_out:'Riduci', viewer_fit:'Adatta',
+      t_sketch:'Schizzo', o_sketch:'Schizzo', h_sketch:'Un pennello a mano libera che disegna solo sui livelli che aggiungi tu. Aggiungine uno con «+ Aggiungi livello» nel pannello dei livelli, selezionalo nell’elenco, poi disegna sulla mappa.', o_hardness:'Durezza', o_sketch_eraser:'Modalità gomma', sketch_target:'Livello di destinazione', sketch_need_layer:'Aggiungi prima un tuo livello e selezionalo nell’elenco', layer_add:'+ Aggiungi livello', h_add_layer:'I livelli che aggiungi servono al disegno libero; dipingici sopra con lo strumento «Schizzo».', layer_added:'Livello aggiunto', layer_untitled:'Livello', layer_max:'Si possono aggiungere al massimo 12 livelli utente', layer_rename:'Nome del livello', layer_rename_hint:'Doppio clic per rinominare', layer_delete:'Elimina livello', layer_delete_confirm:'Eliminare questo livello e tutto ciò che vi è disegnato?', tut_h_sketch:'Disegna a mano libera sui livelli che aggiungi tu; colore, dimensione, durezza, opacità e modalità gomma regolabili.',
+      o_typography:'Tipografia', o_font:'Carattere', o_banner:'Cartiglio', o_banner_none:'Nessuno', o_banner_ribbon:'Nastro', o_banner_plate:'Targa', o_banner_scroll:'Pergamena', o_banner_stone:'Pietra', o_caps:'Maiuscolo', o_outline:'Contorno', o_shadow:'Ombra', h_font_missing:'Questo carattere non è installato su questo dispositivo; viene usato il più simile. Le voci con · sono installate.',
       grp_navigate:'Navigazione', grp_terrain:'Terreno', grp_water:'Acque e Vie', grp_markers:'Segnalini', grp_regions:'Regioni e Misura',
       t_select:'Seleziona', t_landmass:'Terra', t_erase:'Mare', t_fill:'Riempi', t_terrain:'Terreno', t_symbol:'Simbolo',
-      t_river:'Fiume', t_road:'Strada', t_label:'Etichetta', t_pan:'Sposta', t_eyedrop:'Campiona', t_measure:'Misura', h_measure:'Trascina sulla mappa per calcolare la distanza reale tra due punti in base alla scala. Le linee di misura possono essere selezionate, spostate o eliminate; sono escluse dall\'esportazione PNG/SVG.', t_lasso:'Laccio', h_lasso:'Trascina per disegnare un\'area chiusa: Terra + Terreno + Rilievo vengono sollevati insieme al suo interno e diventano spostabili. Trascina per spostare, usa la maniglia superiore per ruotare. Invio per confermare, Esc per annullare, Canc per eliminare completamente l\'area.',
+      t_river:'Fiume', t_road:'Strada', t_label:'Etichetta', t_pan:'Sposta', t_eyedrop:'Campiona', t_measure:'Misura', h_measure:'Fai clic per aggiungere punti e misurare una distanza a più segmenti. Invio / doppio clic per terminare, Esc per annullare. Le linee di misura possono essere selezionate, spostate o eliminate; sono escluse dall\'esportazione PNG/SVG.', t_lasso:'Laccio', h_lasso:'Trascina per disegnare un\'area chiusa: Terra + Terreno + Rilievo vengono sollevati insieme al suo interno e diventano spostabili. Trascina per spostare, usa la maniglia superiore per ruotare. Invio per confermare, Esc per annullare, Canc per eliminare completamente l\'area.',
       o_landmass:'Terra / Costa', o_brushsize:'Dimensione pennello', o_rough:'Irregolarità della costa',
       o_landcolor:'Colore della terra', o_shorew:'Larghezza della costa', o_shorestyle:'Stile della costa', o_shore_sandy:'Sabbiosa', o_shore_rocky:'Rocciosa', o_shore_reef:'Barriera corallina',
       o_smooth:'Smussa la costa', o_clearland:'Cancella terra',
@@ -351,7 +444,7 @@
       h_pan:'Clic destro + trascina, clic centrale, Spazio + trascina, o frecce per spostarti.',
       tab_layers:'Livelli', tab_library:'Libreria', tab_history:'Cronologia',
       ref_title:'Immagine di riferimento', ref_export:"Includi nell'esportazione", ref_clear:'Rimuovi riferimento', ref_trace:'Modalità ricalco (mostra sopra + aggancio alla costa)', layer_drag_hint:'Trascina da qui per riordinare il livello', blend_sourceover:'Normale', blend_multiply:'Moltiplica', blend_overlay:'Overlay', blend_softlight:'Luce soffusa', blend_screen:'Scherma', nav_home:'Home', nav_canvas:'Tela', nav_tutorial:'Guida', nav_community:'Community', home_tagline:'Un editor di mappe per mondi fantasy, nel browser', home_desc:'Disegna i confini tra terra e mare, colora foreste e montagne, posiziona castelli e villaggi, traccia fiumi e strade — tutto su un\'unica tela, nel browser, senza installazione.', home_cta:'Inizia la tua mappa', home_video_caption:'Video di presentazione in arrivo', canvas_new_title:'Crea una nuova tela', canvas_custom:'Dimensione personalizzata…', canvas_name_ph:'Nome della mappa', canvas_create:'Crea', canvas_import:'Importa da file .json', canvas_saved_title:'Tele salvate', canvas_empty:'Nessuna tela salvata in questo browser. Vengono elencate qui automaticamente quando premi "Salva" nell\'editor.', canvas_open:'Apri', canvas_delete:'Elimina', canvas_delete_confirm:'Eliminare questa tela? L\'operazione non può essere annullata.', canvas_unnamed:'Mappa senza titolo', tutorial_title:'Guida', tutorial_intro:'Ogni strumento nella barra laterale sinistra apre le proprie impostazioni nel pannello destro. Di seguito un breve riepilogo di cosa fa ciascuno strumento.', community_title:'Community', community_desc:'Wayborne Map Editor è un progetto open source in continua evoluzione.', community_github_desc:'Codice sorgente, segnalazioni di bug e contributi', community_soon:'Prossimamente', lib_full:'La memoria del browser è piena — elimina una tela vecchia oppure esportala come .json.', tut_h_select:'Seleziona, sposta e ruota gli oggetti; Shift+clic per la selezione multipla.', tut_h_erase:'Cancella la terra dipinta e la texture del terreno sovrastante in un solo passaggio.', tut_h_fill:'Riempie l\'interno di un contorno costiero chiuso con un clic.', tut_h_river:'Clicca per aggiungere punti e disegnare un fiume; Invio per terminare.', tut_h_road:'Clicca per aggiungere punti e disegnare una strada; Invio per terminare.',
-      sym_upload:'+ Carica simbolo PNG', sym_upload_done:'simbolo/i caricato/i', sym_del:'Elimina', sym_search:'Cerca simboli...',
+      sym_upload:'+ Carica simbolo PNG', sym_upload_done:'simbolo/i caricato/i', sym_del:'Elimina', sym_search:'Cerca simboli...', sym_recent:'Usati di recente',
       st_pos:'Posizione', st_zoom:'Zoom', st_size:'Tela', st_tool:'Strumento',
       cancel:'Annulla', ok:'OK',
       locked:'Il livello è bloccato o nascosto.', needtext:"Scrivi prima il testo dell'etichetta.", nopathnear:'Nessun fiume/strada trovato nelle vicinanze.', fill_toolarge:'Area troppo grande — prova all\'interno di un confine chiuso.',
@@ -377,9 +470,18 @@
       new:'Novo', open:'Abrir', save:'Guardar', parchment:'Pergaminho', grid:'Grelha', shore:'Costa',
       narrow_title:'O editor precisa de um ecrã mais largo', narrow_desc:'O editor de mapas usa um layout de computador com a barra de ferramentas, a tela e o painel de camadas lado a lado. São necessários pelo menos 1024 × 600 pixéis.',
       narrow_hint:'Num tablet, tente rodar o dispositivo na horizontal.', narrow_current:'Este ecrã', narrow_back:'Voltar ao início',
+      o_gridsec:'Grelha', o_gridtype:'Tipo', o_grid_square:'Quadrado', o_grid_hex:'Hexágono', o_grid_dot:'Ponto', o_gridcell:'Tamanho da célula', o_gridcolor:'Cor', o_gridop:'Intensidade', h_grid:'Ative a grelha na caixa \'Grelha\' no topo. O hexágono é o padrão do RPG de mesa.',
+      o_polsec:'Mapa político', o_polmode:'Vista política', o_polmute:'Atenuar textura do terreno', o_pollegend:'Mostrar legenda', o_polfill:'Intensidade do preenchimento', o_polcolors:'Atribuir cores dos estados', o_polname:'Nome da região selecionada', o_polname_ph:'Nome do estado', h_political:'A vista política não é uma camada separada; apresenta as regiões desenhadas como estados.', m_polon:'Vista política ativa', m_poloff:'Vista física', m_polcolored:'regiões coloridas', m_polempty:'Desenhe primeiro uma região',
+      o_nameculture:'Cultura', o_namefeature:'Tipo', o_namegen:'🎲 Sugerir nome', o_nf_settlement:'Povoação', o_nf_city:'Cidade', o_nf_river:'Rio', o_nf_mountain:'Montanha', o_nf_forest:'Floresta', o_nf_region:'Região', o_nf_lake:'Lago', o_nf_sea:'Mar',
+      tpl_title:'Começar por um modelo', tpl_desc:'Comece com uma linha costeira pronta e construa o seu mundo por cima.', tpl_ready:'tela pronta',
+      tpl_continent:'Continente', tpl_continent_d:'Vasta massa de terra com costas recortadas', tpl_island:'Ilha', tpl_island_d:'Uma grande ilha em mar aberto', tpl_archipelago:'Arquipélago', tpl_archipelago_d:'Ilhas dispersas e estreitos rasos', tpl_kingdom:'Reino', tpl_kingdom_d:'Costas suaves, interior cultivável', tpl_battle:'Mapa de batalha', tpl_battle_d:'Terreno pequeno com grelha hexagonal', tpl_blank:'Tela vazia', tpl_blank_d:'Começar do zero',
+      o_outlinecolor:'Cor do contorno',
+      exp_html_t:'HTML em ficheiro único', exp_print_t:'Imprimir / PDF', exp_png2_t:'Resolução 2×', exp_png4_t:'Resolução 4×', exp_maxdim:'Lado mais longo', exp_format:'Formato', exp_fmt_png:'PNG · nítido, ficheiro grande', exp_fmt_jpeg:'JPEG · ficheiro pequeno', exp_title:'Título', exp_html_help:'Transfere um único ficheiro .html com o mapa e um pequeno visualizador embutido. Não precisa de servidor — envie o ficheiro e faça duplo clique.', exp_page:'Tamanho da página', exp_orient:'Orientação', exp_portrait:'Retrato', exp_landscape:'Paisagem', exp_margin:'Margem', exp_dpi:'Resolução', exp_dpi_screen:'ecrã', exp_dpi_normal:'impressão normal', exp_dpi_high:'alta qualidade', exp_print_help:'Abre a janela de impressão do navegador. A partir daí pode imprimir ou escolher «Guardar como PDF».', printing:'A preparar a impressão', print_failed:'Não foi possível abrir a janela de impressão', viewer_hint:'arrastar · roda · duplo clique', viewer_in:'Aproximar', viewer_out:'Afastar', viewer_fit:'Ajustar',
+      t_sketch:'Esboço', o_sketch:'Esboço', h_sketch:'Um pincel livre que só desenha nas camadas que você adiciona. Adicione uma com «+ Adicionar camada» no painel de camadas, selecione-a na lista e depois desenhe no mapa.', o_hardness:'Dureza', o_sketch_eraser:'Modo borracha', sketch_target:'Camada de destino', sketch_need_layer:'Adicione primeiro a sua própria camada e selecione-a na lista', layer_add:'+ Adicionar camada', h_add_layer:'As camadas que você adiciona servem para desenho livre; pinte nelas com a ferramenta «Esboço».', layer_added:'Camada adicionada', layer_untitled:'Camada', layer_max:'No máximo 12 camadas de utilizador', layer_rename:'Nome da camada', layer_rename_hint:'Faça duplo clique para renomear', layer_delete:'Apagar camada', layer_delete_confirm:'Apagar esta camada e tudo o que está desenhado nela?', tut_h_sketch:'Desenha à mão livre nas camadas que você adiciona; cor, tamanho, dureza, opacidade e modo borracha ajustáveis.',
+      o_typography:'Tipografia', o_font:'Tipo de letra', o_banner:'Faixa', o_banner_none:'Nenhuma', o_banner_ribbon:'Fita', o_banner_plate:'Placa', o_banner_scroll:'Pergaminho', o_banner_stone:'Pedra', o_caps:'Maiúsculas', o_outline:'Contorno', o_shadow:'Sombra', h_font_missing:'Este tipo de letra não está instalado neste dispositivo; é usado o mais próximo. As entradas marcadas com · estão instaladas.',
       grp_navigate:'Navegação', grp_terrain:'Terreno', grp_water:'Água e Rotas', grp_markers:'Marcadores', grp_regions:'Regiões e Medida',
       t_select:'Selecionar', t_landmass:'Terra', t_erase:'Mar', t_fill:'Preencher', t_terrain:'Terreno', t_symbol:'Símbolo',
-      t_river:'Rio', t_road:'Estrada', t_label:'Etiqueta', t_pan:'Deslocar', t_eyedrop:'Amostra', t_measure:'Medir', h_measure:'Arraste no mapa para calcular a distância real entre dois pontos com base na escala. As linhas de medição podem ser selecionadas, movidas ou eliminadas; são excluídas da exportação PNG/SVG.', t_lasso:'Laço', h_lasso:'Arraste para desenhar uma área fechada: Terra + Terreno + Relevo são levantados juntos nessa área e tornam-se móveis. Arraste para mover, use a pega superior para rodar. Enter para confirmar, Esc para cancelar, Delete para eliminar a área por completo.',
+      t_river:'Rio', t_road:'Estrada', t_label:'Etiqueta', t_pan:'Deslocar', t_eyedrop:'Amostra', t_measure:'Medir', h_measure:'Clique para adicionar pontos e medir uma distância em vários segmentos. Enter / duplo clique para terminar, Esc para cancelar. As linhas de medição podem ser selecionadas, movidas ou eliminadas; são excluídas da exportação PNG/SVG.', t_lasso:'Laço', h_lasso:'Arraste para desenhar uma área fechada: Terra + Terreno + Relevo são levantados juntos nessa área e tornam-se móveis. Arraste para mover, use a pega superior para rodar. Enter para confirmar, Esc para cancelar, Delete para eliminar a área por completo.',
       o_landmass:'Terra / Costa', o_brushsize:'Tamanho do pincel', o_rough:'Irregularidade da costa',
       o_landcolor:'Cor da terra', o_shorew:'Largura da costa', o_shorestyle:'Estilo da costa', o_shore_sandy:'Arenosa', o_shore_rocky:'Rochosa', o_shore_reef:'Recife',
       o_smooth:'Suavizar costa', o_clearland:'Limpar terra',
@@ -412,7 +514,7 @@
       h_pan:'Clique direito + arrastar, clique do meio, Espaço + arrastar, ou setas para deslocar.',
       tab_layers:'Camadas', tab_library:'Biblioteca', tab_history:'Histórico',
       ref_title:'Imagem de referência', ref_export:'Incluir na exportação', ref_clear:'Remover referência', ref_trace:'Modo de decalque (mostrar por cima + fixação ao litoral)', layer_drag_hint:'Arraste a partir daqui para reordenar a camada', blend_sourceover:'Normal', blend_multiply:'Multiplicar', blend_overlay:'Sobrepor', blend_softlight:'Luz suave', blend_screen:'Ecrã', nav_home:'Início', nav_canvas:'Tela', nav_tutorial:'Tutorial', nav_community:'Comunidade', home_tagline:'Um editor de mapas para mundos de fantasia, no navegador', home_desc:'Desenha as fronteiras entre terra e mar, pinta florestas e montanhas, posiciona castelos e aldeias, traça rios e estradas — tudo numa só tela, no navegador, sem instalação.', home_cta:'Começa o teu mapa', home_video_caption:'Vídeo de apresentação brevemente', canvas_new_title:'Criar nova tela', canvas_custom:'Tamanho personalizado…', canvas_name_ph:'Nome do mapa', canvas_create:'Criar', canvas_import:'Importar de ficheiro .json', canvas_saved_title:'Telas guardadas', canvas_empty:'Ainda não há telas guardadas neste navegador. São listadas aqui automaticamente ao clicar em "Guardar" no editor.', canvas_open:'Abrir', canvas_delete:'Eliminar', canvas_delete_confirm:'Eliminar esta tela? Esta ação não pode ser desfeita.', canvas_unnamed:'Mapa sem título', tutorial_title:'Tutorial', tutorial_intro:'Cada ferramenta na barra lateral esquerda abre as suas próprias definições no painel direito. Abaixo, um breve resumo do que cada uma faz.', community_title:'Comunidade', community_desc:'Wayborne Map Editor é um projeto de código aberto em constante evolução.', community_github_desc:'Código-fonte, relatórios de erros e contribuições', community_soon:'Brevemente', lib_full:'O armazenamento do navegador está cheio — elimina uma tela antiga ou exporta-a como .json.', tut_h_select:'Seleciona, move e roda objetos; Shift+clique para seleção múltipla.', tut_h_erase:'Apaga a terra pintada e a textura de terreno sobre ela, num só passo.', tut_h_fill:'Preenche o interior de um contorno costeiro fechado com um clique.', tut_h_river:'Clica para adicionar pontos e desenhar um rio; Enter para terminar.', tut_h_road:'Clica para adicionar pontos e desenhar uma estrada; Enter para terminar.',
-      sym_upload:'+ Carregar símbolo PNG', sym_upload_done:'símbolo(s) carregado(s)', sym_del:'Apagar', sym_search:'Pesquisar símbolos...',
+      sym_upload:'+ Carregar símbolo PNG', sym_upload_done:'símbolo(s) carregado(s)', sym_del:'Apagar', sym_search:'Pesquisar símbolos...', sym_recent:'Usados recentemente',
       st_pos:'Posição', st_zoom:'Zoom', st_size:'Tela', st_tool:'Ferramenta',
       cancel:'Cancelar', ok:'OK',
       locked:'A camada está bloqueada ou oculta.', needtext:'Escreva primeiro o texto da etiqueta.', nopathnear:'Nenhum rio/estrada encontrado nas proximidades.', fill_toolarge:'Área demasiado grande — tente dentro de um limite fechado.',
@@ -438,9 +540,18 @@
       new:'Nieuw', open:'Openen', save:'Opslaan', parchment:'Perkament', grid:'Raster', shore:'Kust',
       narrow_title:'De editor heeft een breder scherm nodig', narrow_desc:'De kaarteditor gebruikt een desktopindeling met gereedschapsbalk, canvas en lagenpaneel naast elkaar. Daarvoor is minimaal 1024 × 600 pixels nodig.',
       narrow_hint:'Op een tablet: draai het apparaat naar liggend.', narrow_current:'Dit scherm', narrow_back:'Terug naar start',
+      o_gridsec:'Raster', o_gridtype:'Type', o_grid_square:'Vierkant', o_grid_hex:'Zeshoek', o_grid_dot:'Punt', o_gridcell:'Celgrootte', o_gridcolor:'Kleur', o_gridop:'Sterkte', h_grid:'Schakel het raster in via het vakje \'Raster\' bovenaan. Zeshoeken zijn de standaard bij tafelrollenspellen.',
+      o_polsec:'Politieke kaart', o_polmode:'Politieke weergave', o_polmute:'Terreintextuur dempen', o_pollegend:'Legenda tonen', o_polfill:'Vulsterkte', o_polcolors:'Staatskleuren automatisch toewijzen', o_polname:'Naam van geselecteerde regio', o_polname_ph:'Staatsnaam', h_political:'De politieke weergave is geen aparte laag; ze toont je regio\'s als staten.', m_polon:'Politieke weergave aan', m_poloff:'Fysieke weergave', m_polcolored:'regio\'s gekleurd', m_polempty:'Teken eerst een regio',
+      o_nameculture:'Cultuur', o_namefeature:'Type', o_namegen:'🎲 Naam voorstellen', o_nf_settlement:'Nederzetting', o_nf_city:'Stad', o_nf_river:'Rivier', o_nf_mountain:'Berg', o_nf_forest:'Bos', o_nf_region:'Regio', o_nf_lake:'Meer', o_nf_sea:'Zee',
+      tpl_title:'Begin met een sjabloon', tpl_desc:'Start met een kant-en-klare kustlijn en bouw daarop je wereld.', tpl_ready:'canvas klaar',
+      tpl_continent:'Continent', tpl_continent_d:'Brede landmassa met grillige kusten', tpl_island:'Eiland', tpl_island_d:'Eén groot eiland in open zee', tpl_archipelago:'Archipel', tpl_archipelago_d:'Verspreide eilanden en ondiepe zeestraten', tpl_kingdom:'Koninkrijk', tpl_kingdom_d:'Zachte kusten, vruchtbaar achterland', tpl_battle:'Slagveldkaart', tpl_battle_d:'Klein terrein met hexraster', tpl_blank:'Leeg canvas', tpl_blank_d:'Helemaal opnieuw beginnen',
+      o_outlinecolor:'Omlijningskleur',
+      exp_html_t:'HTML in één bestand', exp_print_t:'Afdrukken / PDF', exp_png2_t:'2× resolutie', exp_png4_t:'4× resolutie', exp_maxdim:'Langste zijde', exp_format:'Formaat', exp_fmt_png:'PNG · scherp, groot bestand', exp_fmt_jpeg:'JPEG · klein bestand', exp_title:'Titel', exp_html_help:'Downloadt één .html-bestand met de kaart en een kleine viewer erin. Geen server nodig — stuur het bestand en dubbelklik erop.', exp_page:'Paginaformaat', exp_orient:'Richting', exp_portrait:'Staand', exp_landscape:'Liggend', exp_margin:'Marge', exp_dpi:'Resolutie', exp_dpi_screen:'scherm', exp_dpi_normal:'normale afdruk', exp_dpi_high:'hoge kwaliteit', exp_print_help:'Opent het afdrukvenster van de browser. Daar kun je afdrukken of “Opslaan als pdf” kiezen.', printing:'Afdruk wordt voorbereid', print_failed:'Kon het afdrukvenster niet openen', viewer_hint:'slepen · wiel · dubbelklik', viewer_in:'Inzoomen', viewer_out:'Uitzoomen', viewer_fit:'Passend',
+      t_sketch:'Schets', o_sketch:'Schets', h_sketch:'Een vrije-handpenseel dat alleen tekent op lagen die je zelf toevoegt. Voeg er een toe met “+ Laag toevoegen” in het lagenpaneel, selecteer hem in de lijst en teken dan op de kaart.', o_hardness:'Hardheid', o_sketch_eraser:'Gummodus', sketch_target:'Doellaag', sketch_need_layer:'Voeg eerst je eigen laag toe en selecteer hem in de lijst', layer_add:'+ Laag toevoegen', h_add_layer:'Lagen die je zelf toevoegt zijn voor vrij tekenen; schilder erop met het gereedschap “Schets”.', layer_added:'Laag toegevoegd', layer_untitled:'Laag', layer_max:'Maximaal 12 eigen lagen', layer_rename:'Laagnaam', layer_rename_hint:'Dubbelklik om te hernoemen', layer_delete:'Laag verwijderen', layer_delete_confirm:'Deze laag en alles wat erop getekend is verwijderen?', tut_h_sketch:'Tekent uit de vrije hand op lagen die je zelf toevoegt; kleur, grootte, hardheid, dekking en een gummodus zijn instelbaar.',
+      o_typography:'Typografie', o_font:'Lettertype', o_banner:'Banier', o_banner_none:'Geen', o_banner_ribbon:'Lint', o_banner_plate:'Plaat', o_banner_scroll:'Perkament', o_banner_stone:'Steen', o_caps:'Hoofdletters', o_outline:'Omlijning', o_shadow:'Schaduw', h_font_missing:'Dit lettertype is niet op dit apparaat geïnstalleerd; het dichtstbijzijnde wordt gebruikt. Items met · zijn geïnstalleerd.',
       grp_navigate:'Navigatie', grp_terrain:'Terrein', grp_water:'Water & Routes', grp_markers:'Markeringen', grp_regions:"Regio's & Meten",
       t_select:'Selecteren', t_landmass:'Land', t_erase:'Zee', t_fill:'Vullen', t_terrain:'Terrein', t_symbol:'Symbool',
-      t_river:'Rivier', t_road:'Weg', t_label:'Label', t_pan:'Verschuiven', t_eyedrop:'Pipet', t_measure:'Meten', h_measure:'Sleep op de kaart om de werkelijke afstand tussen twee punten te berekenen op basis van de schaal. Meetlijnen kunnen worden geselecteerd, verplaatst of verwijderd; ze worden niet meegenomen in de PNG/SVG-export.', t_lasso:'Lasso', h_lasso:'Sleep om een gesloten gebied te tekenen: Land + Terrein + Reliëf worden daarbinnen samen opgetild en verplaatsbaar. Sleep om te verplaatsen, gebruik de bovenste handgreep om te draaien. Enter om te bevestigen, Escape om te annuleren, Delete om het gebied volledig te verwijderen.',
+      t_river:'Rivier', t_road:'Weg', t_label:'Label', t_pan:'Verschuiven', t_eyedrop:'Pipet', t_measure:'Meten', h_measure:'Klik om punten toe te voegen en een meerdelige afstand te meten. Enter / dubbelklik om te voltooien, Escape om te annuleren. Meetlijnen kunnen worden geselecteerd, verplaatst of verwijderd; ze worden niet meegenomen in de PNG/SVG-export.', t_lasso:'Lasso', h_lasso:'Sleep om een gesloten gebied te tekenen: Land + Terrein + Reliëf worden daarbinnen samen opgetild en verplaatsbaar. Sleep om te verplaatsen, gebruik de bovenste handgreep om te draaien. Enter om te bevestigen, Escape om te annuleren, Delete om het gebied volledig te verwijderen.',
       o_landmass:'Land / Kust', o_brushsize:'Penseelgrootte', o_rough:'Ruwheid van de kust',
       o_landcolor:'Landkleur', o_shorew:'Kustbreedte', o_shorestyle:'Kuststijl', o_shore_sandy:'Zandig', o_shore_rocky:'Rotsachtig', o_shore_reef:'Rif',
       o_smooth:'Kust gladstrijken', o_clearland:'Land wissen',
@@ -473,7 +584,7 @@
       h_pan:'Rechtsklikken + slepen, middelklik, Spatie + slepen, of pijltjestoetsen om te verschuiven.',
       tab_layers:'Lagen', tab_library:'Bibliotheek', tab_history:'Geschiedenis',
       ref_title:'Referentieafbeelding', ref_export:'Opnemen in export', ref_clear:'Referentie verwijderen', ref_trace:'Overtrekmodus (bovenop tonen + kustlijn uitlijnen)', layer_drag_hint:'Sleep hiervandaan om de laag te herschikken', blend_sourceover:'Normaal', blend_multiply:'Vermenigvuldigen', blend_overlay:'Overlay', blend_softlight:'Zacht licht', blend_screen:'Zeef', nav_home:'Home', nav_canvas:'Canvas', nav_tutorial:'Handleiding', nav_community:'Community', home_tagline:'Een browsergebaseerde kaarteditor voor fantasiewerelden', home_desc:'Teken land- en zeegrenzen, schilder bossen en bergen, plaats kastelen en dorpen, leg rivieren en wegen aan — alles op één canvas, in je browser, zonder installatie.', home_cta:'Begin je kaart', home_video_caption:'Introductievideo binnenkort', canvas_new_title:'Nieuw canvas maken', canvas_custom:'Aangepaste afmeting…', canvas_name_ph:'Kaartnaam', canvas_create:'Aanmaken', canvas_import:'Importeren uit .json-bestand', canvas_saved_title:'Opgeslagen canvassen', canvas_empty:'Nog geen opgeslagen canvassen in deze browser. Ze verschijnen hier automatisch zodra je in de editor op "Opslaan" klikt.', canvas_open:'Openen', canvas_delete:'Verwijderen', canvas_delete_confirm:'Dit canvas verwijderen? Dit kan niet ongedaan worden gemaakt.', canvas_unnamed:'Naamloze kaart', tutorial_title:'Handleiding', tutorial_intro:'Elk gereedschap in de linker werkbalk opent zijn eigen instellingen in het rechterpaneel. Hieronder een korte samenvatting van wat elk gereedschap doet.', community_title:'Community', community_desc:'Wayborne Map Editor is een open source project dat voortdurend evolueert.', community_github_desc:'Broncode, bugmeldingen en bijdragen', community_soon:'Binnenkort', lib_full:'De browseropslag is vol — verwijder een oud canvas of exporteer het als .json.', tut_h_select:'Selecteer, verplaats en draai objecten; Shift-klik voor meervoudige selectie.', tut_h_erase:'Wist geschilderd land en de terreintextuur erop in één stap.', tut_h_fill:'Vult het binnenste van een gesloten kustlijn met één klik.', tut_h_river:'Klik om punten toe te voegen en een rivier te tekenen; Enter om te voltooien.', tut_h_road:'Klik om punten toe te voegen en een weg te tekenen; Enter om te voltooien.',
-      sym_upload:'+ PNG-symbool uploaden', sym_upload_done:'symbo(o)l(en) geladen', sym_del:'Verwijderen', sym_search:'Symbolen zoeken...',
+      sym_upload:'+ PNG-symbool uploaden', sym_upload_done:'symbo(o)l(en) geladen', sym_del:'Verwijderen', sym_search:'Symbolen zoeken...', sym_recent:'Recent gebruikt',
       st_pos:'Positie', st_zoom:'Zoom', st_size:'Canvas', st_tool:'Gereedschap',
       cancel:'Annuleren', ok:'OK',
       locked:'Laag is vergrendeld of verborgen.', needtext:'Typ eerst de labeltekst.', nopathnear:'Geen rivier/weg in de buurt gevonden.', fill_toolarge:'Gebied te groot — probeer binnen een gesloten grens.',
@@ -499,9 +610,18 @@
       new:'Nowy', open:'Otwórz', save:'Zapisz', parchment:'Pergamin', grid:'Siatka', shore:'Wybrzeże',
       narrow_title:'Edytor wymaga szerszego ekranu', narrow_desc:'Edytor map korzysta z układu desktopowego: pasek narzędzi, płótno i panel warstw obok siebie. Potrzeba co najmniej 1024 × 600 pikseli.',
       narrow_hint:'Na tablecie spróbuj obrócić urządzenie poziomo.', narrow_current:'Ten ekran', narrow_back:'Powrót do strony głównej',
+      o_gridsec:'Siatka', o_gridtype:'Typ', o_grid_square:'Kwadrat', o_grid_hex:'Heksagon', o_grid_dot:'Kropka', o_gridcell:'Rozmiar komórki', o_gridcolor:'Kolor', o_gridop:'Intensywność', h_grid:'Włącz siatkę polem \'Siatka\' na górze. Heksy to standard w RPG-ach stołowych.',
+      o_polsec:'Mapa polityczna', o_polmode:'Widok polityczny', o_polmute:'Wycisz teksturę terenu', o_pollegend:'Pokaż legendę', o_polfill:'Siła wypełnienia', o_polcolors:'Przypisz kolory państw', o_polname:'Nazwa zaznaczonego regionu', o_polname_ph:'Nazwa państwa', h_political:'Widok polityczny nie jest osobną warstwą; przedstawia narysowane regiony jako państwa.', m_polon:'Widok polityczny włączony', m_poloff:'Widok fizyczny', m_polcolored:'regionów pokolorowano', m_polempty:'Najpierw narysuj region',
+      o_nameculture:'Kultura', o_namefeature:'Typ', o_namegen:'🎲 Zaproponuj nazwę', o_nf_settlement:'Osada', o_nf_city:'Miasto', o_nf_river:'Rzeka', o_nf_mountain:'Góra', o_nf_forest:'Las', o_nf_region:'Region', o_nf_lake:'Jezioro', o_nf_sea:'Morze',
+      tpl_title:'Zacznij od szablonu', tpl_desc:'Zacznij od gotowej linii brzegowej, a potem zbuduj na niej swój świat.', tpl_ready:'płótno gotowe',
+      tpl_continent:'Kontynent', tpl_continent_d:'Rozległy ląd o poszarpanych wybrzeżach', tpl_island:'Wyspa', tpl_island_d:'Jedna duża wyspa na otwartym morzu', tpl_archipelago:'Archipelag', tpl_archipelago_d:'Rozproszone wyspy i płytkie cieśniny', tpl_kingdom:'Królestwo', tpl_kingdom_d:'Łagodne brzegi, żyzne wnętrze', tpl_battle:'Mapa bitwy', tpl_battle_d:'Mały teren z siatką heksagonalną', tpl_blank:'Puste płótno', tpl_blank_d:'Zacznij od zera',
+      o_outlinecolor:'Kolor obrysu',
+      exp_html_t:'HTML w jednym pliku', exp_print_t:'Drukuj / PDF', exp_png2_t:'Rozdzielczość 2×', exp_png4_t:'Rozdzielczość 4×', exp_maxdim:'Dłuższy bok', exp_format:'Format', exp_fmt_png:'PNG · ostry, duży plik', exp_fmt_jpeg:'JPEG · mały plik', exp_title:'Tytuł', exp_html_help:'Pobiera jeden plik .html z mapą i małą przeglądarką w środku. Serwer niepotrzebny — wyślij plik i kliknij dwukrotnie.', exp_page:'Rozmiar strony', exp_orient:'Orientacja', exp_portrait:'Pionowa', exp_landscape:'Pozioma', exp_margin:'Margines', exp_dpi:'Rozdzielczość', exp_dpi_screen:'ekran', exp_dpi_normal:'zwykły druk', exp_dpi_high:'wysoka jakość', exp_print_help:'Otwiera okno drukowania przeglądarki. Stamtąd możesz wydrukować albo wybrać „Zapisz jako PDF”.', printing:'Przygotowywanie wydruku', print_failed:'Nie udało się otworzyć okna drukowania', viewer_hint:'przeciągnij · kółko · dwuklik', viewer_in:'Powiększ', viewer_out:'Pomniejsz', viewer_fit:'Dopasuj',
+      t_sketch:'Szkic', o_sketch:'Szkic', h_sketch:'Pędzel odręczny rysujący wyłącznie na warstwach dodanych przez ciebie. Dodaj warstwę przyciskiem „+ Dodaj warstwę” w panelu warstw, zaznacz ją na liście, a potem rysuj po mapie.', o_hardness:'Twardość', o_sketch_eraser:'Tryb gumki', sketch_target:'Warstwa docelowa', sketch_need_layer:'Najpierw dodaj własną warstwę i zaznacz ją na liście', layer_add:'+ Dodaj warstwę', h_add_layer:'Warstwy dodane przez ciebie służą do swobodnego rysowania; maluj po nich narzędziem „Szkic”.', layer_added:'Dodano warstwę', layer_untitled:'Warstwa', layer_max:'Można dodać najwyżej 12 własnych warstw', layer_rename:'Nazwa warstwy', layer_rename_hint:'Kliknij dwukrotnie, aby zmienić nazwę', layer_delete:'Usuń warstwę', layer_delete_confirm:'Usunąć tę warstwę i wszystko, co na niej narysowano?', tut_h_sketch:'Rysuje odręcznie na warstwach dodanych przez ciebie; kolor, rozmiar, twardość, krycie i tryb gumki są regulowane.',
+      o_typography:'Typografia', o_font:'Krój pisma', o_banner:'Banderola', o_banner_none:'Brak', o_banner_ribbon:'Wstęga', o_banner_plate:'Tablica', o_banner_scroll:'Zwój', o_banner_stone:'Kamień', o_caps:'Wersaliki', o_outline:'Obrys', o_shadow:'Cień', h_font_missing:'Ten krój pisma nie jest zainstalowany na tym urządzeniu; użyto najbliższego zamiennika. Pozycje oznaczone · są zainstalowane.',
       grp_navigate:'Nawigacja', grp_terrain:'Teren', grp_water:'Woda i Drogi', grp_markers:'Znaczniki', grp_regions:'Regiony i Pomiar',
       t_select:'Zaznacz', t_landmass:'Ląd', t_erase:'Morze', t_fill:'Wypełnij', t_terrain:'Teren', t_symbol:'Symbol',
-      t_river:'Rzeka', t_road:'Droga', t_label:'Etykieta', t_pan:'Przesuń', t_eyedrop:'Próbnik', t_measure:'Mierz', h_measure:'Przeciągnij po mapie, aby obliczyć rzeczywistą odległość między dwoma punktami na podstawie skali. Linie pomiarowe można zaznaczać, przesuwać lub usuwać; nie są uwzględniane w eksporcie PNG/SVG.', t_lasso:'Lasso', h_lasso:'Przeciągnij, aby narysować zamknięty obszar: Ląd + Teren + Rzeźba terenu są w nim razem podnoszone i stają się przesuwalne. Przeciągnij, aby przesunąć, użyj górnego uchwytu, aby obrócić. Enter zatwierdza, Escape anuluje, Delete całkowicie usuwa obszar.',
+      t_river:'Rzeka', t_road:'Droga', t_label:'Etykieta', t_pan:'Przesuń', t_eyedrop:'Próbnik', t_measure:'Mierz', h_measure:'Kliknij, aby dodać punkty i zmierzyć wieloodcinkową odległość. Enter / podwójne kliknięcie kończy, Esc anuluje. Linie pomiarowe można zaznaczać, przesuwać lub usuwać; nie są uwzględniane w eksporcie PNG/SVG.', t_lasso:'Lasso', h_lasso:'Przeciągnij, aby narysować zamknięty obszar: Ląd + Teren + Rzeźba terenu są w nim razem podnoszone i stają się przesuwalne. Przeciągnij, aby przesunąć, użyj górnego uchwytu, aby obrócić. Enter zatwierdza, Escape anuluje, Delete całkowicie usuwa obszar.',
       o_landmass:'Ląd / Wybrzeże', o_brushsize:'Rozmiar pędzla', o_rough:'Nieregularność wybrzeża',
       o_landcolor:'Kolor lądu', o_shorew:'Szerokość wybrzeża', o_shorestyle:'Styl wybrzeża', o_shore_sandy:'Piaszczyste', o_shore_rocky:'Skaliste', o_shore_reef:'Rafa',
       o_smooth:'Wygładź wybrzeże', o_clearland:'Wyczyść ląd',
@@ -534,7 +654,7 @@
       h_pan:'Prawy przycisk + przeciągnij, środkowy przycisk, Spacja + przeciągnij lub strzałki, aby przesuwać.',
       tab_layers:'Warstwy', tab_library:'Biblioteka', tab_history:'Historia',
       ref_title:'Obraz referencyjny', ref_export:'Uwzględnij w eksporcie', ref_clear:'Usuń obraz referencyjny', ref_trace:'Tryb kalkowania (pokaż na wierzchu + przyciąganie do linii brzegowej)', layer_drag_hint:'Przeciągnij stąd, aby zmienić kolejność warstwy', blend_sourceover:'Normalny', blend_multiply:'Mnożenie', blend_overlay:'Nakładka', blend_softlight:'Łagodne światło', blend_screen:'Ekran', nav_home:'Strona główna', nav_canvas:'Płótno', nav_tutorial:'Poradnik', nav_community:'Społeczność', home_tagline:'Edytor map dla fantastycznych światów w przeglądarce', home_desc:'Rysuj granice lądu i morza, maluj lasy i góry, umieszczaj zamki i wioski, prowadź rzeki i drogi — wszystko na jednym płótnie, w przeglądarce, bez instalacji.', home_cta:'Zacznij swoją mapę', home_video_caption:'Wkrótce film wprowadzający', canvas_new_title:'Utwórz nowe płótno', canvas_custom:'Niestandardowy rozmiar…', canvas_name_ph:'Nazwa mapy', canvas_create:'Utwórz', canvas_import:'Importuj z pliku .json', canvas_saved_title:'Zapisane płótna', canvas_empty:'W tej przeglądarce nie zapisano jeszcze żadnych płócien. Pojawiają się tu automatycznie po kliknięciu "Zapisz" w edytorze.', canvas_open:'Otwórz', canvas_delete:'Usuń', canvas_delete_confirm:'Usunąć to płótno? Tej operacji nie można cofnąć.', canvas_unnamed:'Mapa bez nazwy', tutorial_title:'Poradnik', tutorial_intro:'Każde narzędzie na lewym pasku otwiera własne ustawienia w prawym panelu. Poniżej krótkie podsumowanie działania każdego narzędzia.', community_title:'Społeczność', community_desc:'Wayborne Map Editor to projekt open source, wciąż rozwijany.', community_github_desc:'Kod źródłowy, zgłoszenia błędów i wkład', community_soon:'Wkrótce', lib_full:'Pamięć przeglądarki jest pełna — usuń stare płótno lub wyeksportuj je jako .json.', tut_h_select:'Zaznaczaj, przesuwaj i obracaj obiekty; Shift+klik dla zaznaczenia wielokrotnego.', tut_h_erase:'Usuwa pomalowany ląd i teksturę terenu nad nim w jednym kroku.', tut_h_fill:'Wypełnia wnętrze zamkniętego zarysu wybrzeża jednym kliknięciem.', tut_h_river:'Kliknij, aby dodać punkty i narysować rzekę; Enter, aby zakończyć.', tut_h_road:'Kliknij, aby dodać punkty i narysować drogę; Enter, aby zakończyć.',
-      sym_upload:'+ Wgraj symbol PNG', sym_upload_done:'wczytano symboli', sym_del:'Usuń', sym_search:'Szukaj symboli...',
+      sym_upload:'+ Wgraj symbol PNG', sym_upload_done:'wczytano symboli', sym_del:'Usuń', sym_search:'Szukaj symboli...', sym_recent:'Ostatnio używane',
       st_pos:'Pozycja', st_zoom:'Powiększenie', st_size:'Płótno', st_tool:'Narzędzie',
       cancel:'Anuluj', ok:'OK',
       locked:'Warstwa jest zablokowana lub ukryta.', needtext:'Najpierw wpisz tekst etykiety.', nopathnear:'Nie znaleziono w pobliżu rzeki/drogi.', fill_toolarge:'Obszar zbyt duży — spróbuj wewnątrz zamkniętej granicy.',
@@ -556,13 +676,136 @@
       o_snap:'Przyciągaj do siatki', o_snapsize:'Rozmiar siatki', o_frame:'Ramka mapy', o_frame_none:'Brak', o_frame_simple:'Prosta linia', o_frame_rope:'Lina', o_frame_ornate:'Zdobiona', o_frame_color:'Kolor',
       o_png2x:'PNG 2×', o_png4x:'PNG 4×'
     },
+    ar: {
+      new:'جديد', open:'فتح', save:'حفظ', parchment:'رَق', grid:'شبكة', shore:'ساحل', narrow_title:'يحتاج المحرِّر إلى شاشة أعرض',
+      narrow_desc:'يستخدم محرِّر الخرائط تخطيطًا مكتبيًا يضع شريط الأدوات واللوحة ولوحة الطبقات جنبًا إلى جنب. ويحتاج إلى 1024 × 600 بكسل على الأقل.',
+      narrow_hint:'إن كنت على جهاز لوحي، جرِّب تدويره أفقيًا.', narrow_current:'هذه الشاشة',
+      narrow_back:'العودة إلى الصفحة الرئيسية', o_gridsec:'الشبكة', o_gridtype:'النوع', o_grid_square:'مربّعة',
+      o_grid_hex:'سداسية', o_grid_dot:'نقطية', o_gridcell:'حجم الخلية', o_gridcolor:'اللون', o_gridop:'الوضوح',
+      h_grid:'فعِّل الشبكة من مربّع «شبكة» في الشريط العلوي. الشبكة السداسية هي المعيار في ألعاب الأدوار الورقية.',
+      o_polsec:'الخريطة السياسية', o_polmode:'العرض السياسي', o_polmute:'إخفات نسيج التضاريس', o_pollegend:'إظهار المفتاح',
+      o_polfill:'شدّة التعبئة', o_polcolors:'إسناد ألوان الدول تلقائيًا', o_polname:'اسم المنطقة المحدَّدة',
+      o_polname_ph:'اسم الدولة', h_political:'العرض السياسي ليس طبقة منفصلة؛ إنما يعرض المناطق التي رسمتها بوصفها دولًا.',
+      m_polon:'العرض السياسي مُفعَّل', m_poloff:'العرض الطبيعي', m_polcolored:'منطقة مُلوَّنة', m_polempty:'ارسم منطقة أولًا',
+      o_nameculture:'الثقافة', o_namefeature:'النوع', o_namegen:'🎲 اقترح اسمًا', o_nf_settlement:'مستوطنة', o_nf_city:'مدينة',
+      o_nf_river:'نهر', o_nf_mountain:'جبل', o_nf_forest:'غابة', o_nf_region:'إقليم', o_nf_lake:'بحيرة', o_nf_sea:'بحر',
+      tpl_title:'ابدأ من قالب', tpl_desc:'ابدأ بخطّ ساحلي جاهز، ثم ابنِ عالمك فوقه.', tpl_ready:'اللوحة جاهزة',
+      tpl_continent:'قارّة', tpl_continent_d:'كتلة يابسة واسعة بسواحل متعرّجة', tpl_island:'جزيرة',
+      tpl_island_d:'جزيرة كبيرة واحدة في عرض البحر', tpl_archipelago:'أرخبيل', tpl_archipelago_d:'جزر متناثرة ومضائق ضحلة',
+      tpl_kingdom:'مملكة', tpl_kingdom_d:'سواحل هادئة وداخل صالح للزراعة', tpl_battle:'خريطة معركة',
+      tpl_battle_d:'أرض صغيرة بشبكة سداسية', tpl_blank:'لوحة فارغة', tpl_blank_d:'ابدأ من الصفر',
+      o_outlinecolor:'لون الحدّ الخارجي', exp_html_t:'HTML بملف واحد', exp_print_t:'طباعة / PDF', exp_png2_t:'دقّة 2×',
+      exp_png4_t:'دقّة 4×', exp_maxdim:'الضلع الأطول', exp_format:'الصيغة', exp_fmt_png:'‏PNG · حادّ، ملف كبير',
+      exp_fmt_jpeg:'‏JPEG · ملف صغير', exp_title:'العنوان',
+      exp_html_help:'يُنزَّل ملف ‎.html واحد يتضمّن الخريطة وعارضًا صغيرًا مدمجًا بداخله. لا حاجة إلى خادم — أرسل الملف وانقر عليه نقرًا مزدوجًا.',
+      exp_page:'حجم الصفحة', exp_orient:'الاتجاه', exp_portrait:'طولي', exp_landscape:'عرضي', exp_margin:'الهامش',
+      exp_dpi:'الدقّة', exp_dpi_screen:'شاشة', exp_dpi_normal:'طباعة عادية', exp_dpi_high:'جودة عالية',
+      exp_print_help:'يفتح نافذة الطباعة في متصفّحك. ومنها يمكنك الإرسال إلى الطابعة أو اختيار «حفظ بصيغة PDF».',
+      printing:'جارٍ تجهيز الطباعة', print_failed:'تعذّر فتح نافذة الطباعة', viewer_hint:'اسحب · بالعجلة · نقر مزدوج',
+      viewer_in:'تكبير', viewer_out:'تصغير', viewer_fit:'ملاءمة', t_sketch:'رسم حرّ', o_sketch:'رسم حرّ',
+      h_sketch:'فرشاة حرّة ترسم على الطبقات التي تضيفها أنت فقط. أضِف طبقة بزرّ «+ أضف طبقة» في لوحة الطبقات، ثم اخترها من القائمة، ثم ارسم على الخريطة.',
+      o_hardness:'الصلابة', o_sketch_eraser:'وضع المِمحاة', sketch_target:'الطبقة الهدف',
+      sketch_need_layer:'أضِف طبقتك أولًا ثم اخترها من القائمة', layer_add:'+ أضف طبقة',
+      h_add_layer:'الطبقات التي تضيفها أنت مخصّصة للرسم الحرّ؛ ارسم عليها بأداة «رسم حرّ».',
+      layer_added:'أُضيفت طبقة', layer_untitled:'طبقة', layer_max:'يمكن إضافة 12 طبقة مستخدم كحدّ أقصى', layer_rename:'اسم الطبقة',
+      layer_rename_hint:'انقر نقرًا مزدوجًا لإعادة التسمية', layer_delete:'حذف الطبقة',
+      layer_delete_confirm:'أتريد حذف هذه الطبقة وكلّ ما رُسم عليها؟',
+      tut_h_sketch:'يرسم بحرّية على الطبقات التي تضيفها أنت؛ اللون والحجم والصلابة والشفافية ووضع المِمحاة قابلة للضبط.',
+      o_typography:'الطباعة والخطوط', o_font:'عائلة الخط', o_banner:'لافتة', o_banner_none:'بلا', o_banner_ribbon:'شريط',
+      o_banner_plate:'لوحة', o_banner_scroll:'مخطوطة', o_banner_stone:'حجر', o_caps:'حروف كبيرة', o_outline:'حدّ خارجي',
+      o_shadow:'ظلّ',
+      h_font_missing:'هذه العائلة الخطّية غير مثبَّتة على هذا الجهاز؛ يُستخدَم أقرب بديل لها. العناصر المعلَّمة بـ · مثبَّتة.',
+      grp_navigate:'التنقّل', grp_terrain:'التضاريس', grp_water:'المياه والطرق', grp_markers:'العلامات',
+      grp_regions:'المناطق والقياس', t_select:'تحديد', t_landmass:'يابسة', t_erase:'بحر', t_fill:'تعبئة', t_terrain:'تضاريس',
+      t_symbol:'رمز', t_river:'نهر', t_road:'طريق', t_label:'تسمية', t_pan:'تحريك', t_eyedrop:'أخذ عيّنة', t_measure:'قياس',
+      h_measure:'انقر لإضافة نقاط وقياس مسافة متعددة الأجزاء. Enter أو النقر المزدوج للإنهاء، Esc للإلغاء. يمكن تحديد خطوط القياس ونقلها وحذفها؛ وهي مستثناة من تصدير PNG/SVG.',
+      t_lasso:'أُنشوطة',
+      h_lasso:'اسحب لرسم منطقة مغلقة: تُرفَع اليابسة والتضاريس والارتفاع داخلها معًا وتصبح قابلة للنقل. اسحب للنقل، واستخدم المقبض العلوي للتدوير. Enter للتثبيت، Escape للإلغاء، Delete لحذف المنطقة كليًا.',
+      o_landmass:'اليابسة / الساحل', o_brushsize:'حجم الفرشاة', o_rough:'خشونة الساحل', o_landcolor:'لون اليابسة',
+      o_shorew:'عرض الساحل', o_shorestyle:'نمط الساحل', o_shore_sandy:'رملي', o_shore_rocky:'صخري', o_shore_reef:'شعاب',
+      o_smooth:'تنعيم خطّ الساحل', o_clearland:'مسح اليابسة',
+      h_landmass:'اسحب لرسم اليابسة. أداة «بحر» تمحو اليابسة والتضاريس معًا.', o_landgen:'توليد يابسة عشوائية',
+      o_landgentpl:'القالب', o_landgen_continent:'قارّة', o_landgen_island:'جزيرة', o_landgen_archipelago:'أرخبيل',
+      o_landgenrough:'التفاصيل / الخشونة', o_landgen_go:'🎲 توليد',
+      h_landgen:'يستبدل طبقة اليابسة الحالية. انقر مرّة أخرى بالإعدادات نفسها للحصول على نتيجة عشوائية جديدة.',
+      o_terrain:'رسم التضاريس', o_opacity:'الشفافية', o_clip:'ارسم على اليابسة فقط', o_clearterrain:'مسح طبقة التضاريس',
+      h_terrain:'تتوزّع العلامات عشوائيًا في كلّ ضربة فرشاة — بلا نمط متكرّر.', t_elevation:'الارتفاع', o_elevation:'الارتفاع',
+      o_elevstrength:'الشدّة', o_elevlower:'وضع الخفض', o_clearelevation:'مسح الارتفاع', o_elevdisplay:'العرض',
+      o_elevhillshade:'تظليل التلال', o_elevcontours:'خطوط الكنتور', o_contourinterval:'فاصل الكنتور',
+      h_elevation:'اسحب لرفع الأرض؛ فعِّل «وضع الخفض» لحفرها. يتحدّث تظليل التلال تلقائيًا.', o_symbol:'رمز', o_size:'الحجم',
+      o_rot:'الدوران', o_hue:'إزاحة اللون', o_wear:'البلى', o_jitter:'عشوائية الموضع',
+      h_symbol:'اختر رمزًا ثم انقر على الخريطة. استخدم «تحديد» للنقل، وDelete للحذف.', o_river:'نهر', o_width:'العرض',
+      o_meander:'التعرّج', o_taper:'تضييق عند المنبع', o_color:'اللون',
+      h_path:'انقر لإضافة نقاط. Enter أو نقر مزدوج للإنهاء، Esc للإلغاء.', o_road:'طريق / درب قوافل', o_label:'تسمية',
+      o_preset:'نمط جاهز', o_curve:'الانحناء', o_track:'تباعد الحروف', o_snappath:'محاذاة إلى مسار (نهر/طريق)',
+      h_label:'اختر نمطًا، اكتب النصّ، ثم انقر على الخريطة. تُطبَّق الإعدادات فورًا على التسمية المحدَّدة.',
+      o_eyedrop:'آخذ عيّنات النسيج', o_eye_nosample:'لا عيّنة بعد', o_eye_radius:'نصف قطر العيّنة', o_eye_brush:'حجم الفرشاة',
+      o_eye_pick:'① اختر منطقة', o_eye_paint:'② ابدأ الرسم', o_eye_clear:'مسح العيّنة',
+      h_eyedrop:'① اختر منطقة: اسحب دائرة. ② ارسم: طبِّق النسيج المأخوذ.', eyeOk:'✓ أُخذت عيّنة النسيج',
+      eyeFail:'فشل أخذ العيّنة — جرِّب فوق يابسة أو تضاريس.', eyePick:'انقر واسحب على الخريطة ← اضبط حجم الدائرة ← أفلِت.',
+      eyePaint:'انقر واسحب على الخريطة ← يُطبَّق النسيج.', eyeNeed:'خُذ عيّنة نسيج أولًا عبر ① اختر منطقة.', o_selection:'التحديد',
+      o_nosel:'لا شيء محدَّد', o_dup:'تكرار', o_del:'حذف', o_scalebar:'شريط المقياس', o_scvis:'إظهار على الخريطة', o_sclen:'الطول',
+      o_scsize:'حجم النصّ', o_scsegs:'الأقسام', h_scale:'اسحب شريط المقياس على الخريطة لتغيير موضعه.', o_view:'العرض',
+      o_fit:'ملاءمة الشاشة', o_100:'100%',
+      h_pan:'اسحب بالزرّ الأيمن، أو الزرّ الأوسط، أو Space مع السحب، أو استخدم مفاتيح الأسهم للتحريك.', tab_layers:'الطبقات',
+      tab_library:'المكتبة', tab_history:'السجلّ', ref_title:'صورة مرجعية', ref_export:'تضمينها في التصدير',
+      ref_clear:'إزالة المرجع', ref_trace:'وضع التتبّع (إظهارها فوق الكلّ + محاذاة خطّ الساحل)',
+      layer_drag_hint:'امسك من هنا لسحب الطبقة وإعادة ترتيبها', blend_sourceover:'عادي', blend_multiply:'ضرب',
+      blend_overlay:'تراكب', blend_softlight:'ضوء ناعم', blend_screen:'شاشة', nav_home:'الرئيسية', nav_canvas:'اللوحة',
+      nav_tutorial:'الدليل', nav_community:'المجتمع', home_tagline:'محرِّر خرائط يعمل في المتصفّح لعوالم الخيال',
+      home_desc:'ارسم حدود اليابسة والبحر، ولوِّن الغابات والجبال، وضَع القلاع والقرى، ومدَّ الأنهار والطرق — كلّ ذلك على لوحة واحدة، داخل متصفّحك، دون أيّ تثبيت.',
+      home_cta:'ابدأ خريطتك', home_video_caption:'فيديو تعريفي قريبًا', canvas_new_title:'إنشاء لوحة جديدة',
+      canvas_custom:'مقاس مخصّص…', canvas_name_ph:'اسم الخريطة', canvas_create:'إنشاء', canvas_import:'استيراد من ملف ‎.json',
+      canvas_saved_title:'اللوحات المحفوظة',
+      canvas_empty:'لا توجد لوحات محفوظة في هذا المتصفّح بعد. تظهر هنا تلقائيًا عند الضغط على «حفظ» داخل المحرِّر.',
+      canvas_open:'فتح', canvas_delete:'حذف', canvas_delete_confirm:'أتريد حذف هذه اللوحة؟ لا يمكن التراجع عن ذلك.',
+      canvas_unnamed:'خريطة بلا عنوان', tutorial_title:'الدليل',
+      tutorial_intro:'كلّ أداة في شريط الأدوات الجانبي تفتح إعداداتها الخاصّة في اللوحة المقابلة. في ما يلي ملخّص سريع لعمل كلّ أداة.',
+      community_title:'المجتمع', community_desc:'Wayborne Map Editor مشروع مفتوح المصدر ويتطوّر باستمرار.',
+      community_github_desc:'الشيفرة المصدرية وبلاغات الأخطاء والمساهمات', community_soon:'قريبًا',
+      lib_full:'مساحة تخزين المتصفّح ممتلئة — احذف لوحة قديمة أو صدِّرها بصيغة ‎.json.',
+      tut_h_select:'حدِّد الكائنات وانقلها ودوِّرها؛ Shift مع النقر للتحديد المتعدّد.',
+      tut_h_erase:'يمحو اليابسة المرسومة ونسيج التضاريس فوقها في خطوة واحدة.', tut_h_fill:'يملأ داخل خطّ ساحلي مغلق بنقرة واحدة.',
+      tut_h_river:'انقر لإضافة نقاط ورسم نهر؛ Enter للإنهاء.', tut_h_road:'انقر لإضافة نقاط ورسم طريق؛ Enter للإنهاء.',
+      sym_upload:'+ ارفع رمز PNG', sym_upload_done:'رمز/رموز حُمِّلت', sym_del:'حذف', sym_search:'ابحث في الرموز…', sym_recent:'المستخدمة مؤخرًا',
+      st_pos:'الموضع', st_zoom:'التقريب', st_size:'اللوحة', st_tool:'الأداة', cancel:'إلغاء', ok:'موافق',
+      locked:'الطبقة مقفلة أو مخفية.', needtext:'اكتب نصّ التسمية أولًا.', nopathnear:'لا يوجد نهر أو طريق قريب.',
+      fill_toolarge:'المنطقة كبيرة جدًا — جرِّب داخل حدّ مغلق.', exported:'صُدِّر:', saved:'حُفظ المشروع.',
+      loaded:'حُمِّل المشروع.', badfile:'ملف مشروع غير صالح.', newmap:'أُنشئت خريطة جديدة.',
+      confirmNew:'ستُلغى الخريطة الحالية. اختر حجم اللوحة:',
+      confirmSize:'تغيير حجم اللوحة يعيد تحجيم الطبقات الموجودة. أتريد المتابعة؟', histStart:'البداية', selNone:'لا شيء محدَّد',
+      symbols:'رمز', selScale:'شريط المقياس محدَّد', o_zorder:'ترتيب الطبقات', o_front:'إلى الأمام تمامًا',
+      o_back:'إلى الخلف تمامًا', o_fwd:'خطوة إلى الأمام', o_bwd:'خطوة إلى الخلف', o_group:'تجميع', o_ungroup:'فكّ التجميع',
+      selMulti:'كائن محدَّد', t_lake:'بحيرة', o_lake:'بحيرة', h_lake:'انقر لإضافة نقاط، ومع 3 نقاط أو أكثر اضغط Enter للإغلاق.',
+      t_territory:'منطقة', o_territory:'منطقة', o_territorycolor:'لون التعبئة', o_territorybcolor:'لون الحدّ',
+      h_territory:'انقر لإضافة نقاط، ومع 3 نقاط أو أكثر اضغط Enter للإغلاق.', t_regionlink:'رابط منطقة',
+      h_regionlink:'انقر على الخريطة وسمِّها: تُنشَأ خريطة منطقة جديدة فارغة. انقر نقرًا مزدوجًا على الدبّوس بأداة «تحديد» للدخول إليها، واستخدم «رجوع» في الأعلى للعودة إلى خريطة العالم.',
+      rl_newtitle:'خريطة منطقة جديدة', rl_placeholder:'اسم المنطقة', rl_default:'منطقة بلا اسم', rl_open:'ادخل المنطقة ←',
+      bc_back:'رجوع', bc_world:'خريطة العالم', t_resource:'مورد', o_resourcetype:'النوع', rs_mine:'منجم', rs_farm:'أرض زراعية',
+      rs_hunting:'أرض صيد', rs_fishing:'موضع صيد سمك', rs_trade:'مركز تجاري', rs_quarry:'محجر',
+      h_resource:'انقر على الخريطة لوضع علامة مورد من النوع المحدَّد.', o_lakecolor:'لون البحيرة', o_symbbrush:'وضع الفرشاة',
+      o_symbdensity:'الكثافة', o_clipland:'القصّ على اليابسة (فرشاة)', o_windrose:'وردة الرياح', o_wrvis:'إظهار على الخريطة',
+      o_wrsize:'الحجم', o_wrstyle_classic:'كلاسيكي', o_wrstyle_minimal:'مبسَّط', o_wrstyle:'النمط', o_wrcolor:'اللون',
+      h_windrose:'اسحب على الخريطة لتغيير الموضع.', o_snap:'محاذاة إلى الشبكة', o_snapsize:'حجم الشبكة', o_frame:'إطار الخريطة',
+      o_frame_none:'بلا', o_frame_simple:'خطّ بسيط', o_frame_rope:'حبل', o_frame_ornate:'مزخرف', o_frame_color:'اللون',
+      o_png2x:'PNG 2×', o_png4x:'PNG 4×'
+    },
     ru: {
       new:'Новый', open:'Открыть', save:'Сохранить', parchment:'Пергамент', grid:'Сетка', shore:'Берег',
       narrow_title:'Редактору нужен экран пошире', narrow_desc:'Редактор карт использует настольную раскладку: панель инструментов, холст и панель слоёв рядом. Требуется минимум 1024 × 600 пикселей.',
       narrow_hint:'На планшете попробуйте повернуть устройство горизонтально.', narrow_current:'Этот экран', narrow_back:'На главную',
+      o_gridsec:'Сетка', o_gridtype:'Тип', o_grid_square:'Квадрат', o_grid_hex:'Гексагон', o_grid_dot:'Точка', o_gridcell:'Размер ячейки', o_gridcolor:'Цвет', o_gridop:'Насыщенность', h_grid:'Включите сетку флажком «Сетка» вверху. Гексы — стандарт настольных ролевых игр.',
+      o_polsec:'Политическая карта', o_polmode:'Политический вид', o_polmute:'Приглушить текстуру рельефа', o_pollegend:'Показать легенду', o_polfill:'Плотность заливки', o_polcolors:'Назначить цвета государств', o_polname:'Название выбранного региона', o_polname_ph:'Название государства', h_political:'Политический вид — не отдельный слой; он показывает нарисованные регионы как государства.', m_polon:'Политический вид включён', m_poloff:'Физический вид', m_polcolored:'регионов раскрашено', m_polempty:'Сначала нарисуйте регион',
+      o_nameculture:'Культура', o_namefeature:'Тип', o_namegen:'🎲 Предложить имя', o_nf_settlement:'Поселение', o_nf_city:'Город', o_nf_river:'Река', o_nf_mountain:'Гора', o_nf_forest:'Лес', o_nf_region:'Регион', o_nf_lake:'Озеро', o_nf_sea:'Море',
+      tpl_title:'Начать с шаблона', tpl_desc:'Начните с готовой береговой линии, а затем стройте на ней свой мир.', tpl_ready:'холст готов',
+      tpl_continent:'Континент', tpl_continent_d:'Обширная суша с изрезанными берегами', tpl_island:'Остров', tpl_island_d:'Один большой остров в открытом море', tpl_archipelago:'Архипелаг', tpl_archipelago_d:'Разбросанные острова и мелкие проливы', tpl_kingdom:'Королевство', tpl_kingdom_d:'Мягкие берега, плодородные земли', tpl_battle:'Карта сражения', tpl_battle_d:'Небольшая местность с гексагональной сеткой', tpl_blank:'Пустой холст', tpl_blank_d:'Начать с нуля',
+      o_outlinecolor:'Цвет обводки',
+      exp_html_t:'HTML одним файлом', exp_print_t:'Печать / PDF', exp_png2_t:'Разрешение 2×', exp_png4_t:'Разрешение 4×', exp_maxdim:'Длинная сторона', exp_format:'Формат', exp_fmt_png:'PNG · чётко, большой файл', exp_fmt_jpeg:'JPEG · маленький файл', exp_title:'Заголовок', exp_html_help:'Скачивается один файл .html с картой и небольшим просмотрщиком внутри. Сервер не нужен — отправьте файл и откройте двойным щелчком.', exp_page:'Размер страницы', exp_orient:'Ориентация', exp_portrait:'Книжная', exp_landscape:'Альбомная', exp_margin:'Поля', exp_dpi:'Разрешение', exp_dpi_screen:'экран', exp_dpi_normal:'обычная печать', exp_dpi_high:'высокое качество', exp_print_help:'Откроется окно печати браузера. Оттуда можно напечатать или выбрать «Сохранить как PDF».', printing:'Подготовка к печати', print_failed:'Не удалось открыть окно печати', viewer_hint:'тяните · колесо · двойной щелчок', viewer_in:'Приблизить', viewer_out:'Отдалить', viewer_fit:'Вписать',
+      t_sketch:'Набросок', o_sketch:'Набросок', h_sketch:'Кисть свободного рисования работает только на слоях, которые вы добавили сами. Добавьте слой кнопкой «+ Добавить слой» в панели слоёв, выберите его в списке и рисуйте по карте.', o_hardness:'Жёсткость', o_sketch_eraser:'Режим ластика', sketch_target:'Целевой слой', sketch_need_layer:'Сначала добавьте свой слой и выберите его в списке', layer_add:'+ Добавить слой', h_add_layer:'Слои, добавленные вами, предназначены для свободного рисования; рисуйте по ним инструментом «Набросок».', layer_added:'Слой добавлен', layer_untitled:'Слой', layer_max:'Можно добавить не более 12 своих слоёв', layer_rename:'Название слоя', layer_rename_hint:'Дважды щёлкните, чтобы переименовать', layer_delete:'Удалить слой', layer_delete_confirm:'Удалить этот слой и всё нарисованное на нём?', tut_h_sketch:'Рисует от руки на слоях, добавленных вами; цвет, размер, жёсткость, непрозрачность и режим ластика настраиваются.',
+      o_typography:'Типографика', o_font:'Гарнитура', o_banner:'Лента', o_banner_none:'Нет', o_banner_ribbon:'Лента', o_banner_plate:'Табличка', o_banner_scroll:'Свиток', o_banner_stone:'Камень', o_caps:'Прописные', o_outline:'Обводка', o_shadow:'Тень', h_font_missing:'Эта гарнитура не установлена на устройстве; используется ближайшая замена. Пункты с · установлены.',
       grp_navigate:'Навигация', grp_terrain:'Рельеф', grp_water:'Вода и пути', grp_markers:'Метки', grp_regions:'Регионы и мера',
       t_select:'Выделение', t_landmass:'Суша', t_erase:'Море', t_fill:'Заливка', t_terrain:'Местность', t_symbol:'Символ',
-      t_river:'Река', t_road:'Дорога', t_label:'Надпись', t_pan:'Перемещение', t_eyedrop:'Пипетка', t_measure:'Измерить', h_measure:'Перетаскивайте по карте, чтобы вычислить реальное расстояние между двумя точками по масштабной линейке. Линии измерения можно выделять, перемещать или удалять; они не входят в экспорт PNG/SVG.', t_lasso:'Лассо', h_lasso:'Перетаскивайте, чтобы нарисовать замкнутую область: Суша + Местность + Рельеф поднимаются в ней вместе и становятся перемещаемыми. Перетаскивайте для перемещения, используйте верхний маркер для поворота. Enter — подтвердить, Escape — отменить, Delete — полностью удалить область.',
+      t_river:'Река', t_road:'Дорога', t_label:'Надпись', t_pan:'Перемещение', t_eyedrop:'Пипетка', t_measure:'Измерить', h_measure:'Щёлкайте, чтобы добавлять точки и измерять расстояние из нескольких отрезков. Enter / двойной щелчок — завершить, Escape — отменить. Линии измерения можно выделять, перемещать или удалять; они не входят в экспорт PNG/SVG.', t_lasso:'Лассо', h_lasso:'Перетаскивайте, чтобы нарисовать замкнутую область: Суша + Местность + Рельеф поднимаются в ней вместе и становятся перемещаемыми. Перетаскивайте для перемещения, используйте верхний маркер для поворота. Enter — подтвердить, Escape — отменить, Delete — полностью удалить область.',
       o_landmass:'Суша / Берег', o_brushsize:'Размер кисти', o_rough:'Неровность берега',
       o_landcolor:'Цвет суши', o_shorew:'Ширина берега', o_shorestyle:'Стиль берега', o_shore_sandy:'Песчаный', o_shore_rocky:'Скалистый', o_shore_reef:'Риф',
       o_smooth:'Сгладить берег', o_clearland:'Очистить сушу',
@@ -595,7 +838,7 @@
       h_pan:'ПКМ + перетаскивание, СКМ, Пробел + перетаскивание или стрелки для перемещения.',
       tab_layers:'Слои', tab_library:'Библиотека', tab_history:'История',
       ref_title:'Референс-изображение', ref_export:'Включить в экспорт', ref_clear:'Убрать референс', ref_trace:'Режим трассировки (показать сверху + привязка к береговой линии)', layer_drag_hint:'Перетащите отсюда, чтобы изменить порядок слоя', blend_sourceover:'Обычный', blend_multiply:'Умножение', blend_overlay:'Перекрытие', blend_softlight:'Мягкий свет', blend_screen:'Экран', nav_home:'Главная', nav_canvas:'Холст', nav_tutorial:'Обучение', nav_community:'Сообщество', home_tagline:'Редактор карт фэнтезийных миров прямо в браузере', home_desc:'Рисуйте границы суши и моря, закрашивайте леса и горы, размещайте замки и деревни, прокладывайте реки и дороги — всё на одном холсте, в браузере, без установки.', home_cta:'Начать карту', home_video_caption:'Видео скоро появится', canvas_new_title:'Создать новый холст', canvas_custom:'Свой размер…', canvas_name_ph:'Название карты', canvas_create:'Создать', canvas_import:'Импорт из файла .json', canvas_saved_title:'Сохранённые холсты', canvas_empty:'В этом браузере пока нет сохранённых холстов. Они появятся здесь автоматически после нажатия «Сохранить» в редакторе.', canvas_open:'Открыть', canvas_delete:'Удалить', canvas_delete_confirm:'Удалить этот холст? Это действие необратимо.', canvas_unnamed:'Карта без названия', tutorial_title:'Обучение', tutorial_intro:'Каждый инструмент на левой панели открывает свои настройки в правой панели. Ниже — краткое описание каждого инструмента.', community_title:'Сообщество', community_desc:'Wayborne Map Editor — проект с открытым исходным кодом, который постоянно развивается.', community_github_desc:'Исходный код, отчёты об ошибках и вклад в проект', community_soon:'Скоро', lib_full:'Хранилище браузера заполнено — удалите старый холст или экспортируйте его как .json.', tut_h_select:'Выделяйте, перемещайте и вращайте объекты; Shift+клик для множественного выбора.', tut_h_erase:'Стирает закрашенную сушу и текстуру местности на ней за один шаг.', tut_h_fill:'Заливает внутреннюю часть замкнутого контура побережья одним щелчком.', tut_h_river:'Щёлкайте, чтобы добавить точки и нарисовать реку; Enter — завершить.', tut_h_road:'Щёлкайте, чтобы добавить точки и нарисовать дорогу; Enter — завершить.',
-      sym_upload:'+ Загрузить PNG-символ', sym_upload_done:'символ(ов) загружено', sym_del:'Удалить', sym_search:'Поиск символов...',
+      sym_upload:'+ Загрузить PNG-символ', sym_upload_done:'символ(ов) загружено', sym_del:'Удалить', sym_search:'Поиск символов...', sym_recent:'Недавно использованные',
       st_pos:'Позиция', st_zoom:'Масштаб', st_size:'Холст', st_tool:'Инструмент',
       cancel:'Отмена', ok:'ОК',
       locked:'Слой заблокирован или скрыт.', needtext:'Сначала введите текст надписи.', nopathnear:'Река/дорога поблизости не найдена.', fill_toolarge:'Область слишком велика — попробуйте внутри замкнутой границы.',
@@ -629,7 +872,8 @@
     { code:'pt', flag:'🇵🇹', name:'Português' },
     { code:'nl', flag:'🇳🇱', name:'Nederlands' },
     { code:'pl', flag:'🇵🇱', name:'Polski' },
-    { code:'ru', flag:'🇷🇺', name:'Русский' }
+    { code:'ru', flag:'🇷🇺', name:'Русский' },
+    { code:'ar', flag:'🇸🇦', name:'العربية' }
   ];
 
   /* Rehber (Tutorial) sayfası — index.html'deki tool-rail ile AYNI gruplama
@@ -658,13 +902,31 @@
     { label:'grp_markers', tools:[
       { id:'symbol',     key:'S',     ico:'⛰︎', hint:'h_symbol' },
       { id:'resource',   key:'Y',     ico:'⛏︎', hint:'h_resource' },
-      { id:'label',      key:'L',     ico:'A', hint:'h_label' }
+      { id:'label',      key:'L',     ico:'A', hint:'h_label' },
+      { id:'sketch',     key:'N',     ico:'✎︎', hint:'tut_h_sketch' }
     ]},
     { label:'grp_regions', tools:[
       { id:'territory',  key:'G',     ico:'▧', hint:'h_territory' },
       { id:'regionlink', key:'M',     ico:'◈', hint:'h_regionlink' },
       { id:'measure',    key:'Q',     ico:'↔︎', hint:'h_measure' }
     ]}
+  ];
+
+  /* Klavye kısayolları ekranının "Genel" bölümü — araç kısayolları zaten
+     TUTORIAL_GROUPS'tan geliyor, burada yalnızca komut/gezinme tuşları. */
+  var SHORTCUT_GENERAL = [
+    { key:'Ctrl+Z',            label:'sc_undo' },
+    { key:'Ctrl+Shift+Z / Y',  label:'sc_redo' },
+    { key:'Ctrl+S',            label:'sc_save' },
+    { key:'↑ ↓ ← →',           label:'sc_pan' },
+    { key:'Shift+↑ ↓ ← →',     label:'sc_panfast' },
+    { key:'+ / -',             label:'sc_zoom' },
+    { key:'0',                 label:'sc_fit' },
+    { key:'Enter / çift tık',  label:'sc_finish' },
+    { key:'Esc',               label:'sc_cancel' },
+    { key:'Delete / Backspace',label:'sc_delete' },
+    { key:'[ / ]',             label:'sc_rotsym' },
+    { key:'?',                 label:'sc_help' }
   ];
 
   function $(id){ return document.getElementById(id); }
@@ -676,11 +938,23 @@
     scaleSnapshot:null,
     msgTimer:0,
 
-    t: function (k) { return (DICT[this.lang] && DICT[this.lang][k]) || DICT.tr[k] || k; },
+    /* Sağdan sola yazılan arayüz dilleri. */
+    RTL_LANGS: { ar:1, fa:1, he:1, ur:1 },
+    isRTL: function (lang) { return !!this.RTL_LANGS[lang || this.lang]; },
+
+    /* Çeviri yoksa: RTL/yeni diller İngilizce'ye düşer (Türkçe'ye değil),
+       çünkü İngilizce bu diller için ortak ikinci dil. */
+    t: function (k) {
+      var d = DICT[this.lang];
+      if (d && d[k] !== undefined) return d[k];
+      if (this.lang !== 'tr' && DICT.en[k] !== undefined) return DICT.en[k];
+      return DICT.tr[k] || k;
+    },
 
     init: function () {
       this.buildTerrainSwatches();
       this.buildLabelPresets();
+      this.buildFontList();
       this.buildSymbolLibrary();
       this.bindTopbar();
       this.bindTools();
@@ -702,10 +976,25 @@
       document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
         el.placeholder = self.t(el.getAttribute('data-i18n-placeholder'));
       });
+      /* Yalnız ikon taşıyan düğmelerde başlık aynı zamanda erişilebilir ad
+         olsun — ekran okuyucu için başka metin yok. */
+      document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+        var v = self.t(el.getAttribute('data-i18n-title'));
+        el.title = v;
+        if (!el.textContent.trim()) el.setAttribute('aria-label', v);
+      });
       document.documentElement.lang = this.lang;
+      /* Sağdan sola diller: yön <html>'e yazılır, düzen mantıksal
+         özelliklerle (padding-inline-start vb.) kendiliğinden aynalanır.
+         Editörün tuvali ve minimap'i her zaman soldan sağ kalır — harita
+         içeriği bir metin akışı değil. */
+      document.documentElement.dir = this.isRTL() ? 'rtl' : 'ltr';
       this.buildTerrainSwatches();
       this.buildLabelPresets();
+      this.buildFontList();
       this.buildSymbolLibrary();
+      this.buildCultureList();
+      this.buildTemplateGrid();
       this.buildLangMenu('lang-menu');
       this.buildLangMenu('lang-menu-shell');
       this.renderTutorial();
@@ -751,6 +1040,7 @@
       on('chk-shore', 'change', function (e) { Cv.shore = e.target.checked; Cv.requestRender(); });
       on('chk-parchment', 'change', function (e) { Cv.parchment = e.target.checked; Cv.requestRender(); });
       on('chk-grid', 'change', function (e) { Cv.grid = e.target.checked; Cv.requestRender(); });
+      on('chk-legend', 'change', function (e) { Cv.symbolLegend = e.target.checked; Cv.requestRender(); });
 
       on('sel-canvas-size', 'change', function (e) {
         var s = parseInt(e.target.value, 10);
@@ -817,38 +1107,172 @@
         e.target.value = '';
       });
 
-      /* cihaz çevrildiğinde / pencere boyutlandığında kapıyı senkronla —
-         yer açılırsa editöre kendiliğinden dön, daralırsa kapıya geç */
-      var rt = 0;
-      window.addEventListener('resize', function () {
-        clearTimeout(rt);
-        rt = setTimeout(function () { self.syncNarrowGate(); }, 150);
-      });
-
       this.renderTutorial();
+      this.buildTemplateGrid();
       this.refreshCanvasList();
-      this.showView('home');
+      if (!this.tryShowSharedMap()) this.showView('home');
     },
 
-    /* Editörün üç sütunlu yerleşimi için gereken en küçük viewport.
-       Bu ölçünün altında tuval sütunu (1fr) negatife düşüyor. */
-    EDITOR_MIN_W: 1024,
-    EDITOR_MIN_H: 600,
-
-    editorFits: function () {
-      return window.innerWidth >= this.EDITOR_MIN_W &&
-             window.innerHeight >= this.EDITOR_MIN_H;
+    /* URL hash'inde bir paylaşım linki bulunursa (bkz. Exporter.parseShareHash)
+       kabuğun geri kalanı yerine salt-okunur görüntüleyiciyi gösterir.
+       embed=1 ise kabuk gezinmesi de gizlenir — bir iframe'in içinden
+       başka hiçbir şey görünmesin diye. */
+    tryShowSharedMap: function () {
+      var data = Exporter.parseShareHash();
+      if (!data) return false;
+      $('share-title').textContent = data.title;
+      document.title = data.title + ' · Wayborne';
+      var img = $('share-img');
+      img.alt = data.title;
+      img.src = data.dataURI;
+      var view = $('view-share');
+      this._shareEmbed = !!data.embed;
+      if (data.embed) view.classList.add('embed');
+      this.bindShareViewer(data.w, data.h);
+      this.showView('share');
+      return true;
     },
 
-    /* Ekran editöre yetmiyorsa bozuk arayüz yerine açıklayıcı kapıyı göster.
-       Kullanıcı hangi görünümü istediğini _wantedView'da saklıyoruz ki
-       cihaz yatay çevrilip yer açıldığında oraya kendiliğinden dönebilelim. */
-    syncNarrowGate: function () {
-      var el = $('narrow-current-size');
-      if (el) el.textContent = window.innerWidth + ' × ' + window.innerHeight;
-      if (this._wantedView !== 'editor') return;
-      if (this._currentView === 'narrow' && this.editorFits()) this.showView('editor');
-      else if (this._currentView === 'editor' && !this.editorFits()) this.showView('narrow');
+    bindShareViewer: function (W, H) {
+      var stage = $('share-stage'), img = $('share-img');
+      var self = this;
+      var z = 1, ox = 0, oy = 0;
+
+      function apply() { img.style.transform = 'translate(' + ox + 'px,' + oy + 'px) scale(' + z + ')'; }
+      function fit() {
+        var p = 24;
+        var fz = Math.min((stage.clientWidth - p*2) / W, (stage.clientHeight - p*2) / H);
+        z = isFinite(fz) && fz > 0 ? fz : 1;
+        ox = (stage.clientWidth - W*z) / 2; oy = (stage.clientHeight - H*z) / 2;
+        apply();
+      }
+      function zoomAt(cx, cy, f) {
+        var nz = Math.max(0.02, Math.min(12, z*f));
+        ox = cx - (cx-ox)*(nz/z); oy = cy - (cy-oy)*(nz/z); z = nz; apply();
+      }
+      this._shareFit = fit;
+
+      if (this._shareViewerBound) { if (img.complete) fit(); else img.onload = fit; return; }
+      this._shareViewerBound = true;
+
+      stage.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        var r = stage.getBoundingClientRect();
+        zoomAt(e.clientX-r.left, e.clientY-r.top, e.deltaY < 0 ? 1.12 : 1/1.12);
+      }, { passive:false });
+      var down = false, px = 0, py = 0;
+      stage.addEventListener('pointerdown', function (e) {
+        down = true; px = e.clientX; py = e.clientY;
+        stage.classList.add('drag'); stage.setPointerCapture(e.pointerId);
+      });
+      stage.addEventListener('pointermove', function (e) {
+        if (!down) return;
+        ox += e.clientX-px; oy += e.clientY-py; px = e.clientX; py = e.clientY; apply();
+      });
+      stage.addEventListener('pointerup', function () { down = false; stage.classList.remove('drag'); });
+      stage.addEventListener('dblclick', function () { if (self._shareFit) self._shareFit(); });
+      $('share-zi').addEventListener('click', function () { zoomAt(stage.clientWidth/2, stage.clientHeight/2, 1.3); });
+      $('share-zo').addEventListener('click', function () { zoomAt(stage.clientWidth/2, stage.clientHeight/2, 1/1.3); });
+      $('share-zf').addEventListener('click', function () { if (self._shareFit) self._shareFit(); });
+      window.addEventListener('resize', function () { if (self._currentView === 'share' && self._shareFit) self._shareFit(); });
+
+      if (img.complete) fit(); else img.onload = fit;
+    },
+
+    /* navigator.clipboard güvenli bağlamda (https/localhost) çalışır;
+       yoksa gizli bir textarea + execCommand'a düşer. */
+    copyToClipboard: function (text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(function () {});
+        return;
+      }
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+    },
+
+    shareLinkDialog: function () {
+      var self = this;
+      var name = App.currentCanvasName || this.t('canvas_unnamed');
+      var body =
+        '<label class="row"><span>' + esc(this.t('exp_maxdim')) + '</span></label>' +
+        '<select id="sl-dim" class="sel">' +
+          '<option value="1024">1024 px</option>' +
+          '<option value="1600" selected>1600 px</option>' +
+          '<option value="2048">2048 px</option>' +
+        '</select>' +
+        '<button class="btn wide" id="sl-generate" style="margin-top:10px">' + esc(this.t('exp_share_gen')) + '</button>' +
+        '<div id="sl-result" style="display:none;margin-top:12px">' +
+          '<label class="row"><span>' + esc(this.t('exp_share_link')) + '</span></label>' +
+          '<div class="row2"><input type="text" id="sl-url" class="sel" readonly>' +
+            '<button class="btn" id="sl-copy-url">' + esc(this.t('copy')) + '</button></div>' +
+          '<p class="hint" id="sl-size-hint"></p>' +
+          '<label class="row" style="margin-top:10px"><span>' + esc(this.t('exp_share_embedcode')) + '</span></label>' +
+          '<div class="row2"><textarea id="sl-embed-code" class="sel" readonly rows="2" style="resize:none"></textarea>' +
+            '<button class="btn" id="sl-copy-embed">' + esc(this.t('copy')) + '</button></div>' +
+        '</div>' +
+        '<p class="hint">' + esc(this.t('exp_share_help')) + '</p>';
+
+      this.modal(this.t('exp_share_t'), body);
+
+      on('sl-generate', 'click', function () {
+        var url = Exporter.buildShareURL({
+          maxDim: parseInt($('sl-dim').value, 10) || 1600,
+          title: name
+        });
+        var kb = Math.round(url.length/1024);
+        $('sl-url').value = url;
+        $('sl-embed-code').value = Exporter.embedCode(url, 800, 600);
+        $('sl-size-hint').textContent = self.t('exp_share_sizehint').replace('{kb}', kb);
+        $('sl-result').style.display = '';
+        self.copyToClipboard(url);
+        self.msg(self.t('copied'));
+      });
+      on('sl-copy-url', 'click', function (e) {
+        e.preventDefault();
+        self.copyToClipboard($('sl-url').value);
+        self.msg(self.t('copied'));
+      });
+      on('sl-copy-embed', 'click', function (e) {
+        e.preventDefault();
+        self.copyToClipboard($('sl-embed-code').value);
+        self.msg(self.t('copied'));
+      });
+    },
+
+    /* Dar ekranlarda editör artık kapatılmıyor — #workspace ~860px altında
+       tek sütuna, sol/sağ paneller kayan çekmecelere dönüşür (bkz.
+       css/main.css'teki mobil kırılım noktası). MOBILE_BREAKPOINT bu eşiği
+       JS tarafında da bilir (ör. editöre ilk girişte panelleri varsayılan
+       kapalı başlatmak için). */
+    MOBILE_BREAKPOINT: 860,
+
+    isMobileViewport: function () {
+      return window.matchMedia && window.matchMedia('(max-width:' + this.MOBILE_BREAKPOINT + 'px)').matches;
+    },
+
+    /* Editöre ilk giriş dar bir viewport'taysa paneller varsayılan kapalı
+       başlar (tuval hemen görünür olsun diye) — yalnızca bir kez uygulanır,
+       kullanıcı elle açtıktan sonra tekrar dayatılmaz. */
+    _mobileDefaultApplied: false,
+    applyMobileDefaults: function () {
+      if (this._mobileDefaultApplied) return;
+      this._mobileDefaultApplied = true;
+      if (!this.isMobileViewport()) return;
+      var ws = $('workspace');
+      if (!ws) return;
+      ['left', 'right'].forEach(function (side) {
+        ws.classList.add('collapsed-' + side);
+        var btn = $(side === 'left' ? 'btn-toggle-left' : 'btn-toggle-right');
+        if (btn) {
+          btn.setAttribute('aria-expanded', 'false');
+          btn.textContent = side === 'left' ? '›' : '‹';
+        }
+      });
     },
 
     showView: function (name) {
@@ -856,24 +1280,20 @@
          böylece "Tuval" sekmesindeki kayıtlı tuvaller listesinde görünür */
       if (this._currentView === 'editor' && name !== 'editor') Exporter.autoSave();
 
-      /* 'narrow' kapının kendisi; kullanıcının asıl niyetini ezmemeli */
-      if (name !== 'narrow') this._wantedView = name;
-      if (name === 'editor' && !this.editorFits()) name = 'narrow';
-      if (name === 'narrow') {
-        var szEl = $('narrow-current-size');
-        if (szEl) szEl.textContent = window.innerWidth + ' × ' + window.innerHeight;
-      }
-
+      this._wantedView = name;
       this._currentView = name;
       document.querySelectorAll('.shell-view').forEach(function (v) { v.classList.add('hidden'); });
       var target = $('view-' + name);
       if (target) target.classList.remove('hidden');
       document.querySelectorAll('.shell-tab').forEach(function (t) {
-        t.classList.toggle('active', t.getAttribute('data-view-link') === name);
+        var on = t.getAttribute('data-view-link') === name;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
       });
-      if ($('shell-nav')) $('shell-nav').classList.toggle('hidden', name === 'editor');
+      if ($('shell-nav')) $('shell-nav').classList.toggle('hidden', name === 'editor' || (name === 'share' && this._shareEmbed));
       if (name === 'canvas') this.refreshCanvasList();
       if (name === 'editor') {
+        this.applyMobileDefaults();
         /* editör gizliyken canvas 0×0 rapor ediyordu — görünür olduktan
            sonra viewport ölçülerini yeniden hesapla ve sığdır */
         requestAnimationFrame(function () { Cv.resize(); Cv.fit(); Cv.requestRender(); });
@@ -892,12 +1312,19 @@
         card.className = 'cv-card';
         var nameEl = document.createElement('div'); nameEl.className = 'cv-card-name';
         var metaEl = document.createElement('div'); metaEl.className = 'cv-card-meta';
-        var thumb = document.createElement('div'); thumb.className = 'cv-card-thumb'; thumb.textContent = '⚔';
+        var thumb = document.createElement('div'); thumb.className = 'cv-card-thumb';
+        if (entry.thumb) {
+          var img = document.createElement('img'); img.src = entry.thumb; img.alt = entry.name; img.loading = 'lazy';
+          thumb.appendChild(img);
+        } else {
+          thumb.textContent = '⚔';
+        }
         var actions = document.createElement('div'); actions.className = 'cv-card-actions';
         var openBtn = document.createElement('button'); openBtn.textContent = self.t('canvas_open');
         var delBtn = document.createElement('button'); delBtn.textContent = self.t('canvas_delete');
         nameEl.textContent = entry.name;
-        metaEl.textContent = entry.W + '×' + entry.H + ' · ' + new Date(entry.updatedAt).toLocaleDateString();
+        var d = new Date(entry.updatedAt);
+        metaEl.textContent = entry.W + '×' + entry.H + ' · ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
         actions.appendChild(openBtn); actions.appendChild(delBtn);
         card.appendChild(thumb); card.appendChild(nameEl); card.appendChild(metaEl); card.appendChild(actions);
 
@@ -943,6 +1370,134 @@
           row.appendChild(ico); row.appendChild(body);
           box.appendChild(row);
         });
+      });
+    },
+
+    /* ================= başlangıç şablonları =================
+       Boş tuval yaratıcı araçlarda en büyük terk sebebidir. Şablonlar
+       mevcut prosedürel kara üretecini (Tools.generateLandmass) hazır
+       ayarlarla çağırır — yeni bir mekanik değil, var olanın önü. */
+    TEMPLATES: [
+      { key:'continent',   tpl:'continent',   rough:0.50, terrain:'grassland', grid:null },
+      { key:'island',      tpl:'island',      rough:0.55, terrain:'forest',    grid:null },
+      { key:'archipelago', tpl:'archipelago', rough:0.62, terrain:'coast',     grid:null },
+      { key:'kingdom',     tpl:'continent',   rough:0.38, terrain:'farmland',  grid:null },
+      { key:'battle',      tpl:'island',      rough:0.30, terrain:'grassland', grid:'hex' },
+      { key:'blank',       tpl:null,          rough:0,    terrain:null,        grid:null }
+    ],
+
+    buildTemplateGrid: function () {
+      var grid = $('tpl-grid');
+      if (!grid) return;
+      var self = this;
+      grid.innerHTML = '';
+      this.TEMPLATES.forEach(function (t) {
+        var card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'tpl-card';
+        var cv = document.createElement('canvas');
+        cv.width = 150; cv.height = 96;
+        self.drawTemplateThumb(cv, t);
+        var nm = document.createElement('span'); nm.className = 'tpl-name';
+        nm.textContent = self.t('tpl_' + t.key);
+        var sb = document.createElement('span'); sb.className = 'tpl-sub';
+        sb.textContent = self.t('tpl_' + t.key + '_d');
+        card.appendChild(cv); card.appendChild(nm); card.appendChild(sb);
+        card.addEventListener('click', function () { self.applyTemplate(t); });
+        grid.appendChild(card);
+      });
+    },
+
+    /* Küçük, tohumlanmış bir önizleme — gerçek üreteci çağırmadan
+       şablonun karakterini gösterir (kart başına tam üretim pahalı olurdu). */
+    drawTemplateThumb: function (cv, t) {
+      var c = cv.getContext('2d'), W = cv.width, H = cv.height;
+      c.fillStyle = '#3f6b74'; c.fillRect(0,0,W,H);
+      if (!t.tpl) {
+        c.fillStyle = 'rgba(255,255,255,0.10)';
+        c.fillRect(0,0,W,H);
+        return;
+      }
+      var seed = t.key.length * 7919;
+      function rnd() { seed = (seed*1664525 + 1013904223) >>> 0; return seed/4294967296; }
+      c.fillStyle = '#e6d09a';
+      var blobs = t.tpl === 'archipelago' ? 6 : (t.tpl === 'island' ? 2 : 3);
+      for (var i = 0; i < blobs; i++) {
+        var cx = W*(0.28 + rnd()*0.44), cy = H*(0.28 + rnd()*0.44);
+        var rx = W*(t.tpl === 'archipelago' ? 0.07+rnd()*0.06 : 0.20+rnd()*0.12);
+        var ry = rx*(0.7+rnd()*0.5);
+        c.beginPath(); c.ellipse(cx, cy, rx, ry, rnd()*Math.PI, 0, Math.PI*2); c.fill();
+      }
+      if (t.grid === 'hex') {
+        c.strokeStyle = 'rgba(30,40,30,0.35)'; c.lineWidth = 1;
+        for (var y = 8; y < H; y += 16) {
+          for (var x = (y/16 % 2 ? 10 : 2); x < W; x += 18) {
+            c.beginPath();
+            for (var k = 0; k < 6; k++) {
+              var a = Math.PI/180 * (60*k - 30);
+              var px = x + 8*Math.cos(a), py = y + 8*Math.sin(a);
+              k ? c.lineTo(px,py) : c.moveTo(px,py);
+            }
+            c.closePath(); c.stroke();
+          }
+        }
+      }
+    },
+
+    applyTemplate: function (t) {
+      var preset = $('cv-size-preset'), w, h;
+      if (preset && preset.value === 'custom') {
+        w = Math.max(256, Math.min(16384, parseInt($('cv-w').value,10) || 2048));
+        h = Math.max(256, Math.min(16384, parseInt($('cv-h').value,10) || 2048));
+      } else { w = h = parseInt((preset && preset.value) || '2048', 10); }
+      var name = ($('cv-name').value || '').trim() || this.t('tpl_' + t.key);
+
+      Exporter.newProject(w, h, name);
+
+      if (t.tpl) {
+        Tools.generateLandmass(t.tpl, t.rough, Math.floor(Math.random()*4294967296));
+        if (t.terrain) App.terrain.type = t.terrain;
+      }
+      if (t.grid) { Cv.grid = true; Cv.gridType = t.grid; }
+      var cg = $('chk-grid'); if (cg) cg.checked = Cv.grid;
+      var gt = $('grid-type'); if (gt) gt.value = Cv.gridType;
+
+      Cv.shoreDirty = true;
+      Cv.requestRender();
+      this.showView('editor');
+      this.msg(this.t('tpl_' + t.key) + ' — ' + this.t('tpl_ready'));
+    },
+
+    /* ================= fantastik ad üreteci ================= */
+    buildCultureList: function () {
+      var sel = $('nm-culture');
+      if (!sel || !global.Names) return;
+      var cur = sel.value;
+      sel.innerHTML = '';
+      Names.cultureList(this.lang).forEach(function (c) {
+        var o = document.createElement('option');
+        o.value = c.key; o.textContent = c.name;
+        sel.appendChild(o);
+      });
+      if (cur) sel.value = cur;
+    },
+
+    suggestNames: function () {
+      var box = $('nm-suggest');
+      if (!box || !global.Names) return;
+      var culture = ($('nm-culture') || {}).value || 'western';
+      var feature = ($('nm-feature') || {}).value || 'settlement';
+      var list = Names.generateMany(culture, feature, this.lang, 6);
+      box.innerHTML = '';
+      list.forEach(function (nm) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = nm;
+        b.addEventListener('click', function () {
+          var ta = $('lb-text');
+          if (ta) { ta.value = nm; ta.dispatchEvent(new Event('input', { bubbles:true })); }
+        });
+        box.appendChild(b);
       });
     },
 
@@ -997,7 +1552,9 @@
       App.tool = name;
       Tools.cancelPath();
       document.querySelectorAll('.tool').forEach(function (b) {
-        b.classList.toggle('active', b.getAttribute('data-tool') === name);
+        var on = b.getAttribute('data-tool') === name;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
       document.querySelectorAll('.opt-group').forEach(function (g) {
         g.classList.toggle('show', g.getAttribute('data-for').split(' ').indexOf(name) >= 0);
@@ -1008,6 +1565,7 @@
       });
       Cv.view.className = (name === 'pan') ? 'pan' : (name === 'select' ? 'pick' : '');
       if (name === 'symbol') this.showTab('library');
+      if (name === 'sketch') { this.showTab('layers'); this.syncSketchTarget(); }
       this.status();
       Cv.requestRender();
     },
@@ -1087,6 +1645,11 @@
                  function (v) { return (v/100).toFixed(2); });
       on('tr-clip', 'change', function (e) { App.terrain.clip = e.target.checked; });
       on('btn-clear-terrain', 'click', function () { Tools.clearRasterLayer('terrain'); });
+      on('btn-biomegen', 'click', function () {
+        self.modal(self.t('o_biomegen'), '<p>' + self.t('h_biomegen') + '</p>', function () {
+          Tools.autoBiome(Math.floor(Math.random()*4294967296));
+        });
+      });
 
       /* --- yükselti --- */
       this.range('el-size', 'v-el-size', function (v) { App.elevation.brushSize = v; });
@@ -1129,6 +1692,9 @@
         if (self.selIs('symbols')) Tools.applyToSelection({ wear:v/100 });
       }, function (v) { return (v/100).toFixed(2); });
       on('sy-jitter', 'change', function (e) { App.symbol.jitter = e.target.checked; });
+      on('btn-settlegen', 'click', function () {
+        Tools.autoSettle(null, Math.floor(Math.random()*4294967296));
+      });
 
       /* --- nehir --- */
       this.range('rv-w', 'v-rv-w', function (v) {
@@ -1149,6 +1715,9 @@
         App.river.color = e.target.value;
         if (self.selIs('rivers')) Tools.applyToSelection({ color:e.target.value });
       });
+      on('btn-rivergen', 'click', function () {
+        Tools.generateRivers(null, Math.floor(Math.random()*4294967296));
+      });
 
       /* --- yol --- */
       on('rd-style', 'change', function (e) {
@@ -1165,6 +1734,12 @@
         App.road.color = e.target.value;
         if (self.selIs('roads')) Tools.applyToSelection({ color:e.target.value });
       });
+      on('btn-roadgen', 'click', function () {
+        Tools.generateRoads(Math.floor(Math.random()*4294967296));
+      });
+
+      /* --- ölçüm --- */
+      on('ms-area', 'change', function (e) { App.measure.area = e.target.checked; });
 
       /* --- etiket --- */
       function labelEdit(props) { if (self.selIs('labels')) Tools.applyToSelection(props); }
@@ -1202,7 +1777,47 @@
         self.drawLabelPreview();
         Cv.requestRender();
       });
+      on('lb-font', 'change', function (e) {
+        App.label.font = e.target.value;
+        labelEdit({ font:e.target.value });
+        self.syncFontNote();
+        self.drawLabelPreview();
+        Cv.requestRender();
+      });
+      on('lb-banner', 'change', function (e) {
+        var v = e.target.value || null;
+        App.label.banner = v;
+        labelEdit({ banner:v });
+        self.drawLabelPreview();
+        Cv.requestRender();
+      });
+      ['caps', 'outline', 'shadow'].forEach(function (k) {
+        on('lb-' + k, 'change', function (e) {
+          var props = {}; props[k] = e.target.checked;
+          App.label[k] = e.target.checked;
+          if (k === 'outline' && $('lb-outline-color')) $('lb-outline-color').disabled = !e.target.checked;
+          labelEdit(props);
+          self.drawLabelPreview();
+          Cv.requestRender();
+        });
+      });
+      on('lb-outline-color', 'input', function (e) {
+        App.label.outlineColor = e.target.value;
+        labelEdit({ outlineColor:e.target.value });
+        self.drawLabelPreview();
+        Cv.requestRender();
+      });
       on('lb-snap-path', 'change', function (e) { App.label.snapPath = e.target.checked; });
+
+      /* --- çizim (kullanıcı katmanı fırçası) --- */
+      on('btn-add-layer', 'click', function () { self.addLayer(); });
+      on('sk-color', 'input', function (e) { App.sketch.color = e.target.value; });
+      this.range('sk-size', 'v-sk-size', function (v) { App.sketch.size = v; });
+      this.range('sk-hard', 'v-sk-hard', function (v) { App.sketch.hardness = v/100; },
+                 function (v) { return (v/100).toFixed(2); });
+      this.range('sk-op', 'v-sk-op', function (v) { App.sketch.opacity = v/100; },
+                 function (v) { return (v/100).toFixed(2); });
+      on('sk-eraser', 'change', function (e) { App.sketch.eraser = e.target.checked; });
 
       /* --- örnekleyici --- */
       on('eye-r', 'input', function (e) {
@@ -1284,6 +1899,33 @@
         App.territory.color = e.target.value;
         terrEdit({ color:e.target.value });
       });
+
+      /* --- siyasi harita görünümü --- */
+      on('pol-on', 'change', function (e) {
+        Cv.political = e.target.checked;
+        Cv.requestRender();
+        UI.msg(e.target.checked ? UI.t('m_polon') : UI.t('m_poloff'));
+      });
+      on('pol-mute', 'change', function (e) { Cv.politicalMuteTerrain = e.target.checked; Cv.requestRender(); });
+      on('pol-legend', 'change', function (e) { Cv.politicalLegend = e.target.checked; Cv.requestRender(); });
+      self.range('pol-fill', 'v-pol-fill', function (v) { Cv.politicalFill = v/100; Cv.requestRender(); },
+                 function (v) { return (v/100).toFixed(2); });
+      on('btn-pol-colors', 'click', function () {
+        var L = Layers.get('territories');
+        var before = JSON.parse(JSON.stringify(L.objects));
+        var n = Cv.assignPoliticalColors();
+        if (!n) { UI.msg(UI.t('m_polempty')); return; }
+        History.pushVector('territories', before, JSON.parse(JSON.stringify(L.objects)), 'political-colors');
+        UI.refreshHistory();
+        Cv.requestRender();
+        self.refreshTerritoryList();
+        UI.msg(n + ' ' + UI.t('m_polcolored'));
+      });
+      on('tt-name', 'input', function (e) { terrEdit({ name: e.target.value }); self.refreshTerritoryList(); });
+
+      /* --- fantastik ad üreteci --- */
+      self.buildCultureList();
+      on('btn-nm-gen', 'click', function () { self.suggestNames(); });
       this.range('tt-op', 'v-tt-op', function (v) {
         App.territory.opacity = v/100;
         terrEdit({ opacity:v/100 });
@@ -1314,6 +1956,13 @@
       on('wr-color', 'input', function (e) { App.windrose.color = e.target.value; Cv.requestRender(); });
 
       /* --- snap --- */
+      /* --- ızgara (kare / altıgen / nokta) --- */
+      on('grid-type', 'change', function (e) { Cv.gridType = e.target.value; Cv.requestViewRender(); });
+      on('grid-color', 'input', function (e) { Cv.gridColor = e.target.value; Cv.requestViewRender(); });
+      self.range('grid-size', 'v-grid-size', function (v) { Cv.gridSize = Math.round(v); Cv.requestViewRender(); });
+      self.range('grid-op', 'v-grid-op', function (v) { Cv.gridOpacity = v/100; Cv.requestViewRender(); },
+                 function (v) { return (v/100).toFixed(2); });
+
       on('snap-enabled', 'change', function (e) { App.snap.enabled = e.target.checked; });
       self.range('snap-size', 'v-snap-size', function (v) { App.snap.size = Math.round(v); });
 
@@ -1325,6 +1974,9 @@
       /* --- PNG export ölçeği --- */
       on('btn-export-png2', 'click', function () { Exporter.png(2); });
       on('btn-export-png4', 'click', function () { Exporter.png(4); });
+      on('btn-export-html', 'click', function () { self.htmlExportDialog(); });
+      on('btn-share-link', 'click', function () { self.shareLinkDialog(); });
+      on('btn-print', 'click', function () { self.printDialog(); });
 
       /* --- görünüm --- */
       on('btn-fit', 'click', function () { Cv.fit(); });
@@ -1387,6 +2039,32 @@
       });
     },
 
+    /* Yazı ailesi listesi. Sistemde kurulu olmayan aileler işaretlenir —
+       proje harici font yüklemediği için kullanıcı ne göreceğini bilmeli. */
+    buildFontList: function () {
+      var sel = $('lb-font');
+      if (!sel) return;
+      var self = this, cur = App.label.font;
+      sel.innerHTML = '';
+      FONT_LIST.forEach(function (f) {
+        var o = document.createElement('option');
+        o.value = f.key;
+        var nm = i18nName('font_' + f.key, f.tr, f.en, self.lang);
+        o.textContent = nm + (fontAvailable(f.key) ? ' ·' : '');
+        sel.appendChild(o);
+      });
+      sel.value = FONTS[cur] ? cur : 'serif';
+      this.syncLabelType(App.label);
+    },
+
+    /* Seçili aile bu cihazda yoksa küçük bir not göster. */
+    syncFontNote: function () {
+      var note = $('lb-font-note');
+      if (!note) return;
+      var ok = fontAvailable(App.label.font);
+      note.classList.toggle('hidden', ok);
+    },
+
     /* ================= etiket şablonları ================= */
     buildLabelPresets: function () {
       var sel = $('lb-preset');
@@ -1420,6 +2098,19 @@
       $('lb-size').value = p.size;   $('v-lb-size').textContent = p.size;
       $('lb-track').value = p.track; $('v-lb-track').textContent = p.track;
       $('lb-color').value = p.color;
+      this.syncLabelType(p);
+    },
+
+    /* Tipografi kutucuklarını bir etiket/preset nesnesinden tazele */
+    syncLabelType: function (o) {
+      var f = $('lb-font');           if (f) f.value = FONTS[o.font] ? o.font : 'serif';
+      var b = $('lb-banner');         if (b) b.value = o.banner || '';
+      var c = $('lb-caps');           if (c) c.checked = !!o.caps;
+      var ol = $('lb-outline');       if (ol) ol.checked = !!o.outline;
+      var oc = $('lb-outline-color');
+      if (oc) { oc.value = o.outlineColor || '#f5ecd8'; oc.disabled = !o.outline; }
+      var sh = $('lb-shadow');        if (sh) sh.checked = !!o.shadow;
+      this.syncFontNote();
     },
 
     drawLabelPreview: function () {
@@ -1456,11 +2147,35 @@
       });
       on('sym-cat', 'change', function () { $('sym-search').value = ''; self.renderSymbolGrid(); });
       on('sym-search', 'input', function () { self.renderSymbolGrid(); });
+
+      on('btn-todo-add', 'click', function () { self.addTodo(); });
+      on('todo-input', 'keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); self.addTodo(); } });
+
+      on('btn-toggle-left', 'click', function () { self.togglePanel('left'); });
+      on('btn-toggle-right', 'click', function () { self.togglePanel('right'); });
+    },
+
+    /* Sol/sağ paneli kapatıp açar (bkz. main.css #workspace.collapsed-*).
+       Tuval alanını büyütmek ya da dar ekranlarda yer açmak için kullanılır;
+       kolçak düğmesi panelin dışında olduğu için kapalıyken de erişilebilir. */
+    togglePanel: function (side) {
+      var ws = $('workspace'), cls = 'collapsed-' + side;
+      var btn = $(side === 'left' ? 'btn-toggle-left' : 'btn-toggle-right');
+      var collapsed = ws.classList.toggle(cls);
+      if (btn) {
+        btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        var openGlyph = side === 'left' ? '‹' : '›';
+        var closedGlyph = side === 'left' ? '›' : '‹';
+        btn.textContent = collapsed ? closedGlyph : openGlyph;
+      }
+      requestAnimationFrame(function () { Cv.resize(); Cv.requestRender(); });
     },
 
     showTab: function (name) {
       document.querySelectorAll('.tab').forEach(function (t) {
-        t.classList.toggle('active', t.getAttribute('data-tab') === name);
+        var on = t.getAttribute('data-tab') === name;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
       });
       document.querySelectorAll('.tab-body').forEach(function (b) {
         b.classList.toggle('hidden', b.getAttribute('data-tab') !== name);
@@ -1495,6 +2210,40 @@
     },
 
     /* ================= sembol kütüphanesi ================= */
+    RECENT_SYM_KEY: 'wayborne_recent_symbols',
+    RECENT_SYM_MAX: 12,
+
+    loadRecentSymbols: function () {
+      try {
+        var raw = localStorage.getItem(this.RECENT_SYM_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) { return []; }
+    },
+
+    /* Bir sembol kütüphaneden seçildiğinde (fırça için aktif olsun ya da
+       doğrudan yerleştirilsin) en başa taşınır — böylece "son kullanılan"
+       tepsisi her zaman gerçekten kullanılanları, en yeniden en eskiye
+       gösterir. localStorage'a yazılır (oturumlar arası kalıcı). */
+    pushRecentSymbol: function (id) {
+      if (!id || Sym.isCustom(id)) return; /* özel semboller kendi ızgarasında zaten görünür */
+      var list = this.loadRecentSymbols().filter(function (x) { return x !== id; });
+      list.unshift(id);
+      if (list.length > this.RECENT_SYM_MAX) list.length = this.RECENT_SYM_MAX;
+      try { localStorage.setItem(this.RECENT_SYM_KEY, JSON.stringify(list)); } catch (e) {}
+      this.renderRecentSymGrid();
+    },
+
+    renderRecentSymGrid: function () {
+      var bar = $('sym-recent-bar'), grid = $('sym-recent-grid');
+      if (!bar || !grid) return;
+      var list = this.loadRecentSymbols().map(function (id) { return Sym.get(id); }).filter(Boolean);
+      if (!list.length) { bar.style.display = 'none'; return; }
+      bar.style.display = '';
+      grid.innerHTML = '';
+      var self = this;
+      list.forEach(function (def) { grid.appendChild(self.makeSymCell(grid, def)); });
+    },
+
     buildSymbolLibrary: function () {
       var sel = $('sym-cat');
       if (!sel) return;
@@ -1510,6 +2259,7 @@
       });
       sel.value = cur && Sym.SYMBOLS[cur] ? cur : 'castles';
       this.renderSymbolGrid();
+      this.renderRecentSymGrid();
     },
 
     makeSymCell: function (grid, def) {
@@ -1525,10 +2275,10 @@
       cell.appendChild(s);
       cell.addEventListener('click', function () {
         App.symbol.id = def.id;
-        grid.querySelectorAll('.sym-cell').forEach(function (e) { e.classList.remove('active'); });
-        document.querySelectorAll('#custom-sym-grid .sym-cell').forEach(function (e) { e.classList.remove('active'); });
+        document.querySelectorAll('.sym-grid .sym-cell').forEach(function (e) { e.classList.remove('active'); });
         cell.classList.add('active');
         self.setTool('symbol');
+        self.pushRecentSymbol(def.id);
       });
       return cell;
     },
@@ -1674,6 +2424,35 @@
         name.textContent = Layers.name(l, self.lang);
 
         top.appendChild(vis); top.appendChild(lock); top.appendChild(name);
+
+        /* Kullanıcı katmanı: adı çift tıkla değiştir, × ile sil. Yerleşik
+           katmanlarda bu düğmeler yok — adları çeviriden gelir ve
+           silinemezler. */
+        if (l.custom) {
+          name.title = self.t('layer_rename_hint');
+          name.classList.add('renamable');
+          name.addEventListener('dblclick', function (e) {
+            e.stopPropagation();
+            var v = prompt(self.t('layer_rename'), Layers.name(l, self.lang));
+            if (v === null) return;
+            Layers.rename(l.id, v.trim() || self.t('layer_untitled'));
+            self.refreshLayers(); self.syncSketchTarget();
+          });
+          var del = document.createElement('button');
+          del.className = 'li-btn li-del';
+          del.textContent = '×';
+          del.title = self.t('layer_delete');
+          del.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (!confirm(self.t('layer_delete_confirm'))) return;
+            var snap = Layers.snapshotLayer(l);
+            Layers.removeCustom(l.id);
+            History.pushLayerRemove(snap, 'layer:remove');
+            self.refreshLayers(); self.refreshHistory(); self.syncSketchTarget(); Cv.requestRender();
+          });
+          top.appendChild(del);
+        }
+
         li.appendChild(top);
 
         var op = document.createElement('input');
@@ -1708,7 +2487,7 @@
           li.appendChild(blendSel);
         }
 
-        li.addEventListener('click', function () { Layers.active = l.id; self.refreshLayers(); });
+        li.addEventListener('click', function () { Layers.active = l.id; self.refreshLayers(); self.syncSketchTarget(); });
 
         li.addEventListener('dragover', function (e) { e.preventDefault(); li.classList.add('drag-over'); });
         li.addEventListener('dragleave', function () { li.classList.remove('drag-over'); });
@@ -1728,6 +2507,147 @@
     },
 
     /* ================= geçmiş ================= */
+    /* ================= bölgeler paneli (siyasi bölgeler + harita ağacı) ================= */
+    refreshRegionsPanel: function () {
+      this.refreshTerritoryList();
+      this.refreshMapTree();
+    },
+
+    refreshTerritoryList: function () {
+      var ul = $('territory-list'), hint = $('territory-empty-hint');
+      if (!ul) return;
+      var self = this;
+      var L = Layers.get('territories');
+      var items = (L ? L.objects : []).filter(function (o) { return o.name; });
+      ul.innerHTML = '';
+      if (hint) hint.style.display = items.length ? 'none' : '';
+      items.forEach(function (o) {
+        var li = document.createElement('li');
+        li.className = 'territory-item';
+        var sw = document.createElement('span');
+        sw.className = 'territory-swatch';
+        sw.style.background = o.color || '#8a5a3a';
+        var name = document.createElement('span');
+        name.className = 'territory-name';
+        name.textContent = o.name;
+        li.appendChild(sw); li.appendChild(name);
+        li.addEventListener('click', function () {
+          self.setTool('territory');
+          App.selection = { layerId:'territories', id:o.id };
+          self.refreshSelection();
+          if (o.pts && o.pts.length) {
+            var cx = 0, cy = 0;
+            o.pts.forEach(function (p) { cx += p[0]; cy += p[1]; });
+            Cv.centerOn(cx/o.pts.length, cy/o.pts.length);
+          }
+          Cv.requestRender();
+        });
+        ul.appendChild(li);
+      });
+    },
+
+    /* Harita ağacını (App.buildMapTree) girintili, tıklanabilir bir listeye
+       çizer. Aktif haritayı vurgular; tıklanan düğüme App.jumpToMap ile
+       doğrudan atlar (ara adımlardan geçmeye gerek yok). */
+    refreshMapTree: function () {
+      var ul = $('maptree-list');
+      if (!ul) return;
+      var self = this;
+      var tree = App.buildMapTree();
+      ul.innerHTML = '';
+
+      function render(node, depth) {
+        var li = document.createElement('li');
+        li.className = 'maptree-item' + (node.id === App.currentMapId ? ' cur' : '');
+        li.style.paddingInlineStart = (7 + depth*16) + 'px';
+        var ico = document.createElement('span');
+        ico.className = 'maptree-ico';
+        ico.textContent = depth === 0 ? '⌂' : '◈';
+        var name = document.createElement('span');
+        name.className = 'maptree-name';
+        name.textContent = depth === 0 ? App.currentCanvasName : (node.label || self.t('rl_default'));
+        li.appendChild(ico); li.appendChild(name);
+        if (node.children.length) {
+          var count = document.createElement('span');
+          count.className = 'maptree-count';
+          count.textContent = node.children.length;
+          li.appendChild(count);
+        }
+        li.addEventListener('click', function () { App.jumpToMap(node.id); });
+        ul.appendChild(li);
+        node.children.forEach(function (c) { render(c, depth+1); });
+      }
+      render(tree, 0);
+    },
+
+    /* ================= yapılacaklar listesi ================= */
+    /* Tarayıcı localStorage'ında tek bir JSON dizi olarak tutulur — kütüphane
+       (Exporter.libList) ile aynı upsert/tam-yeniden-yaz deseni. Proje/harita
+       başına değil, tüm oturum için tek liste (kasıtlı olarak global). */
+    TODO_KEY: 'wayborne_todos',
+
+    _loadTodos: function () {
+      try { return JSON.parse(localStorage.getItem(this.TODO_KEY) || '[]'); }
+      catch (e) { return []; }
+    },
+    _saveTodos: function (arr) {
+      try { localStorage.setItem(this.TODO_KEY, JSON.stringify(arr)); } catch (e) {}
+    },
+
+    addTodo: function () {
+      var input = $('todo-input');
+      if (!input) return;
+      var text = input.value.trim();
+      if (!text) return;
+      var todos = this._loadTodos();
+      var id = 't' + Date.now().toString(36) + Math.floor(Math.random()*1e6).toString(36);
+      todos.push({ id: id, text: text, done: false, createdAt: Date.now() });
+      this._saveTodos(todos);
+      input.value = '';
+      this.refreshTodoList();
+    },
+    toggleTodo: function (id) {
+      var todos = this._loadTodos();
+      var t = todos.filter(function (o) { return o.id === id; })[0];
+      if (!t) return;
+      t.done = !t.done;
+      this._saveTodos(todos);
+      this.refreshTodoList();
+    },
+    deleteTodo: function (id) {
+      var todos = this._loadTodos().filter(function (o) { return o.id !== id; });
+      this._saveTodos(todos);
+      this.refreshTodoList();
+    },
+
+    refreshTodoList: function () {
+      var ul = $('todo-list'), hint = $('todo-empty-hint');
+      if (!ul) return;
+      var self = this;
+      var todos = this._loadTodos();
+      ul.innerHTML = '';
+      if (hint) hint.style.display = todos.length ? 'none' : '';
+      todos.forEach(function (o) {
+        var li = document.createElement('li');
+        li.className = 'todo-item' + (o.done ? ' done' : '');
+        var chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.className = 'todo-check';
+        chk.checked = !!o.done;
+        chk.addEventListener('change', function () { self.toggleTodo(o.id); });
+        var txt = document.createElement('span');
+        txt.className = 'todo-text';
+        txt.textContent = o.text;
+        var del = document.createElement('button');
+        del.className = 'todo-del';
+        del.type = 'button';
+        del.textContent = '×';
+        del.addEventListener('click', function () { self.deleteTodo(o.id); });
+        li.appendChild(chk); li.appendChild(txt); li.appendChild(del);
+        ul.appendChild(li);
+      });
+    },
+
     refreshHistory: function () {
       var ul = $('history-list');
       if (!ul) return;
@@ -1821,6 +2741,7 @@
         $('lb-track').value = o.track;  $('v-lb-track').textContent = o.track;
         $('lb-rot').value = o.rot;      $('v-lb-rot').textContent = o.rot+'°';
         $('lb-color').value = o.color;
+        this.syncLabelType(o);
       } else if (kind === 'rivers' && o.kind === 'lake') {
         $('lk-color').value = o.color;
       } else if (kind === 'rivers') {
@@ -1873,6 +2794,9 @@
       this.refreshWindrosePanel();
       this.refreshEyedropPanel();
       this.renderCustomSymGrid();
+      this.syncSketchTarget();
+      this.refreshRegionsPanel();
+      this.refreshTodoList();
       this.status();
     },
 
@@ -1901,10 +2825,121 @@
       this.msgTimer = setTimeout(function () { el.textContent = ''; }, 3600);
     },
 
+    /* ================= kullanıcı katmanları ================= */
+
+    addLayer: function () {
+      if (Layers.customCount() >= Layers.CUSTOM_MAX) {
+        this.msg(this.t('layer_max'));
+        return;
+      }
+      var n = Layers.customCount() + 1;
+      var l = Layers.addCustom(this.t('layer_untitled') + ' ' + n, Cv.W, Cv.H);
+      if (!l) return;
+      Layers.active = l.id;
+      History.pushLayerAdd(Layers.snapshotLayer(l), 'layer:add');
+      this.refreshLayers();
+      this.refreshHistory();
+      this.syncSketchTarget();
+      this.setTool('sketch');
+      this.msg(this.t('layer_added') + ' · ' + l.name);
+    },
+
+    /* Çizim panelinde hangi katmana yazılacağını gösterir; kullanıcı
+       katmanı seçili değilse aracın neden bir şey yapmadığı görünür olsun. */
+    syncSketchTarget: function () {
+      var box = $('sk-target');
+      if (!box) return;
+      var l = Layers.get(Layers.active);
+      if (l && l.custom) {
+        box.className = 'sk-target ok';
+        box.textContent = this.t('sketch_target') + ': ' + Layers.name(l, this.lang);
+      } else {
+        box.className = 'sk-target warn';
+        box.textContent = this.t('sketch_need_layer');
+      }
+    },
+
+    /* ================= paylaş / baskı ================= */
+
+    /* Tek dosya HTML: boyut ve biçim seçimi. Kayıpsız PNG keskin ama
+       büyük; JPEG paylaşılabilir boyutta kalır. */
+    htmlExportDialog: function () {
+      var self = this;
+      var name = App.currentCanvasName || this.t('canvas_unnamed');
+      var body =
+        '<label class="row"><span>' + esc(this.t('exp_maxdim')) + '</span></label>' +
+        '<select id="hx-dim" class="sel">' +
+          '<option value="1280">1280 px</option>' +
+          '<option value="2048" selected>2048 px</option>' +
+          '<option value="3072">3072 px</option>' +
+          '<option value="4096">4096 px</option>' +
+        '</select>' +
+        '<label class="row"><span>' + esc(this.t('exp_format')) + '</span></label>' +
+        '<select id="hx-fmt" class="sel">' +
+          '<option value="png">' + esc(this.t('exp_fmt_png')) + '</option>' +
+          '<option value="jpeg">' + esc(this.t('exp_fmt_jpeg')) + '</option>' +
+        '</select>' +
+        '<label class="row"><span>' + esc(this.t('exp_title')) + '</span></label>' +
+        '<input type="text" id="hx-title" class="sel" value="' + esc(name) + '">' +
+        '<p class="hint">' + esc(this.t('exp_html_help')) + '</p>';
+
+      this.modal(this.t('exp_html_t'), body, function () {
+        Exporter.html({
+          maxDim: parseInt($('hx-dim').value, 10) || 2048,
+          format: $('hx-fmt').value,
+          title: $('hx-title').value
+        });
+      });
+    },
+
+    /* Baskı: sayfa boyu, yön, kenar boşluğu, DPI. Çıktıyı tarayıcının
+       baskı iletişimine veriyoruz — "PDF olarak kaydet" gerçek PDF üretir. */
+    printDialog: function () {
+      var self = this;
+      var pages = [['a4','A4'], ['a3','A3'], ['a5','A5'], ['letter','Letter'], ['tabloid','Tabloid']];
+      var landscape = Cv.W >= Cv.H;
+      var body =
+        '<label class="row"><span>' + esc(this.t('exp_page')) + '</span></label>' +
+        '<select id="pr-page" class="sel">' +
+          pages.map(function (p) { return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('') +
+        '</select>' +
+        '<label class="row"><span>' + esc(this.t('exp_orient')) + '</span></label>' +
+        '<select id="pr-orient" class="sel">' +
+          '<option value="portrait"' + (landscape ? '' : ' selected') + '>' + esc(this.t('exp_portrait')) + '</option>' +
+          '<option value="landscape"' + (landscape ? ' selected' : '') + '>' + esc(this.t('exp_landscape')) + '</option>' +
+        '</select>' +
+        '<label class="row"><span>' + esc(this.t('exp_margin')) + '</span></label>' +
+        '<select id="pr-margin" class="sel">' +
+          '<option value="0">0 mm</option><option value="5">5 mm</option>' +
+          '<option value="10" selected>10 mm</option><option value="20">20 mm</option>' +
+        '</select>' +
+        '<label class="row"><span>' + esc(this.t('exp_dpi')) + '</span></label>' +
+        '<select id="pr-dpi" class="sel">' +
+          '<option value="96">96 · ' + esc(this.t('exp_dpi_screen')) + '</option>' +
+          '<option value="150" selected>150 · ' + esc(this.t('exp_dpi_normal')) + '</option>' +
+          '<option value="300">300 · ' + esc(this.t('exp_dpi_high')) + '</option>' +
+        '</select>' +
+        '<p class="hint">' + esc(this.t('exp_print_help')) + '</p>';
+
+      this.modal(this.t('exp_print_t'), body, function () {
+        Exporter.print({
+          page: $('pr-page').value,
+          orient: $('pr-orient').value,
+          margin: parseFloat($('pr-margin').value),
+          dpi: parseInt($('pr-dpi').value, 10),
+          title: App.currentCanvasName
+        });
+      });
+    },
+
     /* ================= modal ================= */
     modal: function (title, bodyHTML, onOk) {
       $('modal-title').textContent = title;
-      $('modal-body').innerHTML = bodyHTML;
+      var body = $('modal-body');
+      body.innerHTML = bodyHTML;
+      body.classList.remove('shortcuts-body');
+      var box = document.querySelector('.modal-box');
+      if (box) box.classList.remove('wide');
       var m = $('modal');
       m.classList.remove('hidden');
       function close() {
@@ -1917,12 +2952,41 @@
       $('modal-cancel').addEventListener('click', close);
     },
 
+    /* '?' ile açılan hızlı başvuru — Rehber sayfasının aksine kısa, aranmadan
+       tüm kısayolları tek ekranda gösterir. Araç kısayolları TUTORIAL_GROUPS'tan
+       (Rehber'le aynı kaynak, iki liste asla birbirinden sapmaz), komut
+       kısayolları SHORTCUT_GENERAL'dan gelir. */
+    showShortcuts: function () {
+      var self = this;
+      var html = '<div class="shortcuts-cols">';
+      TUTORIAL_GROUPS.forEach(function (grp) {
+        html += '<div class="shortcuts-group"><div class="shortcuts-group-label">' + self.t(grp.label) + '</div>';
+        grp.tools.forEach(function (tl) {
+          html += '<div class="shortcuts-row"><span class="shortcuts-name">' + self.t('t_' + tl.id) +
+                  '</span><span class="shortcuts-key">' + tl.key + '</span></div>';
+        });
+        html += '</div>';
+      });
+      html += '<div class="shortcuts-group"><div class="shortcuts-group-label">' + self.t('sc_general') + '</div>';
+      SHORTCUT_GENERAL.forEach(function (sc) {
+        html += '<div class="shortcuts-row"><span class="shortcuts-name">' + self.t(sc.label) +
+                '</span><span class="shortcuts-key">' + sc.key + '</span></div>';
+      });
+      html += '</div></div>';
+
+      this.modal(this.t('sc_title'), html);
+      $('modal-body').classList.add('shortcuts-body');
+      var box = document.querySelector('.modal-box');
+      if (box) box.classList.add('wide');
+    },
+
     /* ================= klavye ================= */
     bindKeys: function () {
       var self = this;
       var map = { v:'select', b:'landmass', e:'erase', t:'terrain', s:'symbol',
                   r:'river', d:'road', l:'label', h:'pan', i:'eyedrop', k:'lake', g:'territory',
-                  u:'elevation', m:'regionlink', y:'resource', f:'fill', q:'measure', x:'lasso' };
+                  u:'elevation', m:'regionlink', y:'resource', f:'fill', q:'measure', x:'lasso',
+                  n:'sketch' };
 
       window.addEventListener('keydown', function (ev) {
         var tag = (ev.target.tagName || '').toLowerCase();
@@ -1977,6 +3041,7 @@
           if (self.selIs('symbols')) Tools.applyToSelection({ rot: App.symbol.rot });
           Cv.requestRender(); return;
         }
+        if (ev.key === '?') { self.showShortcuts(); return; }
         if (map[ev.key.toLowerCase()]) self.setTool(map[ev.key.toLowerCase()]);
       });
 
