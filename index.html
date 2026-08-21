@@ -126,33 +126,6 @@
   </div>
 </div>
 
-<!-- ============ DAR EKRAN KAPISI ============
-     Editör üç sütunlu sabit yerleşime dayanır (araç rayı + tuval + katman
-     paneli); ~1024px altında tuval alanı negatife düşer. Bozuk bir arayüz
-     göstermek yerine burada ne gerektiğini açıkça söylüyoruz. -->
-<div id="view-narrow" class="shell-view hidden">
-  <div class="narrow-gate">
-    <div class="narrow-card">
-      <svg class="narrow-ico" viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="2"
-           stroke-linejoin="round" aria-hidden="true">
-        <rect x="2" y="2" width="60" height="38" rx="3"/>
-        <path d="M2 33h60"/>
-        <path d="M24 44h16M32 40v4"/>
-      </svg>
-      <h2 data-i18n="narrow_title">Editör için daha geniş bir ekran gerekli</h2>
-      <p data-i18n="narrow_desc">Harita editörü; araç rayı, tuval ve katman paneliyle yan yana
-        çalışan bir masaüstü yerleşimi kullanır. Bu düzenin sığması için en az
-        1024 × 600 piksel gerekir.</p>
-      <p class="narrow-hint" data-i18n="narrow_hint">Tablet kullanıyorsan cihazı yatay çevirmeyi dene.</p>
-      <div class="narrow-size">
-        <span data-i18n="narrow_current">Bu ekran</span>
-        <b id="narrow-current-size">—</b>
-      </div>
-      <button class="btn primary big" data-view-link="home" data-i18n="narrow_back">Ana sayfaya dön</button>
-    </div>
-  </div>
-</div>
-
 <!-- ============ PAYLAŞIM GÖRÜNTÜLEYİCİ ============
      URL hash'inde (#d=...) gömülü bir harita görüntüsü varsa gösterilir.
      Sunucu yok: hash asla ağa gitmez, bu yüzden bu tamamen istemci

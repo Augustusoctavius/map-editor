@@ -20,6 +20,15 @@
 @media (max-width:1240px){ .brand-name{font-size:14px;letter-spacing:.10em} }
 @media (max-width:1040px){ .brand-name{display:none} }
 
+/* Dar ekranlarda üst çubuk artık gizlenmiyor (editör kapısı kaldırıldı) —
+   düğmeler sığmazsa çubuk kendi içinde yatay kayar, sayfanın geri kalanı
+   etkilenmez. */
+@media (max-width:860px){
+  #topbar{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+  #topbar > *{flex:none}
+  .tb-spacer{flex:none;width:8px}
+}
+
 .tb-group{display:flex;gap:4px}
 .tb-sep{width:1px;height:22px;background:var(--line)}
 .tb-spacer{flex:1}

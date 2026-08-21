@@ -170,6 +170,10 @@
     symBrushLast:null,
     symBrushBefore:null,
     lasso:null, floating:null, floatDrag:null, floatRotateDrag:null,
+    /* iki parmaklı yakınlaştırma/kaydırma (mobil çekirdek jestler) —
+       pointerId'ye göre aktif dokunuşları izler; ayrıntı için onDown/onMove/
+       onUp içindeki dokunmatik erken-çıkış bloklarına bak. */
+    _touches:{}, _pinch:null,
     LASSO_LAYERS: ['landmass','terrain','elevation'],
     /* nokta-tabanlı vektör katmanlar — kement alanının içine düşen semboller,
        kaynaklar, etiketler ve harita bağlantıları da rasterle BİRLİKTE taşınır. */
@@ -215,6 +219,22 @@
 
     /* ================= POINTER DOWN ================= */
     onDown: function (e) {
+      /* iki parmakla dokunma → çizim/kaydırma yerine yakınlaştırma jesti.
+         İkinci parmak indiğinde önce birinci parmağın başlattığı tekli
+         işlem varsa (fırça darbesi, kaydırma...) onUp() ile düzgünce
+         bitirilir/işlenir, sonra bu ve sonraki dokunuşlar çizim
+         yollamasına girmeden pinch durumuna yönlendirilir. */
+      if (e.pointerType === 'touch') {
+        this._touches[e.pointerId] = { x:e.clientX, y:e.clientY };
+        var tids = Object.keys(this._touches);
+        if (tids.length >= 2) {
+          if (!this._pinch) this.onUp();
+          var ta = this._touches[tids[0]], tb = this._touches[tids[1]];
+          this._pinch = { dist: Math.hypot(ta.x-tb.x, ta.y-tb.y) };
+          return;
+        }
+      }
+
       var p = this.pos(e);
       Cv.mouse.x = p.x; Cv.mouse.y = p.y; Cv.mouse.over = true;
 
@@ -226,7 +246,10 @@
         return;
       }
       if (e.button !== 0) return;
-      Cv.view.setPointerCapture(e.pointerId);
+      /* Bazı ortamlarda (sentetik olaylar, ya da parmak zaten kalkmışsa)
+         setPointerCapture NotFoundError fırlatabilir — bu, izleyen çizim
+         mantığını sessizce iptal etmemeli. */
+      try { Cv.view.setPointerCapture(e.pointerId); } catch (ptrErr) {}
 
       /* windrose tutamağı */
       if (App.windrose && App.windrose.visible && this.hitWindrose(p)) {
@@ -308,6 +331,20 @@
 
     /* ================= POINTER MOVE ================= */
     onMove: function (e) {
+      if (e.pointerType === 'touch' && this._touches[e.pointerId]) {
+        this._touches[e.pointerId] = { x:e.clientX, y:e.clientY };
+        var mids = Object.keys(this._touches);
+        if (this._pinch && mids.length >= 2) {
+          var ma = this._touches[mids[0]], mb = this._touches[mids[1]];
+          var md = Math.hypot(ma.x-mb.x, ma.y-mb.y);
+          var mr = Cv.view.getBoundingClientRect();
+          var mx = (ma.x+mb.x)/2 - mr.left, my = (ma.y+mb.y)/2 - mr.top;
+          if (this._pinch.dist > 0 && md > 0) Cv.setZoom(Cv.zoom * (md/this._pinch.dist), mx, my);
+          this._pinch.dist = md;
+          return;
+        }
+      }
+
       var p = this.pos(e);
       Cv.mouse.x = p.x; Cv.mouse.y = p.y; Cv.mouse.over = true;
 
@@ -446,7 +483,12 @@
     },
 
     /* ================= POINTER UP ================= */
-    onUp: function () {
+    onUp: function (e) {
+      if (e && e.pointerType === 'touch') {
+        delete this._touches[e.pointerId];
+        if (this._pinch && Object.keys(this._touches).length < 2) this._pinch = null;
+      }
+
       if (this.panning) { this.panning = false; Cv.view.classList.remove('panning'); return; }
 
       if (this.lasso && this.lasso.dragging) {

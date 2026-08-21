@@ -73,6 +73,43 @@ h4{font-size:11px;color:var(--text-dim)}
 .panel-toggle-l{inset-inline-start:var(--panel-l);margin-inline-start:-1px;border-start-start-radius:0;border-end-start-radius:0}
 .panel-toggle-r{inset-inline-end:var(--panel-r);margin-inline-end:-1px;border-start-end-radius:0;border-end-end-radius:0}
 
+/* ---------- mobil çekirdek uyum ----------
+   ~860px altında üç sütunlu ızgara tuval sütununu (1fr) negatife düşürür
+   (bkz. eski EDITOR_MIN_W kapısı — artık kaldırıldı). Bunun yerine
+   #workspace tek sütuna iner, sol/sağ paneller tuvalin ÜZERİNE kayan sabit
+   konumlu çekmecelere dönüşür; aynı .collapsed-left/-right sınıfları (bkz.
+   yukarısı) burada "kapalı" durumunu ifade eder — masaüstünde genişlik 0'a
+   inerken burada ekran dışına kayar. Kolçak düğmeleri köşelere sabit,
+   büyük dokunma hedefleriyle yüzen düğmelere dönüşür. */
+@media (max-width:860px){
+  #workspace{grid-template-columns:1fr}
+  #left-panel,#right-panel{
+    position:fixed;top:var(--topbar-h);bottom:var(--status-h);
+    width:min(84vw,320px);z-index:25;
+    box-shadow:0 0 32px -6px #000c;
+    transition:transform .22s ease;
+  }
+  #left-panel{inset-inline-start:0;transform:translateX(0)}
+  #right-panel{inset-inline-end:0;transform:translateX(0)}
+  #workspace.collapsed-left #left-panel{transform:translateX(-100%)}
+  #workspace.collapsed-right #right-panel{transform:translateX(100%)}
+  html[dir="rtl"] #workspace.collapsed-left #left-panel{transform:translateX(100%)}
+  html[dir="rtl"] #workspace.collapsed-right #right-panel{transform:translateX(-100%)}
+
+  .panel-toggle{
+    top:auto;bottom:16px;transform:none;
+    width:44px;height:44px;border-radius:50%;
+    box-shadow:0 4px 16px -2px #000a;
+  }
+  .panel-toggle-l{inset-inline-start:10px !important;margin-inline-start:0;border-radius:50%}
+  .panel-toggle-r{inset-inline-end:10px !important;margin-inline-end:0;border-radius:50%}
+
+  /* dokunma hedefleri büyüsün */
+  .tool{min-height:60px}
+  .tab{padding:11px 4px;min-height:40px}
+  .btn,button.btn{min-height:36px}
+}
+
 /* ---------- left: tool rail ----------
    Araçlar 5 işlevsel gruba ayrılır. Tile'lar varsayılan olarak şeffaftır —
    zemin yalnızca hover/aktif durumda belirir; böylece rail bir "kutu

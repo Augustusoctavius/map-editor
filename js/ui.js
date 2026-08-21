@@ -1107,14 +1107,6 @@
         e.target.value = '';
       });
 
-      /* cihaz çevrildiğinde / pencere boyutlandığında kapıyı senkronla —
-         yer açılırsa editöre kendiliğinden dön, daralırsa kapıya geç */
-      var rt = 0;
-      window.addEventListener('resize', function () {
-        clearTimeout(rt);
-        rt = setTimeout(function () { self.syncNarrowGate(); }, 150);
-      });
-
       this.renderTutorial();
       this.buildTemplateGrid();
       this.refreshCanvasList();
@@ -1252,25 +1244,35 @@
       });
     },
 
-    /* Editörün üç sütunlu yerleşimi için gereken en küçük viewport.
-       Bu ölçünün altında tuval sütunu (1fr) negatife düşüyor. */
-    EDITOR_MIN_W: 1024,
-    EDITOR_MIN_H: 600,
+    /* Dar ekranlarda editör artık kapatılmıyor — #workspace ~860px altında
+       tek sütuna, sol/sağ paneller kayan çekmecelere dönüşür (bkz.
+       css/main.css'teki mobil kırılım noktası). MOBILE_BREAKPOINT bu eşiği
+       JS tarafında da bilir (ör. editöre ilk girişte panelleri varsayılan
+       kapalı başlatmak için). */
+    MOBILE_BREAKPOINT: 860,
 
-    editorFits: function () {
-      return window.innerWidth >= this.EDITOR_MIN_W &&
-             window.innerHeight >= this.EDITOR_MIN_H;
+    isMobileViewport: function () {
+      return window.matchMedia && window.matchMedia('(max-width:' + this.MOBILE_BREAKPOINT + 'px)').matches;
     },
 
-    /* Ekran editöre yetmiyorsa bozuk arayüz yerine açıklayıcı kapıyı göster.
-       Kullanıcı hangi görünümü istediğini _wantedView'da saklıyoruz ki
-       cihaz yatay çevrilip yer açıldığında oraya kendiliğinden dönebilelim. */
-    syncNarrowGate: function () {
-      var el = $('narrow-current-size');
-      if (el) el.textContent = window.innerWidth + ' × ' + window.innerHeight;
-      if (this._wantedView !== 'editor') return;
-      if (this._currentView === 'narrow' && this.editorFits()) this.showView('editor');
-      else if (this._currentView === 'editor' && !this.editorFits()) this.showView('narrow');
+    /* Editöre ilk giriş dar bir viewport'taysa paneller varsayılan kapalı
+       başlar (tuval hemen görünür olsun diye) — yalnızca bir kez uygulanır,
+       kullanıcı elle açtıktan sonra tekrar dayatılmaz. */
+    _mobileDefaultApplied: false,
+    applyMobileDefaults: function () {
+      if (this._mobileDefaultApplied) return;
+      this._mobileDefaultApplied = true;
+      if (!this.isMobileViewport()) return;
+      var ws = $('workspace');
+      if (!ws) return;
+      ['left', 'right'].forEach(function (side) {
+        ws.classList.add('collapsed-' + side);
+        var btn = $(side === 'left' ? 'btn-toggle-left' : 'btn-toggle-right');
+        if (btn) {
+          btn.setAttribute('aria-expanded', 'false');
+          btn.textContent = side === 'left' ? '›' : '‹';
+        }
+      });
     },
 
     showView: function (name) {
@@ -1278,14 +1280,7 @@
          böylece "Tuval" sekmesindeki kayıtlı tuvaller listesinde görünür */
       if (this._currentView === 'editor' && name !== 'editor') Exporter.autoSave();
 
-      /* 'narrow' kapının kendisi; kullanıcının asıl niyetini ezmemeli */
-      if (name !== 'narrow') this._wantedView = name;
-      if (name === 'editor' && !this.editorFits()) name = 'narrow';
-      if (name === 'narrow') {
-        var szEl = $('narrow-current-size');
-        if (szEl) szEl.textContent = window.innerWidth + ' × ' + window.innerHeight;
-      }
-
+      this._wantedView = name;
       this._currentView = name;
       document.querySelectorAll('.shell-view').forEach(function (v) { v.classList.add('hidden'); });
       var target = $('view-' + name);
@@ -1298,6 +1293,7 @@
       if ($('shell-nav')) $('shell-nav').classList.toggle('hidden', name === 'editor' || (name === 'share' && this._shareEmbed));
       if (name === 'canvas') this.refreshCanvasList();
       if (name === 'editor') {
+        this.applyMobileDefaults();
         /* editör gizliyken canvas 0×0 rapor ediyordu — görünür olduktan
            sonra viewport ölçülerini yeniden hesapla ve sığdır */
         requestAnimationFrame(function () { Cv.resize(); Cv.fit(); Cv.requestRender(); });

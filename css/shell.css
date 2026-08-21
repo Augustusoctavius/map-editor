@@ -190,59 +190,6 @@ label.btn.wide{display:block; text-align:center; cursor:pointer; margin-top:6px;
 .community-card-title{font-size:14px; color:var(--text); font-weight:600}
 .community-card-desc{font-size:11.5px; color:var(--text-dim)}
 
-/* ---------- dar ekran kapısı ---------- */
-.narrow-gate{
-  min-height:100%; display:flex; align-items:center; justify-content:center;
-  padding:32px 20px 60px;
-}
-.narrow-card{
-  max-width:520px; text-align:center;
-  background:var(--ink-800); border:1px solid var(--line); border-radius:10px;
-  padding:clamp(28px, 6vw, 44px) clamp(20px, 5vw, 40px);
-  box-shadow:0 24px 60px -30px #000a;
-}
-.narrow-ico{
-  width:clamp(56px, 16vw, 76px); height:auto; color:var(--brass-dim);
-  margin-bottom:18px;
-}
-.narrow-card h2{
-  font-family:var(--f-display); font-size:clamp(17px, 4.4vw, 22px);
-  color:var(--brass); margin:0 0 12px; letter-spacing:.02em; text-wrap:balance;
-}
-.narrow-card p{
-  font-size:clamp(13px, 3.4vw, 14.5px); line-height:1.65;
-  color:var(--text-dim); margin:0 0 12px; text-wrap:pretty;
-}
-.narrow-hint{color:var(--text) !important; opacity:.85}
-.narrow-size{
-  display:inline-flex; align-items:center; gap:8px; margin:6px 0 22px;
-  padding:6px 14px; border:1px solid var(--line); border-radius:20px;
-  font-size:12px; color:var(--text-dim);
-}
-.narrow-size b{color:var(--brass); font-family:var(--f-mono); font-weight:500}
-
-/* ---------- dar ekranlar ---------- */
-@media (max-width:640px){
-  #shell-nav{gap:6px; padding:0 10px}
-  .shell-brand .brand-name{display:none}
-  .shell-tab{padding:8px 9px; font-size:12px}
-  .shell-tabs{gap:2px}
-  /* tek sütuna in: kart ızgaraları dar ekranda sıkışmasın */
-  .cv-grid,.community-links{grid-template-columns:1fr}
-  .canvas-new-form{flex-direction:column; align-items:stretch}
-  .canvas-new-form select,.canvas-new-form input[type=text]{width:100%}
-  .cv-wh{justify-content:space-between}
-  .cv-wh input{flex:1; width:auto}
-  label.btn.wide{max-width:none}
-  /* rehber satırları: ikon üstte kalsın ama metin daralmasın */
-  .tutorial-row{gap:10px; padding:12px 2px}
-  .tutorial-ico{width:24px; font-size:17px}
-}
-@media (max-width:400px){
-  .shell-tab{padding:8px 6px; font-size:11px; letter-spacing:0}
-}
-.narrow-size b{color:var(--brass); font-family:var(--f-mono); font-weight:500}
-
 /* ---------- dar ekranlar ---------- */
 @media (max-width:640px){
   #shell-nav{gap:6px; padding:0 10px}
