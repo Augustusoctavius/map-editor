@@ -1,7 +1,7 @@
 /**
- * Faz A doğrulama — tektonik şablon, biyom otomatik atama, nehir otomatik
- * üretimi, sembol lejantı. Diğer test runner'larla aynı CDP iskeletini
- * kullanır (bkz. CLAUDE.md § Tests).
+ * Faz A doğrulama — kara üretimi determinizmi, biyom otomatik atama, nehir
+ * otomatik üretimi, sembol lejantı. Diğer test runner'larla aynı CDP
+ * iskeletini kullanır (bkz. CLAUDE.md § Tests).
  */
 import { execSync, spawn } from 'child_process';
 import { createServer } from 'http';
@@ -83,8 +83,8 @@ async function run() {
 
         Cv.setSize(1024, 1024, false);
 
-        /* 1) Tektonik şablon üretiyor mu + deterministik mi */
-        Tools.generateLandmass('tectonic', 0.5, 12345);
+        /* 1) Kıta şablonu üretiyor mu + deterministik mi + %40 kapsama */
+        Tools.generateLandmass('continent', 0.5, 12345);
         await new Promise(r => setTimeout(r, 50));
         const Lm = Layers.get('landmass');
         function landPct() {
@@ -93,15 +93,16 @@ async function run() {
           return n / (d.length/4);
         }
         const p1 = landPct();
-        check('tektonik kara üretti', p1 > 0.01 && p1 < 0.95);
-        Tools.generateLandmass('tectonic', 0.5, 12345);
+        check('kıta kara üretti', p1 > 0.01 && p1 < 0.95);
+        check('kıta en az %40 kaplıyor', p1 >= 0.38);
+        Tools.generateLandmass('continent', 0.5, 12345);
         await new Promise(r => setTimeout(r, 50));
         const p2 = landPct();
-        check('tektonik aynı tohum -> aynı sonuç', Math.abs(p1-p2) < 0.001);
-        Tools.generateLandmass('tectonic', 0.5, 999);
+        check('kıta aynı tohum -> aynı sonuç', Math.abs(p1-p2) < 0.001);
+        Tools.generateLandmass('continent', 0.5, 999);
         await new Promise(r => setTimeout(r, 50));
         const p3 = landPct();
-        check('tektonik farklı tohum -> farklı sonuç', Math.abs(p1-p3) > 0.001);
+        check('kıta farklı tohum -> farklı sonuç', Math.abs(p1-p3) > 0.001);
 
         /* 2) Biyom otomatik atama */
         Tools.generateLandmass('continent', 0.5, 55);

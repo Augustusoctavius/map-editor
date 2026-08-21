@@ -293,11 +293,31 @@
     return bag[key];
   }
 
-  function makeOceanTile() {
-    var S = 160, c = document.createElement('canvas');
+  /* '#rrggbb' -> [r,g,b]; 3 haneli kısaltmayı da kabul eder. */
+  function hexToRgbArr(hex) {
+    hex = (hex || '#7ba8bd').replace('#', '');
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    return [parseInt(hex.substr(0,2),16), parseInt(hex.substr(2,2),16), parseInt(hex.substr(4,2),16)];
+  }
+  function shadeRgb(rgb, factor) {
+    return [
+      Math.max(0, Math.min(255, Math.round(rgb[0]*factor))),
+      Math.max(0, Math.min(255, Math.round(rgb[1]*factor))),
+      Math.max(0, Math.min(255, Math.round(rgb[2]*factor)))
+    ];
+  }
+
+  /* Verilen deniz rengine göre bir okyanus dokusu (tuval) üretir/günceller.
+     `into` verilirse (Cv.setSeaColor'daki gibi) AYNI tuvale yeniden çizer —
+     mevcut ctx.createPattern() referansı canvas kaynağını izlediğinden,
+     yeni bir tuval/desen nesnesi oluşturmaya gerek kalmadan renk değişir. */
+  function makeOceanTile(color, into) {
+    var rgb = hexToRgbArr(color);
+    var S = 160, c = into || document.createElement('canvas');
     c.width = c.height = S;
     var x = c.getContext('2d');
-    x.fillStyle = '#7ba8bd';
+    x.clearRect(0, 0, S, S);
+    x.fillStyle = 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
     x.fillRect(0, 0, S, S);
     /* ince gren */
     var img = x.getImageData(0, 0, S, S), d = img.data;
@@ -306,8 +326,9 @@
       d[i] += n; d[i+1] += n; d[i+2] += n * 0.7;
     }
     x.putImageData(img, 0, 0);
-    /* dalga çizgileri */
-    x.strokeStyle = 'rgba(70,120,145,0.30)';
+    /* dalga çizgileri: seçili rengin biraz daha açık bir tonu */
+    var wave = shadeRgb(rgb, 1.25);
+    x.strokeStyle = 'rgba('+wave[0]+','+wave[1]+','+wave[2]+',0.30)';
     x.lineWidth = 1.1;
     for (var r = 0; r < 5; r++) {
       var y = 14 + r * 32 + (r % 2) * 6;
@@ -357,6 +378,7 @@
     _raf:0, _miniAt:0,
     shoreCanvas:null, shoreDirty:true,
     elevationCanvas:null, elevationDirty:true,
+    seaColor:'#7ba8bd',
 
     init: function (w, h) {
       this.view = document.getElementById('view');
@@ -364,7 +386,7 @@
       this.mini = document.getElementById('minimap');
       this.mctx = this.mini.getContext('2d');
       this.W = w; this.H = h;
-      oceanTile = makeOceanTile();
+      oceanTile = makeOceanTile(this.seaColor);
       parchTile = makeParchTile();
       this.resize();
       var self = this;
@@ -396,6 +418,16 @@
       this.panX = (this.vw - this.W*s)/2;
       this.panY = (this.vh - this.H*s)/2;
       this.requestViewRender();
+    },
+
+    /* Deniz rengini değiştirir: okyanus dokusunu AYNI tuvale yeniden çizer
+       (yeni bir ctx.createPattern() gerekmez, desen kaynağı tuvali izler)
+       ve bir sonraki renderMap()'in derinlik gradyanını da bu renkten
+       türetmesi için Cv.seaColor'ı günceller. */
+    setSeaColor: function (color) {
+      this.seaColor = color || '#7ba8bd';
+      if (oceanTile) makeOceanTile(this.seaColor, oceanTile);
+      this.requestRender();
     },
 
     setZoom: function (z, cx, cy) {
@@ -845,12 +877,13 @@
       /* --- okyanus --- */
       ctx.save();
       var op = ctxPattern(ctx, oceanTile, 'ocean');
-      ctx.fillStyle = op || '#7ba8bd';
+      ctx.fillStyle = op || this.seaColor;
       ctx.fillRect(0, 0, W, H);
-      /* derinlik gradyanı */
+      /* derinlik gradyanı — seçili deniz renginin koyulaştırılmış tonu */
+      var dRgb = shadeRgb(hexToRgbArr(this.seaColor), 0.62);
       var og = ctx.createRadialGradient(W*0.5, H*0.5, Math.min(W,H)*0.15, W*0.5, H*0.5, Math.max(W,H)*0.78);
-      og.addColorStop(0, 'rgba(40,80,105,0.00)');
-      og.addColorStop(1, 'rgba(28,62,86,0.42)');
+      og.addColorStop(0, 'rgba('+dRgb[0]+','+dRgb[1]+','+dRgb[2]+',0.00)');
+      og.addColorStop(1, 'rgba('+dRgb[0]+','+dRgb[1]+','+dRgb[2]+',0.42)');
       ctx.fillStyle = og;
       ctx.fillRect(0, 0, W, H);
       ctx.restore();

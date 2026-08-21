@@ -194,6 +194,8 @@ textarea{font-family:var(--f-display);font-size:13px}
 .chk{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);
   margin:8px 0;cursor:pointer}
 .chk input{accent-color:var(--brass);width:13px;height:13px}
+.landgen-extras{display:flex;flex-direction:column;gap:0;margin:4px 0 2px}
+.landgen-extras .chk{margin:4px 0}
 .btn{
   background:var(--ink-600);border:1px solid var(--line);color:var(--text);
   padding:6px 8px;border-radius:var(--radius);cursor:pointer;transition:.12s

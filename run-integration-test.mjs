@@ -278,6 +278,35 @@ const TEST_CODE = `(async function () {
     UI.lang = origLang;
     ok('i18n', 'tüm diller çeviri döndürüyor', langFail.length === 0, langs.length + ' dil, ' + (langFail.join(',')||'hepsi tam'));
     ok('i18n', 'çeviriler gerçekten farklı', sameAsTr.length === 0, sameAsTr.join(',') || 'tümü ayrışıyor');
+
+    /* DICT tamlığı: 9 dil için "İngilizce'ye düş" yalnızca güvenlik ağı
+       olmalı, normal durum olmamalı — bu anahtarlar (çoğu Faz A/B/C'de ve
+       kara üretimi/Bölgeler/Görevler işinde eklendi) tüm 11 dilde gerçek
+       çeviriye sahip olmalı. Değeri İngilizce'yle birebir aynıysa (ve
+       gerçekten farklı olması beklenen bir anahtarsa) çeviri düşmüş demektir. */
+    const fullKeys = ['copy','copied','o_seacolor','o_landgen_rivers','o_landgen_lakes','o_landgen_terrain',
+      'lakegen_none','tab_regions','tab_todo','regions_political','regions_maptree','todo_add','todo_empty',
+      'todo_placeholder','panel_toggle_left','panel_toggle_right','sc_title','sc_undo','sc_redo','sc_save',
+      'sc_pan','sc_zoom','sc_fit','sc_finish','sc_cancel','sc_delete','sc_rotsym','sc_general','sc_help',
+      'o_biomegen','o_rivergen','o_roadgen','o_settlegen','o_symlegend','share_editbtn','exp_share_t'];
+    /* Bazı çeviriler İngilizce'yle tesadüfen aynı yazılır (ör. İspanyolca
+       "General" == İngilizce "General") — bunlar sahte pozitif üretmesin
+       diye eşitlik kontrolünden muaf tutulur, ama yine de boş olamazlar. */
+    const cognateOk = new Set(['sc_general']);
+    const otherLangs = langs.filter(l => l !== 'tr' && l !== 'en');
+    const enSnapshot = (UI.lang = 'en', Object.fromEntries(fullKeys.map(k => [k, UI.t(k)])));
+    let i18nGaps = [];
+    otherLangs.forEach(lc => {
+      UI.lang = lc;
+      fullKeys.forEach(k => {
+        const v = UI.t(k);
+        if (!v || (v === enSnapshot[k] && !cognateOk.has(k))) i18nGaps.push(lc + '.' + k);
+      });
+    });
+    UI.lang = origLang;
+    ok('i18n', 'yeni anahtarlar 11 dilde de gerçek çeviriye sahip', i18nGaps.length === 0,
+       i18nGaps.length ? i18nGaps.slice(0,8).join(', ') + (i18nGaps.length>8?' …':'') : (otherLangs.length+' dil × '+fullKeys.length+' anahtar, hepsi tam'));
+
     const rtl = Object.keys(UI.RTL_LANGS || {});
     ok('i18n', 'RTL dilleri tanımlı', rtl.length > 0, rtl.join(','));
     ok('i18n', 'isRTL doğru çalışıyor', UI.isRTL('ar') === true && UI.isRTL('en') === false);
