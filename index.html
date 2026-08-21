@@ -199,6 +199,7 @@
     <label class="chk"><input type="checkbox" id="chk-shore" checked><span data-i18n="shore">Kıyı</span></label>
     <label class="chk"><input type="checkbox" id="chk-parchment"><span data-i18n="parchment">Parşömen</span></label>
     <label class="chk"><input type="checkbox" id="chk-grid"><span data-i18n="grid">Izgara</span></label>
+    <label class="chk"><input type="checkbox" id="chk-legend"><span data-i18n="o_symlegend">Lejant</span></label>
   </div>
 
   <div class="tb-sep"></div>
@@ -306,6 +307,7 @@
           <option value="continent" data-i18n="o_landgen_continent">Kıta</option>
           <option value="island" data-i18n="o_landgen_island">Ada</option>
           <option value="archipelago" data-i18n="o_landgen_archipelago">Takımada</option>
+          <option value="tectonic" data-i18n="o_landgen_tectonic">Tektonik</option>
         </select>
         <label class="row"><span data-i18n="o_landgenrough">Detay / pürüzlülük</span><b id="v-lg-rough">0.50</b></label>
         <input type="range" id="lg-rough" min="5" max="100" value="50">
@@ -324,6 +326,9 @@
         <label class="chk"><input type="checkbox" id="tr-clip" checked><span data-i18n="o_clip">Sadece karaya boya</span></label>
         <button class="btn wide" id="btn-clear-terrain" data-i18n="o_clearterrain">Arazi katmanını temizle</button>
         <p class="hint" data-i18n="h_terrain">Doku her fırça vuruşunda rastgele serpilir — tekrar eden örüntü oluşmaz.</p>
+        <h3 style="margin-top:16px" data-i18n="o_biomegen">Biyomu otomatik ata</h3>
+        <button class="btn wide" id="btn-biomegen" data-i18n="o_biomegen_go">🌍 Biyom ata</button>
+        <p class="hint" data-i18n="h_biomegen">Yükselti ve enleme göre arazi katmanını otomatik doldurur; mevcut arazi katmanının yerine geçer.</p>
       </section>
 
       <!-- ELEVATION -->
@@ -431,6 +436,9 @@
         <label class="row"><span data-i18n="o_color">Renk</span></label>
         <input type="color" id="rv-color" value="#5b8aa6">
         <p class="hint" data-i18n="h_path">Tıklayarak nokta ekle. Enter / çift tık ile bitir, Esc ile iptal.</p>
+        <h3 style="margin-top:16px" data-i18n="o_rivergen">Nehirleri otomatik üret</h3>
+        <button class="btn wide" id="btn-rivergen" data-i18n="o_rivergen_go">💧 Nehir üret</button>
+        <p class="hint" data-i18n="h_rivergen">Yükselti gridinden denize akan nehirler ekler. "Yükselti" fırçasıyla dağ/tepe çizilmiş olması gerekir.</p>
       </section>
 
       <!-- ROAD -->

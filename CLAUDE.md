@@ -27,10 +27,11 @@ protocol directly via Node's built-in `WebSocket`, and each boots its own static
 the repo root with plain `node`; each exits non-zero on failure.
 
 ```bash
-node run-integration-test.mjs   # 75 assertions: every module, catalog integrity, round-trips
-node run-layer-undo-test.mjs    # layer add/delete undo, pixel-level fidelity
-node run-fps.mjs                # frame budget at 1024/2048/4096, idle+pan+zoom
-node run-mapgen-test.mjs        # renders 3 landmass templates to /tmp/mapgen-shots for eyeballing
+node run-integration-test.mjs        # 75 assertions: every module, catalog integrity, round-trips
+node run-layer-undo-test.mjs         # layer add/delete undo, pixel-level fidelity
+node run-fps.mjs                     # frame budget at 1024/2048/4096, idle+pan+zoom
+node run-mapgen-test.mjs             # renders 3 landmass templates to /tmp/mapgen-shots for eyeballing
+node run-mapgen-features-test.mjs    # tectonic template, auto-biome, auto-rivers, symbol legend
 ```
 
 Two gotchas when writing more of these: **`requestAnimationFrame` is throttled in headless Chrome**, so

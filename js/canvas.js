@@ -1116,6 +1116,7 @@
 
       /* --- siyasi harita lejantı --- */
       if (this.political && this.politicalLegend) this.drawPoliticalLegend(ctx);
+      if (this.symbolLegend) this.drawSymbolLegend(ctx);
 
       /* --- ölçek çubuğu (en üstte) --- */
       if (global.App && App.scale && App.scale.visible) this.drawScaleBar(ctx, App.scale);
@@ -1685,6 +1686,10 @@
     politicalMuteTerrain: true,
     politicalLegend: true,
 
+    /* Sembol lejantı: siyasi görünümden bağımsız, haritadaki sembol
+       katmanında fiilen kullanılan sembol türlerini listeler. */
+    symbolLegend: false,
+
     /* Devletlere görsel olarak birbirinden ayrılan renkler atar. Altın
        açı ile hue dağıtımı, komşu bölgelerin benzer renk almasını
        istatistiksel olarak engeller. */
@@ -1778,6 +1783,64 @@
         ctx.fillStyle = '#2e2013';
         ctx.textAlign = 'left';
         ctx.fillText(items[i].name, x + pad + row*0.95, iy);
+      }
+      ctx.restore();
+    },
+
+    /* Sembol lejantı: 'symbols' katmanında fiilen kullanılan her sembol
+       türünden bir örnek — siyasi lejantın (devlet renkleri) muadili ama
+       sembol katalogu için. Elle tutulan bir metadata gerekmez: L.objects
+       üzerinden dedupe edip Sym.draw ile gerçek ikonu çiziyoruz, böylece
+       lejant her zaman haritada ne varsa onu gösterir. */
+    drawSymbolLegend: function (ctx) {
+      var L = Layers.get('symbols');
+      if (!L || !L.visible) return;
+      var seen = {}, items = [];
+      L.objects.forEach(function (o) {
+        if (!o.sym || seen[o.sym]) return;
+        var def = Sym.get(o.sym);
+        if (!def) return;
+        seen[o.sym] = 1;
+        items.push({ id:o.sym, def:def });
+      });
+      if (!items.length) return;
+
+      var lang = (UI && UI.lang) || 'tr';
+      items.forEach(function (it) {
+        it.name = Sym.isCustom(it.id) ? (it.def.tr || it.def.en || it.id)
+                : (global.i18nName ? global.i18nName(it.id, it.def.tr, it.def.en, lang)
+                                    : (lang === 'tr' ? it.def.tr : it.def.en));
+      });
+      items.sort(function (a, b) { return a.name.localeCompare(b.name); });
+      var MAXROWS = 24;
+      if (items.length > MAXROWS) items = items.slice(0, MAXROWS);
+
+      var pad = Math.max(10, this.W * 0.006);
+      var row = Math.max(18, this.W * 0.014);
+      var fs  = row * 0.58;
+      var boxW = Math.max(this.W * 0.17, 200);
+      var boxH = pad*2 + row*items.length;
+      var x = pad*2, y = this.H - boxH - pad*2;
+
+      ctx.save();
+      ctx.globalAlpha = 0.93;
+      ctx.fillStyle = '#f4ead2';
+      ctx.strokeStyle = '#5a4326';
+      ctx.lineWidth = Math.max(1.2, this.W*0.0012);
+      ctx.beginPath();
+      ctx.rect(x, y, boxW, boxH);
+      ctx.fill(); ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      for (var i = 0; i < items.length; i++) {
+        var iy = y + pad + row*i + row/2;
+        var ix = x + pad + row*0.5;
+        Sym.draw(ctx, items[i].id, { x:ix, y:iy, size: row*0.85 });
+        ctx.fillStyle = '#2e2013';
+        ctx.font = '600 ' + fs + 'px ' + FONTS.serif;
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'left';
+        ctx.fillText(items[i].name, x + pad + row*1.1, iy);
       }
       ctx.restore();
     },

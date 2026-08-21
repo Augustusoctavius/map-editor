@@ -33,8 +33,11 @@
       o_landmass:'Kara / Kıyı', o_brushsize:'Fırça boyutu', o_rough:'Kıyı sertliği',
       o_landcolor:'Kara rengi', o_shorew:'Kıyı genişliği', o_shorestyle:'Kıyı stili', o_shore_sandy:'Kumsal', o_shore_rocky:'Kayalık', o_shore_reef:'Resif',
       o_smooth:'Kıyıyı yumuşat', o_clearland:'Karayı temizle',
-      h_landmass:'Sürükleyerek kara çiz. "Deniz" aracı hem karayı hem araziyi siler.', o_landgen:'Rastgele kara üret', o_landgentpl:'Şablon', o_landgen_continent:'Kıta', o_landgen_island:'Ada', o_landgen_archipelago:'Takımada', o_landgenrough:'Detay / pürüzlülük', o_landgen_go:'🎲 Üret', h_landgen:'Mevcut kara katmanının yerine geçer. Aynı ayarlarla tekrar tıklayınca yeni bir rastgele sonuç üretir.',
+      h_landmass:'Sürükleyerek kara çiz. "Deniz" aracı hem karayı hem araziyi siler.', o_landgen:'Rastgele kara üret', o_landgentpl:'Şablon', o_landgen_continent:'Kıta', o_landgen_island:'Ada', o_landgen_archipelago:'Takımada', o_landgen_tectonic:'Tektonik', o_landgenrough:'Detay / pürüzlülük', o_landgen_go:'🎲 Üret', h_landgen:'Mevcut kara katmanının yerine geçer. Aynı ayarlarla tekrar tıklayınca yeni bir rastgele sonuç üretir.',
       o_terrain:'Arazi boyama', o_opacity:'Opaklık', o_clip:'Sadece karaya boya',
+      o_biomegen:'Biyomu otomatik ata', o_biomegen_go:'🌍 Biyom ata', h_biomegen:'Yükselti ve enleme göre arazi katmanını otomatik doldurur; mevcut arazi katmanının yerine geçer.', biomegen_empty:'Önce kara çizilmeli.',
+      o_rivergen:'Nehirleri otomatik üret', o_rivergen_go:'💧 Nehir üret', h_rivergen:'Yükselti gridinden denize akan nehirler ekler. "Yükselti" fırçasıyla dağ/tepe çizilmiş olması gerekir.', rivergen_noelev:'Önce "Yükselti" fırçasıyla dağ/tepe çizilmeli.', rivergen_none:'Uygun nehir kaynağı bulunamadı.',
+      o_symlegend:'Lejant',
       o_clearterrain:'Arazi katmanını temizle',
       h_terrain:'Doku her fırça vuruşunda rastgele serpilir — tekrar eden örüntü oluşmaz.', t_elevation:'Yükselti', o_elevation:'Yükselti', o_elevstrength:'Şiddet', o_elevlower:'Alçaltma modu', o_clearelevation:'Yükseltiyi temizle', o_elevdisplay:'Görünüm', o_elevhillshade:'Gölgelendirme (hillshade)', o_elevcontours:'Kontur çizgileri', o_contourinterval:'Kontur aralığı', h_elevation:'Sürükleyerek yükselt; "Alçaltma modu" işaretliyken çukurlaştırır. Gölgelendirme haritayı otomatik günceller.',
       o_symbol:'Sembol', o_size:'Boyut', o_rot:'Dönüş', o_hue:'Renk tonu',
@@ -103,8 +106,11 @@
       o_landmass:'Landmass / Coast', o_brushsize:'Brush size', o_rough:'Coast roughness',
       o_landcolor:'Land colour', o_shorew:'Shore width', o_shorestyle:'Shore style', o_shore_sandy:'Sandy', o_shore_rocky:'Rocky', o_shore_reef:'Reef',
       o_smooth:'Smooth coastline', o_clearland:'Clear landmass',
-      h_landmass:'Drag to paint land. The "Sea" tool erases both land and terrain.', o_landgen:'Generate random land', o_landgentpl:'Template', o_landgen_continent:'Continent', o_landgen_island:'Island', o_landgen_archipelago:'Archipelago', o_landgenrough:'Detail / roughness', o_landgen_go:'🎲 Generate', h_landgen:'Replaces the current land layer. Click again with the same settings for a new random result.',
+      h_landmass:'Drag to paint land. The "Sea" tool erases both land and terrain.', o_landgen:'Generate random land', o_landgentpl:'Template', o_landgen_continent:'Continent', o_landgen_island:'Island', o_landgen_archipelago:'Archipelago', o_landgen_tectonic:'Tectonic', o_landgenrough:'Detail / roughness', o_landgen_go:'🎲 Generate', h_landgen:'Replaces the current land layer. Click again with the same settings for a new random result.',
       o_terrain:'Terrain painting', o_opacity:'Opacity', o_clip:'Paint on land only',
+      o_biomegen:'Auto-assign biomes', o_biomegen_go:'🌍 Assign biomes', h_biomegen:'Fills the terrain layer automatically by elevation and latitude; replaces the current terrain layer.', biomegen_empty:'Draw land first.',
+      o_rivergen:'Auto-generate rivers', o_rivergen_go:'💧 Generate rivers', h_rivergen:'Adds rivers flowing to the sea from the elevation grid. Requires mountains/hills painted with the "Elevation" brush.', rivergen_noelev:'Paint mountains/hills with the "Elevation" brush first.', rivergen_none:'No suitable river source found.',
+      o_symlegend:'Legend',
       o_clearterrain:'Clear terrain layer',
       h_terrain:'Marks scatter randomly on every stroke — no repeating pattern.', t_elevation:'Elevation', o_elevation:'Elevation', o_elevstrength:'Strength', o_elevlower:'Lower mode', o_clearelevation:'Clear elevation', o_elevdisplay:'Display', o_elevhillshade:'Hillshade', o_elevcontours:'Contour lines', o_contourinterval:'Contour interval', h_elevation:'Drag to raise terrain; enable "Lower mode" to carve it down. Hillshade updates the map automatically.',
       o_symbol:'Symbol', o_size:'Size', o_rot:'Rotation', o_hue:'Hue shift',
@@ -991,6 +997,7 @@
       on('chk-shore', 'change', function (e) { Cv.shore = e.target.checked; Cv.requestRender(); });
       on('chk-parchment', 'change', function (e) { Cv.parchment = e.target.checked; Cv.requestRender(); });
       on('chk-grid', 'change', function (e) { Cv.grid = e.target.checked; Cv.requestRender(); });
+      on('chk-legend', 'change', function (e) { Cv.symbolLegend = e.target.checked; Cv.requestRender(); });
 
       on('sel-canvas-size', 'change', function (e) {
         var s = parseInt(e.target.value, 10);
@@ -1461,6 +1468,11 @@
                  function (v) { return (v/100).toFixed(2); });
       on('tr-clip', 'change', function (e) { App.terrain.clip = e.target.checked; });
       on('btn-clear-terrain', 'click', function () { Tools.clearRasterLayer('terrain'); });
+      on('btn-biomegen', 'click', function () {
+        self.modal(self.t('o_biomegen'), '<p>' + self.t('h_biomegen') + '</p>', function () {
+          Tools.autoBiome(Math.floor(Math.random()*4294967296));
+        });
+      });
 
       /* --- yükselti --- */
       this.range('el-size', 'v-el-size', function (v) { App.elevation.brushSize = v; });
@@ -1522,6 +1534,9 @@
       on('rv-color', 'input', function (e) {
         App.river.color = e.target.value;
         if (self.selIs('rivers')) Tools.applyToSelection({ color:e.target.value });
+      });
+      on('btn-rivergen', 'click', function () {
+        Tools.generateRivers(null, Math.floor(Math.random()*4294967296));
       });
 
       /* --- yol --- */
