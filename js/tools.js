@@ -1913,8 +1913,10 @@
       var L = Layers.get('symbols');
       var before = JSON.parse(JSON.stringify(L.objects));
       var idx = L.objects.findIndex(function(ob){ return ob.id === o.id; });
+      if (idx < 0) return;   /* grup listede yoksa splice(-1) yanlış nesneyi silerdi */
       var members = o.members || [];
-      L.objects.splice(idx, 1, ...members);
+      /* ES5: spread yerine apply — kod tabanının geri kalanıyla aynı seviyede kal */
+      Array.prototype.splice.apply(L.objects, [idx, 1].concat(members));
       App.selection = members.length > 0
         ? { multi:true, layerId:'symbols', ids:members.map(function(m){return m.id;}), objs:members }
         : null;

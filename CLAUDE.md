@@ -10,7 +10,7 @@ Source comments and UI strings are primarily Turkish (this is a Turkish-authored
 
 ## Running it locally
 
-There is no build/compile/lint/test tooling in this repo — it's static files served directly.
+There is no build/compile/lint step — it's static files served directly.
 
 ```bash
 python3 serve.py 8000        # or: python3 -m http.server 8000
@@ -20,7 +20,25 @@ npx http-server . -p 8000 -c-1 -o
 
 Then open `http://localhost:8000/`. **Do not open `index.html` via `file://`** — `toDataURL`/`getImageData` (used for the shore effect and PNG export) are blocked by CORS under `file://`.
 
-There are no automated tests. To verify a change, run the local server, open the app in a browser, and check the browser console for `[WME] hazır — N sembol, tuval 2048×2048` on load, plus manually exercise the affected tool.
+### Tests
+
+Four Node scripts drive a real headless Chromium over CDP (no Playwright dependency — they speak the
+protocol directly via Node's built-in `WebSocket`, and each boots its own static server). Run them from
+the repo root with plain `node`; each exits non-zero on failure.
+
+```bash
+node run-integration-test.mjs   # 75 assertions: every module, catalog integrity, round-trips
+node run-layer-undo-test.mjs    # layer add/delete undo, pixel-level fidelity
+node run-fps.mjs                # frame budget at 1024/2048/4096, idle+pan+zoom
+node run-mapgen-test.mjs        # renders 3 landmass templates to /tmp/mapgen-shots for eyeballing
+```
+
+Two gotchas when writing more of these: **`requestAnimationFrame` is throttled in headless Chrome**, so
+benchmark loops must use `setTimeout(0)`; and a Chromium left over from a previous run holds the CDP port,
+so the first invocation after one is killed can fail to connect — just run it again.
+
+Anything they don't cover still wants a manual pass: run the server, open the app, confirm
+`[WME] hazır — N sembol, tuval 2048×2048` in the console, and exercise the affected tool.
 
 ## Architecture
 

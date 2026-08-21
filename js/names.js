@@ -118,8 +118,6 @@
       });
     },
 
-    featureList: function () { return Object.keys(FEATURES); },
-
     /* Bir ad üret. feature: settlement/city/river/mountain/forest/region/sea/lake */
     generate: function (cultureKey, feature, lang, seed) {
       var rnd = rngFrom(seed);
