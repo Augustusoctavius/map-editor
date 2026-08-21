@@ -1,7 +1,7 @@
 /**
- * Bölgeler sekmesi (siyasi bölgeler alt-paneli + harita ağacı) ve
- * Görevler (yapılacaklar) listesi doğrulaması. Diğer test runner'larla
- * aynı CDP iskeletini kullanır (bkz. CLAUDE.md § Tests).
+ * Bölgeler sekmesi (siyasi bölgeler alt-paneli + harita ağacı), Görevler
+ * (yapılacaklar) listesi ve sol/sağ panel kapatma doğrulaması. Diğer test
+ * runner'larla aynı CDP iskeletini kullanır (bkz. CLAUDE.md § Tests).
  */
 import { execSync, spawn } from 'child_process';
 import { createServer } from 'http';
@@ -157,6 +157,24 @@ async function run() {
         delBtn.click();
         check('görev silindi', tdl.children.length === 0);
         check('boş-ipucu geri geldi', tdHint.style.display !== 'none');
+
+        /* ---- 5) sol/sağ panel kapatma ---- */
+        var ws = document.getElementById('workspace');
+        var btnL = document.getElementById('btn-toggle-left');
+        var btnR = document.getElementById('btn-toggle-right');
+        check('başlangıçta paneller açık', !ws.classList.contains('collapsed-left') && !ws.classList.contains('collapsed-right'));
+        btnL.click();
+        check('sol panel kapandı', ws.classList.contains('collapsed-left'));
+        check('sol panel genişliği 0', getComputedStyle(ws).gridTemplateColumns.split(' ')[0] === '0px');
+        check('kolçak aria-expanded false', btnL.getAttribute('aria-expanded') === 'false');
+        btnL.click();
+        check('sol panel yeniden açıldı', !ws.classList.contains('collapsed-left'));
+        btnR.click();
+        check('sağ panel kapandı', ws.classList.contains('collapsed-right'));
+        var cols = getComputedStyle(ws).gridTemplateColumns.split(' ');
+        check('sağ panel genişliği 0', cols[cols.length - 1] === '0px');
+        btnR.click();
+        check('sağ panel yeniden açıldı', !ws.classList.contains('collapsed-right'));
 
         window.__testResults = results;
         window.__testPass = results.every(function (r) { return r.endsWith('PASS'); });
