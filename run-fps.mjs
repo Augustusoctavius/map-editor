@@ -103,7 +103,7 @@ async function run() {
     /* Basit render sayımı: kaç ms sürüyor? */
     const benchCode = `(async function bench() {
   try {
-    const SIZES  = [1024, 2048, 4096];
+    const SIZES  = [1024, 2048, 4096, 8192];
     const FRAMES = 30;
     const results = {};
 

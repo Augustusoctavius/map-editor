@@ -153,6 +153,26 @@
   </div>
 </div>
 
+<!-- ============ PAYLAŞIM GÖRÜNTÜLEYİCİ ============
+     URL hash'inde (#d=...) gömülü bir harita görüntüsü varsa gösterilir.
+     Sunucu yok: hash asla ağa gitmez, bu yüzden bu tamamen istemci
+     tarafında çalışan bir "harita linki" oluşturur. embed=1 ile üst
+     çubuk/kabuk gezinmesi gizlenir — iframe'e gömmeye uygun. -->
+<div id="view-share" class="shell-view hidden">
+  <div id="share-stage">
+    <img id="share-img" alt="">
+  </div>
+  <div id="share-bar">
+    <h1 id="share-title"></h1>
+    <a id="share-edit-link" class="share-edit-btn" href="./" data-i18n="share_editbtn">Wayborne'da aç</a>
+  </div>
+  <div id="share-zoom">
+    <button id="share-zo" title="&minus;">&minus;</button>
+    <button id="share-zf" title="fit">&#9633;</button>
+    <button id="share-zi" title="+">&plus;</button>
+  </div>
+</div>
+
 <!-- ============ EDITOR ============ -->
 <div id="view-editor" class="shell-view hidden">
 
@@ -184,6 +204,13 @@
     <button class="tb-btn" id="btn-export-png4" data-i18n-title="exp_png4_t">PNG 4×</button>
     <button class="tb-btn" id="btn-export-svg">SVG</button>
     <button class="tb-btn" id="btn-export-html" data-i18n-title="exp_html_t">HTML</button>
+    <button class="tb-btn" id="btn-share-link" data-i18n-title="exp_share_t">
+      <svg class="ico-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="6" r="2.6"/><circle cx="18" cy="18" r="2.6"/>
+        <path d="M8.2 10.8 15.8 7.2M8.2 13.2l7.6 3.6"/>
+      </svg>
+    </button>
     <button class="tb-btn" id="btn-print" data-i18n-title="exp_print_t">
       <svg class="ico-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

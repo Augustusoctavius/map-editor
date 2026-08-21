@@ -38,6 +38,31 @@
 #view-editor{display:contents}
 #view-editor.hidden{display:none}
 
+/* ---------- paylaşım görüntüleyici ---------- */
+#view-share{padding:0; overflow:hidden}
+#view-share.embed{top:0}
+#share-stage{position:absolute; inset:0; cursor:grab; touch-action:none}
+#share-stage.drag{cursor:grabbing}
+#share-img{position:absolute; top:0; left:0; transform-origin:0 0; max-width:none;
+  box-shadow:0 30px 90px -20px #000c; user-select:none; -webkit-user-drag:none}
+#share-bar{
+  position:absolute; left:0; right:0; top:0; z-index:2;
+  display:flex; align-items:center; gap:14px; padding:14px 18px;
+  background:linear-gradient(var(--ink-900),transparent); pointer-events:none;
+}
+#share-bar h1{font-size:14.5px; font-weight:600; letter-spacing:.03em; color:var(--text); margin:0}
+.share-edit-btn{
+  margin-inline-start:auto; pointer-events:auto; font-size:11.5px; color:var(--brass);
+  text-decoration:none; border:1px solid var(--line); border-radius:var(--radius); padding:5px 10px;
+}
+.share-edit-btn:hover{border-color:var(--brass-dim)}
+#share-zoom{position:absolute; right:16px; bottom:16px; z-index:2; display:flex; gap:6px}
+#share-zoom button{
+  width:34px; height:34px; border:1px solid var(--line); background:var(--ink-800);
+  color:var(--brass); border-radius:5px; cursor:pointer; font-size:16px;
+}
+#share-zoom button:hover{border-color:var(--brass-dim)}
+
 /* Kabuk sayfaları 360px telefondan 4K TV'ye kadar tek akışkan ölçekle
    çalışır: clamp() ile tipografi viewport'a bağlı büyür, üst sınır çok
    büyük ekranda satır uzunluğunu okunur tutar. */

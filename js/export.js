@@ -93,6 +93,64 @@
         .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0, 48) || 'harita';
     },
 
+    /* ================= PAYLAŞIM LİNKİ =================
+       Sunucu yok, bu yüzden "link" aslında haritanın küçültülmüş bir
+       görüntüsünü doğrudan URL'nin hash kısmına gömüyor. Hash tarayıcıdan
+       dışarı, ağa hiç gitmez (sunucu logunda bile görünmez) — bu yüzden
+       statik barındırılan bu sayfanın kendisi hem düzenleyici hem de
+       (hash varken) salt-okunur bir görüntüleyici olarak çalışabiliyor.
+       base64 → base64url dönüşümü '+','/','=' karakterlerini kaçış
+       gerektirmeyen '-','_' ile değiştirip URL'yi şişirmiyor. */
+    _b64urlEncode: function (b64) {
+      return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    },
+    _b64urlDecode: function (s) {
+      s = s.replace(/-/g, '+').replace(/_/g, '/');
+      while (s.length % 4) s += '=';
+      return s;
+    },
+
+    buildShareURL: function (opts) {
+      opts = opts || {};
+      var maxDim = opts.maxDim || 1600;
+      var title = (opts.title || App.currentCanvasName || 'Wayborne').trim() || 'Wayborne';
+
+      var k = this._fitScale(maxDim);
+      var c = this.renderToCanvas(Cv.W * k, Cv.H * k);
+      var dataURI = c.toDataURL('image/jpeg', 0.82);
+      var payload = this._b64urlEncode(dataURI.split(',')[1]);
+
+      var hash = 'd=' + payload + '&t=' + encodeURIComponent(title) +
+                 '&w=' + c.width + '&h=' + c.height + '&f=jpeg';
+      return location.origin + location.pathname + '#' + hash;
+    },
+
+    /* Aynı linki iframe'e gömülebilir hâle getirir: e=1 bayrağı
+       kabuk gezinmesini ve üst çubuğu gizler, sadece harita kalır. */
+    embedCode: function (url, w, h) {
+      var embedURL = url + '&e=1';
+      return '<iframe src="' + embedURL + '" width="' + (w||800) + '" height="' + (h||600) +
+             '" style="border:0" loading="lazy" allowfullscreen></iframe>';
+    },
+
+    /* location.hash'i ayrıştırır; paylaşım verisi yoksa null döner. */
+    parseShareHash: function () {
+      var h = location.hash;
+      if (!h || h.indexOf('d=') < 0) return null;
+      var raw = h.charAt(0) === '#' ? h.slice(1) : h;
+      var params = new URLSearchParams(raw);
+      var d = params.get('d');
+      if (!d) return null;
+      var fmt = params.get('f') || 'jpeg';
+      return {
+        title: params.get('t') || 'Wayborne',
+        dataURI: 'data:image/' + fmt + ';base64,' + this._b64urlDecode(d),
+        w: parseInt(params.get('w'), 10) || 0,
+        h: parseInt(params.get('h'), 10) || 0,
+        embed: params.get('e') === '1'
+      };
+    },
+
     _humanSize: function (n) {
       if (n < 1024) return n + ' B';
       if (n < 1024*1024) return (n/1024).toFixed(0) + ' KB';

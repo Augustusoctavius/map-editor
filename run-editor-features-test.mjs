@@ -145,6 +145,21 @@ async function run() {
         try { Cv.renderMap(c.getContext('2d'), { includeReference:false, includeLinks:true }); check('tam pipeline renderMap hatasiz', true); }
         catch (e) { check('tam pipeline renderMap hatasiz: ' + e.message, false); }
 
+        /* ---- 7) paylaşım linki (URL hash, sunucu yok) ---- */
+        App.currentCanvasName = 'Test Ada';
+        var shareUrl = Exporter.buildShareURL({ maxDim: 800, title: 'Test Ada' });
+        check('paylasim linki uretildi', shareUrl.indexOf('#d=') >= 0);
+        var hashPart = shareUrl.split('#')[1];
+        history.replaceState(null, '', '#' + hashPart);
+        var parsed = Exporter.parseShareHash();
+        check('link geri cozumlendi', !!parsed && parsed.title === 'Test Ada');
+        var embedSnippet = Exporter.embedCode(shareUrl, 640, 480);
+        check('embed kodu uretildi', embedSnippet.indexOf('<iframe') === 0 && embedSnippet.indexOf('e=1') > 0);
+        var sharedOk = UI.tryShowSharedMap();
+        await new Promise(function (r) { setTimeout(r, 200); });
+        check('paylasim gorunumu acildi', sharedOk === true && !document.getElementById('view-share').classList.contains('hidden'));
+        history.replaceState(null, '', location.pathname);
+
         window.__testResults = results;
         window.__testPass = results.every(function (r) { return r.endsWith('PASS'); });
         window.__testDone = true;

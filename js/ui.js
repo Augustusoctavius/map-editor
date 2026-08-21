@@ -25,6 +25,9 @@
       tpl_continent:'Kıta', tpl_continent_d:'Geniş ana kara, girintili kıyılar', tpl_island:'Ada', tpl_island_d:'Tek büyük ada, çevresi açık deniz', tpl_archipelago:'Takımada', tpl_archipelago_d:'Dağınık adalar ve sığ boğazlar', tpl_kingdom:'Krallık', tpl_kingdom_d:'Yumuşak kıyılı, tarıma elverişli topraklar', tpl_battle:'Savaş alanı', tpl_battle_d:'Altıgen ızgaralı küçük arazi', tpl_blank:'Boş tuval', tpl_blank_d:'Her şeye sıfırdan başla',
       o_outlinecolor:'Dış hat rengi',
       exp_html_t:'Tek dosya HTML', exp_print_t:'Baskı / PDF', exp_png2_t:'2× çözünürlük', exp_png4_t:'4× çözünürlük', exp_maxdim:'En uzun kenar', exp_format:'Biçim', exp_fmt_png:'PNG · keskin, büyük dosya', exp_fmt_jpeg:'JPEG · küçük dosya', exp_title:'Başlık', exp_html_help:'Tek bir .html dosyası indirilir: harita ve küçük bir görüntüleyici içine gömülüdür. Sunucu gerekmez — dosyayı yollayıp çift tıklamak yeterli.', exp_page:'Sayfa boyu', exp_orient:'Yön', exp_portrait:'Dikey', exp_landscape:'Yatay', exp_margin:'Kenar boşluğu', exp_dpi:'Çözünürlük', exp_dpi_screen:'ekran', exp_dpi_normal:'normal baskı', exp_dpi_high:'yüksek kalite', exp_print_help:'Tarayıcının baskı penceresi açılır. Oradan yazıcıya gönderebilir ya da "PDF olarak kaydet" ile PDF üretebilirsin.', printing:'Baskı hazırlanıyor', print_failed:'Baskı penceresi açılamadı', viewer_hint:'sürükle · tekerlek · çift tık', viewer_in:'Yakınlaş', viewer_out:'Uzaklaş', viewer_fit:'Sığdır',
+      exp_share_t:'Paylaşım linki', exp_share_gen:'🔗 Link oluştur', exp_share_link:'Link', exp_share_embedcode:'Embed kodu (iframe)', copy:'Kopyala', copied:'Kopyalandı',
+      exp_share_help:'Sunucu yok — harita görüntüsü doğrudan linkin içine (URL\'nin # kısmına) gömülür. Link kimseye gönderilmeden hiçbir yere yüklenmez; büyük haritalarda link uzun olabilir.', exp_share_sizehint:'Link uzunluğu ≈ {kb} KB',
+      share_editbtn:"Wayborne'da aç",
       t_sketch:'Çizim', o_sketch:'Çizim', h_sketch:'Serbest fırça, yalnızca kendi eklediğin katmanlara çizer. Katman panelinden "+ Katman ekle" ile bir katman ekle, listeden onu seç, sonra haritaya çiz.', o_hardness:'Sertlik', o_sketch_eraser:'Silgi modu', sketch_target:'Hedef katman', sketch_need_layer:'Önce kendi katmanını ekle ve listeden seç', layer_add:'+ Katman ekle', h_add_layer:'Kendi eklediğin katmanlar serbest çizim içindir; "Çizim" aracıyla üzerlerine boyayabilirsin.', layer_added:'Katman eklendi', layer_untitled:'Katman', layer_max:'En fazla 12 kullanıcı katmanı eklenebilir', layer_rename:'Katman adı', layer_rename_hint:'Adı değiştirmek için çift tıkla', layer_delete:'Katmanı sil', layer_delete_confirm:'Bu katmanı ve üzerindeki çizimi silmek istediğine emin misin?', tut_h_sketch:'Kendi eklediğin katmanlara serbest fırçayla çizer; renk, boyut, sertlik, opaklık ve silgi modu ayarlanabilir.',
       o_typography:'Tipografi', o_font:'Yazı ailesi', o_banner:'Kapıt', o_banner_none:'Yok', o_banner_ribbon:'Kurdele', o_banner_plate:'Levha', o_banner_scroll:'Tomar', o_banner_stone:'Taş', o_caps:'Büyük harf', o_outline:'Dış hat', o_shadow:'Gölge', h_font_missing:'Bu yazı ailesi bu cihazda kurulu değil; en yakın karşılığı kullanılıyor. Listede • ile işaretli olanlar kurulu.',
       grp_navigate:'Gezinme', grp_terrain:'Arazi', grp_water:'Su & Yollar', grp_markers:'İşaretler', grp_regions:'Bölge & Ölçüm',
@@ -103,6 +106,9 @@
       tpl_continent:'Continent', tpl_continent_d:'Broad landmass with indented coasts', tpl_island:'Island', tpl_island_d:'A single large island in open sea', tpl_archipelago:'Archipelago', tpl_archipelago_d:'Scattered isles and shallow straits', tpl_kingdom:'Kingdom', tpl_kingdom_d:'Gentle coasts, farmable inland', tpl_battle:'Battle map', tpl_battle_d:'Small terrain with a hex grid', tpl_blank:'Blank canvas', tpl_blank_d:'Start from nothing',
       o_outlinecolor:'Outline colour',
       exp_html_t:'Single-file HTML', exp_print_t:'Print / PDF', exp_png2_t:'2× resolution', exp_png4_t:'4× resolution', exp_maxdim:'Longest edge', exp_format:'Format', exp_fmt_png:'PNG · sharp, large file', exp_fmt_jpeg:'JPEG · small file', exp_title:'Title', exp_html_help:'Downloads one .html file with the map and a small viewer embedded inside it. No server needed — send the file and double-click it.', exp_page:'Page size', exp_orient:'Orientation', exp_portrait:'Portrait', exp_landscape:'Landscape', exp_margin:'Margin', exp_dpi:'Resolution', exp_dpi_screen:'screen', exp_dpi_normal:'normal print', exp_dpi_high:'high quality', exp_print_help:'Opens your browser’s print dialog. From there you can send it to a printer or choose “Save as PDF”.', printing:'Preparing print', print_failed:'Could not open the print dialog', viewer_hint:'drag · wheel · double-click', viewer_in:'Zoom in', viewer_out:'Zoom out', viewer_fit:'Fit',
+      exp_share_t:'Share link', exp_share_gen:'🔗 Generate link', exp_share_link:'Link', exp_share_embedcode:'Embed code (iframe)', copy:'Copy', copied:'Copied',
+      exp_share_help:'No server — the map image is embedded directly in the link (the URL\'s # part). The link is never uploaded anywhere unless you send it yourself; large maps make longer links.', exp_share_sizehint:'Link length ≈ {kb} KB',
+      share_editbtn:'Open in Wayborne',
       t_sketch:'Sketch', o_sketch:'Sketch', h_sketch:'A freehand brush that only draws on layers you add yourself. Add one with "+ Add layer" in the layer panel, select it in the list, then draw on the map.', o_hardness:'Hardness', o_sketch_eraser:'Eraser mode', sketch_target:'Target layer', sketch_need_layer:'Add your own layer first, then select it in the list', layer_add:'+ Add layer', h_add_layer:'Layers you add yourself are for freehand drawing; paint on them with the "Sketch" tool.', layer_added:'Layer added', layer_untitled:'Layer', layer_max:'At most 12 user layers can be added', layer_rename:'Layer name', layer_rename_hint:'Double-click to rename', layer_delete:'Delete layer', layer_delete_confirm:'Delete this layer and everything drawn on it?', tut_h_sketch:'Draws freehand on layers you add yourself; colour, size, hardness, opacity and an eraser mode are adjustable.',
       o_typography:'Typography', o_font:'Typeface', o_banner:'Banner', o_banner_none:'None', o_banner_ribbon:'Ribbon', o_banner_plate:'Plate', o_banner_scroll:'Scroll', o_banner_stone:'Stone', o_caps:'Uppercase', o_outline:'Outline', o_shadow:'Shadow', h_font_missing:'This typeface is not installed on this device; the closest match is used instead. Entries marked · are installed.',
       grp_navigate:'Navigate', grp_terrain:'Terrain', grp_water:'Water & Routes', grp_markers:'Markers', grp_regions:'Regions & Measure',
@@ -1102,7 +1108,138 @@
       this.renderTutorial();
       this.buildTemplateGrid();
       this.refreshCanvasList();
-      this.showView('home');
+      if (!this.tryShowSharedMap()) this.showView('home');
+    },
+
+    /* URL hash'inde bir paylaşım linki bulunursa (bkz. Exporter.parseShareHash)
+       kabuğun geri kalanı yerine salt-okunur görüntüleyiciyi gösterir.
+       embed=1 ise kabuk gezinmesi de gizlenir — bir iframe'in içinden
+       başka hiçbir şey görünmesin diye. */
+    tryShowSharedMap: function () {
+      var data = Exporter.parseShareHash();
+      if (!data) return false;
+      $('share-title').textContent = data.title;
+      document.title = data.title + ' · Wayborne';
+      var img = $('share-img');
+      img.alt = data.title;
+      img.src = data.dataURI;
+      var view = $('view-share');
+      this._shareEmbed = !!data.embed;
+      if (data.embed) view.classList.add('embed');
+      this.bindShareViewer(data.w, data.h);
+      this.showView('share');
+      return true;
+    },
+
+    bindShareViewer: function (W, H) {
+      var stage = $('share-stage'), img = $('share-img');
+      var self = this;
+      var z = 1, ox = 0, oy = 0;
+
+      function apply() { img.style.transform = 'translate(' + ox + 'px,' + oy + 'px) scale(' + z + ')'; }
+      function fit() {
+        var p = 24;
+        var fz = Math.min((stage.clientWidth - p*2) / W, (stage.clientHeight - p*2) / H);
+        z = isFinite(fz) && fz > 0 ? fz : 1;
+        ox = (stage.clientWidth - W*z) / 2; oy = (stage.clientHeight - H*z) / 2;
+        apply();
+      }
+      function zoomAt(cx, cy, f) {
+        var nz = Math.max(0.02, Math.min(12, z*f));
+        ox = cx - (cx-ox)*(nz/z); oy = cy - (cy-oy)*(nz/z); z = nz; apply();
+      }
+      this._shareFit = fit;
+
+      if (this._shareViewerBound) { if (img.complete) fit(); else img.onload = fit; return; }
+      this._shareViewerBound = true;
+
+      stage.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        var r = stage.getBoundingClientRect();
+        zoomAt(e.clientX-r.left, e.clientY-r.top, e.deltaY < 0 ? 1.12 : 1/1.12);
+      }, { passive:false });
+      var down = false, px = 0, py = 0;
+      stage.addEventListener('pointerdown', function (e) {
+        down = true; px = e.clientX; py = e.clientY;
+        stage.classList.add('drag'); stage.setPointerCapture(e.pointerId);
+      });
+      stage.addEventListener('pointermove', function (e) {
+        if (!down) return;
+        ox += e.clientX-px; oy += e.clientY-py; px = e.clientX; py = e.clientY; apply();
+      });
+      stage.addEventListener('pointerup', function () { down = false; stage.classList.remove('drag'); });
+      stage.addEventListener('dblclick', function () { if (self._shareFit) self._shareFit(); });
+      $('share-zi').addEventListener('click', function () { zoomAt(stage.clientWidth/2, stage.clientHeight/2, 1.3); });
+      $('share-zo').addEventListener('click', function () { zoomAt(stage.clientWidth/2, stage.clientHeight/2, 1/1.3); });
+      $('share-zf').addEventListener('click', function () { if (self._shareFit) self._shareFit(); });
+      window.addEventListener('resize', function () { if (self._currentView === 'share' && self._shareFit) self._shareFit(); });
+
+      if (img.complete) fit(); else img.onload = fit;
+    },
+
+    /* navigator.clipboard güvenli bağlamda (https/localhost) çalışır;
+       yoksa gizli bir textarea + execCommand'a düşer. */
+    copyToClipboard: function (text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(function () {});
+        return;
+      }
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+    },
+
+    shareLinkDialog: function () {
+      var self = this;
+      var name = App.currentCanvasName || this.t('canvas_unnamed');
+      var body =
+        '<label class="row"><span>' + esc(this.t('exp_maxdim')) + '</span></label>' +
+        '<select id="sl-dim" class="sel">' +
+          '<option value="1024">1024 px</option>' +
+          '<option value="1600" selected>1600 px</option>' +
+          '<option value="2048">2048 px</option>' +
+        '</select>' +
+        '<button class="btn wide" id="sl-generate" style="margin-top:10px">' + esc(this.t('exp_share_gen')) + '</button>' +
+        '<div id="sl-result" style="display:none;margin-top:12px">' +
+          '<label class="row"><span>' + esc(this.t('exp_share_link')) + '</span></label>' +
+          '<div class="row2"><input type="text" id="sl-url" class="sel" readonly>' +
+            '<button class="btn" id="sl-copy-url">' + esc(this.t('copy')) + '</button></div>' +
+          '<p class="hint" id="sl-size-hint"></p>' +
+          '<label class="row" style="margin-top:10px"><span>' + esc(this.t('exp_share_embedcode')) + '</span></label>' +
+          '<div class="row2"><textarea id="sl-embed-code" class="sel" readonly rows="2" style="resize:none"></textarea>' +
+            '<button class="btn" id="sl-copy-embed">' + esc(this.t('copy')) + '</button></div>' +
+        '</div>' +
+        '<p class="hint">' + esc(this.t('exp_share_help')) + '</p>';
+
+      this.modal(this.t('exp_share_t'), body);
+
+      on('sl-generate', 'click', function () {
+        var url = Exporter.buildShareURL({
+          maxDim: parseInt($('sl-dim').value, 10) || 1600,
+          title: name
+        });
+        var kb = Math.round(url.length/1024);
+        $('sl-url').value = url;
+        $('sl-embed-code').value = Exporter.embedCode(url, 800, 600);
+        $('sl-size-hint').textContent = self.t('exp_share_sizehint').replace('{kb}', kb);
+        $('sl-result').style.display = '';
+        self.copyToClipboard(url);
+        self.msg(self.t('copied'));
+      });
+      on('sl-copy-url', 'click', function (e) {
+        e.preventDefault();
+        self.copyToClipboard($('sl-url').value);
+        self.msg(self.t('copied'));
+      });
+      on('sl-copy-embed', 'click', function (e) {
+        e.preventDefault();
+        self.copyToClipboard($('sl-embed-code').value);
+        self.msg(self.t('copied'));
+      });
     },
 
     /* Editörün üç sütunlu yerleşimi için gereken en küçük viewport.
@@ -1148,7 +1285,7 @@
         t.classList.toggle('active', on);
         t.setAttribute('aria-selected', on ? 'true' : 'false');
       });
-      if ($('shell-nav')) $('shell-nav').classList.toggle('hidden', name === 'editor');
+      if ($('shell-nav')) $('shell-nav').classList.toggle('hidden', name === 'editor' || (name === 'share' && this._shareEmbed));
       if (name === 'canvas') this.refreshCanvasList();
       if (name === 'editor') {
         /* editör gizliyken canvas 0×0 rapor ediyordu — görünür olduktan
@@ -1831,6 +1968,7 @@
       on('btn-export-png2', 'click', function () { Exporter.png(2); });
       on('btn-export-png4', 'click', function () { Exporter.png(4); });
       on('btn-export-html', 'click', function () { self.htmlExportDialog(); });
+      on('btn-share-link', 'click', function () { self.shareLinkDialog(); });
       on('btn-print', 'click', function () { self.printDialog(); });
 
       /* --- görünüm --- */
