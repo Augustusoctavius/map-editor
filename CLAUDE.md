@@ -73,7 +73,11 @@ This order matters: later files reference globals defined by earlier ones (e.g. 
 CSS uses **logical** properties (`border-inline-start`, `padding-inline-end`, `inset-inline-end`, `text-align:start`)
 — the `#workspace` grid reverses its columns under `dir="rtl"`, so the tool rail moves to the right and the options
 panel to the left. Canvas rendering is coordinate math and is unaffected. `UI.t()` falls back to **English** (not
-Turkish) for any non-`tr` language, so a partially translated language degrades sensibly.
+Turkish) for any non-`tr` language, so a partially translated language degrades sensibly — this is a safety net for
+whichever new key someone forgets to translate next, not the normal state: as of this writing all 400 `DICT` keys
+are filled in for all 11 languages (verified by a permanent `run-integration-test.mjs` assertion that compares each
+non-`tr`/`en` language's translation of a representative key set against the English fallback value, catching a
+silently-dropped translation the moment it regresses).
 
 The canvas label engine needed a real fix for this, independent of UI language: `drawLabel` positions glyphs
 **one at a time** to implement letter-spacing, arc curvature and path-following, which destroys Arabic/Persian

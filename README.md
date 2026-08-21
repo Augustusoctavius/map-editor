@@ -2,7 +2,7 @@
 
 Fantastik / ortaçağ tarzı, tarayıcı üzerinde çalışan bir harita editörü. Tamamen vanilla JavaScript ve Canvas 2D ile yazılmıştır — framework, build adımı, bundler, npm bağımlılığı veya CDN varlığı yoktur. Karada, denizde, kıyıda, arazi dokularında, izometrik binalarda kullanılan her şey (891 sembol, 34 arazi tipi, onlarca izometrik yapı) kodun içinde üretilir; dışarıdan görsel dosyası yüklenmez.
 
-Arayüz 10 dilde kullanılabilir: Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, İtalyanca, Portekizce, Hollandaca, Lehçe, Rusça. Sağ üstteki 🌐 simgesinden değiştirilir.
+Arayüz 11 dilde kullanılabilir: Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, İtalyanca, Portekizce, Hollandaca, Lehçe, Rusça, Arapça (bu sonuncusu sağdan sola yerleşimle). Sağ üstteki 🌐 simgesinden değiştirilir; tüm arayüz metinleri her 11 dilde eksiksiz çevrilidir.
 
 ## Çalıştırma
 
@@ -41,6 +41,7 @@ Bir tuval oluşturulduğunda veya açıldığında, bildiğiniz editör ekranın
 | **PNG / PNG 2× / PNG 4×** | Haritayı normal, 2× veya 4× çözünürlükte PNG olarak dışa aktarır. |
 | **SVG** | Haritayı gerçek vektör SVG olarak dışa aktarır — sembol yolları (`Path2D` verisi) doğrudan `<path>` olarak yazılır, bitmap gömme değildir. Kıyı parlaması ve yükselti gölgelendirmesi gibi raster efektler base64 `<image>` olarak gömülür. |
 | **HTML** | Haritayı **tek bir `.html` dosyası** olarak dışa aktarır: görüntü ve küçük bir görüntüleyici (sürükle-kaydır, tekerlekle yakınlaş, çift tıkla sığdır) dosyanın içine gömülüdür. Dış istek, sunucu veya betik kütüphanesi yok — dosyayı yollayıp çift tıklamak yeterli. En uzun kenar (1280–4096 px) ve biçim (PNG kayıpsız / JPEG küçük dosya) seçilebilir. |
+| **🔗 Paylaşım linki** | Sunucu yok: küçültülmüş bir JPEG görüntü doğrudan URL'nin `#` kısmına gömülür (linki e-posta/mesajla gönderdiğinde de hiçbir sunucuya yüklenmez). Karşı taraf linki açınca salt-okunur bir görüntüleyici (pan/zoom) açılır. Bir `<iframe>` göm kodu da otomatik üretilir. |
 | **🖨 Baskı / PDF** | Haritayı sayfa boyu (A5–Tabloid), yön, kenar boşluğu ve DPI (96 / 150 / 300) seçerek tarayıcının baskı iletişimine gönderir. Oradan yazıcıya basılabilir ya da "PDF olarak kaydet" ile gerçek PDF üretilebilir; ayrı bir PDF kütüphanesi kullanılmaz. Harita, seçilen sayfanın basılabilir alanına en-boy oranı korunarak sığdırılır. |
 | **🌐 Dil** | 11 dilli arayüz dili seçici (bayraklı, açılır menü). Arapça seçildiğinde arayüz sağdan sola döner (araç rayı sağa, seçenek paneli sola geçer); tuval her zaman aynı kalır. |
 
@@ -62,7 +63,7 @@ bölümünü açar ve tuşuyla da seçilebilir. Rehber sayfası da aynı gruplam
 
 | Araç | Tuş | İşlev |
 |---|---|---|
-| **Kara** | `B` | Kara kütlesi fırçası — karayı boyar, deniz ile arasına otomatik kıyı efekti (glow) uygulanır. Aynı panelde **prosedürel kara üreteci** de bulunur: Kıta / Ada / Takımada şablonlarından biriyle, tohumlu Perlin gürültüsüne dayalı tek tıkla rastgele kıyı çizgisi üretir (detay/pürüzlülük ayarlanabilir, harici kütüphane kullanılmaz). |
+| **Kara** | `B` | Kara kütlesi fırçası — karayı boyar, deniz ile arasına otomatik kıyı efekti (glow) uygulanır. Aynı panelde **prosedürel kara üreteci** de bulunur: Kıta / Ada / Takımada şablonlarından biriyle, tohumlu Perlin gürültüsüne dayalı tek tıkla rastgele kıyı çizgisi üretir (detay/pürüzlülük ayarlanabilir, harici kütüphane kullanılmaz). Bir **kapsama garantisi** kıtanın tuvalin en az %40'ını, ada/takımadanın en az %20'sini kaplamasını sağlar; takımada adaları birbirinden gerçekten ayrık, dağınık parçalar olarak üretir (tek bir kaynaşmış kara kütlesi değil). "Üret" düğmesinin üstündeki **Nehir / Göl / Arazi** onay kutuları işaretlenirse aynı tohumdan otomatik nehir, göl ve biyom da eklenir. Uyarı penceresi yalnızca ilk kullanımda çıkar. |
 | **Deniz** | `E` | Silgi — boyanmış karayı (ve üzerindeki arazi dokusunu) tek adımda kaldırır. |
 | **Doldur** | `F` | Kova doldurma — kalemle çizilmiş kapalı bir kıyı çevriminin (ring) içini tek tıkla dolduran flood-fill aracı; tıklanan pikselle aynı kara/deniz durumundaki bitişik alanı doldurur. |
 | **Arazi** | `T` | 34 arazi tipinden biriyle doku boyar (otlak, orman, karanlık orman, tayga, bozkır, savan, çöl, bataklık, kayalık, kar/buz, arnavut kaldırımı, kırık taş yol, çamur yol, pis su akıntısı, süs çiçeği tarhı, çalı bordürü vb.). Her fırça darbesinde desen rastgele serpilir; iki darbe asla birebir aynı görünmez. Fırçanın kara sınırlarını aşmaması otomatik sağlanır. |
@@ -110,7 +111,7 @@ Bağlantı iğneleri yalnızca editör içi gezinme yardımcısıdır; PNG/SVG �
 
 ## Sağ panel — seçenekler
 
-Seçili araca göre değişen ayarlar burada görünür: fırça boyutu, opaklık, renk, kenarlık rengi/kalınlığı, kıyı stili (kumlu / kayalık / resif), yükselti gücü ve alçaltma modu, pusula gülü stili, ölçek çubuğu ayarları, ızgaraya yapış (snap-to-grid) açma/kapama, referans görsel yükleme/opaklık ve görünüm (yakınlaştır/sığdır) kontrolleri.
+Seçili araca göre değişen ayarlar burada görünür: fırça boyutu, opaklık, renk, kenarlık rengi/kalınlığı, kıyı stili (kumlu / kayalık / resif), **deniz rengi** (Kara aracının panelinde bir renk seçici — okyanus dokusu ve derinlik gradyanı anında yeni renkten türetilir, proje kaydında saklanır), yükselti gücü ve alçaltma modu, pusula gülü stili, ölçek çubuğu ayarları, ızgaraya yapış (snap-to-grid) açma/kapama, referans görsel yükleme/opaklık ve görünüm (yakınlaştır/sığdır) kontrolleri.
 
 **Referans görsel — iz sürme (trace) modu:** Bir referans görsel yüklendikten sonra "İz sürme modu" işaretlenirse, görsel boyanan kara/arazi katmanlarının üstünde yarı saydam olarak gösterilmeye devam eder (normalde opak fırça darbeleri altında kalırdı) ve kara/deniz fırçası, referanstaki en yakın belirgin kenara (elle çizilmiş kıyı hattı gibi) otomatik kenetlenir. Bu mod yalnızca ekranda geçerlidir, PNG/SVG çıktısını etkilemez.
 
@@ -125,6 +126,10 @@ Bir nesne seçildiğinde ek işlemler görünür: **Çoğalt**, **Sil**, öne/ar
 - **Katmanlar** — Referans görsel, Kara, Arazi, Yükselti, Bölgeler, Nehirler, Yollar, Semboller, Kaynaklar, Harita bağlantıları, Ölçümler, Etiketler, Kaplama olmak üzere 13 katman; her biri görünürlük ve opaklık kontrolüyle açılıp kapatılabilir, sıralanabilir. Bunlara ek olarak **"+ Katman ekle"** ile en fazla 12 kendi katmanını ekleyebilirsin: serbest çizim/not katmanları. Adları çift tıkla değiştirilir (dil değişse de değişmez), × ile silinir, yerleşik katmanlarla aynı şekilde sıralanır ve karışım modu alır. `.json` kaydı bu katmanları içeriğiyle birlikte taşır. **Katman ekleme/silme geri alınamaz** — silme onay ister.
 - **Kütüphane** — Tüm sembol/bina kataloğu; kategoriye göre gezinilebilir ve arama kutusuyla filtrelenebilir. Kendi PNG sembolünüzü de yükleyip kütüphaneye ekleyebilirsiniz. İzometrik binalarda malzeme/çatı varyantları arasında yaşlanma (yosunlu, yanık, yıpranmış) ve kültürel çeşitlilik (kilden/kerpiç, bambu, Doğu Asya pagoda kuleleri) temaları da bulunur; binaların altında artık yuvarlak zemin diski yok.
 - **Geçmiş** — Yapılan işlemlerin (fırça darbesi, nesne ekleme/silme vb.) kronolojik listesi; herhangi bir adıma geri dönülebilir.
+- **Bölgeler** — İki alt bölüm: adlandırılmış siyasi bölgelerin listesi (tıklayınca seçilir ve tuval o bölgeye kayar) ve tüm harita ağacının (dünya haritası + iç içe geçmiş her bölge bağlantısı) girintili, tıklanabilir bir görünümü — herhangi bir düğüme tıklayarak doğrudan o alt haritaya atlanır, ayrı ayrı "◀ Geri"lere basmaya gerek yoktur.
+- **Görevler** — Tarayıcının `localStorage`'ında tutulan, basit tıklanabilir bir yapılacaklar listesi (ekle / işaretle / sil). Belirli bir projeye değil, tüm oturuma aittir.
+
+Sol ve sağ panellerin dış kenarında birer **kolçak düğmesi** bulunur; tuvale daha fazla yer açmak için paneli tek tıkla kapatıp tekrar açabilirsiniz.
 
 ## Diğer özellikler
 
@@ -157,17 +162,21 @@ Türkçe arayüzde Arapça yer adı yazan biri de doğru sonucu alır.
 viewport'a bağlı büyür, üst sınır çok büyük ekranda satır uzunluğunu okunur tutar.
 640 piksel altında kart ızgaraları tek sütuna iner ve formlar tam genişliğe yayılır.
 
-**Editör masaüstü yerleşimi gerektirir.** Araç rayı + tuval + katman paneli yan yana
-çalışan üç sütunlu sabit bir düzendir; **1024 × 600 pikselin** altında tuval sütunu
-sıfıra düşer. Bu ölçünün altında bozuk bir arayüz göstermek yerine ne gerektiğini
-açıklayan bir bilgi ekranı çıkar (`#view-narrow`) ve mevcut ekran ölçüsünü gösterir.
-Eşik `UI.EDITOR_MIN_W` / `UI.EDITOR_MIN_H` ile tanımlıdır; cihaz yatay çevrilip yer
-açıldığında editöre kendiliğinden dönülür, daraldığında bilgi ekranına geçilir
-(geçmeden önce sessiz oto-kayıt çalışır, çizim kaybolmaz).
+**Editör artık her ekran boyutunda açılır — eski "ekran çok küçük" kapısı kaldırıldı.**
+Araç rayı + tuval + katman paneli yan yana çalışan üç sütunlu düzen ~860 piksel
+altında tek sütuna iner; sol ve sağ paneller tuvalin üzerine kayan çekmecelere
+dönüşür (kolçak düğmesiyle açılıp kapatılır, editöre ilk girişte dar ekranlarda
+varsayılan kapalı başlarlar ki tuval hemen görünür olsun). Bu, çekirdek düzeyde
+bir mobil destektir — telefon/tablette editör açılır ve kullanılabilir, ama
+derinlemesine dokunmatik-arayüz cilası (uzun basma menüleri, jest kütüphanesi
+vb.) henüz hedeflenmiyor.
 
-Dokunmatik cihazlarda editör henüz hedeflenmiyor: çizim `pointer` olaylarıyla çalışır
-ve yol araçları çift dokunmayla bitirilebilir, ancak yakınlaştırma yalnızca fare
-tekerleğine bağlıdır (pinch-zoom yoktur) ve bazı kontroller parmak için küçüktür.
+Dokunmatik cihazlarda çizim `pointer` olaylarıyla çalışır, yol araçları çift
+dokunmayla bitirilebilir, ve **iki parmakla yakınlaştırma/kaydırma (pinch-zoom)**
+desteklenir: ikinci parmak indiğinde birinci parmağın başlattığı tekli işlem
+(varsa) önce düzgünce tamamlanır, sonra iki parmak birlikte tuvali yakınlaştırıp
+kaydırır. Dar ekranlarda dokunma hedefleri (araç kareleri, sekmeler, düğmeler)
+büyütülür; üst araç çubuğu sığmadığında kendi içinde yatay kaydırılabilir.
 
 ## Mimari (geliştiriciler için)
 
