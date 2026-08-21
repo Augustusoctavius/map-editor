@@ -3,8 +3,10 @@
    ============================================================ */
 #canvas-area{
   position:relative;overflow:hidden;
+  /* Koyu ama saf siyah değil — markanın deri/pirinç paletindeki ink
+     tonlarından bir gradyan, tuvalin etrafını "kapalı" değil "loş" hissettirir. */
   background:
-    radial-gradient(120% 90% at 50% 0%,#201a12 0%,#0f0b07 100%);
+    radial-gradient(120% 90% at 50% 0%,var(--ink-800) 0%,var(--ink-900) 100%);
 }
 #canvas-area::after{
   content:"";position:absolute;inset:0;pointer-events:none;

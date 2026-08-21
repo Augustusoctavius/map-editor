@@ -1309,7 +1309,8 @@
       };
     },
 
-    generateLandmass: function (template, roughness, seed) {
+    generateLandmass: function (template, roughness, seed, opts) {
+      opts = opts || {};
       var L = Layers.get('landmass');
       if (L.locked) { UI.msg(UI.t('locked')); return; }
       var w = L.canvas.width, h = L.canvas.height;
@@ -1320,72 +1321,112 @@
       var octaves = 3 + Math.round(roughness*3);      /* 3..6 */
       var freq = 2.2 + roughness*4;                    /* pürüzlülük arttıkça daha sık desen */
 
-      /* ---- kaynak noktaları (tohum) — şablona göre 1..9 arası ----
-         Bunlar artık analitik bir daireye "falloff" ile değil, aşağıdaki
+      /* ---- kaynak noktaları (tohum) — şablona göre değişen sayıda ----
+         Bunlar analitik bir daireye "falloff" ile değil, aşağıdaki
          blobFill() ile ızgara üzerinde rastgele bir su baskını (flood-fill)
          gibi yayılıyor; bu, Azgaar's Fantasy Map Generator'ın "en basit ve
          en iyi sonuç veren" yükselti algoritmasıyla aynı fikir: komşu
          hücrelere geçişte küçük rastgele bir çürüme (decay) uygulamak,
          analitik dairelerin asla üretemeyeceği koy/yarımada/parmak gibi
-         gerçekçi, düzensiz kıyı biçimleri doğurur. */
-      var seeds = [];
-      if (template === 'island') {
-        var ibCount = 3 + Math.floor(noise.next() * 4);  /* 3..6 */
-        for (var ib = 0; ib < ibCount; ib++) {
-          seeds.push({
-            x: 0.5 + (noise.next() - 0.5) * 0.30,
-            y: 0.5 + (noise.next() - 0.5) * 0.30,
-            r: 0.12 + noise.next() * 0.15,
-            h: ib === 0 ? 1.0 : 0.55 + noise.next() * 0.3
-          });
-        }
-      } else if (template === 'archipelago') {
-        var count = 5 + Math.floor(noise.next()*5);
-        for (var ii = 0; ii < count; ii++) {
-          seeds.push({
-            x: 0.15 + noise.next()*0.7, y: 0.15 + noise.next()*0.7,
-            r: 0.10 + noise.next()*0.14,
-            h: 0.75 + noise.next() * 0.25
-          });
-        }
-      } else if (template === 'tectonic') {
-        /* Fay hattı şablonu: tohumlar dairesel bir kümede değil, kıvrılarak
-           ilerleyen tek bir çizgi (fay hattı) boyunca diziliyor. Bu, kıta/
-           ada şablonlarının asla üretemeyeceği uzun, sırt gibi bir siluet
-           doğurur — dağ silsilesiyle omurgalanmış bir kıta hissi verir.
-           Uçlara doğru yükseklik düşer (h küçülür) böylece fay hattının iki
-           ucu ince bir yarımada gibi sivrilir, ortası geniş kalır. */
-        var flen = 6 + Math.floor(noise.next() * 3);      /* 6..8 fay adımı */
-        var fx = 0.16 + noise.next() * 0.12;
-        var fy = 0.20 + noise.next() * 0.15;
-        var fang = -0.35 + noise.next() * 0.7;              /* başlangıç yönü */
-        for (var fseg = 0; fseg <= flen; fseg++) {
-          var branch = 2 + Math.floor(noise.next() * 2);    /* fay hattının eni */
-          for (var fb = 0; fb < branch; fb++) {
-            var off = (noise.next() - 0.5) * 0.10;
+         gerçekçi, düzensiz kıyı biçimleri doğurur.
+
+         "boost" parametresi, aşağıdaki kapsama-garantisi döngüsünün
+         (coverage retry) her denemede tohum yarıçaplarını/sayısını
+         büyütmesini sağlar — sonuç istenen minimum kara oranına ulaşana
+         kadar. Takımada'da boost SADECE ada başına yarıçapı ve küme
+         sayısını büyütür, aralarındaki minimum boşluğu KORUR — böylece
+         büyüdükçe adalar birbirine kaynaşıp tek kıtaya dönüşmez. */
+      function buildSeeds(boost) {
+        var seeds = [];
+        if (template === 'island') {
+          /* Tek, büyükçe bir ada: baskın bir gövde + gövdeye örtüşen birkaç
+             lob (düzensiz kıyı için) + bazen ayrı küçük bir uydu adacık. */
+          var cx = 0.5 + (noise.next() - 0.5) * 0.16;
+          var cy = 0.5 + (noise.next() - 0.5) * 0.16;
+          /* Taban yarıçap kasıtlı olarak mütevazı tutulur — kapsama garantisi
+             döngüsü zaten gerektiğinde boost ile büyütecek; büyük bir taban +
+             cömert loblar birleşince (özellikle yüksek pürüzlülükte) ada
+             kolayca tuvalin tamamına yakınını kaplayıp "kıta" gibi
+             görünüyordu. */
+          var mainR = (0.15 + noise.next() * 0.06) * Math.min(2.1, boost);
+          seeds.push({ x:cx, y:cy, r:mainR, h:1.0 });
+          var lobes = 2 + Math.floor(noise.next() * 2); /* 2..3 */
+          for (var li = 0; li < lobes; li++) {
+            var lAng = noise.next() * Math.PI * 2;
+            var lDist = mainR * (0.30 + noise.next() * 0.30);
             seeds.push({
-              x: fx + Math.cos(fang + Math.PI/2) * off,
-              y: fy + Math.sin(fang + Math.PI/2) * off,
-              r: 0.11 + noise.next() * 0.11,
-              h: (fseg === 0 || fseg === flen) ? 0.5 + noise.next()*0.25 : 0.85 + noise.next()*0.15
+              x: cx + Math.cos(lAng) * lDist, y: cy + Math.sin(lAng) * lDist,
+              r: mainR * (0.30 + noise.next() * 0.30),
+              h: 0.65 + noise.next() * 0.3
             });
           }
-          fang += (noise.next() - 0.5) * 0.6;               /* fay hattı kıvrılır */
-          var fstep = 0.07 + noise.next() * 0.04;
-          fx = Math.max(0.08, Math.min(0.92, fx + Math.cos(fang) * fstep));
-          fy = Math.max(0.08, Math.min(0.92, fy + Math.sin(fang) * fstep));
+          if (noise.next() < 0.5) {
+            var sAng = noise.next() * Math.PI * 2;
+            var sDist = mainR * (1.5 + noise.next() * 0.8);
+            seeds.push({
+              x: cx + Math.cos(sAng) * sDist, y: cy + Math.sin(sAng) * sDist,
+              r: mainR * (0.15 + noise.next() * 0.15),
+              h: 0.5 + noise.next() * 0.25
+            });
+          }
+        } else if (template === 'archipelago') {
+          /* Ayrı ayrı ada kümeleri: her küme kendi merkezinde, önceki
+             kümelerin en az (yarıçaplar toplamı × ayırma-katsayısı) kadar
+             uzağına reddet-örnekle (rejection sampling) yerleştirilir —
+             adalar tek bir büyük kara parçasında birleşmez. Yarıçap
+             büyümesi kasıtlı olarak DAR bir aralıkta sınırlı (en fazla
+             ~1.7×) — aksi hâlde tek bir ada continent kadar büyüyüp
+             "takımada" yerine "küçük kıta + birkaç adacık" gibi
+             görünüyordu. Kapsam artışı bunun yerine daha çok ada sayısından
+             (clusterCount) gelir. */
+          var clusterCount = 5 + Math.floor(noise.next() * 4);
+          var placed = [];
+          /* SEP*(yarıçaplar toplamı) her aday merkezinin çevresindeki
+             "yasak disk"i belirler — SEP çok büyükse (ör. 2+) altı-sekiz
+             adayı 0.8×0.8'lik kutuya sığdırmak matematiksel olarak
+             imkânsız hâle gelir (yasak diskler kutudan büyür) ve neredeyse
+             hiçbir aday yerleşemez. 1.6 gerçekçi bir alt sınır: adalar
+             belirgin biçimde ayrı kalır ama paketleme genelde başarılı olur.
+             Yine de kötü şanslı bir tohumda tüm denemeler tükenirse, adayı
+             tamamen atmak yerine son denenen konuma YERLEŞTİRİRİZ — yumuşak
+             bir kısıt, adaların "yakın ama yine de ayrı" kalmasını sağlar. */
+          var SEP = 1.6;
+          for (var ci = 0; ci < clusterCount; ci++) {
+            var ccx, ccy, cr, tries = 0, ok = false;
+            do {
+              ccx = 0.10 + noise.next() * 0.80;
+              ccy = 0.10 + noise.next() * 0.80;
+              cr = (0.095 + noise.next() * 0.075) * Math.min(1.7, boost);
+              ok = placed.every(function (p) {
+                return Math.hypot(ccx - p.x, ccy - p.y) >= (cr + p.r) * SEP;
+              });
+              tries++;
+            } while (!ok && tries < 40);
+            placed.push({ x:ccx, y:ccy, r:cr });
+            seeds.push({ x:ccx, y:ccy, r:cr, h: 0.8 + noise.next() * 0.2 });
+            if (noise.next() < 0.7) {
+              var isAng = noise.next() * Math.PI * 2;
+              var isDist = cr * (1.7 + noise.next() * 1.1);
+              seeds.push({
+                x: ccx + Math.cos(isAng) * isDist, y: ccy + Math.sin(isAng) * isDist,
+                r: cr * (0.25 + noise.next() * 0.25),
+                h: 0.55 + noise.next() * 0.3
+              });
+            }
+          }
+        } else { /* continent */
+          var cbCount = 4 + Math.floor(noise.next() * 4);  /* 4..7 */
+          var cCX = 0.5 + (noise.next() - 0.5) * 0.18, cCY = 0.5 + (noise.next() - 0.5) * 0.12;
+          for (var cbi = 0; cbi < cbCount; cbi++) {
+            seeds.push({
+              x: cCX + (noise.next() - 0.5) * 0.42,
+              y: cCY + (noise.next() - 0.5) * 0.32,
+              r: (0.16 + noise.next() * 0.20) * Math.min(1.7, boost),
+              h: cbi === 0 ? 1.0 : 0.6 + noise.next() * 0.3
+            });
+          }
         }
-      } else { /* continent */
-        var cbCount = 4 + Math.floor(noise.next() * 4);  /* 4..7 */
-        var cCX = 0.5 + (noise.next() - 0.5) * 0.18, cCY = 0.5 + (noise.next() - 0.5) * 0.12;
-        for (var cbi = 0; cbi < cbCount; cbi++) {
-          seeds.push({
-            x: cCX + (noise.next() - 0.5) * 0.42,
-            y: cCY + (noise.next() - 0.5) * 0.32,
-            r: 0.16 + noise.next() * 0.20,
-            h: cbi === 0 ? 1.0 : 0.6 + noise.next() * 0.3
-          });
-        }
+        return seeds;
       }
 
       /* Çok kaynaklı, rastgele-çürümeli taşkın doldurma: her tohumdan
@@ -1430,22 +1471,49 @@
         return hgt;
       }
 
-      var heightGrid = blobFill(N, seeds, roughness, noise);
+      /* ---- kapsama garantisi ----
+         Kullanıcı beklentisi: Kıta tuvalin en az %40'ını, Ada/Takımada en
+         az %20'sini kaplamalı. Ucuz N×N ızgara üzerinde tahmini kapsamı
+         ölçüp yetersizse tohumları büyüterek yeniden dener (aynı `noise`
+         nesnesi kullanıldığından hâlâ tohuma göre tam deterministik). */
+      var TARGET_COVERAGE = { continent:0.40, island:0.20, archipelago:0.20 };
+      var target = TARGET_COVERAGE[template] || 0;
+      var heightGrid, small, sctx, img;
+      var bestCoverage = -1, bestHeightGrid = null, bestImg = null;
+      var boost = 1;
+      for (var attempt = 0; attempt < 6; attempt++) {
+        var seeds = buildSeeds(boost);
+        heightGrid = blobFill(N, seeds, roughness, noise);
 
-      var small = document.createElement('canvas'); small.width = N; small.height = N;
-      var sctx = small.getContext('2d');
-      var img = sctx.createImageData(N, N);
-      for (var gy = 0; gy < N; gy++) {
-        for (var gx = 0; gx < N; gx++) {
-          var base = noise.fbm(gx/N*freq, gy/N*freq, octaves, 0.5);
-          var falloff = heightGrid[gy*N+gx];
-          var value = (falloff - 0.5) + base*(0.22 + roughness*0.5);
-          var a = Math.max(0, Math.min(1, value/0.12 + 0.5));
-          var idx = (gy*N+gx)*4;
-          img.data[idx] = 20; img.data[idx+1] = 20; img.data[idx+2] = 20;
-          img.data[idx+3] = Math.round(a*255);
+        small = document.createElement('canvas'); small.width = N; small.height = N;
+        sctx = small.getContext('2d');
+        img = sctx.createImageData(N, N);
+        var landCells = 0;
+        for (var gy = 0; gy < N; gy++) {
+          for (var gx = 0; gx < N; gx++) {
+            var base = noise.fbm(gx/N*freq, gy/N*freq, octaves, 0.5);
+            var falloff = heightGrid[gy*N+gx];
+            var value = (falloff - 0.5) + base*(0.22 + roughness*0.5);
+            var a = Math.max(0, Math.min(1, value/0.12 + 0.5));
+            var idx = (gy*N+gx)*4;
+            img.data[idx] = 20; img.data[idx+1] = 20; img.data[idx+2] = 20;
+            var av = Math.round(a*255);
+            img.data[idx+3] = av;
+            if (av > 127) landCells++;
+          }
         }
+        var coverage = landCells/(N*N);
+        /* Rastgele yerleşim (özellikle takımada'nın reddet-örnekle adacık
+           paketlemesi) her denemede monoton büyümeyebilir — boost arttıkça
+           daha fazla ada istenip alan yetersiz kalınca bazı adaların hiç
+           yerleşememesiyle kapsam gerileyebilir. Bu yüzden hedefe ulaşan
+           İLK sonucu değil, GÖRÜLEN EN İYİ sonucu saklarız. */
+        if (coverage > bestCoverage) { bestCoverage = coverage; bestHeightGrid = heightGrid; bestImg = img; }
+        if (coverage >= target) break;
+        boost *= 1.35;
       }
+      heightGrid = bestHeightGrid;
+      img = bestImg;
       sctx.putImageData(img, 0, 0);
 
       /* CSS blur filtresi + getImageData, piksel sayısıyla orantılı maliyetli —
@@ -1485,6 +1553,122 @@
 
       History.pushRaster('landmass', before, L.canvas, {x:0,y:0,w:w,h:h}, 'landgen:'+template);
       Cv.shoreDirty = true;
+      UI.refreshHistory();
+
+      /* opsiyonel: aynı düşük-çözünürlüklü yükseklik gridinden bir yükselti
+         katmanı da türet — "nehir"/"arazi" seçenekleri bunu kullanır, ayrı
+         bir geri-alma adımı olarak eklenir. */
+      if (opts.withElevation) this._paintGeneratedElevation(heightGrid, N, seed);
+
+      Cv.requestRender();
+    },
+
+    /* generateLandmass ile aynı N×N yükseklik gridinden (heightGrid, 0..~1
+       "çekirdeklik" değeri) grayscale bir yükselti katmanı boyar — autoBiome
+       ve generateRivers'ın beklediği kodlamayla aynı: R=G=B gri seviye,
+       alfa o pikseldeki verinin "gücü" (bkz. autoBiome'daki ea/height
+       formülü). Kıyıya yakın hücreler zayıf alfa ile deniz seviyesine
+       (128) yakın kalır, iç kesimler daha güçlü ve daha yüksek çıkar. */
+    _paintGeneratedElevation: function (heightGrid, N, seed) {
+      var Ev = Layers.get('elevation');
+      if (!Ev || Ev.locked) return;
+      var w = Ev.canvas.width, h = Ev.canvas.height;
+      var before = snap(Ev.canvas);
+      var rnd = this._noiseGrid(((seed >>> 0) + 0x9e3779b9) >>> 0);
+
+      var small = document.createElement('canvas'); small.width = N; small.height = N;
+      var sctx = small.getContext('2d');
+      var img = sctx.createImageData(N, N);
+      for (var gy = 0; gy < N; gy++) {
+        for (var gx = 0; gx < N; gx++) {
+          var idx = (gy*N+gx)*4;
+          var f = heightGrid[gy*N+gx];
+          if (f <= 0.02) continue; /* deniz: boyanmamış bırak (alfa 0) */
+          var rough = rnd.fbm(gx/N*3.4, gy/N*3.4, 4, 0.55);
+          var peak = Math.pow(f, 1.5) * (0.55 + rough*0.45);
+          var gray = Math.round(128 + Math.min(1, peak) * 110);
+          img.data[idx] = gray; img.data[idx+1] = gray; img.data[idx+2] = gray;
+          img.data[idx+3] = Math.round(Math.min(1, 0.35 + f*0.9) * 255);
+        }
+      }
+      sctx.putImageData(img, 0, 0);
+
+      Ev.ctx.clearRect(0, 0, w, h);
+      Ev.ctx.imageSmoothingEnabled = true;
+      Ev.ctx.drawImage(small, 0, 0, w, h);
+
+      History.pushRaster('elevation', before, Ev.canvas, {x:0,y:0,w:w,h:h}, 'landgen:elevation');
+      Cv.elevationDirty = true;
+      UI.refreshHistory();
+    },
+
+    /* ================= GÖL OTOMATİK ÜRETİMİ =================
+       Kıyıdan yeterince uzak, çevresi tamamen kara olan iç noktaları
+       (autoBiome'daki gibi ucuz bir N×N ızgara üzerinde) bulup birkaçına
+       düzensiz kapalı bir çokgen (göl) yerleştirir — 'rivers' katmanında
+       kind:'lake' olarak, elle "Göl" aracıyla çizilenle aynı biçimde. */
+    autoLakes: function (seed) {
+      var Lm = Layers.get('landmass'), Rv = Layers.get('rivers');
+      if (!Lm || !Rv) return;
+      if (Rv.locked) { UI.msg(UI.t('locked')); return; }
+      var w = Lm.canvas.width, h = Lm.canvas.height;
+      var rnd = this._noiseGrid((seed >>> 0) || Math.floor(Math.random()*4294967296));
+
+      var N = Math.max(40, Math.min(120, Math.round(Math.min(w,h)/40)));
+      var sw = N, sh = Math.max(1, Math.round(N * h/w));
+      var lc = document.createElement('canvas'); lc.width = sw; lc.height = sh;
+      var lctx = lc.getContext('2d', { willReadFrequently:true });
+      lctx.drawImage(Lm.canvas, 0, 0, sw, sh);
+      var land = lctx.getImageData(0, 0, sw, sh).data;
+
+      function isLand(gx, gy) {
+        if (gx < 0 || gy < 0 || gx >= sw || gy >= sh) return false;
+        return land[(gy*sw+gx)*4+3]/255 > 0.5;
+      }
+
+      var margin = Math.max(2, Math.round(Math.min(sw,sh)*0.035));
+      var candidates = [];
+      for (var gy = 0; gy < sh; gy++) {
+        for (var gx = 0; gx < sw; gx++) {
+          if (!isLand(gx, gy)) continue;
+          var ok = true;
+          for (var oy = -margin; oy <= margin && ok; oy += margin) {
+            for (var ox = -margin; ox <= margin && ok; ox += margin) {
+              if (!isLand(gx+ox, gy+oy)) ok = false;
+            }
+          }
+          if (ok) candidates.push({ gx:gx, gy:gy });
+        }
+      }
+      if (!candidates.length) { UI.msg(UI.t('lakegen_none')); return; }
+
+      var before = JSON.parse(JSON.stringify(Rv.objects));
+      var wanted = 1 + Math.floor(rnd.next()*3); /* 1..3 göl */
+      var placed = [];
+      var minSepCells = margin*3;
+      var made = 0, tries = 0;
+      while (made < wanted && tries < candidates.length*2) {
+        tries++;
+        var c = candidates[Math.floor(rnd.next()*candidates.length)];
+        var tooClose = placed.some(function (p) { return Math.hypot(p.gx-c.gx, p.gy-c.gy) < minSepCells; });
+        if (tooClose) continue;
+        placed.push(c);
+
+        var cx = (c.gx+0.5)/sw*w, cy = (c.gy+0.5)/sh*h;
+        var baseR = Math.min(w,h) * (0.012 + rnd.next()*0.018);
+        var segs = 10 + Math.floor(rnd.next()*6);
+        var pts = [];
+        for (var s = 0; s < segs; s++) {
+          var ang = (s/segs) * Math.PI*2;
+          var rr = baseR * (0.65 + rnd.next()*0.6);
+          pts.push([cx + Math.cos(ang)*rr, cy + Math.sin(ang)*rr]);
+        }
+        Rv.objects.push({ id:uid(), kind:'lake', pts:pts, color:App.lake.color, opacity:App.lake.opacity });
+        made++;
+      }
+      if (!made) { UI.msg(UI.t('lakegen_none')); return; }
+
+      History.pushVector('rivers', before, JSON.parse(JSON.stringify(Rv.objects)), 'lakegen');
       UI.refreshHistory();
       Cv.requestRender();
     },

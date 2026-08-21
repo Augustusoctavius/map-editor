@@ -37,9 +37,11 @@
       sc_pan:'Kaydır', sc_panfast:'Hızlı kaydır', sc_zoom:'Yakınlaştır / uzaklaştır', sc_fit:'Tümünü sığdır',
       sc_finish:'Yolu bitir', sc_cancel:'İptal / seçimi kaldır', sc_delete:'Seçileni sil', sc_rotsym:'Sembolü döndür', sc_help:'Bu ekranı aç', t_lasso:'Kement', h_lasso:'Sürükleyerek kapalı bir alan çiz: Kara + Arazi + Yükselti o alanda birlikte kaldırılıp taşınabilir hâle gelir. Sürükleyerek taşı, üstteki tutamaçla döndür. Enter ile onayla, Escape ile iptal et, Delete ile alanı tamamen sil.',
       o_landmass:'Kara / Kıyı', o_brushsize:'Fırça boyutu', o_rough:'Kıyı sertliği',
-      o_landcolor:'Kara rengi', o_shorew:'Kıyı genişliği', o_shorestyle:'Kıyı stili', o_shore_sandy:'Kumsal', o_shore_rocky:'Kayalık', o_shore_reef:'Resif',
+      o_landcolor:'Kara rengi', o_seacolor:'Deniz rengi', o_shorew:'Kıyı genişliği', o_shorestyle:'Kıyı stili', o_shore_sandy:'Kumsal', o_shore_rocky:'Kayalık', o_shore_reef:'Resif',
       o_smooth:'Kıyıyı yumuşat', o_clearland:'Karayı temizle',
-      h_landmass:'Sürükleyerek kara çiz. "Deniz" aracı hem karayı hem araziyi siler.', o_landgen:'Rastgele kara üret', o_landgentpl:'Şablon', o_landgen_continent:'Kıta', o_landgen_island:'Ada', o_landgen_archipelago:'Takımada', o_landgen_tectonic:'Tektonik', o_landgenrough:'Detay / pürüzlülük', o_landgen_go:'🎲 Üret', h_landgen:'Mevcut kara katmanının yerine geçer. Aynı ayarlarla tekrar tıklayınca yeni bir rastgele sonuç üretir.',
+      h_landmass:'Sürükleyerek kara çiz. "Deniz" aracı hem karayı hem araziyi siler.', o_landgen:'Rastgele kara üret', o_landgentpl:'Şablon', o_landgen_continent:'Kıta', o_landgen_island:'Ada', o_landgen_archipelago:'Takımada', o_landgenrough:'Detay / pürüzlülük',
+      o_landgen_rivers:'Nehir ekle', o_landgen_lakes:'Göl ekle', o_landgen_terrain:'Arazi ekle', lakegen_none:'Uygun göl konumu bulunamadı.',
+      o_landgen_go:'🎲 Üret', h_landgen:'Mevcut kara katmanının yerine geçer. Aynı ayarlarla tekrar tıklayınca yeni bir rastgele sonuç üretir.',
       o_terrain:'Arazi boyama', o_opacity:'Opaklık', o_clip:'Sadece karaya boya',
       o_biomegen:'Biyomu otomatik ata', o_biomegen_go:'🌍 Biyom ata', h_biomegen:'Yükselti ve enleme göre arazi katmanını otomatik doldurur; mevcut arazi katmanının yerine geçer.', biomegen_empty:'Önce kara çizilmeli.',
       o_rivergen:'Nehirleri otomatik üret', o_rivergen_go:'💧 Nehir üret', h_rivergen:'Yükselti gridinden denize akan nehirler ekler. "Yükselti" fırçasıyla dağ/tepe çizilmiş olması gerekir.', rivergen_noelev:'Önce "Yükselti" fırçasıyla dağ/tepe çizilmeli.', rivergen_none:'Uygun nehir kaynağı bulunamadı.',
@@ -123,9 +125,11 @@
       sc_pan:'Pan', sc_panfast:'Pan faster', sc_zoom:'Zoom in / out', sc_fit:'Fit to view',
       sc_finish:'Finish path', sc_cancel:'Cancel / deselect', sc_delete:'Delete selection', sc_rotsym:'Rotate symbol', sc_help:'Open this screen', t_lasso:'Lasso', h_lasso:'Drag to draw a closed area: Land + Terrain + Elevation are lifted together within it and become movable. Drag to move, use the top handle to rotate. Enter to commit, Escape to cancel, Delete to remove the area entirely.',
       o_landmass:'Landmass / Coast', o_brushsize:'Brush size', o_rough:'Coast roughness',
-      o_landcolor:'Land colour', o_shorew:'Shore width', o_shorestyle:'Shore style', o_shore_sandy:'Sandy', o_shore_rocky:'Rocky', o_shore_reef:'Reef',
+      o_landcolor:'Land colour', o_seacolor:'Sea colour', o_shorew:'Shore width', o_shorestyle:'Shore style', o_shore_sandy:'Sandy', o_shore_rocky:'Rocky', o_shore_reef:'Reef',
       o_smooth:'Smooth coastline', o_clearland:'Clear landmass',
-      h_landmass:'Drag to paint land. The "Sea" tool erases both land and terrain.', o_landgen:'Generate random land', o_landgentpl:'Template', o_landgen_continent:'Continent', o_landgen_island:'Island', o_landgen_archipelago:'Archipelago', o_landgen_tectonic:'Tectonic', o_landgenrough:'Detail / roughness', o_landgen_go:'🎲 Generate', h_landgen:'Replaces the current land layer. Click again with the same settings for a new random result.',
+      h_landmass:'Drag to paint land. The "Sea" tool erases both land and terrain.', o_landgen:'Generate random land', o_landgentpl:'Template', o_landgen_continent:'Continent', o_landgen_island:'Island', o_landgen_archipelago:'Archipelago', o_landgenrough:'Detail / roughness',
+      o_landgen_rivers:'Add rivers', o_landgen_lakes:'Add lakes', o_landgen_terrain:'Add terrain', lakegen_none:'No suitable lake spot found.',
+      o_landgen_go:'🎲 Generate', h_landgen:'Replaces the current land layer. Click again with the same settings for a new random result.',
       o_terrain:'Terrain painting', o_opacity:'Opacity', o_clip:'Paint on land only',
       o_biomegen:'Auto-assign biomes', o_biomegen_go:'🌍 Assign biomes', h_biomegen:'Fills the terrain layer automatically by elevation and latitude; replaces the current terrain layer.', biomegen_empty:'Draw land first.',
       o_rivergen:'Auto-generate rivers', o_rivergen_go:'💧 Generate rivers', h_rivergen:'Adds rivers flowing to the sea from the elevation grid. Requires mountains/hills painted with the "Elevation" brush.', rivergen_noelev:'Paint mountains/hills with the "Elevation" brush first.', rivergen_none:'No suitable river source found.',
@@ -1612,6 +1616,10 @@
       return App.selection && App.selection.layerId === layerId;
     },
 
+    /* "Rastgele kara üret" uyarı modalının yalnızca ilk seferinde
+       gösterildiğini hatırlamak için localStorage bayrağı. */
+    LANDGEN_WARNED_KEY: 'wayborne_landgen_warned',
+
     /* ================= araç seçenekleri ================= */
     bindOptions: function () {
       var self = this;
@@ -1621,6 +1629,7 @@
       this.range('lm-rough', 'v-lm-rough', function (v) { App.brush.roughness = v/100; },
                  function (v) { return (v/100).toFixed(2); });
       on('lm-color', 'input', function (e) { App.brush.color = e.target.value; });
+      on('sea-color', 'input', function (e) { App.sea.color = e.target.value; Cv.setSeaColor(e.target.value); });
       this.range('shore-w', 'v-shore-w', function (v) {
         Cv.shoreWidth = v; Cv.shoreDirty = true;
       });
@@ -1633,9 +1642,30 @@
       on('lg-template', 'change', function (e) { App.landgen.template = e.target.value; });
       self.range('lg-rough', 'v-lg-rough', function (v) { App.landgen.roughness = v/100; },
                  function (v) { return (v/100).toFixed(2); });
+      on('lg-rivers', 'change', function (e) { App.landgen.rivers = e.target.checked; });
+      on('lg-lakes', 'change', function (e) { App.landgen.lakes = e.target.checked; });
+      on('lg-terrain', 'change', function (e) { App.landgen.terrain = e.target.checked; });
+
+      /* Kara + (istenirse) yükselti/nehir/göl/arazi'yi tek tıkla, tek bir
+         tohumdan üretir. Uyarı modalı yalnızca İLK seferde gösterilir —
+         localStorage bayrağı kalıcı, her "Üret" tıklamasında tekrar
+         sormaya gerek yok. */
+      function runLandgen() {
+        var seed = Math.floor(Math.random()*4294967296);
+        var withRivers = App.landgen.rivers, withTerrain = App.landgen.terrain;
+        Tools.generateLandmass(App.landgen.template, App.landgen.roughness, seed,
+          { withElevation: withRivers || withTerrain });
+        if (withTerrain) Tools.autoBiome(seed);
+        if (withRivers) Tools.generateRivers(null, seed);
+        if (App.landgen.lakes) Tools.autoLakes(seed);
+      }
       on('btn-landgen', 'click', function () {
+        var warned = false;
+        try { warned = !!localStorage.getItem(self.LANDGEN_WARNED_KEY); } catch (e) {}
+        if (warned) { runLandgen(); return; }
         self.modal(self.t('o_landgen'), '<p>' + self.t('h_landgen') + '</p>', function () {
-          Tools.generateLandmass(App.landgen.template, App.landgen.roughness, Math.floor(Math.random()*4294967296));
+          try { localStorage.setItem(self.LANDGEN_WARNED_KEY, '1'); } catch (e) {}
+          runLandgen();
         });
       });
 

@@ -10,7 +10,8 @@
     exportReference: false,
 
     brush:   { size:120, roughness:0.35, color:'#ded0ac' },
-    landgen: { template:'continent', roughness:0.5 },
+    landgen: { template:'continent', roughness:0.5, rivers:false, lakes:false, terrain:false },
+    sea:     { color:'#7ba8bd' },
     terrain: { type:'grassland', size:160, opacity:0.85, clip:true },
     symbol:  { id:'ik_knight', size:72, rot:0, hue:0, opacity:1, wear:0, jitter:false,
                brushMode:false, brushDensity:0.5, clipToLand:true },

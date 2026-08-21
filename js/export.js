@@ -631,6 +631,7 @@
         gridType:Cv.gridType, gridSize:Cv.gridSize,
         gridColor:Cv.gridColor, gridOpacity:Cv.gridOpacity,
         shore:Cv.shore, shoreWidth:Cv.shoreWidth, shoreStyle:Cv.shoreStyle, frame:Cv.frame,
+        seaColor:Cv.seaColor,
         elevShowHillshade:App.elevation.showHillshade,
         elevShowContours:App.elevation.showContours,
         elevContourInterval:App.elevation.contourInterval,
@@ -683,6 +684,8 @@
       Cv.shoreWidth = d.shoreWidth || 26;
       Cv.shoreStyle = d.shoreStyle || 'sandy';
       Cv.frame = d.frame || { style:'none', color:'#3a2b18', width:24 };
+      Cv.setSeaColor(d.seaColor || '#7ba8bd');
+      App.sea.color = Cv.seaColor;
       App.elevation.showHillshade = d.elevShowHillshade !== false;
       App.elevation.showContours = !!d.elevShowContours;
       App.elevation.contourInterval = d.elevContourInterval || 32;
@@ -704,6 +707,7 @@
       document.getElementById('chk-shore').checked = Cv.shore;
       document.getElementById('ref-export').checked = App.exportReference;
       document.getElementById('sel-canvas-size').value = String(d.W||2048);
+      var _sc=document.getElementById('sea-color'); if (_sc) _sc.value = Cv.seaColor;
       document.getElementById('shore-w').value = Cv.shoreWidth;
       document.getElementById('v-shore-w').textContent = Cv.shoreWidth;
       document.getElementById('shore-style').value = Cv.shoreStyle;
